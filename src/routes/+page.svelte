@@ -1,18 +1,25 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import mapboxgl, { type MapLayerMouseEvent } from 'mapbox-gl';
-	import { compileLayer, type CartoKitLayer } from '../lib/compile';
-	import LayerPanel from '../lib/layers/LayerPanel.svelte';
+	import mapboxgl from 'mapbox-gl';
+
+	import { addLayer } from '$lib/interaction/layer';
+	import { addSource } from '$lib/interaction/source';
+	import { instrumentHover } from '$lib/interaction/hover';
+	import { instrumentSelect } from '$lib/interaction/select';
+	import { map as mapStore } from '$lib/stores/map';
+	import { layers } from '$lib/stores/layers';
+	import { selectedFeature } from '$lib/stores/feature';
+	import { mapType } from '$lib/stores/map-type';
+	import ColorPicker from '$lib/components/color/ColorPicker.svelte';
+	import Menu from '$lib/components/shared/Menu.svelte';
+	import Program from '$lib/components/program/Program.svelte';
+	import ColorPalette from '$lib/components/color/ColorPalette.svelte';
+	import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
+	import MenuItem from '$lib/components/shared/MenuItem.svelte';
+	import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
 
 	mapboxgl.accessToken =
 		'pk.eyJ1IjoidG1jdyIsImEiOiJja3FmbGJoNXMxNmx5Mm9uejIxcmpiNjh2In0.2F8HR-8J859J7frYE6DG9g';
-
-	const exampleLayer: CartoKitLayer = {
-		name: 'nifc-fires',
-		type: 'choropleth',
-		data: 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/Fire_History_Perimeters_Public/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson',
-		attribute: ''
-	};
 
 	onMount(() => {
 		const map = new mapboxgl.Map({
@@ -22,50 +29,22 @@
 			zoom: 6
 		});
 
+		mapStore.set(map);
+
 		map.on('load', () => {
-			eval(compileLayer(exampleLayer));
+			$layers.forEach((layer) => {
+				addSource(map, layer);
+				addLayer(map, layer);
 
-			map.addLayer({
-				id: 'nifc-fires',
-				source: 'nifc-fires',
-				type: 'fill',
-				paint: {
-					'fill-color': '#fd6a0b'
-				}
+				instrumentHover(map, layer);
 			});
 
-			map.addLayer({
-				id: 'nifc-fires-hover',
-				type: 'line',
-				source: 'nifc-fires',
-				paint: {
-					'line-color': '#ffffff',
-					'line-width': ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0]
-				}
+			instrumentSelect({
+				map,
+				layers: $layers,
+				selectedFeature,
+				mapType
 			});
-
-			let hoveredFeatureId: string | null = null;
-
-			const onMouseMove = (event: MapLayerMouseEvent) => {
-				if (event.features && event.features.length > 0) {
-					if (hoveredFeatureId !== null) {
-						map.setFeatureState({ source: 'nifc-fires', id: hoveredFeatureId }, { hover: false });
-					}
-
-					hoveredFeatureId = event.features[0].id!.toString();
-					map.setFeatureState({ source: 'nifc-fires', id: hoveredFeatureId }, { hover: true });
-				}
-			};
-
-			const onMouseLeave = () => {
-				if (hoveredFeatureId !== null) {
-					map.setFeatureState({ source: 'nifc-fires', id: hoveredFeatureId }, { hover: false });
-				}
-				hoveredFeatureId = null;
-			};
-
-			map.on('mousemove', 'nifc-fires', onMouseMove);
-			map.on('mouseleave', 'nifc-fires', onMouseLeave);
 		});
 
 		return () => {
@@ -76,10 +55,28 @@
 
 <main class="absolute inset-0">
 	<div class="grid grid-cols-12 h-full w-full">
-		<div class="col-span-2 text-slate-700 bg-slate-100 p-4">
-			<h1 class="text-3xl font-bold pb-2 mb-2 border-b border-b-slate-400">cartokit</h1>
-			<LayerPanel layers={['nifc-fires']} />
-		</div>
-		<div class="col-span-10" id="map" />
+		<div class="col-span-12" id="map" />
+		<Menu className="absolute top-4 right-4 max-w-xl">
+			{#if $selectedFeature}
+				<MenuItem title="Map Type">
+					<MapTypeSelect />
+				</MenuItem>
+			{/if}
+			{#if $mapType === 'Choropleth' && $selectedFeature}
+				<MenuItem title="Attribute">
+					<AttributeSelect selectedFeature={$selectedFeature} />
+				</MenuItem>
+				<MenuItem title="Palette">
+					<ColorPalette />
+				</MenuItem>
+			{:else}
+				<MenuItem title="Fill">
+					<ColorPicker />
+				</MenuItem>
+			{/if}
+			<MenuItem title="Program">
+				<Program />
+			</MenuItem>
+		</Menu>
 	</div>
 </main>

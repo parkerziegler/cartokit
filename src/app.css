@@ -4,7 +4,7 @@
 
 /* Utilities */
 @layer utilities {
-	/* Stack */
+	/* Block Stack */
 	.stack {
 		display: flex;
 		flex-direction: column;
@@ -19,6 +19,22 @@
 		margin-block-start: var(--space, 1.5rem);
 	}
 
+	/* Inline Stack */
+	.stack-h {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+	}
+
+	.stack-h > * {
+		margin-inline: 0;
+	}
+
+	.stack-h > * + * {
+		margin-inline-start: var(--space, 1.5rem);
+	}
+
+	/* Stack Sizes */
 	.stack-xs {
 		--space: 0.5rem;
 	}
@@ -33,5 +49,58 @@
 
 	.stack-lg {
 		--space: 2rem;
+	}
+
+	/* Stack Borders */
+	.stack-border > * + * {
+		@apply border-t border-t-slate-400;
+	}
+}
+
+@layer components {
+	/* Color picker */
+	.color-picker ::-webkit-color-swatch-wrapper,
+	.color-palette ::-webkit-color-swatch-wrapper {
+		padding: 0;
+	}
+
+	::-webkit-color-swatch {
+		border: 0;
+	}
+
+	.color-picker ::-webkit-color-swatch {
+		@apply rounded;
+	}
+
+	.color-palette li:first-child ::-webkit-color-swatch {
+		@apply rounded-l;
+	}
+
+	.color-palette li:last-child ::-webkit-color-swatch {
+		@apply rounded-r;
+	}
+
+	.color-picker ::-moz-color-swatch,
+	.color-picker ::-moz-focus-inner,
+	.color-palette ::-moz-color-swatch {
+		border: 0;
+	}
+
+	.color-picker ::-moz-focus-inner,
+	.color-palette ::-moz-focus-inner {
+		padding: 0;
+	}
+
+	/* Number input */
+	/* Chrome, Safari, Edge, Opera */
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	/* Firefox */
+	input[type='number'] {
+		-moz-appearance: textfield;
 	}
 }

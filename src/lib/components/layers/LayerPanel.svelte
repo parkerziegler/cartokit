@@ -1,6 +1,6 @@
 <script lang="ts">
-	import MapTypeCard from '$lib/map-types/MapTypeCard.svelte';
-	import Modal from '$lib/shared/Modal.svelte';
+	import MapTypeCard from '$lib/components/map-types/MapTypeCard.svelte';
+	import Modal from '$lib/components/shared/Modal.svelte';
 
 	export let layers: string[] = [];
 
