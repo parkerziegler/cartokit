@@ -1,6 +1,7 @@
 import type { Map } from 'mapbox-gl';
 
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+import { deriveColorScale } from '$lib/interaction/color';
 
 /**
  * Add a CartoKit layer to the map.
@@ -8,14 +9,40 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
  * @param map – The top-level Mapbox GL map instance.
  * @param layer – The CartoKit layer to add to the map.
  */
-export function addLayer(map: Map, layer: CartoKitLayer) {
-	map.addLayer({
-		id: layer.id,
-		source: layer.id,
-		type: 'fill',
-		paint: {
-			'fill-color': layer.id.includes('ca') ? '#1ff498' : '#fd6a0b',
-			'fill-opacity': 0.75
+export function addLayer(map: Map, layer: CartoKitLayer): void {
+	switch (layer.type) {
+		case 'Fill':
+			map.addLayer({
+				id: layer.id,
+				source: layer.id,
+				type: 'fill',
+				paint: {
+					'fill-color': '#fd6a0b',
+					'fill-opacity': 1
+				}
+			});
+			break;
+		case 'Choropleth': {
+			map.addLayer({
+				id: layer.id,
+				source: layer.id,
+				type: 'fill'
+			});
+
+			map.on('sourcedata', (event) => {
+				if (
+					event.sourceId === layer.id &&
+					event.isSourceLoaded &&
+					event.sourceDataType !== 'metadata'
+				) {
+					const features = map.querySourceFeatures(layer.id);
+
+					map.setPaintProperty(layer.id, 'fill-color', deriveColorScale(layer, features));
+				}
+			});
+			break;
 		}
-	});
+		default:
+			break;
+	}
 }
