@@ -29,12 +29,16 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 				type: 'fill'
 			});
 
+			let hasSourceLoadedPreviously = false;
+
 			map.on('sourcedata', (event) => {
 				if (
 					event.sourceId === layer.id &&
 					event.isSourceLoaded &&
-					event.sourceDataType !== 'metadata'
+					event.sourceDataType !== 'metadata' &&
+					!hasSourceLoadedPreviously
 				) {
+					hasSourceLoadedPreviously = true;
 					const features = map.querySourceFeatures(layer.id);
 
 					map.setPaintProperty(layer.id, 'fill-color', deriveColorScale(layer, features));
@@ -42,7 +46,5 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 			});
 			break;
 		}
-		default:
-			break;
 	}
 }

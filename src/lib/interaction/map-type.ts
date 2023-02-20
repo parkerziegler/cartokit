@@ -1,15 +1,22 @@
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+import type { Map } from 'mapbox-gl';
+
+import { isChoroplethLayer, type CartoKitLayer } from '$lib/types/CartoKitLayer';
 import type { MapType } from '$lib/types/MapTypes';
 
-export function transitionMapType(layer: CartoKitLayer, targetMapType: MapType): CartoKitLayer {
+interface TransitionMapTypeParams {
+	map: Map;
+	layer: CartoKitLayer;
+	targetMapType: MapType;
+}
+
+export function transitionMapType({
+	map,
+	layer,
+	targetMapType
+}: TransitionMapTypeParams): CartoKitLayer {
 	switch (targetMapType) {
 		case 'Fill':
-			return {
-				id: layer.id,
-				displayName: layer.displayName,
-				type: 'Fill',
-				data: layer.data
-			};
+			return transitionToFill(map, layer);
 		case 'Choropleth':
 			return {
 				id: layer.id,
@@ -24,4 +31,20 @@ export function transitionMapType(layer: CartoKitLayer, targetMapType: MapType):
 				}
 			};
 	}
+}
+
+function transitionToFill(map: Map, layer: CartoKitLayer): CartoKitLayer {
+	const fill = isChoroplethLayer(layer)
+		? layer.breaks.colors[Math.floor(layer.breaks.colors.length / 2)]
+		: '#FFFFFF';
+
+	map.setPaintProperty(layer.id, 'fill-color', fill);
+	console.log(map.getStyle().layers);
+
+	return {
+		id: layer.id,
+		displayName: layer.displayName,
+		type: 'Fill',
+		data: layer.data
+	};
 }
