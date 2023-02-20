@@ -1,4 +1,5 @@
-import type { MapType } from './MapTypes';
+import type { MapType } from '$lib/types/MapTypes';
+import type { ColorScales } from '$lib/types/ColorScales';
 
 interface Layer {
 	id: string;
@@ -12,7 +13,7 @@ export interface CartoKitChoroplethLayer extends Layer {
 	attribute: string;
 	breaks: {
 		count: number;
-		scale: 'Quantile' | 'Quantize';
+		scale: ColorScales;
 		colors: string[];
 	};
 }

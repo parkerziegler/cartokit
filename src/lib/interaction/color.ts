@@ -18,7 +18,6 @@ export function deriveColorScale(
 	const { scale, colors } = layer.breaks;
 
 	const prelude: Expression = ['step', ['get', layer.attribute], colors[0]];
-	console.log({ prelude });
 	let stops: (string | number)[] = [];
 
 	switch (scale) {
@@ -52,7 +51,6 @@ function deriveQuantileStops(
 
 	// Derive quantiles.
 	const quantiles = d3.scaleQuantile<string>().domain(data).range(colors).quantiles();
-	console.log({ quantiles });
 
 	const stops = colors.reduce<(string | number)[]>(
 		(acc, color, i) => (i === 0 ? acc : acc.concat([quantiles[i - 1], color])),

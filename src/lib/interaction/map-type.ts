@@ -39,7 +39,6 @@ function transitionToFill(map: Map, layer: CartoKitLayer): CartoKitLayer {
 		: '#FFFFFF';
 
 	map.setPaintProperty(layer.id, 'fill-color', fill);
-	console.log(map.getStyle().layers);
 
 	return {
 		id: layer.id,
