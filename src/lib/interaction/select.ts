@@ -2,13 +2,11 @@ import type { Map, MapboxGeoJSONFeature, MapLayerMouseEvent } from 'mapbox-gl';
 import type { Writable } from 'svelte/store';
 
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
-import type { MapType } from '$lib/types/MapTypes';
 
 interface InstrumentSelectParams {
 	map: Map;
 	layers: CartoKitLayer[];
 	selectedFeature: Writable<MapboxGeoJSONFeature | null>;
-	mapType: Writable<MapType>;
 }
 
 /**
@@ -17,12 +15,7 @@ interface InstrumentSelectParams {
  * @param map – The top-level Mapbox GL map instance.
  * @param layer – A CartoKit layer to add a select effect to.
  */
-export function instrumentSelect({
-	map,
-	layers,
-	selectedFeature,
-	mapType
-}: InstrumentSelectParams): void {
+export function instrumentSelect({ map, layers, selectedFeature }: InstrumentSelectParams): void {
 	const layerIds: string[] = [];
 
 	layers.forEach((layer) => {
@@ -64,17 +57,12 @@ export function instrumentSelect({
 				{ selected: true }
 			);
 			selectedFeature.set(features[0]);
-
-			const selectedLayerType: MapType =
-				layers.find((l) => l.id === features[0].layer.id)?.type ?? 'Fill';
-			mapType.set(selectedLayerType);
 		} else if (selectedFeatureId !== null && selectedLayerId !== null) {
 			// If no features are returned in the event, clear the selection.
 			map.setFeatureState({ source: selectedLayerId, id: selectedFeatureId }, { selected: false });
 			selectedFeatureId = null;
 			selectedLayerId = null;
 			selectedFeature.set(null);
-			mapType.set('Fill');
 		}
 	}
 

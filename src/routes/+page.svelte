@@ -42,8 +42,7 @@
 			instrumentSelect({
 				map,
 				layers: $layers,
-				selectedFeature,
-				mapType
+				selectedFeature
 			});
 		});
 
