@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { map } from '$lib/stores/map';
+	import { layers } from '$lib/stores/layers';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { decimalToPercent, percentToDecimal } from '$lib/utils/color';
 	import { dispatchLayerUpdate } from '$lib/interaction/layer';
@@ -22,6 +23,7 @@
 				type: 'fill',
 				map: $map,
 				layer: $selectedLayer,
+				layers: $layers,
 				payload: {
 					color: target.value
 				}
@@ -37,6 +39,7 @@
 				type: 'opacity',
 				map: $map,
 				layer: $selectedLayer,
+				layers: $layers,
 				payload: {
 					opacity: percentToDecimal(Math.min(100, Math.max(0, +target.value)))
 				}

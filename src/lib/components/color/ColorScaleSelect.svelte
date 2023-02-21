@@ -7,25 +7,23 @@
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
 	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 
-	const selected = isChoroplethLayer($selectedLayer)
-		? $selectedLayer.breaks.scale
-		: COLOR_SCALES[0];
+	const selected =
+		$selectedLayer && isChoroplethLayer($selectedLayer)
+			? $selectedLayer.breaks.scale
+			: COLOR_SCALES[0];
 
 	function onChange(event: CustomEvent<{ value: ColorScales }>) {
-		layers.update((ls) => {
-			const layer = ls.find((l) => l.id === $selectedLayer.id);
-
-			if ($map && layer && isChoroplethLayer(layer)) {
-				layer.breaks.scale = event.detail.value;
-				dispatchLayerUpdate({
-					type: 'color-scale',
-					map: $map,
-					layer
-				});
-			}
-
-			return ls;
-		});
+		if ($map && $selectedLayer) {
+			dispatchLayerUpdate({
+				type: 'color-scale-type',
+				map: $map,
+				layer: $selectedLayer,
+				layers: $layers,
+				payload: {
+					scale: event.detail.value
+				}
+			});
+		}
 	}
 </script>
 

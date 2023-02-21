@@ -1,35 +1,30 @@
 <script lang="ts">
-	import type { MapboxGeoJSONFeature } from 'mapbox-gl';
-
 	import Select from '$lib/components/shared/Select.svelte';
 	import { layers } from '$lib/stores/layers';
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
 	import { map } from '$lib/stores/map';
 	import { dispatchLayerUpdate } from '$lib/interaction/layer';
+	import { selectedLayer } from '$lib/stores/selected-layer';
+	import { selectedFeature } from '$lib/stores/feature';
 
-	export let selectedFeature: MapboxGeoJSONFeature;
-
-	const options = Object.keys(selectedFeature.properties ?? {});
-	const layer = $layers.find((layer) => layer.id === selectedFeature.layer.id);
-	const selected = layer && isChoroplethLayer(layer) ? layer.attribute : '';
+	const options = Object.keys($selectedFeature?.properties ?? {});
+	const selected =
+		$selectedLayer && isChoroplethLayer($selectedLayer) ? $selectedLayer.attribute : '';
 
 	function onChange(event: CustomEvent<{ value: string }>) {
 		const attribute = event.detail.value;
 
-		layers.update((ls) => {
-			const layer = ls.find((l) => l.id === selectedFeature.layer.id);
-
-			if ($map && layer && isChoroplethLayer(layer)) {
-				layer.attribute = attribute;
-				dispatchLayerUpdate({
-					type: 'color-scale',
-					map: $map,
-					layer
-				});
-			}
-
-			return ls;
-		});
+		if ($map && $selectedLayer) {
+			dispatchLayerUpdate({
+				type: 'attribute',
+				map: $map,
+				layer: $selectedLayer,
+				layers: $layers,
+				payload: {
+					attribute
+				}
+			});
+		}
 	}
 </script>
 

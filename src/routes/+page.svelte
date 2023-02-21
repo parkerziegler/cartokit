@@ -63,7 +63,7 @@
 			{/if}
 			{#if $mapType === 'Choropleth' && $selectedFeature}
 				<MenuItem title="Attribute">
-					<AttributeSelect selectedFeature={$selectedFeature} />
+					<AttributeSelect />
 				</MenuItem>
 				<MenuItem title="Palette">
 					<ColorPalette />
