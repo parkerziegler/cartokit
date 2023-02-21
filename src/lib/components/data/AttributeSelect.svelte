@@ -5,7 +5,7 @@
 	import { layers } from '$lib/stores/layers';
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
 	import { map } from '$lib/stores/map';
-	import { deriveColorScale } from '$lib/interaction/color';
+	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 
 	export let selectedFeature: MapboxGeoJSONFeature;
 
@@ -19,13 +19,13 @@
 		layers.update((ls) => {
 			const layer = ls.find((l) => l.id === selectedFeature.layer.id);
 
-			if (layer && isChoroplethLayer(layer)) {
+			if ($map && layer && isChoroplethLayer(layer)) {
 				layer.attribute = attribute;
-				$map?.setPaintProperty(
-					layer.id,
-					'fill-color',
-					deriveColorScale(layer, $map.querySourceFeatures(layer.id))
-				);
+				dispatchLayerUpdate({
+					type: 'color-scale',
+					map: $map,
+					layer
+				});
 			}
 
 			return ls;

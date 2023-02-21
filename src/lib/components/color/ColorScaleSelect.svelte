@@ -5,7 +5,7 @@
 	import Select from '$lib/components/shared/Select.svelte';
 	import { COLOR_SCALES, type ColorScales } from '$lib/types/ColorScales';
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
-	import { deriveColorScale } from '$lib/interaction/color';
+	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 
 	const selected = isChoroplethLayer($selectedLayer)
 		? $selectedLayer.breaks.scale
@@ -15,13 +15,13 @@
 		layers.update((ls) => {
 			const layer = ls.find((l) => l.id === $selectedLayer.id);
 
-			if (layer && isChoroplethLayer(layer)) {
+			if ($map && layer && isChoroplethLayer(layer)) {
 				layer.breaks.scale = event.detail.value;
-				$map?.setPaintProperty(
-					layer.id,
-					'fill-color',
-					deriveColorScale(layer, $map.querySourceFeatures(layer.id))
-				);
+				dispatchLayerUpdate({
+					type: 'color-scale',
+					map: $map,
+					layer
+				});
 			}
 
 			return ls;

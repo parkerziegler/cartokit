@@ -4,9 +4,11 @@
 	import { map } from '$lib/stores/map';
 	import { layers } from '$lib/stores/layers';
 	import { selectedFeature } from '$lib/stores/feature';
+	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { program } from '$lib/stores/program';
 	import { decimalToPercent, percentToDecimal, rgbToHex } from '$lib/utils/color';
 	import { compile } from '$lib/compile/compile';
+	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 
 	const defaultColor = '#FFFFFF';
 	const defaultOpacity = 100;
@@ -37,7 +39,14 @@
 		color = target.value;
 
 		if ($selectedFeature && $map) {
-			$map.setPaintProperty($selectedFeature.layer.id, 'fill-color', color);
+			dispatchLayerUpdate({
+				type: 'fill',
+				map: $map,
+				layer: $selectedLayer,
+				payload: {
+					color
+				}
+			});
 			program.set(compile($map, $layers));
 		}
 	};
@@ -47,7 +56,14 @@
 		opacity = Math.min(100, Math.max(0, +target.value));
 
 		if ($selectedFeature && $map) {
-			$map.setPaintProperty($selectedFeature.layer.id, 'fill-opacity', percentToDecimal(opacity));
+			dispatchLayerUpdate({
+				type: 'opacity',
+				map: $map,
+				layer: $selectedLayer,
+				payload: {
+					opacity: percentToDecimal(opacity)
+				}
+			});
 			program.set(compile($map, $layers));
 		}
 	};

@@ -25,8 +25,8 @@
 		const map = new mapboxgl.Map({
 			container: 'map',
 			style: 'mapbox://styles/mapbox/dark-v10',
-			center: [-110, 35],
-			zoom: 6
+			center: [-81, 26.5],
+			zoom: 7
 		});
 
 		mapStore.set(map);
