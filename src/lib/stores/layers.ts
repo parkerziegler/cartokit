@@ -19,7 +19,9 @@ const caCounties: CartoKitLayer = {
 	id: 'ca-counties',
 	displayName: 'CA Counties',
 	type: 'Fill',
-	data: 'https://api.dokku.censusreporter.org/1.0/geo/show/tiger2021?geo_ids=04000US06,050|04000US06'
+	data: 'https://api.dokku.censusreporter.org/1.0/geo/show/tiger2021?geo_ids=04000US06,050|04000US06',
+	fill: '#fd8d3c',
+	opacity: 0.75
 };
 
 export const layers = writable<CartoKitLayer[]>([exampleLayer]);

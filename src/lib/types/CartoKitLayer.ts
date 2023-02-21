@@ -31,6 +31,19 @@ export function isChoroplethLayer(layer: CartoKitLayer): layer is CartoKitChorop
 
 interface CartoKitFillLayer extends Layer {
 	type: 'Fill';
+	fill: string;
+	opacity: number;
+}
+
+/**
+ * A type guard to determine if a CartoKit layer is a CartoKitFillLayer.
+ *
+ * @param layer – The layer to test.
+ *
+ * @returns – A Boolean value indicating whether the layer is a CartoKitFillLayer.
+ */
+export function isFillLayer(layer: CartoKitLayer): layer is CartoKitFillLayer {
+	return layer.type === 'Fill';
 }
 
 export type CartoKitLayer = CartoKitChoroplethLayer | CartoKitFillLayer;

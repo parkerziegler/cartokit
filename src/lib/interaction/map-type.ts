@@ -44,6 +44,8 @@ function transitionToFill(map: Map, layer: CartoKitLayer): CartoKitLayer {
 		id: layer.id,
 		displayName: layer.displayName,
 		type: 'Fill',
-		data: layer.data
+		data: layer.data,
+		fill,
+		opacity: 1
 	};
 }

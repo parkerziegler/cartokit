@@ -1,7 +1,8 @@
 import type { Map } from 'mapbox-gl';
 
-import { isChoroplethLayer, type CartoKitLayer } from '$lib/types/CartoKitLayer';
+import { isChoroplethLayer, isFillLayer, type CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { deriveColorScale } from '$lib/interaction/color';
+import { layers } from '$lib/stores/layers';
 
 /**
  * Add a CartoKit layer to the map.
@@ -100,10 +101,33 @@ export function dispatchLayerUpdate(update: DispatchLayerUpdateParams): void {
 		}
 		case 'fill': {
 			update.map.setPaintProperty(update.layer.id, 'fill-color', update.payload.color);
+
+			// Update the layer in the store.
+			layers.update((layers) => {
+				const layer = layers.find((layer) => layer.id === update.layer.id);
+
+				if (layer && isFillLayer(layer)) {
+					layer.fill = update.payload.color;
+				}
+
+				return layers;
+			});
 			break;
 		}
 		case 'opacity': {
 			update.map.setPaintProperty(update.layer.id, 'fill-opacity', update.payload.opacity);
+
+			// Update the layer in the store.
+			layers.update((layers) => {
+				const layer = layers.find((layer) => layer.id === update.layer.id);
+
+				if (layer && isFillLayer(layer)) {
+					layer.opacity = update.payload.opacity;
+				}
+
+				return layers;
+			});
+			break;
 		}
 	}
 }
