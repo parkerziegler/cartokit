@@ -55,7 +55,7 @@
 <main class="absolute inset-0">
 	<div class="grid grid-cols-12 h-full w-full">
 		<div class="col-span-12" id="map" />
-		<Menu className="absolute top-4 right-4 max-w-xl">
+		<Menu className="absolute top-4 right-4 max-w-xl overflow-auto style-editor">
 			{#if $selectedFeature}
 				<MenuItem title="Map Type">
 					<MapTypeSelect />

@@ -1,7 +1,12 @@
 import type { Map } from 'mapbox-gl';
 
-import { isChoroplethLayer, type CartoKitLayer } from '$lib/types/CartoKitLayer';
+import {
+	isChoroplethLayer,
+	type CartoKitChoroplethLayer,
+	type CartoKitLayer
+} from '$lib/types/CartoKitLayer';
 import type { MapType } from '$lib/types/MapTypes';
+import { deriveColorScale } from '$lib/interaction/color';
 
 interface TransitionMapTypeParams {
 	map: Map;
@@ -18,24 +23,13 @@ export function transitionMapType({
 		case 'Fill':
 			return transitionToFill(map, layer);
 		case 'Choropleth':
-			return {
-				id: layer.id,
-				displayName: layer.displayName,
-				type: 'Choropleth',
-				data: layer.data,
-				attribute: '',
-				breaks: {
-					count: 5,
-					scale: 'Quantile',
-					colors: ['#f1eef6', '#bdc9e1', '#74a9cf', '#2b8cbe', '#045a8d']
-				}
-			};
+			return transitionToChoropleth(map, layer);
 	}
 }
 
 function transitionToFill(map: Map, layer: CartoKitLayer): CartoKitLayer {
 	const fill = isChoroplethLayer(layer)
-		? layer.breaks.colors[Math.floor(layer.breaks.colors.length / 2)]
+		? layer.style.breaks.colors[Math.floor(layer.style.breaks.colors.length / 2)]
 		: '#FFFFFF';
 
 	map.setPaintProperty(layer.id, 'fill-color', fill);
@@ -45,7 +39,44 @@ function transitionToFill(map: Map, layer: CartoKitLayer): CartoKitLayer {
 		displayName: layer.displayName,
 		type: 'Fill',
 		data: layer.data,
-		fill,
-		opacity: 1
+		style: {
+			fill,
+			opacity: layer.style.opacity
+		}
 	};
+}
+
+function transitionToChoropleth(map: Map, layer: CartoKitLayer): CartoKitLayer {
+	// Select the first numeric attribute in the dataset.
+	const features = map.querySourceFeatures(layer.id);
+	let attribute = '';
+
+	if (features[0].properties) {
+		for (const property in features[0].properties) {
+			if (typeof features[0].properties[property] === 'number') {
+				attribute = property;
+				break;
+			}
+		}
+	}
+
+	const targetLayer: CartoKitChoroplethLayer = {
+		id: layer.id,
+		displayName: layer.displayName,
+		type: 'Choropleth',
+		data: layer.data,
+		attribute,
+		style: {
+			breaks: {
+				count: 5,
+				scale: 'Quantile',
+				colors: ['#feedde', '#fdbe85', '#fd8d3c', '#e6550d', '#a63603']
+			},
+			opacity: layer.style.opacity
+		}
+	};
+
+	map.setPaintProperty(layer.id, 'fill-color', deriveColorScale(targetLayer, features));
+
+	return targetLayer;
 }

@@ -17,13 +17,13 @@ const DEFAULT_FILL = '#000000';
 export function compilePaint(map: Map, layer: CartoKitLayer): string {
 	switch (layer.type) {
 		case 'Fill': {
-			if (layer.fill === DEFAULT_FILL && layer.opacity === DEFAULT_OPACITY) {
+			if (layer.style.fill === DEFAULT_FILL && layer.style.opacity === DEFAULT_OPACITY) {
 				return '';
 			}
 
 			return `paint: {
-				${layer.fill !== DEFAULT_FILL ? `'fill-color' : '${layer.fill}'` : ''},
-				${layer.opacity !== DEFAULT_OPACITY ? `'fill-opacity': ${layer.opacity}` : ''}
+				${layer.style.fill !== DEFAULT_FILL ? `'fill-color' : '${layer.style.fill}'` : ''},
+				${layer.style.opacity !== DEFAULT_OPACITY ? `'fill-opacity': ${layer.style.opacity}` : ''}
 			}
 			`;
 		}

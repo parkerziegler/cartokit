@@ -9,11 +9,11 @@
 	const defaultColor = '#FFFFFF';
 	const defaultOpacity = 1;
 
-	$: color = $selectedLayer && isFillLayer($selectedLayer) ? $selectedLayer.fill : defaultColor;
-	$: opacity =
-		$selectedLayer && isFillLayer($selectedLayer)
-			? decimalToPercent($selectedLayer.opacity)
-			: decimalToPercent(defaultOpacity);
+	$: color =
+		$selectedLayer && isFillLayer($selectedLayer) ? $selectedLayer.style.fill : defaultColor;
+	$: opacity = $selectedLayer
+		? decimalToPercent($selectedLayer.style.opacity)
+		: decimalToPercent(defaultOpacity);
 
 	const onColorInput = (event: Event) => {
 		const target = event.target as HTMLInputElement;

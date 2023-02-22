@@ -108,4 +108,9 @@
 	input[type='number'] {
 		-moz-appearance: textfield;
 	}
+
+	/* Style Editor */
+	.style-editor {
+		max-height: calc(100% - 2rem);
+	}
 }

@@ -77,6 +77,14 @@ interface ColorScaleTypeUpdate extends LayerUpdate {
 	};
 }
 
+interface ColorPaletteColorUpdate extends LayerUpdate {
+	type: 'color-palette-color';
+	payload: {
+		index: number;
+		color: string;
+	};
+}
+
 interface AttributeUpdate extends LayerUpdate {
 	type: 'attribute';
 	payload: {
@@ -101,6 +109,7 @@ interface FillOpacityUpdate extends LayerUpdate {
 type DispatchLayerUpdateParams =
 	| MapTypeUpdate
 	| ColorScaleTypeUpdate
+	| ColorPaletteColorUpdate
 	| AttributeUpdate
 	| FillUpdate
 	| FillOpacityUpdate;
@@ -136,7 +145,27 @@ export function dispatchLayerUpdate(update: DispatchLayerUpdateParams): void {
 					const layer = ls.find((l) => l.id === update.layer.id);
 
 					if (layer && isChoroplethLayer(layer)) {
-						layer.breaks.scale = update.payload.scale;
+						layer.style.breaks.scale = update.payload.scale;
+
+						update.map.setPaintProperty(
+							update.layer.id,
+							'fill-color',
+							deriveColorScale(layer, update.map.querySourceFeatures(update.layer.id))
+						);
+					}
+
+					return ls;
+				});
+			}
+			break;
+		}
+		case 'color-palette-color': {
+			if (isChoroplethLayer(update.layer)) {
+				layersStore.update((ls) => {
+					const layer = ls.find((l) => l.id === update.layer.id);
+
+					if (layer && isChoroplethLayer(layer)) {
+						layer.style.breaks.colors[update.payload.index] = update.payload.color;
 
 						update.map.setPaintProperty(
 							update.layer.id,
@@ -178,7 +207,7 @@ export function dispatchLayerUpdate(update: DispatchLayerUpdateParams): void {
 				const layer = layers.find((layer) => layer.id === update.layer.id);
 
 				if (layer && isFillLayer(layer)) {
-					layer.fill = update.payload.color;
+					layer.style.fill = update.payload.color;
 				}
 
 				return layers;
@@ -192,8 +221,8 @@ export function dispatchLayerUpdate(update: DispatchLayerUpdateParams): void {
 			layersStore.update((layers) => {
 				const layer = layers.find((layer) => layer.id === update.layer.id);
 
-				if (layer && isFillLayer(layer)) {
-					layer.opacity = update.payload.opacity;
+				if (layer) {
+					layer.style.opacity = update.payload.opacity;
 				}
 
 				return layers;

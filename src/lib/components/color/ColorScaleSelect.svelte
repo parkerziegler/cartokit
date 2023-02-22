@@ -9,7 +9,7 @@
 
 	const selected =
 		$selectedLayer && isChoroplethLayer($selectedLayer)
-			? $selectedLayer.breaks.scale
+			? $selectedLayer.style.breaks.scale
 			: COLOR_SCALES[0];
 
 	function onChange(event: CustomEvent<{ value: ColorScale }>) {

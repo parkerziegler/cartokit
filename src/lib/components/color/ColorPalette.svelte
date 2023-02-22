@@ -1,16 +1,56 @@
 <script lang="ts">
 	import ColorScaleSelect from '$lib/components/color/ColorScaleSelect.svelte';
+	import { map } from '$lib/stores/map';
+	import { layers } from '$lib/stores/layers';
+	import { selectedLayer } from '$lib/stores/selected-layer';
+	import { dispatchLayerUpdate } from '$lib/interaction/layer';
+	import { percentToDecimal, decimalToPercent } from '$lib/utils/color';
+	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
 
 	let selectedColor: string = '#FFFFFF';
-	let colors = ['#feedde', '#fdbe85', '#fd8d3c', '#e6550d', '#a63603'];
-	let opacity = 100;
+	const defaultColors = ['#feedde', '#fdbe85', '#fd8d3c', '#e6550d', '#a63603'];
+	const defaultOpacity = 1;
+
+	$: colors =
+		$selectedLayer && isChoroplethLayer($selectedLayer)
+			? $selectedLayer.style.breaks.colors
+			: defaultColors;
+	$: opacity = $selectedLayer
+		? decimalToPercent($selectedLayer.style.opacity)
+		: decimalToPercent(defaultOpacity);
 
 	function onColorInput(event: Event, i: number) {
 		const target = event.target as HTMLInputElement;
-		colors[i] = target.value;
+
+		if ($selectedLayer && $map) {
+			dispatchLayerUpdate({
+				type: 'color-palette-color',
+				map: $map,
+				layer: $selectedLayer,
+				layers: $layers,
+				payload: {
+					color: target.value,
+					index: i
+				}
+			});
+		}
 	}
 
-	function onOpacityChange(event: Event) {}
+	function onOpacityChange(event: Event) {
+		const target = event.target as HTMLInputElement;
+
+		if ($selectedLayer && $map) {
+			dispatchLayerUpdate({
+				type: 'opacity',
+				map: $map,
+				layer: $selectedLayer,
+				layers: $layers,
+				payload: {
+					opacity: percentToDecimal(Math.min(100, Math.max(0, +target.value)))
+				}
+			});
+		}
+	}
 </script>
 
 <div class="font-mono text-xs text-white stack stack-xs">
@@ -22,7 +62,7 @@
 					<input
 						type="color"
 						class="appearance-none cursor-pointer bg-transparent p-0 h-4 w-4"
-						bind:value={color}
+						value={color}
 						on:input={(event) => onColorInput(event, i)}
 					/>
 				</li>
@@ -35,7 +75,7 @@
 				class="bg-inherit w-8 text-right"
 				min="0"
 				max="100"
-				bind:value={opacity}
+				value={opacity}
 				on:change={onOpacityChange}
 			/>
 			%

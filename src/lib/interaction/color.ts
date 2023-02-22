@@ -15,7 +15,7 @@ export function deriveColorScale(
 	layer: CartoKitChoroplethLayer,
 	features: MapboxGeoJSONFeature[]
 ): Expression {
-	const { scale, colors } = layer.breaks;
+	const { scale, colors } = layer.style.breaks;
 
 	const prelude: Expression = ['step', ['get', layer.attribute], colors[0]];
 	let stops: (string | number)[] = [];
@@ -44,7 +44,7 @@ function deriveQuantileStops(
 	layer: CartoKitChoroplethLayer,
 	features: MapboxGeoJSONFeature[]
 ): (string | number)[] {
-	const { colors } = layer.breaks;
+	const { colors } = layer.style.breaks;
 
 	// For a quantile scale, use the entirety of the data as the domain.
 	const data = features.map((feature) => feature.properties?.[layer.attribute]);
@@ -72,7 +72,7 @@ function deriveQuantizeStops(
 	layer: CartoKitChoroplethLayer,
 	features: MapboxGeoJSONFeature[]
 ): (string | number)[] {
-	const { colors, count } = layer.breaks;
+	const { colors, count } = layer.style.breaks;
 
 	// For a quantize scale, use the extent of the data as the domain.
 	const data = d3.extent(

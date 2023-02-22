@@ -6,15 +6,21 @@ interface Layer {
 	displayName: string;
 	type: MapType;
 	data: string; // Need to extend to valid GeoJSON.
+	style: {
+		opacity: number;
+	};
 }
 
 export interface CartoKitChoroplethLayer extends Layer {
 	type: 'Choropleth';
 	attribute: string;
-	breaks: {
-		count: number;
-		scale: ColorScale;
-		colors: string[];
+	style: {
+		breaks: {
+			count: number;
+			scale: ColorScale;
+			colors: string[];
+		};
+		opacity: number;
 	};
 }
 
@@ -31,8 +37,10 @@ export function isChoroplethLayer(layer: CartoKitLayer): layer is CartoKitChorop
 
 interface CartoKitFillLayer extends Layer {
 	type: 'Fill';
-	fill: string;
-	opacity: number;
+	style: {
+		fill: string;
+		opacity: number;
+	};
 }
 
 /**
