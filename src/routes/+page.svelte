@@ -29,8 +29,6 @@
 			zoom: 7
 		});
 
-		mapStore.set(map);
-
 		map.on('load', () => {
 			$layers.forEach((layer) => {
 				addSource(map, layer);
@@ -44,6 +42,16 @@
 				layers: $layers,
 				selectedFeature
 			});
+		});
+
+		// Wait for the map to reach an idle state for the first time
+		// before loading the instance into the store.
+		let hasReachedIdle = false;
+		map.on('idle', () => {
+			if (!hasReachedIdle) {
+				hasReachedIdle = true;
+				mapStore.set(map);
+			}
 		});
 
 		return () => {
