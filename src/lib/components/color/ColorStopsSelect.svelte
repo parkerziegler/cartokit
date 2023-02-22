@@ -1,30 +1,29 @@
 <script lang="ts">
+	import Select from '$lib/components/shared/Select.svelte';
 	import { map } from '$lib/stores/map';
 	import { layers } from '$lib/stores/layers';
 	import { selectedLayer } from '$lib/stores/selected-layer';
-	import Select from '$lib/components/shared/Select.svelte';
-	import { COLOR_SCALES, type ColorScale } from '$lib/types/ColorScales';
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
 	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 
 	const selected =
 		$selectedLayer && isChoroplethLayer($selectedLayer)
-			? $selectedLayer.style.breaks.scale
-			: COLOR_SCALES[0];
-	const options = COLOR_SCALES.map((scale) => ({
-		value: scale,
-		label: scale
+			? $selectedLayer.style.breaks.colors.length
+			: 3;
+	const options = new Array(9).fill(undefined).map((_, i) => ({
+		value: i + 3,
+		label: `${i + 3}`
 	}));
 
-	function onChange(event: CustomEvent<{ value: ColorScale }>) {
+	function onChange(event: CustomEvent<{ value: number }>) {
 		if ($map && $selectedLayer) {
 			dispatchLayerUpdate({
-				type: 'color-scale-type',
+				type: 'color-palette-stops',
 				map: $map,
 				layer: $selectedLayer,
 				layers: $layers,
 				payload: {
-					scale: event.detail.value
+					count: event.detail.value
 				}
 			});
 		}

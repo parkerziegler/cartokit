@@ -7,7 +7,10 @@
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { selectedFeature } from '$lib/stores/feature';
 
-	const options = Object.keys($selectedFeature?.properties ?? {});
+	const options = Object.keys($selectedFeature?.properties ?? {}).map((attribute) => ({
+		value: attribute,
+		label: attribute
+	}));
 	const selected =
 		$selectedLayer && isChoroplethLayer($selectedLayer) ? $selectedLayer.attribute : '';
 

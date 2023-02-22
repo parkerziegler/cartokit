@@ -10,7 +10,6 @@ const exampleLayer: CartoKitLayer = {
 	attribute: 'irwin_DailyAcres',
 	style: {
 		breaks: {
-			count: 4,
 			scale: 'Quantize',
 			colors: ['#feedde', '#fdbe85', '#fd8d3c', '#e6550d', '#a63603']
 		},

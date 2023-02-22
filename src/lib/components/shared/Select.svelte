@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
+	type T = $$Generic;
+	interface SelectOption<T> {
+		value: T;
+		label: string;
+	}
 
 	export let className: string = '';
-	export let selected: string = '';
+	export let selected: T;
 	export let disabled: boolean = false;
-	export let options: string[] = [];
+	export let options: SelectOption<T>[] = [];
 
 	const dispatch = createEventDispatcher();
 	function onChange(event: Event) {
@@ -20,6 +25,6 @@
 	{disabled}
 >
 	{#each options as option}
-		<option value={option} selected={option === selected}>{option}</option>
+		<option value={option.value} selected={option.value === selected}>{option.label}</option>
 	{/each}
 </select>

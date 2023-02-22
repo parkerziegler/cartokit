@@ -12,18 +12,7 @@ import { compilePaint } from '$lib/compile/compile-paint';
  */
 export function compileLayer(map: Map, layer: CartoKitLayer): string {
 	switch (layer.type) {
-		case 'Fill': {
-			const paint = compilePaint(map, layer);
-
-			return `
-			map.addLayer({
-				id: '${layer.id}',
-				source: '${layer.id}',
-				type: 'fill',
-				${paint}
-			});
-			`;
-		}
+		case 'Fill':
 		case 'Choropleth': {
 			const paint = compilePaint(map, layer);
 

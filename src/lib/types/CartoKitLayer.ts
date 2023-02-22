@@ -16,7 +16,6 @@ export interface CartoKitChoroplethLayer extends Layer {
 	attribute: string;
 	style: {
 		breaks: {
-			count: number;
 			scale: ColorScale;
 			colors: string[];
 		};

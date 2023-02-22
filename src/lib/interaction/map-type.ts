@@ -68,7 +68,6 @@ function transitionToChoropleth(map: Map, layer: CartoKitLayer): CartoKitLayer {
 		attribute,
 		style: {
 			breaks: {
-				count: 5,
 				scale: 'Quantile',
 				colors: ['#feedde', '#fdbe85', '#fd8d3c', '#e6550d', '#a63603']
 			},

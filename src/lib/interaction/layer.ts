@@ -1,4 +1,5 @@
 import type { Map } from 'mapbox-gl';
+import * as d3 from 'd3';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import { transitionMapType } from '$lib/interaction/map-type';
@@ -85,6 +86,13 @@ interface ColorPaletteColorUpdate extends LayerUpdate {
 	};
 }
 
+interface ColorPaletteStopsUpdate extends LayerUpdate {
+	type: 'color-palette-stops';
+	payload: {
+		count: number;
+	};
+}
+
 interface AttributeUpdate extends LayerUpdate {
 	type: 'attribute';
 	payload: {
@@ -110,6 +118,7 @@ type DispatchLayerUpdateParams =
 	| MapTypeUpdate
 	| ColorScaleTypeUpdate
 	| ColorPaletteColorUpdate
+	| ColorPaletteStopsUpdate
 	| AttributeUpdate
 	| FillUpdate
 	| FillOpacityUpdate;
@@ -166,6 +175,35 @@ export function dispatchLayerUpdate(update: DispatchLayerUpdateParams): void {
 
 					if (layer && isChoroplethLayer(layer)) {
 						layer.style.breaks.colors[update.payload.index] = update.payload.color;
+
+						update.map.setPaintProperty(
+							update.layer.id,
+							'fill-color',
+							deriveColorScale(layer, update.map.querySourceFeatures(update.layer.id))
+						);
+					}
+
+					return ls;
+				});
+			}
+			break;
+		}
+		case 'color-palette-stops': {
+			if (isChoroplethLayer(update.layer)) {
+				layersStore.update((ls) => {
+					const layer = ls.find((l) => l.id === update.layer.id);
+
+					if (layer && isChoroplethLayer(layer)) {
+						// Construct a new color palette based on the new number of breaks.
+						layer.style.breaks.colors = d3
+							.quantize(
+								d3.interpolateHsl(
+									layer.style.breaks.colors[0],
+									layer.style.breaks.colors[layer.style.breaks.colors.length - 1]
+								),
+								update.payload.count
+							)
+							.map((color) => d3.color(color)!.formatHex());
 
 						update.map.setPaintProperty(
 							update.layer.id,

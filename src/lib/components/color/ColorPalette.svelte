@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ColorScaleSelect from '$lib/components/color/ColorScaleSelect.svelte';
+	import ColorStopsSelect from '$lib/components/color/ColorStopsSelect.svelte';
 	import { map } from '$lib/stores/map';
 	import { layers } from '$lib/stores/layers';
 	import { selectedLayer } from '$lib/stores/selected-layer';
@@ -54,7 +55,10 @@
 </script>
 
 <div class="font-mono text-xs text-white stack stack-xs">
-	<ColorScaleSelect />
+	<div class="stack-h stack-xs">
+		<ColorScaleSelect />
+		<ColorStopsSelect />
+	</div>
 	<div class="stack-h stack-xs">
 		<ul class="color-palette flex">
 			{#each colors as color, i}

@@ -7,6 +7,11 @@
 	import Select from '$lib/components/shared/Select.svelte';
 	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 
+	const options = MAP_TYPES.map((mapType) => ({
+		value: mapType,
+		label: mapType
+	}));
+
 	function onChange(event: CustomEvent<{ value: MapType }>) {
 		if ($map && $selectedLayer) {
 			dispatchLayerUpdate({
@@ -20,4 +25,4 @@
 	}
 </script>
 
-<Select options={[...MAP_TYPES]} selected={$mapType} on:change={onChange} disabled={!$mapType} />
+<Select {options} selected={$mapType} on:change={onChange} disabled={!$mapType} />
