@@ -1,33 +1,40 @@
-import type { Map, AnyLayer } from 'mapbox-gl';
+import type { Map } from 'mapbox-gl';
+
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
-import { compilePaint } from './compile-paint';
+import { compilePaint } from '$lib/compile/compile-paint';
 
-export const compileLayer = (map: Map, layer: CartoKitLayer, mbLayer: AnyLayer) => {
-	switch (mbLayer.type) {
-		case 'fill': {
-			let fillColor: string | undefined = undefined;
-			let fillOpacity: number | undefined = undefined;
-
-			if (mbLayer.paint?.['fill-color']) {
-				fillColor = mbLayer.paint['fill-color'];
-			}
-
-			if (mbLayer.paint?.['fill-opacity']) {
-				fillOpacity = mbLayer.paint['fill-opacity'];
-			}
-
-			const paint = compilePaint({ 'fill-color': fillColor, 'fill-opacity': fillOpacity });
+/**
+ * Compile the CartoKit layer IR into a Mapbox GL JS program fragment.
+ *
+ * @param layer – the CartoKit layer to compile.
+ *
+ * @returns – a Mapbox GL JS program fragment.
+ */
+export function compileLayer(map: Map, layer: CartoKitLayer): string {
+	switch (layer.type) {
+		case 'Fill': {
+			const paint = compilePaint(map, layer);
 
 			return `
-        map.addLayer({
-          id: '${layer.id}',
-          source: '${layer.id}',
-          type: 'fill',
-          ${paint}
-        });
-      `;
+			map.addLayer({
+				id: '${layer.id}',
+				source: '${layer.id}',
+				type: 'fill',
+				${paint}
+			});
+			`;
 		}
-		default:
-			return '';
+		case 'Choropleth': {
+			const paint = compilePaint(map, layer);
+
+			return `
+			map.addLayer({
+				id: '${layer.id}',
+				source: '${layer.id}',
+				type: 'fill',
+				${paint}
+			});
+			`;
+		}
 	}
-};
+}

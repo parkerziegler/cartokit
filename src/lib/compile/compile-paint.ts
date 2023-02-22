@@ -1,29 +1,38 @@
-function quotePropertyValue(value: string | number) {
-	if (typeof value === 'string') {
-		return `'${value}'`;
-	}
+import type { Map } from 'mapbox-gl';
 
-	return `${value}`;
-}
+import { deriveColorScale } from '$lib/interaction/color';
+import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
-export function compilePaint(properties: Record<string, string | number | undefined>): string {
-	if (Object.values(properties).every((value) => typeof value === 'undefined')) {
-		return '';
-	}
+const DEFAULT_OPACITY = 1;
+const DEFAULT_FILL = '#000000';
 
-	const paint = Object.entries(properties).reduce((p, [key, value], i, arr) => {
-		if (typeof value === 'undefined') {
-			return p;
+/**
+ * Compile a layer's presentational properties into a Mapbox GL JS program fragment.
+ *
+ * @param map – the Mapbox GL JS map instance.
+ * @param layer – the CartoKit layer to compile.
+ *
+ * @returns – a Mapbox GL JS program fragment representing the layer's presentational properties.
+ */
+export function compilePaint(map: Map, layer: CartoKitLayer): string {
+	switch (layer.type) {
+		case 'Fill': {
+			if (layer.fill === DEFAULT_FILL && layer.opacity === DEFAULT_OPACITY) {
+				return '';
+			}
+
+			return `paint: {
+				${layer.fill !== DEFAULT_FILL ? `'fill-color' : '${layer.fill}'` : ''},
+				${layer.opacity !== DEFAULT_OPACITY ? `'fill-opacity': ${layer.opacity}` : ''}
+			}
+			`;
 		}
+		case 'Choropleth': {
+			const features = map.querySourceFeatures(layer.id);
 
-		const v = quotePropertyValue(value);
-
-		if (i === arr.length - 1) {
-			return p.concat(`'${key}': ${v}\n}`);
+			return `paint: {
+				'fill-color': ${JSON.stringify(deriveColorScale(layer, features))}
+			}`;
 		}
-
-		return p.concat(`'${key}': ${v},\n`);
-	}, 'paint: {');
-
-	return paint;
+	}
 }

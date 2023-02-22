@@ -1,11 +1,11 @@
 import type { Map } from 'mapbox-gl';
 
-import { isChoroplethLayer, isFillLayer, type CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { deriveColorScale } from '$lib/interaction/color';
+import { transitionMapType } from '$lib/interaction/map-type';
 import { layers as layersStore } from '$lib/stores/layers';
-import { program } from '$lib/stores/program';
-import { compile } from '$lib/compile/compile';
-import type { ColorScales } from '$lib/types/ColorScales';
+import { isChoroplethLayer, isFillLayer, type CartoKitLayer } from '$lib/types/CartoKitLayer';
+import type { ColorScale } from '$lib/types/ColorScales';
+import type { MapType } from '$lib/types/MapTypes';
 
 /**
  * Add a CartoKit layer to the map.
@@ -63,10 +63,17 @@ interface LayerUpdate {
 	layers: CartoKitLayer[];
 }
 
+interface MapTypeUpdate extends LayerUpdate {
+	type: 'map-type';
+	payload: {
+		mapType: MapType;
+	};
+}
+
 interface ColorScaleTypeUpdate extends LayerUpdate {
 	type: 'color-scale-type';
 	payload: {
-		scale: ColorScales;
+		scale: ColorScale;
 	};
 }
 
@@ -92,6 +99,7 @@ interface FillOpacityUpdate extends LayerUpdate {
 }
 
 type DispatchLayerUpdateParams =
+	| MapTypeUpdate
 	| ColorScaleTypeUpdate
 	| AttributeUpdate
 	| FillUpdate
@@ -108,6 +116,20 @@ type DispatchLayerUpdateParams =
  */
 export function dispatchLayerUpdate(update: DispatchLayerUpdateParams): void {
 	switch (update.type) {
+		case 'map-type': {
+			const targetLayer = transitionMapType({
+				map: update.map,
+				layer: update.layer,
+				targetMapType: update.payload.mapType
+			});
+
+			layersStore.update((ls) => {
+				const idx = ls.findIndex((l) => l.id === update.layer.id);
+
+				return [...ls.slice(0, idx), targetLayer, ...ls.slice(idx + 1)];
+			});
+			break;
+		}
 		case 'color-scale-type': {
 			if (isChoroplethLayer(update.layer)) {
 				layersStore.update((ls) => {
@@ -179,6 +201,4 @@ export function dispatchLayerUpdate(update: DispatchLayerUpdateParams): void {
 			break;
 		}
 	}
-
-	program.set(compile(update.map, update.layers));
 }

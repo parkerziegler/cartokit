@@ -5,26 +5,12 @@ import { compileSource } from '$lib/compile/compile-source';
 import { compileLayer } from '$lib/compile/compile-layer';
 
 export const compileMap = (map: Map, layers: CartoKitLayer[]) => {
-	const mbLayers = map.getStyle().layers;
-
 	const layerSources = layers.reduce((p, layer) => {
-		const source = mbLayers.find((l) => l.id === layer.id);
-
-		if (source) {
-			return p.concat('\n\n' + compileSource(layer));
-		}
-
-		return p;
+		return p.concat('\n\n' + compileSource(layer));
 	}, '');
 
 	const layerRenders = layers.reduce((p, layer) => {
-		const mbLayer = mbLayers.find((l) => l.id === layer.id);
-
-		if (mbLayer) {
-			return p.concat('\n\n' + compileLayer(map, layer, mbLayer));
-		}
-
-		return p;
+		return p.concat('\n\n' + compileLayer(map, layer));
 	}, '');
 
 	const program = `

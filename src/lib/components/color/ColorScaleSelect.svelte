@@ -3,7 +3,7 @@
 	import { layers } from '$lib/stores/layers';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import Select from '$lib/components/shared/Select.svelte';
-	import { COLOR_SCALES, type ColorScales } from '$lib/types/ColorScales';
+	import { COLOR_SCALES, type ColorScale } from '$lib/types/ColorScales';
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
 	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 
@@ -12,7 +12,7 @@
 			? $selectedLayer.breaks.scale
 			: COLOR_SCALES[0];
 
-	function onChange(event: CustomEvent<{ value: ColorScales }>) {
+	function onChange(event: CustomEvent<{ value: ColorScale }>) {
 		if ($map && $selectedLayer) {
 			dispatchLayerUpdate({
 				type: 'color-scale-type',

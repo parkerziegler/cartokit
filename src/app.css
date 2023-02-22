@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prism Overrides */
+.token.operator {
+	background: none;
+}
+
 /* Utilities */
 @layer utilities {
 	/* Block Stack */

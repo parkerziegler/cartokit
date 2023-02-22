@@ -1,17 +1,13 @@
 <script lang="ts">
-	import { compile } from '$lib/compile/compile';
-	import { map } from '$lib/stores/map';
+	import Prism from 'prismjs';
+
 	import { program } from '$lib/stores/program';
-	import { layers } from '$lib/stores/layers';
 
 	let programVisible = false;
+	$: formattedProgram = Prism.highlight($program, Prism.languages.javascript, 'javascript');
 
 	const onClick = () => {
 		programVisible = !programVisible;
-
-		if (programVisible && $map) {
-			program.set(compile($map, $layers));
-		}
 	};
 </script>
 
@@ -54,6 +50,6 @@
 		</button>
 	</div>
 	{#if programVisible}
-		<pre class="overflow-auto mt-2">{$program}</pre>
+		<pre class="overflow-auto mt-2">{@html formattedProgram}</pre>
 	{/if}
 </div>
