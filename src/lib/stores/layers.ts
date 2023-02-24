@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import * as d3 from 'd3';
 
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
@@ -11,7 +12,7 @@ const exampleLayer: CartoKitLayer = {
 	style: {
 		breaks: {
 			scale: 'Quantize',
-			colors: ['#feedde', '#fdbe85', '#fd8d3c', '#e6550d', '#a63603']
+			colors: d3.schemeOranges[5].slice()
 		},
 		opacity: 1
 	}

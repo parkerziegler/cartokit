@@ -1,4 +1,15 @@
 /**
+ * Generate a random color in hexademical format.
+ *
+ * @returns - a random color in hexademical format.
+ */
+export function randomColor(): string {
+	const candidate = Math.floor(Math.random() * 16777215).toString(16);
+
+	return '#000000'.slice(0, -candidate.length) + candidate;
+}
+
+/**
  * Convert a percent to a decimal.
  *
  * @param percent – The input percent, e.g., 100.
