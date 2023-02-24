@@ -1,7 +1,7 @@
 import type { Map } from 'mapbox-gl';
 
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { compilePaint } from '$lib/compile/compile-paint';
+import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
 /**
  * Compile the CartoKit layer IR into a Mapbox GL JS program fragment.

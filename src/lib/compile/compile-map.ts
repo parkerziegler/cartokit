@@ -1,10 +1,18 @@
 import type { Map } from 'mapbox-gl';
 
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { compileSource } from '$lib/compile/compile-source';
 import { compileLayer } from '$lib/compile/compile-layer';
+import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
-export const compileMap = (map: Map, layers: CartoKitLayer[]) => {
+/**
+ * Compile the map instance and layers into a Mapbox GL JS program.
+ *
+ * @param map – the Mapbox GL JS map instance.
+ * @param layers – the CartoKit IR.
+ *
+ * @returns – a Mapbox GL JS program fragment.
+ */
+export const compileMap = (map: Map, layers: CartoKitLayer[]): string => {
 	const layerSources = layers.reduce((p, layer) => {
 		return p.concat('\n\n' + compileSource(layer));
 	}, '');

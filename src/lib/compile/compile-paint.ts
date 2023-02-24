@@ -2,9 +2,7 @@ import type { Map } from 'mapbox-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
-
-const DEFAULT_OPACITY = 1;
-const DEFAULT_FILL = '#000000';
+import { DEFAULT_FILL, DEFAULT_OPACITY } from '$lib/utils/constants';
 
 /**
  * Compile a layer's presentational properties into a Mapbox GL JS program fragment.
@@ -31,7 +29,8 @@ export function compilePaint(map: Map, layer: CartoKitLayer): string {
 			const features = map.querySourceFeatures(layer.id);
 
 			return `paint: {
-				'fill-color': ${JSON.stringify(deriveColorScale(layer, features))}
+				'fill-color': ${JSON.stringify(deriveColorScale(layer, features))},
+				${layer.style.opacity !== DEFAULT_OPACITY ? `'fill-opacity': ${layer.style.opacity}` : ''}
 			}`;
 		}
 	}
