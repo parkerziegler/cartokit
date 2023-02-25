@@ -1,11 +1,11 @@
 <script lang="ts">
+	import Select from '$lib/components/shared/Select.svelte';
+	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 	import { map } from '$lib/stores/map';
 	import { layers } from '$lib/stores/layers';
 	import { selectedLayer } from '$lib/stores/selected-layer';
-	import Select from '$lib/components/shared/Select.svelte';
 	import { COLOR_SCALES, type ColorScale } from '$lib/types/ColorScales';
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
-	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 
 	const selected =
 		$selectedLayer && isChoroplethLayer($selectedLayer)
@@ -31,4 +31,4 @@
 	}
 </script>
 
-<Select {options} {selected} on:change={onChange} />
+<Select {options} {selected} on:change={onChange} title="Method" />

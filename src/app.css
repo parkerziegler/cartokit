@@ -20,8 +20,20 @@
 		margin-block: 0;
 	}
 
-	.stack > * + * {
-		margin-block-start: var(--space, 1.5rem);
+	.stack-xs > * + * {
+		margin-block-start: 0.5rem;
+	}
+
+	.stack-sm > * + * {
+		margin-block-start: 1rem;
+	}
+
+	.stack-md > * + * {
+		margin-block-start: 1.5rem;
+	}
+
+	.stack-lg > * + * {
+		margin-block-start: 2rem;
 	}
 
 	/* Inline Stack */
@@ -35,25 +47,20 @@
 		margin-inline: 0;
 	}
 
-	.stack-h > * + * {
-		margin-inline-start: var(--space, 1.5rem);
+	.stack-h-xs > * + * {
+		margin-inline-start: 0.5rem;
 	}
 
-	/* Stack Sizes */
-	.stack-xs {
-		--space: 0.5rem;
+	.stack-h-sm > * + * {
+		margin-inline-start: 1rem;
 	}
 
-	.stack-sm {
-		--space: 1rem;
+	.stack-h-md > * + * {
+		margin-inline-start: 1.5rem;
 	}
 
-	.stack-md {
-		--space: 1.5rem;
-	}
-
-	.stack-lg {
-		--space: 2rem;
+	.stack-h-lg > * + * {
+		margin-inline-start: 2rem;
 	}
 
 	/* Stack Borders */
@@ -63,7 +70,7 @@
 }
 
 @layer components {
-	/* Color picker */
+	/* Color Picker and Color Palette */
 	.color-picker ::-webkit-color-swatch-wrapper,
 	.color-palette ::-webkit-color-swatch-wrapper {
 		padding: 0;
@@ -112,5 +119,15 @@
 	/* Style Editor */
 	.style-editor {
 		max-height: calc(100% - 2rem);
+	}
+
+	/* Hex Input */
+	.hex-input > input:first-child {
+		@apply border-r border-transparent;
+	}
+
+	.hex-input:hover > input:first-child,
+	.hex-input:focus-within > input:first-child {
+		@apply border-slate-600;
 	}
 }

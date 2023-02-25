@@ -1,21 +1,24 @@
 <script lang="ts">
+	import * as d3 from 'd3';
+
+	import HexInput from '$lib/components/color/HexInput.svelte';
+	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 	import { map } from '$lib/stores/map';
 	import { layers } from '$lib/stores/layers';
 	import { selectedLayer } from '$lib/stores/selected-layer';
-	import { decimalToPercent, percentToDecimal } from '$lib/utils/color';
-	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 	import { isFillLayer } from '$lib/types/CartoKitLayer';
-
-	const defaultColor = '#FFFFFF';
-	const defaultOpacity = 1;
+	import { decimalToPercent, percentToDecimal } from '$lib/utils/color';
+	import { DEFAULT_FILL, DEFAULT_OPACITY } from '$lib/utils/constants';
 
 	$: color =
-		$selectedLayer && isFillLayer($selectedLayer) ? $selectedLayer.style.fill : defaultColor;
+		$selectedLayer && isFillLayer($selectedLayer)
+			? d3.color($selectedLayer.style.fill)?.formatHex() ?? DEFAULT_FILL
+			: DEFAULT_FILL;
 	$: opacity = $selectedLayer
 		? decimalToPercent($selectedLayer.style.opacity)
-		: decimalToPercent(defaultOpacity);
+		: decimalToPercent(DEFAULT_OPACITY);
 
-	const onColorInput = (event: Event) => {
+	function onColorInput(event: Event) {
 		const target = event.target as HTMLInputElement;
 
 		if ($selectedLayer && $map) {
@@ -29,9 +32,23 @@
 				}
 			});
 		}
-	};
+	}
 
-	const onOpacityChange = (event: Event) => {
+	function onHexChange(hex: string) {
+		if ($selectedLayer && $map) {
+			dispatchLayerUpdate({
+				type: 'fill',
+				map: $map,
+				layer: $selectedLayer,
+				layers: $layers,
+				payload: {
+					color: hex
+				}
+			});
+		}
+	}
+
+	function onOpacityChange(event: Event) {
 		const target = event.target as HTMLInputElement;
 
 		if ($selectedLayer && $map) {
@@ -45,28 +62,17 @@
 				}
 			});
 		}
-	};
+	}
 </script>
 
-<div class="color-picker flex">
-	<div class="stack-h stack-xs font-mono text-xs text-white">
+<div class="flex color-picker">
+	<div class="stack-h stack-h-xs items-center">
 		<input
 			type="color"
-			class="appearance-none cursor-pointer p-0 h-4 w-4 rounded"
+			class="appearance-none cursor-pointer h-4 w-4 rounded"
 			value={color}
 			on:input={onColorInput}
 		/>
-		<input type="text" class="bg-inherit pl-2" size="7" value={color} />
-		<span>
-			<input
-				type="number"
-				class="bg-inherit w-8 text-right"
-				min="0"
-				max="100"
-				value={opacity}
-				on:change={onOpacityChange}
-			/>
-			%
-		</span>
+		<HexInput hex={color} {onHexChange} {opacity} {onOpacityChange} />
 	</div>
 </div>

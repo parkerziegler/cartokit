@@ -1,16 +1,18 @@
 <script lang="ts">
+	import * as d3 from 'd3';
+
 	import Select from '$lib/components/shared/Select.svelte';
+	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 	import { map } from '$lib/stores/map';
 	import { layers } from '$lib/stores/layers';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
-	import { dispatchLayerUpdate } from '$lib/interaction/layer';
 
 	const selected =
 		$selectedLayer && isChoroplethLayer($selectedLayer)
 			? $selectedLayer.style.breaks.colors.length
 			: 3;
-	const options = new Array(9).fill(undefined).map((_, i) => ({
+	const options = d3.range(3, 12).map((_, i) => ({
 		value: i + 3,
 		label: `${i + 3}`
 	}));
@@ -30,4 +32,4 @@
 	}
 </script>
 
-<Select {options} {selected} on:change={onChange} />
+<Select {options} {selected} on:change={onChange} title="Steps" />
