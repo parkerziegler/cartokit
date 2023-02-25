@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Select from '$lib/components/shared/Select.svelte';
-	import { layers } from '$lib/stores/layers';
-	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
-	import { map } from '$lib/stores/map';
 	import { dispatchLayerUpdate } from '$lib/interaction/layer';
+	import { map } from '$lib/stores/map';
+	import { layers } from '$lib/stores/layers';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { selectedFeature } from '$lib/stores/feature';
+	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
 
 	const options = Object.keys($selectedFeature?.properties ?? {}).map((attribute) => ({
 		value: attribute,

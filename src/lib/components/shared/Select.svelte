@@ -11,7 +11,6 @@
 
 	export let className: string = '';
 	export let selected: T;
-	export let disabled: boolean = false;
 	export let options: SelectOption<T>[] = [];
 	export let title: string = '';
 
@@ -24,15 +23,17 @@
 </script>
 
 {#if title}
-	<div class="flex items-baseline">
-		<p class="font-sans text-slate-400 text-sm underline decoration-dotted py-2 mr-2">
+	<div class="stack-h stack-xs-h items-baseline">
+		<p class="font-sans text-slate-400 text-sm underline decoration-dotted py-2">
 			{title}
 		</p>
 		<select
-			class={cs('bg-inherit p-2 border border-transparent hover:border-slate-600', className)}
+			class={cs(
+				'bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600',
+				className
+			)}
 			bind:value={selected}
 			on:change={onChange}
-			{disabled}
 		>
 			{#each options as option}
 				<option value={option.value} selected={option.value === selected}>{option.label}</option>
@@ -41,10 +42,12 @@
 	</div>
 {:else}
 	<select
-		class={cs('bg-inherit p-2 border border-transparent hover:border-slate-600', className)}
+		class={cs(
+			'bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600',
+			className
+		)}
 		bind:value={selected}
 		on:change={onChange}
-		{disabled}
 	>
 		{#each options as option}
 			<option value={option.value} selected={option.value === selected}>{option.label}</option>

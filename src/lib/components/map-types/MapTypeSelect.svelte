@@ -25,4 +25,4 @@
 	}
 </script>
 
-<Select {options} selected={$mapType} on:change={onChange} disabled={!$mapType} />
+<Select {options} selected={$mapType} on:change={onChange} />

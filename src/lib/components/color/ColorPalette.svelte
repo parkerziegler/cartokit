@@ -61,7 +61,7 @@
 	}
 
 	function onColorClick(i: number) {
-		return function handleColorClick(_event: Event) {
+		return function handleColorClick() {
 			activeColorIndex = i;
 		};
 	}

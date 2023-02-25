@@ -23,7 +23,7 @@
 </script>
 
 <div
-	class="flex font-mono text-xs text-white border border-transparent hover:border-slate-600 focus-within:border-slate-600 hex-input"
+	class="flex border border-transparent hover:border-slate-600 focus-within:border-slate-600 hex-input"
 >
 	<input class="bg-inherit p-2" size="7" value={hex} on:change={validateHex} />
 	<span class="pr-2">
