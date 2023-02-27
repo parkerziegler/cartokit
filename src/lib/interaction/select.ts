@@ -47,7 +47,8 @@ export function instrumentSelect({ map, layers, selectedFeature }: InstrumentSel
 				);
 			}
 
-			// We forcibly assign an "id" property to all layers.
+			// We forcibly assign an "id" property to all GeoJSON sources using generateId:
+			// https://docs.mapbox.com/mapbox-gl-js/style-spec/sources/#geojson-generateId
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			selectedFeatureId = features[0].id!.toString();
 			selectedLayerId = features[0].layer.id;

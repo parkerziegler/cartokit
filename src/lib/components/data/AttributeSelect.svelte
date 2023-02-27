@@ -1,8 +1,7 @@
 <script lang="ts">
 	import Select from '$lib/components/shared/Select.svelte';
-	import { dispatchLayerUpdate } from '$lib/interaction/layer';
+	import { dispatchLayerUpdate } from '$lib/interaction/update';
 	import { map } from '$lib/stores/map';
-	import { layers } from '$lib/stores/layers';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { selectedFeature } from '$lib/stores/feature';
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
@@ -22,7 +21,6 @@
 				type: 'attribute',
 				map: $map,
 				layer: $selectedLayer,
-				layers: $layers,
 				payload: {
 					attribute
 				}

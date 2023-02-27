@@ -14,7 +14,7 @@ export function instrumentHover(map: Map, layer: CartoKitLayer): void {
 		type: 'line',
 		source: layer.id,
 		paint: {
-			'line-color': '#ffffff',
+			'line-color': '#FFFFFF',
 			'line-width': ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0]
 		}
 	});

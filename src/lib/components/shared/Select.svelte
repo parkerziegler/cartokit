@@ -23,7 +23,7 @@
 </script>
 
 {#if title}
-	<div class="stack-h stack-xs-h items-baseline">
+	<div class="stack-h stack-h-xs items-baseline">
 		<p class="font-sans text-slate-400 text-sm underline decoration-dotted py-2">
 			{title}
 		</p>

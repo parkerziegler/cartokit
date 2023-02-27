@@ -5,9 +5,8 @@
 	import ColorScaleSelect from '$lib/components/color/ColorScaleSelect.svelte';
 	import ColorStopsSelect from '$lib/components/color/ColorStopsSelect.svelte';
 	import HexInput from '$lib/components/color/HexInput.svelte';
-	import { dispatchLayerUpdate } from '$lib/interaction/layer';
+	import { dispatchLayerUpdate } from '$lib/interaction/update';
 	import { map } from '$lib/stores/map';
-	import { layers } from '$lib/stores/layers';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { selectedFeature } from '$lib/stores/feature';
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
@@ -35,7 +34,6 @@
 					type: 'color-palette-color',
 					map: $map,
 					layer: $selectedLayer,
-					layers: $layers,
 					payload: {
 						color: target.value,
 						index: i
@@ -51,7 +49,6 @@
 				type: 'color-palette-color',
 				map: $map,
 				layer: $selectedLayer,
-				layers: $layers,
 				payload: {
 					color: hex,
 					index: i
@@ -78,7 +75,6 @@
 				type: 'opacity',
 				map: $map,
 				layer: $selectedLayer,
-				layers: $layers,
 				payload: {
 					opacity: percentToDecimal(Math.min(100, Math.max(0, +target.value)))
 				}
@@ -88,13 +84,8 @@
 
 	function deriveActiveColor(idx: number | null, feature: MapboxGeoJSONFeature | null): string {
 		if (idx !== null) {
-			console.log('Returning color from activeIndex: ', colors[idx]);
 			return colors[idx];
 		} else if (feature && isMapboxFillLayer(feature.layer)) {
-			console.log(
-				'Returning color from feature: ',
-				d3.color(feature.layer.paint?.['fill-color']?.toString() ?? colors[0])?.formatHex()
-			);
 			return (
 				d3.color(feature.layer.paint?.['fill-color']?.toString() ?? colors[0])?.formatHex() ??
 				colors[0]

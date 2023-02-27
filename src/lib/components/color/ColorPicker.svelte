@@ -2,9 +2,8 @@
 	import * as d3 from 'd3';
 
 	import HexInput from '$lib/components/color/HexInput.svelte';
-	import { dispatchLayerUpdate } from '$lib/interaction/layer';
+	import { dispatchLayerUpdate } from '$lib/interaction/update';
 	import { map } from '$lib/stores/map';
-	import { layers } from '$lib/stores/layers';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { isFillLayer } from '$lib/types/CartoKitLayer';
 	import { decimalToPercent, percentToDecimal } from '$lib/utils/color';
@@ -26,7 +25,6 @@
 				type: 'fill',
 				map: $map,
 				layer: $selectedLayer,
-				layers: $layers,
 				payload: {
 					color: target.value
 				}
@@ -40,7 +38,6 @@
 				type: 'fill',
 				map: $map,
 				layer: $selectedLayer,
-				layers: $layers,
 				payload: {
 					color: hex
 				}
@@ -56,7 +53,6 @@
 				type: 'opacity',
 				map: $map,
 				layer: $selectedLayer,
-				layers: $layers,
 				payload: {
 					opacity: percentToDecimal(Math.min(100, Math.max(0, +target.value)))
 				}

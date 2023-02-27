@@ -52,15 +52,13 @@ function deriveQuantileStops(
 	const { colors } = layer.style.breaks;
 
 	// For a quantile scale, use the entirety of the data as the domain.
-	const data = features.map((feature) => feature.properties?.[layer.attribute]);
+	const data = features
+		.map((feature) => feature.properties?.[layer.attribute])
+		.filter(isPropertyNumeric);
 
 	// Derive quantiles.
 	const quantiles = d3.scaleQuantile<string>().domain(data).range(colors).quantiles();
-
-	const stops = colors.reduce<(string | number)[]>(
-		(acc, color, i) => (i === 0 ? acc : acc.concat([quantiles[i - 1], color])),
-		[]
-	);
+	const stops = buildStops(colors, quantiles);
 
 	return stops;
 }
@@ -87,11 +85,7 @@ function deriveQuantizeStops(
 
 	// Derive ticks.
 	const ticks = d3.scaleQuantize<string>().domain(data).range(colors).nice().ticks(colors.length);
-
-	const stops = colors.reduce<(string | number)[]>(
-		(acc, color, i) => (i === 0 ? acc : acc.concat([ticks[i - 1], color])),
-		[]
-	);
+	const stops = buildStops(colors, ticks);
 
 	return stops;
 }
@@ -117,11 +111,22 @@ function deriveJenksStops(
 
 	// Derive Jenks breaks using ckmeans clustering.
 	const breaks = ckmeans(data, colors.length).map((cluster) => cluster[cluster.length - 1]);
-
-	const stops = colors.reduce<(string | number)[]>(
-		(acc, color, i) => (i === 0 ? acc : acc.concat([breaks[i - 1], color])),
-		[]
-	);
+	const stops = buildStops(colors, breaks);
 
 	return stops;
+}
+
+/**
+ * Construct the stops portion of a Mapbox GL JS step expression.
+ *
+ * @param colors – the colors to use in the expression.
+ * @param stops – the stops (breaks) to use in the expression.
+ *
+ * @returns – the stops portion of a Mapbox GL JS step expression.
+ */
+function buildStops(colors: string[], stops: number[]): (string | number)[] {
+	return colors.reduce<(string | number)[]>(
+		(acc, color, i) => (i === 0 ? acc : acc.concat([stops[i - 1], color])),
+		[]
+	);
 }
