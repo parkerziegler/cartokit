@@ -5,8 +5,8 @@
 
 	import { addLayer } from '$lib/interaction/layer';
 	import { addSource } from '$lib/interaction/source';
-	import { instrumentHover } from '$lib/interaction/hover';
-	import { instrumentSelect, onFeatureLeave } from '$lib/interaction/select';
+	import { instrumentPolygonHover } from '$lib/interaction/hover';
+	import { instrumentPolygonSelect, onFeatureLeave } from '$lib/interaction/select';
 	import { map as mapStore } from '$lib/stores/map';
 	import { layers } from '$lib/stores/layers';
 	import { selectedFeature } from '$lib/stores/feature';
@@ -35,8 +35,8 @@
 			Object.values($layers).forEach((layer) => {
 				addSource(map, layer);
 				addLayer(map, layer);
-				instrumentHover(map, layer);
-				instrumentSelect(map, layer);
+				instrumentPolygonHover(map, layer);
+				instrumentPolygonSelect(map, layer);
 			});
 		});
 

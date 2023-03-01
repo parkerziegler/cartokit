@@ -1,5 +1,9 @@
-import type { Map } from 'mapbox-gl';
+import type { GeoJSONSource, Map, MapboxGeoJSONFeature } from 'mapbox-gl';
+import * as turf from '@turf/turf';
 
+import { deriveColorScale } from '$lib/interaction/color';
+import { instrumentPointHover } from '$lib/interaction/hover';
+import { instrumentPointSelect } from '$lib/interaction/select';
 import type {
 	CartoKitFillLayer,
 	CartoKitChoroplethLayer,
@@ -7,7 +11,6 @@ import type {
 	CartoKitLayer
 } from '$lib/types/CartoKitLayer';
 import type { MapType } from '$lib/types/MapTypes';
-import { deriveColorScale } from '$lib/interaction/color';
 import { randomColor } from '$lib/utils/color';
 import { DEFAULT_PALETTE } from '$lib/utils/constants';
 import { isPropertyNumeric } from '$lib/utils/property';
@@ -123,14 +126,6 @@ function transitionToProportionalSymbol(
 	map: Map,
 	layer: CartoKitLayer
 ): CartoKitProportionalSymbolLayer {
-	// If the current layer geometry and the target don't match, remove the layer and
-	// all instrumented layers.
-	if (layer.geometry !== 'Point') {
-		map.removeLayer(layer.id);
-		map.removeLayer(`${layer.id}-hover`);
-		map.removeLayer(`${layer.id}-select`);
-	}
-
 	const targetLayer: CartoKitProportionalSymbolLayer = {
 		id: layer.id,
 		displayName: layer.displayName,
@@ -147,7 +142,17 @@ function transitionToProportionalSymbol(
 		}
 	};
 
-	addProportionalSymbolLayer(map, targetLayer);
+	// If the current layer geometry and the target don't match, remove the layer and
+	// all instrumented layers. Add and instrument the new layer.
+	if (layer.geometry !== 'Point') {
+		map.removeLayer(layer.id);
+		map.removeLayer(`${layer.id}-hover`);
+		map.removeLayer(`${layer.id}-select`);
+
+		addProportionalSymbolLayer(map, targetLayer);
+	} else {
+		// Otherwise, just update the paint properties.
+	}
 
 	return targetLayer;
 }
@@ -159,14 +164,31 @@ function transitionToProportionalSymbol(
  * @param layer – The CartoKitProportionalSymbolLayer to add.
  */
 function addProportionalSymbolLayer(map: Map, layer: CartoKitProportionalSymbolLayer): void {
+	// Derive centroids from the polygons in the input GeoJSON dataset.
+	const features = map.querySourceFeatures(layer.id);
+	const centroids = features.map((feature) => {
+		return turf.feature(turf.centroid(feature).geometry, feature.properties);
+	});
+
+	// After deriving centroids, replace the source data.
+	// We currently only support GeoJSON sources.
+	(map.getSource(layer.id) as GeoJSONSource).setData({
+		type: 'FeatureCollection',
+		features: centroids
+	});
+
 	map.addLayer({
 		id: layer.id,
 		type: 'circle',
 		source: layer.id,
 		paint: {
-			'circle-radius': ['sqrt', ['get', layer.attribute]]
+			'circle-radius': 10,
+			'circle-color': '#3d521e'
 		}
 	});
+
+	instrumentPointHover(map, layer);
+	instrumentPointSelect(map, layer);
 }
 
 /**

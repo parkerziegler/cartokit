@@ -6,12 +6,12 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import type { CartoKitIR } from '$lib/stores/layers';
 
 /**
- * Add a selection indicator to a feature in a layer.
+ * Add a selection indicator to a feature in a polygon layer.
  *
  * @param map – The top-level Mapbox GL map instance.
  * @param layer – A CartoKit layer to add a select effect to.
  */
-export function instrumentSelect(map: Map, layer: CartoKitLayer): void {
+export function instrumentPolygonSelect(map: Map, layer: CartoKitLayer): void {
 	map.addLayer({
 		id: `${layer.id}-select`,
 		type: 'line',
@@ -22,6 +22,42 @@ export function instrumentSelect(map: Map, layer: CartoKitLayer): void {
 		}
 	});
 
+	addSelectListeners(map, layer);
+}
+
+/**
+ * Add a selection indicator to a feature in a point layer.
+ *
+ * @param map – The top-level Mapbox GL map instance.
+ * @param layer – A CartoKit layer to add a select effect to.
+ */
+export function instrumentPointSelect(map: Map, layer: CartoKitLayer): void {
+	const currentStrokeWidth = map.getPaintProperty(layer.id, 'circle-stroke-width');
+	const currentStrokeColor = map.getPaintProperty(layer.id, 'circle-stroke-color');
+
+	map.setPaintProperty(layer.id, 'circle-stroke-width', [
+		'case',
+		['boolean', ['feature-state', 'selected'], false],
+		1,
+		currentStrokeWidth ?? 0
+	]);
+	map.setPaintProperty(layer.id, 'circle-stroke-color', [
+		'case',
+		['boolean', ['feature-state', 'selected'], false],
+		'#A534FF',
+		currentStrokeColor ?? 'transparent'
+	]);
+
+	addSelectListeners(map, layer);
+}
+
+/**
+ * Wire up event listeners for select effects.
+ *
+ * @param map – The top-level Mapbox GL map instance.
+ * @param layer – The CartoKit layer to wire the listeners to.
+ */
+function addSelectListeners(map: Map, layer: CartoKitLayer) {
 	let selectedFeatureId: string | null = null;
 
 	function onClick(event: MapLayerMouseEvent): void {
@@ -42,6 +78,13 @@ export function instrumentSelect(map: Map, layer: CartoKitLayer): void {
 	map.on('click', layer.id, onClick);
 }
 
+/**
+ * A global event listener for deselecting features.
+ *
+ * @param map – The top-level Mapbox GL map instance.
+ * @param layers – The CartoKit IR.
+ * @returns – deselectFeature, a callback to run when a map mouse event intersects no features.
+ */
 export function onFeatureLeave(map: Map, layers: CartoKitIR): (event: MapMouseEvent) => void {
 	const layerIds = Object.keys(layers);
 
