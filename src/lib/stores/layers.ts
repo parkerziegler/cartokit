@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
-const exampleLayer: CartoKitLayer = {
+const nifcFires: CartoKitLayer = {
 	id: 'nifc-fires',
 	displayName: 'NIFC Fires',
 	type: 'Choropleth',
@@ -31,4 +31,7 @@ const caCounties: CartoKitLayer = {
 	}
 };
 
-export const layers = writable<CartoKitLayer[]>([exampleLayer]);
+export type CartoKitIR = Record<string, CartoKitLayer>;
+export const layers = writable<CartoKitIR>({
+	'nifc-fires': nifcFires
+});

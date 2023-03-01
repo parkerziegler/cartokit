@@ -7,6 +7,10 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 export const selectedLayer = derived<[typeof selectedFeature, typeof layers], CartoKitLayer | null>(
 	[selectedFeature, layers],
 	([$selectedFeature, $layers]) => {
-		return $layers.find((layer) => layer.id === $selectedFeature?.layer.id) ?? null;
+		if ($selectedFeature) {
+			return $layers[$selectedFeature.layer.id];
+		}
+
+		return null;
 	}
 );

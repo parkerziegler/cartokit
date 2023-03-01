@@ -25,5 +25,17 @@ export function compileLayer(map: Map, layer: CartoKitLayer): string {
 			});
 			`;
 		}
+		case 'Proportional Symbol': {
+			const paint = compilePaint(map, layer);
+
+			return `
+			map.addLayer({
+				id: '${layer.id}',
+				source: '${layer.id}',
+				type: 'circle',
+				${paint}
+			});
+			`;
+		}
 	}
 }

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import mapboxgl from 'mapbox-gl';
+	import { PUBLIC_MAPBOX_ACCESS_TOKEN } from '$env/static/public';
 
 	import { addLayer } from '$lib/interaction/layer';
 	import { addSource } from '$lib/interaction/source';
 	import { instrumentHover } from '$lib/interaction/hover';
-	import { instrumentSelect } from '$lib/interaction/select';
+	import { instrumentSelect, onFeatureLeave } from '$lib/interaction/select';
 	import { map as mapStore } from '$lib/stores/map';
 	import { layers } from '$lib/stores/layers';
 	import { selectedFeature } from '$lib/stores/feature';
@@ -18,11 +19,12 @@
 	import MenuItem from '$lib/components/shared/MenuItem.svelte';
 	import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
 
-	mapboxgl.accessToken =
-		'pk.eyJ1IjoidG1jdyIsImEiOiJja3FmbGJoNXMxNmx5Mm9uejIxcmpiNjh2In0.2F8HR-8J859J7frYE6DG9g';
+	mapboxgl.accessToken = PUBLIC_MAPBOX_ACCESS_TOKEN;
+
+	let map: mapboxgl.Map;
 
 	onMount(() => {
-		const map = new mapboxgl.Map({
+		map = new mapboxgl.Map({
 			container: 'map',
 			style: 'mapbox://styles/mapbox/dark-v10',
 			center: [-81, 26.5],
@@ -30,28 +32,21 @@
 		});
 
 		map.on('load', () => {
-			$layers.forEach((layer) => {
+			Object.values($layers).forEach((layer) => {
 				addSource(map, layer);
 				addLayer(map, layer);
-
 				instrumentHover(map, layer);
-			});
-
-			instrumentSelect({
-				map,
-				layers: $layers,
-				selectedFeature
+				instrumentSelect(map, layer);
 			});
 		});
 
-		// Wait for the map to reach an idle state for the first time
-		// before loading the instance into the store.
-		let hasReachedIdle = false;
-		map.on('idle', () => {
-			if (!hasReachedIdle) {
-				hasReachedIdle = true;
-				mapStore.set(map);
-			}
+		// Add an event listener to handle feature deselection.
+		map.on('click', onFeatureLeave(map, $layers));
+
+		// When the map first reaches an idle state, set it in the store.
+		// This _should_ ensure that the map's styles and data have fully loaded.
+		map.once('idle', () => {
+			mapStore.set(map);
 		});
 
 		return () => {

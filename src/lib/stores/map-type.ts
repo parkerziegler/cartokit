@@ -10,9 +10,9 @@ export const mapType = derived<[typeof selectedFeature, typeof layers], MapType>
 	[selectedFeature, layers],
 	([$selectedFeature, $layers]) => {
 		if ($selectedFeature) {
-			const layer = $layers.find((layer) => layer.id === $selectedFeature.layer.id);
+			const layer = $layers[$selectedFeature.layer.id];
 
-			return layer?.type ?? DEFAULT_MAP_TYPE;
+			return layer.type;
 		}
 
 		return DEFAULT_MAP_TYPE;

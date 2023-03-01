@@ -3,7 +3,7 @@ import prettier from 'prettier/standalone';
 import babylon from 'prettier/parser-babel';
 
 import { compileMap } from '$lib/compile/compile-map';
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+import type { CartoKitIR } from '$lib/stores/layers';
 
 /**
  * Compile the CartoKit layer IR into a Mapbox GL JS program.
@@ -13,7 +13,7 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
  *
  * @returns – a Mapbox GL JS program.
  */
-export const compile = (map: Map, layers: CartoKitLayer[]) => {
+export const compile = (map: Map, layers: CartoKitIR) => {
 	const compiled = compileMap(map, layers);
 	const formatted = prettier.format(compiled, {
 		parser: 'babel',

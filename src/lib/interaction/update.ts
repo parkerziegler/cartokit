@@ -2,7 +2,7 @@ import type { Map } from 'mapbox-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import { transitionMapType } from '$lib/interaction/map-type';
-import { layers as layersStore } from '$lib/stores/layers';
+import { layers } from '$lib/stores/layers';
 import { isChoroplethLayer, isFillLayer, type CartoKitLayer } from '$lib/types/CartoKitLayer';
 import type { ColorScale } from '$lib/types/ColorScales';
 import type { MapType } from '$lib/types/MapTypes';
@@ -94,17 +94,17 @@ export function dispatchLayerUpdate({
 				targetMapType: payload.mapType
 			});
 
-			layersStore.update((ls) => {
-				const idx = ls.findIndex((l) => l.id === layer.id);
+			layers.update((lyrs) => {
+				lyrs[layer.id] = targetLayer;
 
-				return [...ls.slice(0, idx), targetLayer, ...ls.slice(idx + 1)];
+				return lyrs;
 			});
 			break;
 		}
 		case 'color-scale-type': {
 			if (isChoroplethLayer(layer)) {
-				layersStore.update((ls) => {
-					const lyr = ls.find((l) => l.id === layer.id);
+				layers.update((lyrs) => {
+					const lyr = lyrs[layer.id];
 
 					if (lyr && isChoroplethLayer(lyr)) {
 						lyr.style.breaks.scale = payload.scale;
@@ -116,15 +116,15 @@ export function dispatchLayerUpdate({
 						);
 					}
 
-					return ls;
+					return lyrs;
 				});
 			}
 			break;
 		}
 		case 'color-palette-color': {
 			if (isChoroplethLayer(layer)) {
-				layersStore.update((ls) => {
-					const lyr = ls.find((l) => l.id === layer.id);
+				layers.update((lyrs) => {
+					const lyr = lyrs[layer.id];
 
 					if (lyr && isChoroplethLayer(lyr)) {
 						lyr.style.breaks.colors[payload.index] = payload.color;
@@ -132,19 +132,19 @@ export function dispatchLayerUpdate({
 						map.setPaintProperty(
 							lyr.id,
 							'fill-color',
-							deriveColorScale(lyr, map.querySourceFeatures(layer.id))
+							deriveColorScale(lyr, map.querySourceFeatures(lyr.id))
 						);
 					}
 
-					return ls;
+					return lyrs;
 				});
 			}
 			break;
 		}
 		case 'color-palette-stops': {
 			if (isChoroplethLayer(layer)) {
-				layersStore.update((ls) => {
-					const lyr = ls.find((l) => l.id === layer.id);
+				layers.update((lyrs) => {
+					const lyr = lyrs[layer.id];
 
 					if (lyr && isChoroplethLayer(lyr)) {
 						const diff = payload.count - lyr.style.breaks.colors.length;
@@ -167,15 +167,15 @@ export function dispatchLayerUpdate({
 						);
 					}
 
-					return ls;
+					return lyrs;
 				});
 			}
 			break;
 		}
 		case 'attribute': {
 			if (isChoroplethLayer(layer)) {
-				layersStore.update((ls) => {
-					const lyr = ls.find((l) => l.id === layer.id);
+				layers.update((lyrs) => {
+					const lyr = lyrs[layer.id];
 
 					if (lyr && isChoroplethLayer(lyr)) {
 						lyr.attribute = payload.attribute;
@@ -187,38 +187,37 @@ export function dispatchLayerUpdate({
 						);
 					}
 
-					return ls;
+					return lyrs;
 				});
 			}
 			break;
 		}
 		case 'fill': {
-			map.setPaintProperty(layer.id, 'fill-color', payload.color);
-
-			// Update the layer in the store.
-			layersStore.update((layers) => {
-				const lyr = layers.find((layer) => layer.id === layer.id);
+			layers.update((lyrs) => {
+				const lyr = lyrs[layer.id];
 
 				if (lyr && isFillLayer(lyr)) {
 					lyr.style.fill = payload.color;
+
+					map.setPaintProperty(layer.id, 'fill-color', payload.color);
 				}
 
-				return layers;
+				return lyrs;
 			});
 			break;
 		}
 		case 'opacity': {
-			map.setPaintProperty(layer.id, 'fill-opacity', payload.opacity);
-
 			// Update the layer in the store.
-			layersStore.update((layers) => {
-				const lyr = layers.find((l) => l.id === layer.id);
+			layers.update((lyrs) => {
+				const lyr = lyrs[layer.id];
 
 				if (lyr) {
 					layer.style.opacity = payload.opacity;
+
+					map.setPaintProperty(layer.id, 'fill-opacity', payload.opacity);
 				}
 
-				return layers;
+				return lyrs;
 			});
 			break;
 		}

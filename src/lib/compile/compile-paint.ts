@@ -33,5 +33,8 @@ export function compilePaint(map: Map, layer: CartoKitLayer): string {
 				${layer.style.opacity !== DEFAULT_OPACITY ? `'fill-opacity': ${layer.style.opacity}` : ''}
 			}`;
 		}
+		case 'Proportional Symbol': {
+			return 'TODO';
+		}
 	}
 }
