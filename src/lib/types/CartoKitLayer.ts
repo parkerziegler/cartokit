@@ -6,9 +6,29 @@ interface Layer {
 	displayName: string;
 	type: MapType;
 	data: string; // Need to extend to valid GeoJSON.
+	geometry: 'Point' | 'Line' | 'Polygon';
 	style: {
 		opacity: number;
 	};
+}
+
+export interface CartoKitFillLayer extends Layer {
+	type: 'Fill';
+	style: {
+		fill: string;
+		opacity: number;
+	};
+}
+
+/**
+ * A type guard to determine if a CartoKit layer is a CartoKitFillLayer.
+ *
+ * @param layer – The layer to test.
+ *
+ * @returns – A Boolean value indicating whether the layer is a CartoKitFillLayer.
+ */
+export function isFillLayer(layer: CartoKitLayer): layer is CartoKitFillLayer {
+	return layer.type === 'Fill';
 }
 
 export interface CartoKitChoroplethLayer extends Layer {
@@ -34,23 +54,23 @@ export function isChoroplethLayer(layer: CartoKitLayer): layer is CartoKitChorop
 	return layer.type === 'Choropleth';
 }
 
-interface CartoKitFillLayer extends Layer {
-	type: 'Fill';
+export interface CartoKitProportionalSymbolLayer extends Layer {
+	type: 'Proportional Symbol';
+	attribute: string;
 	style: {
-		fill: string;
+		radius: {
+			min: number;
+			max: number;
+		};
+		breaks?: {
+			scale: ColorScale;
+			colors: string[];
+		};
 		opacity: number;
 	};
 }
 
-/**
- * A type guard to determine if a CartoKit layer is a CartoKitFillLayer.
- *
- * @param layer – The layer to test.
- *
- * @returns – A Boolean value indicating whether the layer is a CartoKitFillLayer.
- */
-export function isFillLayer(layer: CartoKitLayer): layer is CartoKitFillLayer {
-	return layer.type === 'Fill';
-}
-
-export type CartoKitLayer = CartoKitChoroplethLayer | CartoKitFillLayer;
+export type CartoKitLayer =
+	| CartoKitFillLayer
+	| CartoKitChoroplethLayer
+	| CartoKitProportionalSymbolLayer;
