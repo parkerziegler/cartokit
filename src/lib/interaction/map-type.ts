@@ -1,13 +1,9 @@
-import type { GeoJSONSource, Map, MapboxGeoJSONFeature } from 'mapbox-gl';
-import * as turf from '@turf/turf';
+import type { Map } from 'mapbox-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
-import { instrumentPointHover } from '$lib/interaction/hover';
-import { instrumentPointSelect } from '$lib/interaction/select';
 import type {
 	CartoKitFillLayer,
 	CartoKitChoroplethLayer,
-	CartoKitProportionalSymbolLayer,
 	CartoKitLayer
 } from '$lib/types/CartoKitLayer';
 import type { MapType } from '$lib/types/MapTypes';
@@ -42,7 +38,8 @@ export function transitionMapType({
 		case 'Choropleth':
 			return transitionToChoropleth(map, layer);
 		case 'Proportional Symbol':
-			return transitionToProportionalSymbol(map, layer);
+			return layer;
+		// return transitionToProportionalSymbol(map, layer);
 	}
 }
 
@@ -63,7 +60,6 @@ function transitionToFill(map: Map, layer: CartoKitLayer): CartoKitFillLayer {
 		displayName: layer.displayName,
 		type: 'Fill',
 		data: layer.data,
-		geometry: 'Polygon',
 		style: {
 			fill,
 			opacity: layer.style.opacity
@@ -81,24 +77,13 @@ function transitionToFill(map: Map, layer: CartoKitLayer): CartoKitFillLayer {
  */
 function transitionToChoropleth(map: Map, layer: CartoKitLayer): CartoKitChoroplethLayer {
 	// Select the first numeric attribute in the dataset.
-	const features = map.querySourceFeatures(layer.id);
-	let attribute = '';
-
-	if (features[0].properties) {
-		for (const property in features[0].properties) {
-			if (typeof features[0].properties[property] === 'number') {
-				attribute = property;
-				break;
-			}
-		}
-	}
+	const attribute = selectNumericAttribute(layer.data.geoJSON.features);
 
 	const targetLayer: CartoKitChoroplethLayer = {
 		id: layer.id,
 		displayName: layer.displayName,
 		type: 'Choropleth',
 		data: layer.data,
-		geometry: 'Polygon',
 		attribute,
 		style: {
 			breaks: {
@@ -109,87 +94,86 @@ function transitionToChoropleth(map: Map, layer: CartoKitLayer): CartoKitChoropl
 		}
 	};
 
-	map.setPaintProperty(layer.id, 'fill-color', deriveColorScale(targetLayer, features));
+	map.setPaintProperty(layer.id, 'fill-color', deriveColorScale(targetLayer));
 
 	return targetLayer;
 }
 
-/**
- * Transition a layer to a proportional symbol layer.
- *
- * @param map — The top-level Mapbox GL map instance.
- * @param layer — The CartoKit layer to transition.
- *
- * @returns – The transitioned CartoKitProportionalSymbolLayer.
- */
-function transitionToProportionalSymbol(
-	map: Map,
-	layer: CartoKitLayer
-): CartoKitProportionalSymbolLayer {
-	const targetLayer: CartoKitProportionalSymbolLayer = {
-		id: layer.id,
-		displayName: layer.displayName,
-		type: 'Proportional Symbol',
-		data: layer.data,
-		geometry: 'Point',
-		attribute: selectNumericAttribute(map.querySourceFeatures(layer.id)),
-		style: {
-			radius: {
-				min: 1,
-				max: 50
-			},
-			opacity: layer.style.opacity
-		}
-	};
+// /**
+//  * Transition a layer to a proportional symbol layer.
+//  *
+//  * @param map — The top-level Mapbox GL map instance.
+//  * @param layer — The CartoKit layer to transition.
+//  *
+//  * @returns – The transitioned CartoKitProportionalSymbolLayer.
+//  */
+// function transitionToProportionalSymbol(
+// 	map: Map,
+// 	layer: CartoKitLayer
+// ): CartoKitProportionalSymbolLayer {
+// 	const targetLayer: CartoKitProportionalSymbolLayer = {
+// 		id: layer.id,
+// 		displayName: layer.displayName,
+// 		type: 'Proportional Symbol',
+// 		data: layer.data,
+// 		attribute: selectNumericAttribute(map.querySourceFeatures(layer.id)),
+// 		style: {
+// 			radius: {
+// 				min: 1,
+// 				max: 50
+// 			},
+// 			opacity: layer.style.opacity
+// 		}
+// 	};
 
-	// If the current layer geometry and the target don't match, remove the layer and
-	// all instrumented layers. Add and instrument the new layer.
-	if (layer.geometry !== 'Point') {
-		map.removeLayer(layer.id);
-		map.removeLayer(`${layer.id}-hover`);
-		map.removeLayer(`${layer.id}-select`);
+// 	// If the current layer geometry and the target don't match, remove the layer and
+// 	// all instrumented layers. Add and instrument the new layer.
+// 	if (layer.geometry !== 'Point') {
+// 		map.removeLayer(layer.id);
+// 		map.removeLayer(`${layer.id}-hover`);
+// 		map.removeLayer(`${layer.id}-select`);
 
-		addProportionalSymbolLayer(map, targetLayer);
-	} else {
-		// Otherwise, just update the paint properties.
-	}
+// 		addProportionalSymbolLayer(map, targetLayer);
+// 	} else {
+// 		// Otherwise, just update the paint properties.
+// 	}
 
-	return targetLayer;
-}
+// 	return targetLayer;
+// }
 
-/**
- * Add a proportional symbol layer to the map.
- *
- * @param map – The top-level Mapbox GL map instance.
- * @param layer – The CartoKitProportionalSymbolLayer to add.
- */
-function addProportionalSymbolLayer(map: Map, layer: CartoKitProportionalSymbolLayer): void {
-	// Derive centroids from the polygons in the input GeoJSON dataset.
-	const features = map.querySourceFeatures(layer.id);
-	const centroids = features.map((feature) => {
-		return turf.feature(turf.centroid(feature).geometry, feature.properties);
-	});
+// /**
+//  * Add a proportional symbol layer to the map.
+//  *
+//  * @param map – The top-level Mapbox GL map instance.
+//  * @param layer – The CartoKitProportionalSymbolLayer to add.
+//  */
+// function addProportionalSymbolLayer(map: Map, layer: CartoKitProportionalSymbolLayer): void {
+// 	// Derive centroids from the polygons in the input GeoJSON dataset.
+// 	const features = map.querySourceFeatures(layer.id);
+// 	const centroids = features.map((feature) => {
+// 		return turf.feature(turf.centroid(feature).geometry, feature.properties);
+// 	});
 
-	// After deriving centroids, replace the source data.
-	// We currently only support GeoJSON sources.
-	(map.getSource(layer.id) as GeoJSONSource).setData({
-		type: 'FeatureCollection',
-		features: centroids
-	});
+// 	// After deriving centroids, replace the source data.
+// 	// We currently only support GeoJSON sources.
+// 	(map.getSource(layer.id) as GeoJSONSource).setData({
+// 		type: 'FeatureCollection',
+// 		features: centroids
+// 	});
 
-	map.addLayer({
-		id: layer.id,
-		type: 'circle',
-		source: layer.id,
-		paint: {
-			'circle-radius': 10,
-			'circle-color': '#3d521e'
-		}
-	});
+// 	map.addLayer({
+// 		id: layer.id,
+// 		type: 'circle',
+// 		source: layer.id,
+// 		paint: {
+// 			'circle-radius': 10,
+// 			'circle-color': '#3d521e'
+// 		}
+// 	});
 
-	instrumentPointHover(map, layer);
-	instrumentPointSelect(map, layer);
-}
+// 	instrumentPointHover(map, layer);
+// 	instrumentPointSelect(map, layer);
+// }
 
 /**
  * Select a numeric attribute from a GeoJSON dataset.

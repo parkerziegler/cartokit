@@ -3,10 +3,8 @@
 	import mapboxgl from 'mapbox-gl';
 	import { PUBLIC_MAPBOX_ACCESS_TOKEN } from '$env/static/public';
 
-	import { addLayer } from '$lib/interaction/layer';
 	import { addSource } from '$lib/interaction/source';
-	import { instrumentPolygonHover } from '$lib/interaction/hover';
-	import { instrumentPolygonSelect, onFeatureLeave } from '$lib/interaction/select';
+	import { onFeatureLeave } from '$lib/interaction/select';
 	import { map as mapStore } from '$lib/stores/map';
 	import { layers } from '$lib/stores/layers';
 	import { selectedFeature } from '$lib/stores/feature';
@@ -34,9 +32,6 @@
 		map.on('load', () => {
 			Object.values($layers).forEach((layer) => {
 				addSource(map, layer);
-				addLayer(map, layer);
-				instrumentPolygonHover(map, layer);
-				instrumentPolygonSelect(map, layer);
 			});
 		});
 

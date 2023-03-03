@@ -1,6 +1,8 @@
 import type { Map } from 'mapbox-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
+import { instrumentPolygonHover } from '$lib/interaction/hover';
+import { instrumentPolygonSelect } from '$lib/interaction/select';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
 /**
@@ -11,43 +13,34 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
  */
 export function addLayer(map: Map, layer: CartoKitLayer): void {
 	switch (layer.type) {
-		case 'Fill':
+		case 'Fill': {
 			map.addLayer({
 				id: layer.id,
 				source: layer.id,
 				type: 'fill',
 				paint: {
-					'fill-color': '#fd6a0b',
-					'fill-opacity': 1
+					'fill-color': layer.style.fill,
+					'fill-opacity': layer.style.opacity
 				}
 			});
+
+			instrumentPolygonHover(map, layer);
+			instrumentPolygonSelect(map, layer);
 			break;
+		}
 		case 'Choropleth': {
-			let hasSourceLoadedPreviously = false;
-
-			map.on('sourcedata', (event) => {
-				if (
-					event.sourceId === layer.id &&
-					event.isSourceLoaded &&
-					event.sourceDataType !== 'metadata' &&
-					!hasSourceLoadedPreviously
-				) {
-					hasSourceLoadedPreviously = true;
-
-					map.addLayer({
-						id: layer.id,
-						source: layer.id,
-						type: 'fill',
-						paint: {
-							'fill-color': 'transparent' // Make features transparent until we derive a color scale.
-						}
-					});
-
-					const features = map.querySourceFeatures(layer.id);
-
-					map.setPaintProperty(layer.id, 'fill-color', deriveColorScale(layer, features));
+			map.addLayer({
+				id: layer.id,
+				source: layer.id,
+				type: 'fill',
+				paint: {
+					'fill-color': deriveColorScale(layer),
+					'fill-opacity': layer.style.opacity
 				}
 			});
+
+			instrumentPolygonHover(map, layer);
+			instrumentPolygonSelect(map, layer);
 			break;
 		}
 	}

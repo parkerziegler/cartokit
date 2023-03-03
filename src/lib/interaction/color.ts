@@ -1,9 +1,10 @@
-import type { Expression, MapboxGeoJSONFeature } from 'mapbox-gl';
+import type { Expression } from 'mapbox-gl';
 import * as d3 from 'd3';
 import { ckmeans } from 'simple-statistics';
 
 import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
 import { isPropertyNumeric } from '$lib/utils/property';
+import type { Feature, Geometry, GeoJsonProperties } from 'geojson';
 
 /**
  * Derive a Mapbox GL JS expression for a choropleth color scale.
@@ -13,48 +14,57 @@ import { isPropertyNumeric } from '$lib/utils/property';
  *
  * @returns A Mapbox GL JS expression for a choropleth color scale.
  */
-export function deriveColorScale(
-	layer: CartoKitChoroplethLayer,
-	features: MapboxGeoJSONFeature[]
-): Expression {
-	const { scale, colors } = layer.style.breaks;
+export function deriveColorScale(layer: CartoKitChoroplethLayer): Expression {
+	const {
+		attribute,
+		data: {
+			geoJSON: { features }
+		},
+		style: {
+			breaks: { scale, colors }
+		}
+	} = layer;
 
 	const prelude: Expression = ['step', ['get', layer.attribute], colors[0]];
 	let stops: (string | number)[] = [];
 
 	switch (scale) {
 		case 'Quantile':
-			stops = deriveQuantileStops(layer, features);
+			stops = deriveQuantileStops({ attribute, features, colors });
 			break;
 		case 'Quantize':
-			stops = deriveQuantizeStops(layer, features);
+			stops = deriveQuantizeStops({ attribute, features, colors });
 			break;
 		case 'Jenks':
-			stops = deriveJenksStops(layer, features);
+			stops = deriveJenksStops({ attribute, features, colors });
 			break;
 	}
 
 	return [...prelude, ...stops];
 }
 
+interface DeriveStopsParams {
+	attribute: string;
+	features: Feature<Geometry, GeoJsonProperties>[];
+	colors: string[];
+}
+
 /**
  * Derive a Mapbox GL JS expression for a quantile color scale.
  *
- * @param layer — The CartoKit layer to derive a quantile color scale for.
+ * @param attribute — The attribute to use when derviving the quantile color scale.
  * @param features — The features in the layer.
+ * @param colors — The colors to use in the color scale.
  *
  * @returns A Mapbox GL JS expression for a quantile color scale.
  */
-function deriveQuantileStops(
-	layer: CartoKitChoroplethLayer,
-	features: MapboxGeoJSONFeature[]
-): (string | number)[] {
-	const { colors } = layer.style.breaks;
-
+function deriveQuantileStops({
+	attribute,
+	features,
+	colors
+}: DeriveStopsParams): (string | number)[] {
 	// For a quantile scale, use the entirety of the data as the domain.
-	const data = features
-		.map((feature) => feature.properties?.[layer.attribute])
-		.filter(isPropertyNumeric);
+	const data = features.map((feature) => feature.properties?.[attribute]).filter(isPropertyNumeric);
 
 	// Derive quantiles.
 	const quantiles = d3.scaleQuantile<string>().domain(data).range(colors).quantiles();
@@ -67,19 +77,17 @@ function deriveQuantileStops(
  * Derive a Mapbox GL JS expression for a quantize color scale.
  *
  * @param layer – The CartoKit layer to derive a quantize color scale for.
- * @param features – The features in the layer.
  *
  * @returns A Mapbox GL JS expression for a quantize color scale.
  */
-function deriveQuantizeStops(
-	layer: CartoKitChoroplethLayer,
-	features: MapboxGeoJSONFeature[]
-): (string | number)[] {
-	const { colors } = layer.style.breaks;
-
+function deriveQuantizeStops({
+	attribute,
+	features,
+	colors
+}: DeriveStopsParams): (string | number)[] {
 	// For a quantize scale, use the extent of the data as the domain.
 	const [min, max] = d3.extent(
-		features.map((feature) => feature.properties?.[layer.attribute]).filter(isPropertyNumeric)
+		features.map((feature) => feature.properties?.[attribute]).filter(isPropertyNumeric)
 	);
 	const data = typeof min === 'undefined' || typeof max === 'undefined' ? [0, 1] : [min, max];
 
@@ -94,20 +102,12 @@ function deriveQuantizeStops(
  * Derive a Mapbox GL JS expression for a color scale using Jenks natural breaks.
  *
  * @param layer – The CartoKit layer to derive a Jenks color scale for.
- * @param features – The features in the layer.
  *
  * @returns A Mapbox GL JS expression for a Jenks color scale.
  */
-function deriveJenksStops(
-	layer: CartoKitChoroplethLayer,
-	features: MapboxGeoJSONFeature[]
-): (string | number)[] {
-	const { colors } = layer.style.breaks;
-
+function deriveJenksStops({ attribute, features, colors }: DeriveStopsParams): (string | number)[] {
 	// For a Jenks scale, use the entirety of the data as the domain.
-	const data = features
-		.map((feature) => feature.properties?.[layer.attribute])
-		.filter(isPropertyNumeric);
+	const data = features.map((feature) => feature.properties?.[attribute]).filter(isPropertyNumeric);
 
 	// Derive Jenks breaks using ckmeans clustering.
 	const breaks = ckmeans(data, colors.length).map((cluster) => cluster[cluster.length - 1]);

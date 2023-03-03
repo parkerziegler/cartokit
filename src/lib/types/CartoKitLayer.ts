@@ -1,3 +1,5 @@
+import type { FeatureCollection } from 'geojson';
+
 import type { MapType } from '$lib/types/MapTypes';
 import type { ColorScale } from '$lib/types/ColorScales';
 
@@ -5,8 +7,10 @@ interface Layer {
 	id: string;
 	displayName: string;
 	type: MapType;
-	data: string; // Need to extend to valid GeoJSON.
-	geometry: 'Point' | 'Line' | 'Polygon';
+	data: {
+		url?: string;
+		geoJSON: FeatureCollection;
+	};
 	style: {
 		opacity: number;
 	};

@@ -26,6 +26,7 @@
 		"@sveltejs/adapter-auto": "^1.0.0",
 		"@sveltejs/kit": "^1.0.0",
 		"@types/d3": "^7.4.0",
+		"@types/geojson": "^7946.0.10",
 		"@types/lodash.isfinite": "^3.3.7",
 		"@types/mapbox-gl": "^2.7.10",
 		"@types/prettier": "^2.7.2",

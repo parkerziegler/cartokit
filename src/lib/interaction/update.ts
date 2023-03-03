@@ -1,4 +1,5 @@
 import type { Map } from 'mapbox-gl';
+import type { FeatureCollection } from 'geojson';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import { transitionMapType } from '$lib/interaction/map-type';
@@ -63,6 +64,13 @@ interface FillOpacityUpdate extends LayerUpdate {
 	};
 }
 
+interface DataUpdate extends LayerUpdate {
+	type: 'data';
+	payload: {
+		geoJSON: FeatureCollection;
+	};
+}
+
 type DispatchLayerUpdateParams =
 	| MapTypeUpdate
 	| ColorScaleTypeUpdate
@@ -70,7 +78,8 @@ type DispatchLayerUpdateParams =
 	| ColorPaletteStopsUpdate
 	| AttributeUpdate
 	| FillUpdate
-	| FillOpacityUpdate;
+	| FillOpacityUpdate
+	| DataUpdate;
 
 /**
  * Dispatch standardized updates to specific layers.
@@ -106,14 +115,10 @@ export function dispatchLayerUpdate({
 				layers.update((lyrs) => {
 					const lyr = lyrs[layer.id];
 
-					if (lyr && isChoroplethLayer(lyr)) {
+					if (isChoroplethLayer(lyr)) {
 						lyr.style.breaks.scale = payload.scale;
 
-						map.setPaintProperty(
-							lyr.id,
-							'fill-color',
-							deriveColorScale(lyr, map.querySourceFeatures(lyr.id))
-						);
+						map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
 					}
 
 					return lyrs;
@@ -126,14 +131,10 @@ export function dispatchLayerUpdate({
 				layers.update((lyrs) => {
 					const lyr = lyrs[layer.id];
 
-					if (lyr && isChoroplethLayer(lyr)) {
+					if (isChoroplethLayer(lyr)) {
 						lyr.style.breaks.colors[payload.index] = payload.color;
 
-						map.setPaintProperty(
-							lyr.id,
-							'fill-color',
-							deriveColorScale(lyr, map.querySourceFeatures(lyr.id))
-						);
+						map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
 					}
 
 					return lyrs;
@@ -146,7 +147,7 @@ export function dispatchLayerUpdate({
 				layers.update((lyrs) => {
 					const lyr = lyrs[layer.id];
 
-					if (lyr && isChoroplethLayer(lyr)) {
+					if (isChoroplethLayer(lyr)) {
 						const diff = payload.count - lyr.style.breaks.colors.length;
 
 						if (Math.sign(diff) === 1) {
@@ -160,11 +161,7 @@ export function dispatchLayerUpdate({
 							);
 						}
 
-						map.setPaintProperty(
-							lyr.id,
-							'fill-color',
-							deriveColorScale(lyr, map.querySourceFeatures(lyr.id))
-						);
+						map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
 					}
 
 					return lyrs;
@@ -177,14 +174,10 @@ export function dispatchLayerUpdate({
 				layers.update((lyrs) => {
 					const lyr = lyrs[layer.id];
 
-					if (lyr && isChoroplethLayer(lyr)) {
+					if (isChoroplethLayer(lyr)) {
 						lyr.attribute = payload.attribute;
 
-						map.setPaintProperty(
-							lyr.id,
-							'fill-color',
-							deriveColorScale(lyr, map.querySourceFeatures(layer.id))
-						);
+						map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
 					}
 
 					return lyrs;
@@ -196,7 +189,7 @@ export function dispatchLayerUpdate({
 			layers.update((lyrs) => {
 				const lyr = lyrs[layer.id];
 
-				if (lyr && isFillLayer(lyr)) {
+				if (isFillLayer(lyr)) {
 					lyr.style.fill = payload.color;
 
 					map.setPaintProperty(layer.id, 'fill-color', payload.color);
@@ -220,6 +213,17 @@ export function dispatchLayerUpdate({
 				return lyrs;
 			});
 			break;
+		}
+		case 'data': {
+			layers.update((lyrs) => {
+				const lyr = lyrs[layer.id];
+
+				if (lyr) {
+					lyr.data.geoJSON = payload.geoJSON;
+				}
+
+				return lyrs;
+			});
 		}
 	}
 }
