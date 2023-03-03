@@ -1,5 +1,3 @@
-import type { Map } from 'mapbox-gl';
-
 import { compileSource } from '$lib/compile/compile-source';
 import { compileLayer } from '$lib/compile/compile-layer';
 import type { CartoKitIR } from '$lib/stores/layers';
@@ -12,13 +10,13 @@ import type { CartoKitIR } from '$lib/stores/layers';
  *
  * @returns – a Mapbox GL JS program fragment.
  */
-export const compileMap = (map: Map, layers: CartoKitIR): string => {
+export const compileMap = (layers: CartoKitIR): string => {
 	const layerSources = Object.values(layers).reduce((p, layer) => {
 		return p.concat('\n\n' + compileSource(layer));
 	}, '');
 
 	const layerRenders = Object.values(layers).reduce((p, layer) => {
-		return p.concat('\n\n' + compileLayer(map, layer));
+		return p.concat('\n\n' + compileLayer(layer));
 	}, '');
 
 	const program = `

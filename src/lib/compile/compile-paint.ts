@@ -1,5 +1,3 @@
-import type { Map } from 'mapbox-gl';
-
 import { deriveColorScale } from '$lib/interaction/color';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { DEFAULT_FILL, DEFAULT_OPACITY } from '$lib/utils/constants';
@@ -12,7 +10,7 @@ import { DEFAULT_FILL, DEFAULT_OPACITY } from '$lib/utils/constants';
  *
  * @returns – a Mapbox GL JS program fragment representing the layer's presentational properties.
  */
-export function compilePaint(map: Map, layer: CartoKitLayer): string {
+export function compilePaint(layer: CartoKitLayer): string {
 	switch (layer.type) {
 		case 'Fill': {
 			if (layer.style.fill === DEFAULT_FILL && layer.style.opacity === DEFAULT_OPACITY) {
@@ -26,10 +24,8 @@ export function compilePaint(map: Map, layer: CartoKitLayer): string {
 			`;
 		}
 		case 'Choropleth': {
-			const features = map.querySourceFeatures(layer.id);
-
 			return `paint: {
-				'fill-color': ${JSON.stringify(deriveColorScale(layer, features))},
+				'fill-color': ${JSON.stringify(deriveColorScale(layer))},
 				${layer.style.opacity !== DEFAULT_OPACITY ? `'fill-opacity': ${layer.style.opacity}` : ''}
 			}`;
 		}

@@ -26,7 +26,8 @@ export function addSource(map: Map, layer: CartoKitLayer) {
 
 			map.addSource(layer.id, {
 				type: 'geojson',
-				data,
+				// Still use the API endpoint when available to speed up vector tile generation.
+				data: layer.data.url,
 				generateId: true
 			});
 

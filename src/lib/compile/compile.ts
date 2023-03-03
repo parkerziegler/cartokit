@@ -1,4 +1,3 @@
-import type { Map } from 'mapbox-gl';
 import prettier from 'prettier/standalone';
 import babylon from 'prettier/parser-babel';
 
@@ -13,8 +12,8 @@ import type { CartoKitIR } from '$lib/stores/layers';
  *
  * @returns – a Mapbox GL JS program.
  */
-export const compile = (map: Map, layers: CartoKitIR) => {
-	const compiled = compileMap(map, layers);
+export const compile = (layers: CartoKitIR) => {
+	const compiled = compileMap(layers);
 	const formatted = prettier.format(compiled, {
 		parser: 'babel',
 		plugins: [babylon]
