@@ -1,4 +1,4 @@
 import { writable } from 'svelte/store';
-import type { MapboxGeoJSONFeature } from 'mapbox-gl';
+import type { MapGeoJSONFeature } from 'maplibre-gl';
 
-export const selectedFeature = writable<MapboxGeoJSONFeature | null>(null);
+export const selectedFeature = writable<MapGeoJSONFeature | null>(null);

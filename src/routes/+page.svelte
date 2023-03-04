@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import mapboxgl from 'mapbox-gl';
-	import { PUBLIC_MAPBOX_ACCESS_TOKEN } from '$env/static/public';
+	import maplibregl from 'maplibre-gl';
 
+	import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
 	import { addSource } from '$lib/interaction/source';
 	import { onFeatureLeave } from '$lib/interaction/select';
 	import { map as mapStore } from '$lib/stores/map';
@@ -17,16 +17,14 @@
 	import MenuItem from '$lib/components/shared/MenuItem.svelte';
 	import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
 
-	mapboxgl.accessToken = PUBLIC_MAPBOX_ACCESS_TOKEN;
-
-	let map: mapboxgl.Map;
+	let map: maplibregl.Map;
 
 	onMount(() => {
-		map = new mapboxgl.Map({
+		map = new maplibregl.Map({
 			container: 'map',
-			style: 'mapbox://styles/mapbox/dark-v10',
-			center: [-81, 26],
-			zoom: 8
+			style: `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
+			center: [-120, 37],
+			zoom: 5
 		});
 
 		map.on('load', () => {

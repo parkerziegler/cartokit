@@ -1,14 +1,14 @@
-import type { Map } from 'mapbox-gl';
+import type { Map } from 'maplibre-gl';
 
+import { addLayer } from '$lib/interaction/layer';
 import { dispatchLayerUpdate } from '$lib/interaction/update';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { sourceWorker } from '$lib/utils/worker';
-import { addLayer } from './layer';
 
 /**
  * Add a source for a CartoKit layer to the map.
  *
- * @param map – The top-level Mapbox GL map instance.
+ * @param map – The top-level MapLibre GL map instance.
  * @param layer – The CartoKit layer to add a source for.
  */
 export function addSource(map: Map, layer: CartoKitLayer) {

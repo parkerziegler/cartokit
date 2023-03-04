@@ -7,7 +7,7 @@
 
 <svelte:head>
 	<title>cartokit</title>
-	<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.css" />
+	<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" />
 </svelte:head>
 
 <slot />

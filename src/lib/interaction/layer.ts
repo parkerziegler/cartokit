@@ -1,4 +1,4 @@
-import type { Map } from 'mapbox-gl';
+import type { Map } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import { instrumentPolygonHover } from '$lib/interaction/hover';
@@ -8,7 +8,7 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 /**
  * Add a CartoKit layer to the map.
  *
- * @param map – The top-level Mapbox GL map instance.
+ * @param map – The top-level MapLibre GL map instance.
  * @param layer – The CartoKit layer to add to the map.
  */
 export function addLayer(map: Map, layer: CartoKitLayer): void {

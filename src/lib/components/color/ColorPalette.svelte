@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as d3 from 'd3';
-	import type { MapboxGeoJSONFeature } from 'mapbox-gl';
+	import type { MapGeoJSONFeature } from 'maplibre-gl';
 
 	import ColorScaleSelect from '$lib/components/color/ColorScaleSelect.svelte';
 	import ColorStopsSelect from '$lib/components/color/ColorStopsSelect.svelte';
@@ -12,7 +12,7 @@
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
 	import { percentToDecimal, decimalToPercent } from '$lib/utils/color';
 	import { DEFAULT_OPACITY, DEFAULT_PALETTE } from '$lib/utils/constants';
-	import { isMapboxFillLayer } from '$lib/utils/mapbox';
+	import { isMapLibreFillLayer } from '$lib/utils/maplibre';
 
 	let activeColorIndex: number | null = null;
 
@@ -82,10 +82,10 @@
 		}
 	}
 
-	function deriveActiveColor(idx: number | null, feature: MapboxGeoJSONFeature | null): string {
+	function deriveActiveColor(idx: number | null, feature: MapGeoJSONFeature | null): string {
 		if (idx !== null) {
 			return colors[idx];
-		} else if (feature && isMapboxFillLayer(feature.layer)) {
+		} else if (feature && isMapLibreFillLayer(feature.layer)) {
 			return (
 				d3.color(feature.layer.paint?.['fill-color']?.toString() ?? colors[0])?.formatHex() ??
 				colors[0]

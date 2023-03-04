@@ -1,4 +1,4 @@
-import type { Map } from 'mapbox-gl';
+import type { Map } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import type {
@@ -21,7 +21,7 @@ interface TransitionMapTypeParams {
  * Transition a layer from one map type to another. For cross-geometry transitions,
  * this will create a new layer and remove the previous layer.
  *
- * @param map — The top-level Mapbox GL map instance.
+ * @param map — The top-level MapLibre GL map instance.
  * @param layer — The CartoKitLayer to transition.
  * @param targetMapType — The map type to transition to.
  *
@@ -46,7 +46,7 @@ export function transitionMapType({
 /**
  * Transition a layer to a polygon fill layer.
  *
- * @param map — The top-level Mapbox GL map instance.
+ * @param map — The top-level MapLibre GL map instance.
  * @param layer — The CartoKit layer to transition.
  *
  * @returns — The transitioned CartoKitFillLayer.
@@ -70,7 +70,7 @@ function transitionToFill(map: Map, layer: CartoKitLayer): CartoKitFillLayer {
 /**
  * Transition a layer to a choropleth layer.
  *
- * @param map — The top-level Mapbox GL map instance.
+ * @param map — The top-level MapLibre GL map instance.
  * @param layer — The CartoKit layer to transition.
  *
  * @returns – The transitioned CartoKitChoroplethLayer.
@@ -102,7 +102,7 @@ function transitionToChoropleth(map: Map, layer: CartoKitLayer): CartoKitChoropl
 // /**
 //  * Transition a layer to a proportional symbol layer.
 //  *
-//  * @param map — The top-level Mapbox GL map instance.
+//  * @param map — The top-level MapLibre GL map instance.
 //  * @param layer — The CartoKit layer to transition.
 //  *
 //  * @returns – The transitioned CartoKitProportionalSymbolLayer.
@@ -144,7 +144,7 @@ function transitionToChoropleth(map: Map, layer: CartoKitLayer): CartoKitChoropl
 // /**
 //  * Add a proportional symbol layer to the map.
 //  *
-//  * @param map – The top-level Mapbox GL map instance.
+//  * @param map – The top-level MapLibre GL map instance.
 //  * @param layer – The CartoKitProportionalSymbolLayer to add.
 //  */
 // function addProportionalSymbolLayer(map: Map, layer: CartoKitProportionalSymbolLayer): void {

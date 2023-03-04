@@ -1,4 +1,4 @@
-import type { Expression } from 'mapbox-gl';
+import type { ExpressionSpecification } from 'maplibre-gl';
 import * as d3 from 'd3';
 import { ckmeans } from 'simple-statistics';
 
@@ -7,14 +7,14 @@ import { isPropertyNumeric } from '$lib/utils/property';
 import type { Feature, Geometry, GeoJsonProperties } from 'geojson';
 
 /**
- * Derive a Mapbox GL JS expression for a choropleth color scale.
+ * Derive a MapLibre GL JS expression for a choropleth color scale.
  *
  * @param layer – The CartoKit layer to derive a color scale for.
  * @param features – The features in the layer.
  *
- * @returns A Mapbox GL JS expression for a choropleth color scale.
+ * @returns A MapLibre GL JS expression for a choropleth color scale.
  */
-export function deriveColorScale(layer: CartoKitChoroplethLayer): Expression {
+export function deriveColorScale(layer: CartoKitChoroplethLayer): ExpressionSpecification {
 	const {
 		attribute,
 		data: {
@@ -25,7 +25,7 @@ export function deriveColorScale(layer: CartoKitChoroplethLayer): Expression {
 		}
 	} = layer;
 
-	const prelude: Expression = ['step', ['get', layer.attribute], colors[0]];
+	const prelude: ExpressionSpecification = ['step', ['get', layer.attribute], colors[0]];
 	let stops: (string | number)[] = [];
 
 	switch (scale) {
@@ -50,13 +50,13 @@ interface DeriveStopsParams {
 }
 
 /**
- * Derive a Mapbox GL JS expression for a quantile color scale.
+ * Derive a MapLibre GL JS expression for a quantile color scale.
  *
  * @param attribute — The attribute to use when derviving the quantile color scale.
  * @param features — The features in the layer.
  * @param colors — The colors to use in the color scale.
  *
- * @returns A Mapbox GL JS expression for a quantile color scale.
+ * @returns A MapLibre GL JS expression for a quantile color scale.
  */
 function deriveQuantileStops({
 	attribute,
@@ -74,11 +74,11 @@ function deriveQuantileStops({
 }
 
 /**
- * Derive a Mapbox GL JS expression for a quantize color scale.
+ * Derive a MapLibre GL JS expression for a quantize color scale.
  *
  * @param layer – The CartoKit layer to derive a quantize color scale for.
  *
- * @returns A Mapbox GL JS expression for a quantize color scale.
+ * @returns A MapLibre GL JS expression for a quantize color scale.
  */
 function deriveQuantizeStops({
 	attribute,
@@ -99,11 +99,11 @@ function deriveQuantizeStops({
 }
 
 /**
- * Derive a Mapbox GL JS expression for a color scale using Jenks natural breaks.
+ * Derive a MapLibre GL JS expression for a color scale using Jenks natural breaks.
  *
  * @param layer – The CartoKit layer to derive a Jenks color scale for.
  *
- * @returns A Mapbox GL JS expression for a Jenks color scale.
+ * @returns A MapLibre GL JS expression for a Jenks color scale.
  */
 function deriveJenksStops({ attribute, features, colors }: DeriveStopsParams): (string | number)[] {
 	// For a Jenks scale, use the entirety of the data as the domain.
@@ -117,12 +117,12 @@ function deriveJenksStops({ attribute, features, colors }: DeriveStopsParams): (
 }
 
 /**
- * Construct the stops portion of a Mapbox GL JS step expression.
+ * Construct the stops portion of a MapLibre GL JS step expression.
  *
  * @param colors – the colors to use in the expression.
  * @param stops – the stops (breaks) to use in the expression.
  *
- * @returns – the stops portion of a Mapbox GL JS step expression.
+ * @returns – the stops portion of a MapLibre GL JS step expression.
  */
 function buildStops(colors: string[], stops: number[]): (string | number)[] {
 	return colors.reduce<(string | number)[]>(

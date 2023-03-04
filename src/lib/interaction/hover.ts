@@ -1,11 +1,11 @@
-import type { Map, MapLayerMouseEvent } from 'mapbox-gl';
+import type { Map, MapLayerMouseEvent } from 'maplibre-gl';
 
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
 /**
  * Add a hover effect to all features in a polygon layer.
  *
- * @param map – The top-level Mapbox GL map instance.
+ * @param map – The top-level MapLibre GL map instance.
  * @param layer – The CartoKit layer to add the hover effect to.
  */
 export function instrumentPolygonHover(map: Map, layer: CartoKitLayer): void {
@@ -25,7 +25,7 @@ export function instrumentPolygonHover(map: Map, layer: CartoKitLayer): void {
 /**
  * Add a hover effect to all features in a point layer.
  *
- * @param map – The top-level Mapbox GL map instance.
+ * @param map – The top-level MapLibre GL map instance.
  * @param layer – The CartoKit layer to add the hover effect to.
  */
 export function instrumentPointHover(map: Map, layer: CartoKitLayer): void {
@@ -51,7 +51,7 @@ export function instrumentPointHover(map: Map, layer: CartoKitLayer): void {
 /**
  * Wire up event listeners for hover effects.
  *
- * @param map – The top-level Mapbox GL map instance.
+ * @param map – The top-level MapLibre GL map instance.
  * @param layer – The CartoKit layer to wire the listeners to.
  */
 function addHoverListeners(map: Map, layer: CartoKitLayer): void {

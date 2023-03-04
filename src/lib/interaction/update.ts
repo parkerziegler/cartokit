@@ -1,4 +1,4 @@
-import type { Map } from 'mapbox-gl';
+import type { Map } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
 
 import { deriveColorScale } from '$lib/interaction/color';
@@ -85,7 +85,7 @@ type DispatchLayerUpdateParams =
  * Dispatch standardized updates to specific layers.
  *
  * @param type – The type of update to dispatch.
- * @param map – The top-level Mapbox GL map instance.
+ * @param map – The top-level MapLibre GL map instance.
  * @param layer – The CartoKit layer to update.
  * @param payload – The payload for the update.
  */

@@ -1,4 +1,4 @@
-import type { Map, MapLayerMouseEvent, MapMouseEvent } from 'mapbox-gl';
+import type { Map, MapGeoJSONFeature, MapLayerMouseEvent, MapMouseEvent } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { selectedFeature } from '$lib/stores/feature';
@@ -8,7 +8,7 @@ import type { CartoKitIR } from '$lib/stores/layers';
 /**
  * Add a selection indicator to a feature in a polygon layer.
  *
- * @param map – The top-level Mapbox GL map instance.
+ * @param map – The top-level MapLibre GL map instance.
  * @param layer – A CartoKit layer to add a select effect to.
  */
 export function instrumentPolygonSelect(map: Map, layer: CartoKitLayer): void {
@@ -28,7 +28,7 @@ export function instrumentPolygonSelect(map: Map, layer: CartoKitLayer): void {
 /**
  * Add a selection indicator to a feature in a point layer.
  *
- * @param map – The top-level Mapbox GL map instance.
+ * @param map – The top-level MapLibre GL map instance.
  * @param layer – A CartoKit layer to add a select effect to.
  */
 export function instrumentPointSelect(map: Map, layer: CartoKitLayer): void {
@@ -54,7 +54,7 @@ export function instrumentPointSelect(map: Map, layer: CartoKitLayer): void {
 /**
  * Wire up event listeners for select effects.
  *
- * @param map – The top-level Mapbox GL map instance.
+ * @param map – The top-level MapLibre GL map instance.
  * @param layer – The CartoKit layer to wire the listeners to.
  */
 function addSelectListeners(map: Map, layer: CartoKitLayer) {
@@ -62,16 +62,20 @@ function addSelectListeners(map: Map, layer: CartoKitLayer) {
 
 	function onClick(event: MapLayerMouseEvent): void {
 		if (event.features && event.features.length > 0) {
+			console.log(event.features[0]);
 			if (selectedFeatureId !== null) {
 				map.setFeatureState({ source: layer.id, id: selectedFeatureId }, { selected: false });
 			}
 
 			// We forcibly assign an "id" property to all GeoJSON sources using generateId:
-			// https://docs.mapbox.com/mapbox-gl-js/style-spec/sources/#geojson-generateId
+			// https://maplibre.org/maplibre-gl-js-docs/style-spec/sources/#geojson-generateId
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			selectedFeatureId = event.features[0].id!.toString();
 			map.setFeatureState({ source: layer.id, id: selectedFeatureId }, { selected: true });
-			selectedFeature.set(event.features[0]);
+
+			// The types appear to be wrong here, so we cast:
+			// https://github.com/maplibre/maplibre-gl-js/blob/main/src/ui/events.ts#L11
+			selectedFeature.set(event.features[0] as MapGeoJSONFeature);
 		}
 	}
 
@@ -81,7 +85,7 @@ function addSelectListeners(map: Map, layer: CartoKitLayer) {
 /**
  * A global event listener for deselecting features.
  *
- * @param map – The top-level Mapbox GL map instance.
+ * @param map – The top-level MapLibre GL map instance.
  * @param layers – The CartoKit IR.
  * @returns – deselectFeature, a callback to run when a map mouse event intersects no features.
  */
