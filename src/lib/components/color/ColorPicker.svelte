@@ -2,11 +2,12 @@
 	import * as d3 from 'd3';
 
 	import HexInput from '$lib/components/color/HexInput.svelte';
+	import OpacityInput from '$lib/components/color/OpacityInput.svelte';
 	import { dispatchLayerUpdate } from '$lib/interaction/update';
 	import { map } from '$lib/stores/map';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { isFillLayer } from '$lib/types/CartoKitLayer';
-	import { decimalToPercent, percentToDecimal } from '$lib/utils/color';
+	import { decimalToPercent } from '$lib/utils/color';
 	import { DEFAULT_FILL, DEFAULT_OPACITY } from '$lib/utils/constants';
 
 	$: color =
@@ -45,16 +46,14 @@
 		}
 	}
 
-	function onOpacityChange(event: Event) {
-		const target = event.target as HTMLInputElement;
-
+	function onOpacityChange(opacity: number) {
 		if ($selectedLayer && $map) {
 			dispatchLayerUpdate({
 				type: 'opacity',
 				map: $map,
 				layer: $selectedLayer,
 				payload: {
-					opacity: percentToDecimal(Math.min(100, Math.max(0, +target.value)))
+					opacity
 				}
 			});
 		}
@@ -69,6 +68,7 @@
 			value={color}
 			on:input={onColorInput}
 		/>
-		<HexInput hex={color} {onHexChange} {opacity} {onOpacityChange} />
+		<HexInput hex={color} {onHexChange} />
+		<OpacityInput {opacity} {onOpacityChange} />
 	</div>
 </div>

@@ -5,12 +5,13 @@
 	import ColorScaleSelect from '$lib/components/color/ColorScaleSelect.svelte';
 	import ColorStopsSelect from '$lib/components/color/ColorStopsSelect.svelte';
 	import HexInput from '$lib/components/color/HexInput.svelte';
+	import OpacityInput from '$lib/components/color/OpacityInput.svelte';
 	import { dispatchLayerUpdate } from '$lib/interaction/update';
 	import { map } from '$lib/stores/map';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { selectedFeature } from '$lib/stores/feature';
 	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
-	import { percentToDecimal, decimalToPercent } from '$lib/utils/color';
+	import { decimalToPercent } from '$lib/utils/color';
 	import { DEFAULT_OPACITY, DEFAULT_PALETTE } from '$lib/utils/constants';
 	import { isMapLibreFillLayer } from '$lib/utils/maplibre';
 
@@ -67,16 +68,14 @@
 		activeColorIndex = null;
 	}
 
-	function onOpacityChange(event: Event) {
-		const target = event.target as HTMLInputElement;
-
+	function onOpacityChange(opacity: number) {
 		if ($selectedLayer && $map) {
 			dispatchLayerUpdate({
 				type: 'opacity',
 				map: $map,
 				layer: $selectedLayer,
 				payload: {
-					opacity: percentToDecimal(Math.min(100, Math.max(0, +target.value)))
+					opacity
 				}
 			});
 		}
@@ -119,12 +118,11 @@
 	</ul>
 	<HexInput
 		hex={selectedColor}
-		{opacity}
 		onHexChange={(hex) =>
 			onHexChange(
 				hex,
 				colors.findIndex((c) => c === selectedColor)
 			)}
-		{onOpacityChange}
 	/>
+	<OpacityInput {opacity} {onOpacityChange} />
 </div>

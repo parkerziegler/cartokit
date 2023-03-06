@@ -3,18 +3,18 @@ import * as d3 from 'd3';
 
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
-const caCounties: CartoKitLayer = {
-	id: 'ca-counties',
-	displayName: 'CA Counties',
+const nifc2023Fires: CartoKitLayer = {
+	id: 'nifc-2023-fires',
+	displayName: 'NIFC 2023 Fires',
 	type: 'Choropleth',
 	data: {
-		url: 'https://api.dokku.censusreporter.org/1.0/geo/show/tiger2021?geo_ids=050|04000US06',
+		url: 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/ArcGIS/rest/services/WFIGS_Interagency_Perimeters/FeatureServer/0/query?outFields=*&where=attr_CreatedOnDateTime_dt%20BETWEEN%20timestamp%20%272022-01-01%2008%3A00%3A00%27%20AND%20timestamp%20%272023-01-03%2007%3A59%3A58%27&f=geojson',
 		geoJSON: {
 			type: 'FeatureCollection',
 			features: []
 		}
 	},
-	attribute: '2013_population_estimate',
+	attribute: 'attr_IncidentSize',
 	style: {
 		breaks: {
 			scale: 'Quantile',
@@ -26,5 +26,5 @@ const caCounties: CartoKitLayer = {
 
 export type CartoKitIR = Record<string, CartoKitLayer>;
 export const layers = writable<CartoKitIR>({
-	'ca-counties': caCounties
+	'nifc-2023-fires': nifc2023Fires
 });
