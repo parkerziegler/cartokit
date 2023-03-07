@@ -12,9 +12,13 @@ const nifc2023Fires: CartoKitLayer = {
 		geoJSON: {
 			type: 'FeatureCollection',
 			features: []
+		},
+		rawGeoJSON: {
+			type: 'FeatureCollection',
+			features: []
 		}
 	},
-	attribute: 'attr_IncidentSize',
+	attribute: 'poly_GISAcres',
 	style: {
 		breaks: {
 			scale: 'Quantile',

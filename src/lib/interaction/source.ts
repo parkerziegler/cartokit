@@ -16,7 +16,7 @@ export function addSource(map: Map, layer: CartoKitLayer) {
 		// Load the data in a worker thread.
 		sourceWorker(layer.data.url, (data) => {
 			dispatchLayerUpdate({
-				type: 'data',
+				type: 'initial-data',
 				map,
 				layer,
 				payload: {

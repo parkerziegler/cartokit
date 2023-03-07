@@ -4,14 +4,13 @@
 	import { map } from '$lib/stores/map';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { selectedFeature } from '$lib/stores/feature';
-	import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
+	import { isDataLayer } from '$lib/types/CartoKitLayer';
 
-	const options = Object.keys($selectedFeature?.properties ?? {}).map((attribute) => ({
+	$: options = Object.keys($selectedFeature?.properties ?? {}).map((attribute) => ({
 		value: attribute,
 		label: attribute
 	}));
-	const selected =
-		$selectedLayer && isChoroplethLayer($selectedLayer) ? $selectedLayer.attribute : '';
+	$: selected = $selectedLayer && isDataLayer($selectedLayer) ? $selectedLayer.attribute : '';
 
 	function onChange(event: CustomEvent<{ value: string }>) {
 		const attribute = event.detail.value;

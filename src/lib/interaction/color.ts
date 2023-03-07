@@ -1,10 +1,10 @@
 import type { ExpressionSpecification } from 'maplibre-gl';
 import * as d3 from 'd3';
 import { ckmeans } from 'simple-statistics';
+import type { Feature } from 'geojson';
 
 import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
 import { isPropertyNumeric } from '$lib/utils/property';
-import type { Feature, Geometry, GeoJsonProperties } from 'geojson';
 
 /**
  * Derive a MapLibre GL JS expression for a choropleth color scale.
@@ -45,7 +45,7 @@ export function deriveColorScale(layer: CartoKitChoroplethLayer): ExpressionSpec
 
 interface DeriveStopsParams {
 	attribute: string;
-	features: Feature<Geometry, GeoJsonProperties>[];
+	features: Feature[];
 	colors: string[];
 }
 

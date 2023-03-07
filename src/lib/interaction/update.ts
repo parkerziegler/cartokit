@@ -1,7 +1,8 @@
-import type { Map } from 'maplibre-gl';
+import type { Map, GeoJSONSource } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
 
 import { deriveColorScale } from '$lib/interaction/color';
+import { addLayer } from '$lib/interaction/layer';
 import { transitionMapType } from '$lib/interaction/map-type';
 import { layers } from '$lib/stores/layers';
 import { isChoroplethLayer, isFillLayer, type CartoKitLayer } from '$lib/types/CartoKitLayer';
@@ -64,8 +65,8 @@ interface FillOpacityUpdate extends LayerUpdate {
 	};
 }
 
-interface DataUpdate extends LayerUpdate {
-	type: 'data';
+interface InitialDataUpdate extends LayerUpdate {
+	type: 'initial-data';
 	payload: {
 		geoJSON: FeatureCollection;
 	};
@@ -79,7 +80,7 @@ type DispatchLayerUpdateParams =
 	| AttributeUpdate
 	| FillUpdate
 	| FillOpacityUpdate
-	| DataUpdate;
+	| InitialDataUpdate;
 
 /**
  * Dispatch standardized updates to specific layers.
@@ -97,11 +98,30 @@ export function dispatchLayerUpdate({
 }: DispatchLayerUpdateParams): void {
 	switch (type) {
 		case 'map-type': {
-			const targetLayer = transitionMapType({
+			const { targetLayer, redraw } = transitionMapType({
 				map,
 				layer,
 				targetMapType: payload.mapType
 			});
+
+			if (redraw) {
+				// Remove the existing layer and all instrumented layers.
+				map.removeLayer(layer.id);
+
+				if (map.getLayer(`${layer.id}-hover`)) {
+					map.removeLayer(`${layer.id}-hover`);
+				}
+
+				if (map.getLayer(`${layer.id}-select`)) {
+					map.removeLayer(`${layer.id}-select`);
+				}
+
+				// Update the source with the new data.
+				(map.getSource(layer.id) as GeoJSONSource).setData(targetLayer.data.geoJSON);
+
+				// Add the new layer. This function call includes instrumentation.
+				addLayer(map, targetLayer);
+			}
 
 			layers.update((lyrs) => {
 				lyrs[layer.id] = targetLayer;
@@ -111,78 +131,70 @@ export function dispatchLayerUpdate({
 			break;
 		}
 		case 'color-scale-type': {
-			if (isChoroplethLayer(layer)) {
-				layers.update((lyrs) => {
-					const lyr = lyrs[layer.id];
+			layers.update((lyrs) => {
+				const lyr = lyrs[layer.id];
 
-					if (isChoroplethLayer(lyr)) {
-						lyr.style.breaks.scale = payload.scale;
+				if (isChoroplethLayer(lyr)) {
+					lyr.style.breaks.scale = payload.scale;
 
-						map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
-					}
+					map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+				}
 
-					return lyrs;
-				});
-			}
+				return lyrs;
+			});
 			break;
 		}
 		case 'color-palette-color': {
-			if (isChoroplethLayer(layer)) {
-				layers.update((lyrs) => {
-					const lyr = lyrs[layer.id];
+			layers.update((lyrs) => {
+				const lyr = lyrs[layer.id];
 
-					if (isChoroplethLayer(lyr)) {
-						lyr.style.breaks.colors[payload.index] = payload.color;
+				if (isChoroplethLayer(lyr)) {
+					lyr.style.breaks.colors[payload.index] = payload.color;
 
-						map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
-					}
+					map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+				}
 
-					return lyrs;
-				});
-			}
+				return lyrs;
+			});
 			break;
 		}
 		case 'color-palette-stops': {
-			if (isChoroplethLayer(layer)) {
-				layers.update((lyrs) => {
-					const lyr = lyrs[layer.id];
+			layers.update((lyrs) => {
+				const lyr = lyrs[layer.id];
 
-					if (isChoroplethLayer(lyr)) {
-						const diff = payload.count - lyr.style.breaks.colors.length;
+				if (isChoroplethLayer(lyr)) {
+					const diff = payload.count - lyr.style.breaks.colors.length;
 
-						if (Math.sign(diff) === 1) {
-							lyr.style.breaks.colors = lyr.style.breaks.colors.concat(
-								new Array(diff).fill(undefined).map(randomColor)
-							);
-						} else if (Math.sign(diff) === -1) {
-							lyr.style.breaks.colors = lyr.style.breaks.colors.slice(
-								0,
-								lyr.style.breaks.colors.length + diff
-							);
-						}
-
-						map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+					if (Math.sign(diff) === 1) {
+						lyr.style.breaks.colors = lyr.style.breaks.colors.concat(
+							new Array(diff).fill(undefined).map(randomColor)
+						);
+					} else if (Math.sign(diff) === -1) {
+						lyr.style.breaks.colors = lyr.style.breaks.colors.slice(
+							0,
+							lyr.style.breaks.colors.length + diff
+						);
 					}
 
-					return lyrs;
-				});
-			}
+					map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+				}
+
+				return lyrs;
+			});
 			break;
 		}
 		case 'attribute': {
-			if (isChoroplethLayer(layer)) {
-				layers.update((lyrs) => {
-					const lyr = lyrs[layer.id];
+			layers.update((lyrs) => {
+				const lyr = lyrs[layer.id];
 
-					if (isChoroplethLayer(lyr)) {
-						lyr.attribute = payload.attribute;
+				if (isChoroplethLayer(lyr)) {
+					lyr.attribute = payload.attribute;
 
-						map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
-					}
+					map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+				}
 
-					return lyrs;
-				});
-			}
+				return lyrs;
+			});
 			break;
 		}
 		case 'fill': {
@@ -200,7 +212,6 @@ export function dispatchLayerUpdate({
 			break;
 		}
 		case 'opacity': {
-			// Update the layer in the store.
 			layers.update((lyrs) => {
 				const lyr = lyrs[layer.id];
 
@@ -214,16 +225,22 @@ export function dispatchLayerUpdate({
 			});
 			break;
 		}
-		case 'data': {
+		case 'initial-data': {
 			layers.update((lyrs) => {
 				const lyr = lyrs[layer.id];
 
 				if (lyr) {
 					lyr.data.geoJSON = payload.geoJSON;
+
+					// The initial data loaded for a layer gets preserved in the rawGeoJSON property.
+					// This allows us to recover polygons when we do things like transition to points
+					// and subsequently back to polygons.
+					lyr.data.rawGeoJSON = payload.geoJSON;
 				}
 
 				return lyrs;
 			});
+			break;
 		}
 	}
 }

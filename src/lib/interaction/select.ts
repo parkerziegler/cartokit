@@ -62,7 +62,6 @@ function addSelectListeners(map: Map, layer: CartoKitLayer) {
 
 	function onClick(event: MapLayerMouseEvent): void {
 		if (event.features && event.features.length > 0) {
-			console.log(event.features[0]);
 			if (selectedFeatureId !== null) {
 				map.setFeatureState({ source: layer.id, id: selectedFeatureId }, { selected: false });
 			}

@@ -1,8 +1,9 @@
 import type { Map } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
-import { instrumentPolygonHover } from '$lib/interaction/hover';
-import { instrumentPolygonSelect } from '$lib/interaction/select';
+import { deriveRadii } from '$lib/interaction/geometry';
+import { instrumentPolygonHover, instrumentPointHover } from '$lib/interaction/hover';
+import { instrumentPolygonSelect, instrumentPointSelect } from '$lib/interaction/select';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
 /**
@@ -41,6 +42,22 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 
 			instrumentPolygonHover(map, layer);
 			instrumentPolygonSelect(map, layer);
+			break;
+		}
+		case 'Proportional Symbol': {
+			map.addLayer({
+				id: layer.id,
+				source: layer.id,
+				type: 'circle',
+				paint: {
+					'circle-color': '#f2df17',
+					'circle-radius': deriveRadii(layer),
+					'circle-opacity': layer.style.opacity
+				}
+			});
+
+			instrumentPointHover(map, layer);
+			instrumentPointSelect(map, layer);
 			break;
 		}
 	}

@@ -10,6 +10,7 @@ interface Layer {
 	data: {
 		url?: string;
 		geoJSON: FeatureCollection;
+		rawGeoJSON: FeatureCollection;
 	};
 	style: {
 		opacity: number;
@@ -78,3 +79,16 @@ export type CartoKitLayer =
 	| CartoKitFillLayer
 	| CartoKitChoroplethLayer
 	| CartoKitProportionalSymbolLayer;
+
+/**
+ * A type guard to determine if a CartoKit layer has a visualized attribute.
+ *
+ * @param layer – The layer to test.
+ *
+ * @returns – A Boolean value indicating whether the layer has a visualized attribute.
+ */
+export function isDataLayer(
+	layer: CartoKitLayer
+): layer is CartoKitChoroplethLayer | CartoKitProportionalSymbolLayer {
+	return 'attribute' in layer;
+}
