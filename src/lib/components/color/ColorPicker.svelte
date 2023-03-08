@@ -6,12 +6,12 @@
 	import { dispatchLayerUpdate } from '$lib/interaction/update';
 	import { map } from '$lib/stores/map';
 	import { selectedLayer } from '$lib/stores/selected-layer';
-	import { isFillLayer } from '$lib/types/CartoKitLayer';
+	import { hasFill } from '$lib/types/CartoKitLayer';
 	import { decimalToPercent } from '$lib/utils/color';
 	import { DEFAULT_FILL, DEFAULT_OPACITY } from '$lib/utils/constants';
 
 	$: color =
-		$selectedLayer && isFillLayer($selectedLayer)
+		$selectedLayer && hasFill($selectedLayer)
 			? d3.color($selectedLayer.style.fill)?.formatHex() ?? DEFAULT_FILL
 			: DEFAULT_FILL;
 	$: opacity = $selectedLayer

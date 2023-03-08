@@ -10,7 +10,6 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 export const compileSource = (layer: CartoKitLayer): string => {
 	const geometry = layer.data.geoJSON.features?.[0]?.geometry?.type;
 	const rawGeometry = layer.data.rawGeoJSON.features?.[0]?.geometry?.type;
-	console.log({ geometry, rawGeometry });
 
 	let transformation = '';
 

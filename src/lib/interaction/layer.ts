@@ -50,7 +50,7 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 				source: layer.id,
 				type: 'circle',
 				paint: {
-					'circle-color': '#f2df17',
+					'circle-color': layer.style.fill,
 					'circle-radius': deriveRadii(layer),
 					'circle-opacity': layer.style.opacity
 				}

@@ -18,7 +18,7 @@ const nifc2023Fires: CartoKitLayer = {
 			features: []
 		}
 	},
-	attribute: 'poly_GISAcres',
+	attribute: 'poly_Acres_AutoCalc',
 	style: {
 		breaks: {
 			scale: 'Quantile',

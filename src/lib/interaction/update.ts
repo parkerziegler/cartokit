@@ -2,10 +2,16 @@ import type { Map, GeoJSONSource } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
 
 import { deriveColorScale } from '$lib/interaction/color';
+import { deriveRadii } from '$lib/interaction/geometry';
 import { addLayer } from '$lib/interaction/layer';
 import { transitionMapType } from '$lib/interaction/map-type';
 import { layers } from '$lib/stores/layers';
-import { isChoroplethLayer, isFillLayer, type CartoKitLayer } from '$lib/types/CartoKitLayer';
+import {
+	isChoroplethLayer,
+	isFillLayer,
+	isProportionalSymbolLayer,
+	type CartoKitLayer
+} from '$lib/types/CartoKitLayer';
 import type { ColorScale } from '$lib/types/ColorScales';
 import type { MapType } from '$lib/types/MapTypes';
 import { randomColor } from '$lib/utils/color';
@@ -72,6 +78,14 @@ interface InitialDataUpdate extends LayerUpdate {
 	};
 }
 
+interface RadiusUpdate extends LayerUpdate {
+	type: 'radius';
+	payload: {
+		min?: number;
+		max?: number;
+	};
+}
+
 type DispatchLayerUpdateParams =
 	| MapTypeUpdate
 	| ColorScaleTypeUpdate
@@ -80,7 +94,8 @@ type DispatchLayerUpdateParams =
 	| AttributeUpdate
 	| FillUpdate
 	| FillOpacityUpdate
-	| InitialDataUpdate;
+	| InitialDataUpdate
+	| RadiusUpdate;
 
 /**
  * Dispatch standardized updates to specific layers.
@@ -205,6 +220,10 @@ export function dispatchLayerUpdate({
 					lyr.style.fill = payload.color;
 
 					map.setPaintProperty(layer.id, 'fill-color', payload.color);
+				} else if (isProportionalSymbolLayer(lyr)) {
+					lyr.style.fill = payload.color;
+
+					map.setPaintProperty(layer.id, 'circle-color', payload.color);
 				}
 
 				return lyrs;
@@ -215,10 +234,14 @@ export function dispatchLayerUpdate({
 			layers.update((lyrs) => {
 				const lyr = lyrs[layer.id];
 
-				if (lyr) {
+				if (isFillLayer(lyr) || isChoroplethLayer(lyr)) {
 					layer.style.opacity = payload.opacity;
 
 					map.setPaintProperty(layer.id, 'fill-opacity', payload.opacity);
+				} else if (isProportionalSymbolLayer(lyr)) {
+					lyr.style.opacity = payload.opacity;
+
+					map.setPaintProperty(layer.id, 'circle-opacity', payload.opacity);
 				}
 
 				return lyrs;
@@ -241,6 +264,25 @@ export function dispatchLayerUpdate({
 				return lyrs;
 			});
 			break;
+		}
+		case 'radius': {
+			layers.update((lyrs) => {
+				const lyr = lyrs[layer.id];
+
+				if (isProportionalSymbolLayer(lyr)) {
+					if (payload.min) {
+						lyr.style.radius.min = payload.min;
+					}
+
+					if (payload.max) {
+						lyr.style.radius.max = payload.max;
+					}
+
+					map.setPaintProperty(layer.id, 'circle-radius', deriveRadii(lyr));
+				}
+
+				return lyrs;
+			});
 		}
 	}
 }

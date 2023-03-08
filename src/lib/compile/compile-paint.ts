@@ -32,9 +32,9 @@ export function compilePaint(layer: CartoKitLayer): string {
 		}
 		case 'Proportional Symbol': {
 			return `paint: {
-				'circle-color': '#f2df17',
+				${layer.style.fill !== DEFAULT_FILL ? `'circle-color' : '${layer.style.fill}'` : ''},
 				'circle-radius': ${JSON.stringify(deriveRadii(layer))},
-				${layer.style.opacity !== DEFAULT_OPACITY ? `'fill-opacity': ${layer.style.opacity}` : ''}
+				${layer.style.opacity !== DEFAULT_OPACITY ? `'circle-opacity': ${layer.style.opacity}` : ''}
 			}`;
 		}
 	}

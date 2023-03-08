@@ -3,12 +3,6 @@
 	import maplibregl from 'maplibre-gl';
 
 	import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
-	import { addSource } from '$lib/interaction/source';
-	import { onFeatureLeave } from '$lib/interaction/select';
-	import { map as mapStore } from '$lib/stores/map';
-	import { layers } from '$lib/stores/layers';
-	import { selectedFeature } from '$lib/stores/feature';
-	import { mapType } from '$lib/stores/map-type';
 	import ColorPicker from '$lib/components/color/ColorPicker.svelte';
 	import Menu from '$lib/components/shared/Menu.svelte';
 	import Program from '$lib/components/program/Program.svelte';
@@ -16,6 +10,13 @@
 	import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
 	import MenuItem from '$lib/components/shared/MenuItem.svelte';
 	import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
+	import RadiusControls from '$lib/components/size/RadiusControls.svelte';
+	import { addSource } from '$lib/interaction/source';
+	import { onFeatureLeave } from '$lib/interaction/select';
+	import { map as mapStore } from '$lib/stores/map';
+	import { layers } from '$lib/stores/layers';
+	import { selectedFeature } from '$lib/stores/feature';
+	import { mapType } from '$lib/stores/map-type';
 
 	let map: maplibregl.Map;
 
@@ -63,6 +64,16 @@
 				</MenuItem>
 				<MenuItem title="Palette">
 					<ColorPalette />
+				</MenuItem>
+			{:else if $mapType === 'Proportional Symbol' && $selectedFeature}
+				<MenuItem title="Attribute">
+					<AttributeSelect />
+				</MenuItem>
+				<MenuItem title="Radius">
+					<RadiusControls />
+				</MenuItem>
+				<MenuItem title="Fill">
+					<ColorPicker />
 				</MenuItem>
 			{:else}
 				<MenuItem title="Fill">

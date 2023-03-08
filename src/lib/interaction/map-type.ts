@@ -2,18 +2,19 @@ import type { Map } from 'maplibre-gl';
 import * as turf from '@turf/turf';
 
 import { deriveColorScale } from '$lib/interaction/color';
+import { deriveRadii } from '$lib/interaction/geometry';
 import {
 	type CartoKitFillLayer,
 	type CartoKitChoroplethLayer,
 	type CartoKitProportionalSymbolLayer,
 	type CartoKitLayer,
-	isDataLayer
+	hasAttribute,
+	isFillLayer
 } from '$lib/types/CartoKitLayer';
 import type { MapType } from '$lib/types/MapTypes';
 import { randomColor } from '$lib/utils/color';
 import { DEFAULT_PALETTE } from '$lib/utils/constants';
-import { isPropertyNumeric } from '$lib/utils/property';
-import { deriveRadii } from './geometry';
+import { selectNumericAttribute } from '$lib/utils/geojson';
 
 interface TransitionMapTypeParams {
 	map: Map;
@@ -110,7 +111,7 @@ function transitionToChoropleth(map: Map, layer: CartoKitLayer): TransitionMapTy
 	const rawGeometry = layer.data.rawGeoJSON.features[0].geometry;
 
 	// If the layer has an attribute visualized, use it. Otherwise, select the first numeric attribute.
-	const attribute = isDataLayer(layer)
+	const attribute = hasAttribute(layer)
 		? layer.attribute
 		: selectNumericAttribute(layer.data.geoJSON.features);
 
@@ -167,7 +168,7 @@ function transitionToProportionalSymbol(
 	const features = layer.data.geoJSON.features;
 
 	// If the layer has an attribute visualized, use it. Otherwise, select the first numeric attribute.
-	const attribute = isDataLayer(layer) ? layer.attribute : selectNumericAttribute(features);
+	const attribute = hasAttribute(layer) ? layer.attribute : selectNumericAttribute(features);
 
 	const targetLayer: CartoKitProportionalSymbolLayer = {
 		...layer,
@@ -175,9 +176,10 @@ function transitionToProportionalSymbol(
 		attribute,
 		style: {
 			radius: {
-				min: 0,
+				min: 1,
 				max: 100
 			},
+			fill: isFillLayer(layer) ? layer.style.fill : randomColor(),
 			opacity: layer.style.opacity
 		}
 	};
@@ -198,23 +200,4 @@ function transitionToProportionalSymbol(
 		targetLayer,
 		redraw
 	};
-}
-
-/**
- * Select a numeric attribute from a GeoJSON dataset.
- *
- * @param data – The GeoJSON dataset.
- *
- * @returns – The name of the first numeric attribute found in the input GeoJSON dataset.
- */
-function selectNumericAttribute(data: GeoJSON.Feature[]): string {
-	for (const property in data[0].properties) {
-		if (isPropertyNumeric(data[0].properties[property])) {
-			return property;
-		}
-	}
-
-	// TODO: Catch this error and display a message prompting the user
-	// to select a layer type that does not require a numeric attribute.
-	throw new Error('No numeric attributes found in dataset.');
 }

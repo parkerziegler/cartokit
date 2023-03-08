@@ -4,13 +4,19 @@
 	import { map } from '$lib/stores/map';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { selectedFeature } from '$lib/stores/feature';
-	import { isDataLayer } from '$lib/types/CartoKitLayer';
+	import { hasAttribute } from '$lib/types/CartoKitLayer';
+	import { selectNumericAttribute } from '$lib/utils/geojson';
 
 	$: options = Object.keys($selectedFeature?.properties ?? {}).map((attribute) => ({
 		value: attribute,
 		label: attribute
 	}));
-	$: selected = $selectedLayer && isDataLayer($selectedLayer) ? $selectedLayer.attribute : '';
+	$: selected =
+		$selectedLayer && hasAttribute($selectedLayer)
+			? $selectedLayer.attribute
+			: $selectedLayer
+			? selectNumericAttribute($selectedLayer.data.geoJSON.features)
+			: 'Select Attrribute';
 
 	function onChange(event: CustomEvent<{ value: string }>) {
 		const attribute = event.detail.value;

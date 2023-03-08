@@ -25,17 +25,6 @@ export interface CartoKitFillLayer extends Layer {
 	};
 }
 
-/**
- * A type guard to determine if a CartoKit layer is a CartoKitFillLayer.
- *
- * @param layer – The layer to test.
- *
- * @returns – A Boolean value indicating whether the layer is a CartoKitFillLayer.
- */
-export function isFillLayer(layer: CartoKitLayer): layer is CartoKitFillLayer {
-	return layer.type === 'Fill';
-}
-
 export interface CartoKitChoroplethLayer extends Layer {
 	type: 'Choropleth';
 	attribute: string;
@@ -46,6 +35,35 @@ export interface CartoKitChoroplethLayer extends Layer {
 		};
 		opacity: number;
 	};
+}
+
+export interface CartoKitProportionalSymbolLayer extends Layer {
+	type: 'Proportional Symbol';
+	attribute: string;
+	style: {
+		radius: {
+			min: number;
+			max: number;
+		};
+		fill: string;
+		opacity: number;
+	};
+}
+
+export type CartoKitLayer =
+	| CartoKitFillLayer
+	| CartoKitChoroplethLayer
+	| CartoKitProportionalSymbolLayer;
+
+/**
+ * A type guard to determine if a CartoKit layer is a CartoKitFillLayer.
+ *
+ * @param layer – The layer to test.
+ *
+ * @returns – A Boolean value indicating whether the layer is a CartoKitFillLayer.
+ */
+export function isFillLayer(layer: CartoKitLayer): layer is CartoKitFillLayer {
+	return layer.type === 'Fill';
 }
 
 /**
@@ -59,26 +77,18 @@ export function isChoroplethLayer(layer: CartoKitLayer): layer is CartoKitChorop
 	return layer.type === 'Choropleth';
 }
 
-export interface CartoKitProportionalSymbolLayer extends Layer {
-	type: 'Proportional Symbol';
-	attribute: string;
-	style: {
-		radius: {
-			min: number;
-			max: number;
-		};
-		breaks?: {
-			scale: ColorScale;
-			colors: string[];
-		};
-		opacity: number;
-	};
+/**
+ * A type guard to determine if a CartoKit layer is a CartoKitProportionalLayer.
+ *
+ * @param layer – The layer to test.
+ *
+ * @returns – A Boolean value indicating whether the layer is a CartoKitProportionalSymbolLayer.
+ */
+export function isProportionalSymbolLayer(
+	layer: CartoKitLayer
+): layer is CartoKitProportionalSymbolLayer {
+	return layer.type === 'Proportional Symbol';
 }
-
-export type CartoKitLayer =
-	| CartoKitFillLayer
-	| CartoKitChoroplethLayer
-	| CartoKitProportionalSymbolLayer;
 
 /**
  * A type guard to determine if a CartoKit layer has a visualized attribute.
@@ -87,8 +97,21 @@ export type CartoKitLayer =
  *
  * @returns – A Boolean value indicating whether the layer has a visualized attribute.
  */
-export function isDataLayer(
+export function hasAttribute(
 	layer: CartoKitLayer
 ): layer is CartoKitChoroplethLayer | CartoKitProportionalSymbolLayer {
 	return 'attribute' in layer;
+}
+
+/**
+ * A type guard to determine if a CartoKit layer has a fill style.
+ *
+ * @param layer – The layer to test.
+ *
+ * @returns – A Boolean value indicating whether the layer has a fill style.
+ */
+export function hasFill(
+	layer: CartoKitLayer
+): layer is CartoKitFillLayer | CartoKitProportionalSymbolLayer {
+	return 'fill' in layer.style;
 }
