@@ -1,7 +1,7 @@
 import type { Map } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
-import { deriveRadii } from '$lib/interaction/geometry';
+import { deriveSize } from '$lib/interaction/geometry';
 import { instrumentPolygonHover, instrumentPointHover } from '$lib/interaction/hover';
 import { instrumentPolygonSelect, instrumentPointSelect } from '$lib/interaction/select';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
@@ -51,7 +51,7 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 				type: 'circle',
 				paint: {
 					'circle-color': layer.style.fill,
-					'circle-radius': deriveRadii(layer),
+					'circle-radius': deriveSize(layer),
 					'circle-opacity': layer.style.opacity
 				}
 			});

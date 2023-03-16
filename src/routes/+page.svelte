@@ -10,7 +10,7 @@
 	import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
 	import MenuItem from '$lib/components/shared/MenuItem.svelte';
 	import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
-	import RadiusControls from '$lib/components/size/RadiusControls.svelte';
+	import SizeControls from '$lib/components/size/SizeControls.svelte';
 	import { addSource } from '$lib/interaction/source';
 	import { onFeatureLeave } from '$lib/interaction/select';
 	import { map as mapStore } from '$lib/stores/map';
@@ -69,8 +69,8 @@
 				<MenuItem title="Attribute">
 					<AttributeSelect />
 				</MenuItem>
-				<MenuItem title="Radius">
-					<RadiusControls />
+				<MenuItem title="Size">
+					<SizeControls />
 				</MenuItem>
 				<MenuItem title="Fill">
 					<ColorPicker />

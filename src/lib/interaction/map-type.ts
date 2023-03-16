@@ -2,7 +2,7 @@ import type { Map } from 'maplibre-gl';
 import * as turf from '@turf/turf';
 
 import { deriveColorScale } from '$lib/interaction/color';
-import { deriveRadii } from '$lib/interaction/geometry';
+import { deriveSize } from '$lib/interaction/geometry';
 import {
 	type CartoKitFillLayer,
 	type CartoKitChoroplethLayer,
@@ -175,7 +175,7 @@ function transitionToProportionalSymbol(
 		type: 'Proportional Symbol',
 		attribute,
 		style: {
-			radius: {
+			size: {
 				min: 1,
 				max: 50
 			},
@@ -186,7 +186,7 @@ function transitionToProportionalSymbol(
 
 	if (geometry.type === 'Point' || geometry.type === 'MultiPoint') {
 		// Just update the radius of the existing layer.
-		map.setPaintProperty(layer.id, 'circle-radius', deriveRadii(targetLayer));
+		map.setPaintProperty(layer.id, 'circle-radius', deriveSize(targetLayer));
 	} else {
 		redraw = true;
 

@@ -10,18 +10,18 @@ import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
  *
  * @returns – a MapLibre GL JS expression for a proportional symbol radius scale.
  */
-export function deriveRadii(layer: CartoKitProportionalSymbolLayer): ExpressionSpecification {
+export function deriveSize(layer: CartoKitProportionalSymbolLayer): ExpressionSpecification {
 	const {
 		attribute,
 		data: {
 			geoJSON: { features }
 		},
 		style: {
-			radius: { min: rMin, max: rMax }
+			size: { min: rMin, max: rMax }
 		}
 	} = layer;
-
 	const extent = d3.extent(features, (d) => Math.sqrt(d.properties?.[attribute] ?? 0));
 	const [min, max] = [extent[0] ?? 0, extent[1] ?? 1];
+
 	return ['interpolate', ['linear'], ['sqrt', ['get', attribute]], min, rMin, max, rMax];
 }

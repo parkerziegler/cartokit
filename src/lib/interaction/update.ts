@@ -2,7 +2,7 @@ import type { Map, GeoJSONSource } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
 
 import { deriveColorScale } from '$lib/interaction/color';
-import { deriveRadii } from '$lib/interaction/geometry';
+import { deriveSize } from '$lib/interaction/geometry';
 import { addLayer } from '$lib/interaction/layer';
 import { transitionMapType } from '$lib/interaction/map-type';
 import { layers } from '$lib/stores/layers';
@@ -78,8 +78,8 @@ interface InitialDataUpdate extends LayerUpdate {
 	};
 }
 
-interface RadiusUpdate extends LayerUpdate {
-	type: 'radius';
+interface SizeUpdate extends LayerUpdate {
+	type: 'size';
 	payload: {
 		min?: number;
 		max?: number;
@@ -95,7 +95,7 @@ type DispatchLayerUpdateParams =
 	| FillUpdate
 	| FillOpacityUpdate
 	| InitialDataUpdate
-	| RadiusUpdate;
+	| SizeUpdate;
 
 /**
  * Dispatch standardized updates to specific layers.
@@ -265,20 +265,20 @@ export function dispatchLayerUpdate({
 			});
 			break;
 		}
-		case 'radius': {
+		case 'size': {
 			layers.update((lyrs) => {
 				const lyr = lyrs[layer.id];
 
 				if (isProportionalSymbolLayer(lyr)) {
 					if (payload.min) {
-						lyr.style.radius.min = payload.min;
+						lyr.style.size.min = payload.min;
 					}
 
 					if (payload.max) {
-						lyr.style.radius.max = payload.max;
+						lyr.style.size.max = payload.max;
 					}
 
-					map.setPaintProperty(layer.id, 'circle-radius', deriveRadii(lyr));
+					map.setPaintProperty(layer.id, 'circle-radius', deriveSize(lyr));
 				}
 
 				return lyrs;

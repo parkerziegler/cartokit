@@ -1,24 +1,22 @@
 <script lang="ts">
-	import RadiusInput from '$lib/components/size/RadiusInput.svelte';
+	import SizeInput from '$lib/components/size/SizeInput.svelte';
 	import { dispatchLayerUpdate } from '$lib/interaction/update';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { map } from '$lib/stores/map';
 	import { isProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
 
 	$: min =
-		$selectedLayer && isProportionalSymbolLayer($selectedLayer)
-			? $selectedLayer.style.radius.min
-			: 0;
+		$selectedLayer && isProportionalSymbolLayer($selectedLayer) ? $selectedLayer.style.size.min : 0;
 	$: max =
 		$selectedLayer && isProportionalSymbolLayer($selectedLayer)
-			? $selectedLayer.style.radius.max
+			? $selectedLayer.style.size.max
 			: 50;
 
-	function onRadiusChange(field: 'min' | 'max') {
-		return function handleRadiusChange(event: CustomEvent<{ value: number }>) {
+	function onSizeChange(field: 'min' | 'max') {
+		return function handleSizeChange(event: CustomEvent<{ value: number }>) {
 			if ($selectedLayer && $map && isProportionalSymbolLayer($selectedLayer)) {
 				dispatchLayerUpdate({
-					type: 'radius',
+					type: 'size',
 					map: $map,
 					layer: $selectedLayer,
 					payload: {
@@ -31,6 +29,6 @@
 </script>
 
 <div class="stack-h stack-h-xs">
-	<RadiusInput title="Min" value={min} onRadiusChange={onRadiusChange('min')} />
-	<RadiusInput title="Max" value={max} onRadiusChange={onRadiusChange('max')} />
+	<SizeInput title="Min" value={min} onSizeChange={onSizeChange('min')} />
+	<SizeInput title="Max" value={max} onSizeChange={onSizeChange('max')} />
 </div>

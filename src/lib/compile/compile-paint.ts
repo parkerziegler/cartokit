@@ -1,5 +1,5 @@
 import { deriveColorScale } from '$lib/interaction/color';
-import { deriveRadii } from '$lib/interaction/geometry';
+import { deriveSize } from '$lib/interaction/geometry';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { DEFAULT_FILL, DEFAULT_OPACITY } from '$lib/utils/constants';
 
@@ -33,7 +33,7 @@ export function compilePaint(layer: CartoKitLayer): string {
 		case 'Proportional Symbol': {
 			return `paint: {
 				${layer.style.fill !== DEFAULT_FILL ? `'circle-color' : '${layer.style.fill}'` : ''},
-				'circle-radius': ${JSON.stringify(deriveRadii(layer))},
+				'circle-radius': ${JSON.stringify(deriveSize(layer))},
 				${layer.style.opacity !== DEFAULT_OPACITY ? `'circle-opacity': ${layer.style.opacity}` : ''}
 			}`;
 		}

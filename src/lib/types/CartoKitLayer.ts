@@ -41,7 +41,7 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
 	type: 'Proportional Symbol';
 	attribute: string;
 	style: {
-		radius: {
+		size: {
 			min: number;
 			max: number;
 		};
