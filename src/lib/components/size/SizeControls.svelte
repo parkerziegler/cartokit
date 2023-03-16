@@ -1,5 +1,6 @@
 <script lang="ts">
-	import SizeInput from '$lib/components/size/SizeInput.svelte';
+	import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
+	import NumberInput from '$lib/components/shared/NumberInput.svelte';
 	import { dispatchLayerUpdate } from '$lib/interaction/update';
 	import { selectedLayer } from '$lib/stores/selected-layer';
 	import { map } from '$lib/stores/map';
@@ -29,6 +30,8 @@
 </script>
 
 <div class="stack-h stack-h-xs">
-	<SizeInput title="Min" value={min} onSizeChange={onSizeChange('min')} />
-	<SizeInput title="Max" value={max} onSizeChange={onSizeChange('max')} />
+	<FieldLabel fieldId="Min">Min</FieldLabel>
+	<NumberInput min={1} max={Infinity} size={4} value={min} on:change={onSizeChange('min')} />
+	<FieldLabel fieldId="Max">Max</FieldLabel>
+	<NumberInput min={1} max={Infinity} size={4} value={max} on:change={onSizeChange('max')} />
 </div>

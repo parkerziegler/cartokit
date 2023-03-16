@@ -8,6 +8,7 @@ import { transitionMapType } from '$lib/interaction/map-type';
 import { layers } from '$lib/stores/layers';
 import {
 	isChoroplethLayer,
+	isDotDensityLayer,
 	isFillLayer,
 	isProportionalSymbolLayer,
 	type CartoKitLayer
@@ -86,6 +87,20 @@ interface SizeUpdate extends LayerUpdate {
 	};
 }
 
+interface DotSizeUpdate extends LayerUpdate {
+	type: 'dot-size';
+	payload: {
+		size: number;
+	};
+}
+
+interface DotValueUpdate extends LayerUpdate {
+	type: 'dot-value';
+	payload: {
+		value: number;
+	};
+}
+
 type DispatchLayerUpdateParams =
 	| MapTypeUpdate
 	| ColorScaleTypeUpdate
@@ -95,7 +110,9 @@ type DispatchLayerUpdateParams =
 	| FillUpdate
 	| FillOpacityUpdate
 	| InitialDataUpdate
-	| SizeUpdate;
+	| SizeUpdate
+	| DotSizeUpdate
+	| DotValueUpdate;
 
 /**
  * Dispatch standardized updates to specific layers.
@@ -283,6 +300,31 @@ export function dispatchLayerUpdate({
 
 				return lyrs;
 			});
+			break;
+		}
+		case 'dot-size': {
+			layers.update((lyrs) => {
+				const lyr = lyrs[layer.id];
+
+				if (isDotDensityLayer(lyr)) {
+					lyr.style.dots.size = payload.size;
+
+					map.setPaintProperty(layer.id, 'circle-radius', payload.size);
+				}
+
+				return lyrs;
+			});
+			break;
+		}
+		case 'dot-value': {
+			layers.update((lyrs) => {
+				const lyr = lyrs[layer.id];
+
+				// TODO: This update will require recomputing and redrawing the dot density layer.
+
+				return lyrs;
+			});
+			break;
 		}
 	}
 }

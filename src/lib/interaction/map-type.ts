@@ -1,12 +1,14 @@
 import type { Map } from 'maplibre-gl';
 import * as turf from '@turf/turf';
+import type { Feature, FeatureCollection } from 'geojson';
 
 import { deriveColorScale } from '$lib/interaction/color';
-import { deriveSize } from '$lib/interaction/geometry';
+import { deriveSize, deriveDotDensityStartingValue } from '$lib/interaction/geometry';
 import {
 	type CartoKitFillLayer,
 	type CartoKitChoroplethLayer,
 	type CartoKitProportionalSymbolLayer,
+	type CartoKitDotDensityLayer,
 	type CartoKitLayer,
 	hasAttribute,
 	isFillLayer
@@ -49,6 +51,8 @@ export function transitionMapType({
 			return transitionToChoropleth(map, layer);
 		case 'Proportional Symbol':
 			return transitionToProportionalSymbol(map, layer);
+		case 'Dot Density':
+			return transitionToDotDensity(map, layer);
 	}
 }
 
@@ -200,4 +204,100 @@ function transitionToProportionalSymbol(
 		targetLayer,
 		redraw
 	};
+}
+
+/**
+ * Transition a layer to a dot density layer.
+ *
+ * @param map — The top-level MapLibre GL map instance.
+ * @param layer — The CartoKit layer to transition.
+ *
+ * @returns – The transitioned CartoKitDotDensityLayer.
+ */
+function transitionToDotDensity(map: Map, layer: CartoKitLayer): TransitionMapTypeReturnValue {
+	let redraw = false;
+
+	const geometry = layer.data.geoJSON.features[0].geometry;
+	const features = layer.data.geoJSON.features;
+
+	const rawGeometry = layer.data.rawGeoJSON.features[0].geometry;
+	const rawFeatures = layer.data.rawGeoJSON.features;
+
+	// If the layer has an attribute visualized, use it. Otherwise, select the first numeric attribute.
+	const attribute = hasAttribute(layer) ? layer.attribute : selectNumericAttribute(features);
+
+	const targetLayer: CartoKitDotDensityLayer = {
+		...layer,
+		type: 'Dot Density',
+		attribute,
+		style: {
+			dots: {
+				size: 1,
+				value: deriveDotDensityStartingValue(features, attribute)
+			},
+			fill: isFillLayer(layer) ? layer.style.fill : randomColor(),
+			opacity: layer.style.opacity
+		}
+	};
+
+	if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
+		targetLayer.data.geoJSON = generateDotDensityPoints({
+			features,
+			attribute,
+			value: targetLayer.style.dots.value
+		});
+		redraw = true;
+	} else if (rawGeometry.type === 'Polygon' || rawGeometry.type === 'MultiPolygon') {
+		targetLayer.data.geoJSON = generateDotDensityPoints({
+			features: rawFeatures,
+			attribute,
+			value: targetLayer.style.dots.value
+		});
+		redraw = true;
+	} else {
+		// Throw an error — the geometry transition is not supported.
+		throw new Error('Geometry transition not supported.');
+	}
+
+	return {
+		targetLayer,
+		redraw
+	};
+}
+
+interface GenerateDotDensityPointsParams {
+	features: Feature[];
+	attribute: string;
+	value: number;
+}
+
+/**
+ * Generate dots for a dot density layer.
+ *
+ * @param features – the polygon features within which to generate dots.
+ * @param attribute – the attribute being visualized.
+ * @param value – the value of dots to attribute value.
+ *
+ * @returns – a FeatureCollection of dots.
+ */
+function generateDotDensityPoints({
+	features,
+	attribute,
+	value
+}: GenerateDotDensityPointsParams): FeatureCollection {
+	const dots = features.flatMap((feature) => {
+		const numPoints = Math.floor(feature.properties?.[attribute] / value) ?? 0;
+
+		// Obtain the bounding box of the polygon.
+		const bbox = turf.bbox(feature);
+
+		// Generate numPoints random points within the bounding box.
+		const points = turf.randomPoint(numPoints, { bbox });
+
+		return points.features.flatMap((point) => {
+			return turf.feature(point.geometry, feature.properties);
+		});
+	});
+
+	return turf.featureCollection(dots);
 }

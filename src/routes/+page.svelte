@@ -11,6 +11,7 @@
 	import MenuItem from '$lib/components/shared/MenuItem.svelte';
 	import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
 	import SizeControls from '$lib/components/size/SizeControls.svelte';
+	import DotControls from '$lib/components/dots/DotControls.svelte';
 	import { addSource } from '$lib/interaction/source';
 	import { onFeatureLeave } from '$lib/interaction/select';
 	import { map as mapStore } from '$lib/stores/map';
@@ -71,6 +72,16 @@
 				</MenuItem>
 				<MenuItem title="Size">
 					<SizeControls />
+				</MenuItem>
+				<MenuItem title="Fill">
+					<ColorPicker />
+				</MenuItem>
+			{:else if $mapType === 'Dot Density' && $selectedFeature}
+				<MenuItem title="Attribute">
+					<AttributeSelect />
+				</MenuItem>
+				<MenuItem title="Dots">
+					<DotControls />
 				</MenuItem>
 				<MenuItem title="Fill">
 					<ColorPicker />

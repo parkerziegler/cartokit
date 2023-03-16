@@ -50,10 +50,24 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
 	};
 }
 
+export interface CartoKitDotDensityLayer extends Layer {
+	type: 'Dot Density';
+	attribute: string;
+	style: {
+		dots: {
+			size: number;
+			value: number;
+		};
+		fill: string;
+		opacity: number;
+	};
+}
+
 export type CartoKitLayer =
 	| CartoKitFillLayer
 	| CartoKitChoroplethLayer
-	| CartoKitProportionalSymbolLayer;
+	| CartoKitProportionalSymbolLayer
+	| CartoKitDotDensityLayer;
 
 /**
  * A type guard to determine if a CartoKit layer is a CartoKitFillLayer.
@@ -88,6 +102,17 @@ export function isProportionalSymbolLayer(
 	layer: CartoKitLayer
 ): layer is CartoKitProportionalSymbolLayer {
 	return layer.type === 'Proportional Symbol';
+}
+
+/**
+ * A type guard to determine if a CartoKit layer is a CartoKitDotDensityLayer.
+ *
+ * @param layer – The layer to test.
+ *
+ * @returns – A Boolean value indicating whether the layer is a CartoKitDotDensityLayer.
+ */
+export function isDotDensityLayer(layer: CartoKitLayer): layer is CartoKitDotDensityLayer {
+	return layer.type === 'Dot Density';
 }
 
 /**

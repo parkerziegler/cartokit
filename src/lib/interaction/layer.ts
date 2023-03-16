@@ -60,5 +60,20 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 			instrumentPointSelect(map, layer);
 			break;
 		}
+		case 'Dot Density': {
+			map.addLayer({
+				id: layer.id,
+				source: layer.id,
+				type: 'circle',
+				paint: {
+					'circle-color': layer.style.fill,
+					'circle-radius': layer.style.dots.size,
+					'circle-opacity': layer.style.opacity
+				}
+			});
+
+			// TODO: Determine which geographic features we want to instrument in a dot density layer.
+			break;
+		}
 	}
 }
