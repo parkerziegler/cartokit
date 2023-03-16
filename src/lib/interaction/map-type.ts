@@ -177,7 +177,7 @@ function transitionToProportionalSymbol(
 		style: {
 			radius: {
 				min: 1,
-				max: 100
+				max: 50
 			},
 			fill: isFillLayer(layer) ? layer.style.fill : randomColor(),
 			opacity: layer.style.opacity

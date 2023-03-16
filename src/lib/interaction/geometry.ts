@@ -21,6 +21,7 @@ export function deriveRadii(layer: CartoKitProportionalSymbolLayer): ExpressionS
 		}
 	} = layer;
 
-	const [min, max] = d3.extent(features, (d) => d.properties?.[attribute]);
+	const extent = d3.extent(features, (d) => Math.sqrt(d.properties?.[attribute] ?? 0));
+	const [min, max] = [extent[0] ?? 0, extent[1] ?? 1];
 	return ['interpolate', ['linear'], ['sqrt', ['get', attribute]], min, rMin, max, rMax];
 }
