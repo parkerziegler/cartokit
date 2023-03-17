@@ -41,6 +41,6 @@
 <div class="stack-h stack-h-xs">
 	<FieldLabel fieldId="Dot Size">Dot Size</FieldLabel>
 	<NumberInput min={1} max={Infinity} size={4} value={size} on:change={onDotSizeChange} />
-	<FieldLabel fieldId="Dot Value">Value</FieldLabel>
+	<FieldLabel fieldId="Dot Value">Dot Value</FieldLabel>
 	<NumberInput min={1} max={Infinity} size={4} value={dotValue} on:change={onDotValueChange} />
 </div>

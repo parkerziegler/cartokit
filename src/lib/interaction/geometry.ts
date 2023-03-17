@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
+import * as turf from '@turf/turf';
 import type { ExpressionSpecification } from 'maplibre-gl';
-import type { Feature } from 'geojson';
+import type { Feature, FeatureCollection } from 'geojson';
 
 import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
 
@@ -25,6 +26,43 @@ export function deriveSize(layer: CartoKitProportionalSymbolLayer): ExpressionSp
 	const [min, max] = [extent[0] ?? 0, extent[1] ?? 1];
 
 	return ['interpolate', ['linear'], ['sqrt', ['get', attribute]], min, rMin, max, rMax];
+}
+
+interface GenerateDotDensityPointsParams {
+	features: Feature[];
+	attribute: string;
+	value: number;
+}
+
+/**
+ * Generate dots for a dot density layer.
+ *
+ * @param features – the polygon features within which to generate dots.
+ * @param attribute – the attribute being visualized.
+ * @param value – the value of dots to attribute value.
+ *
+ * @returns – a FeatureCollection of dots.
+ */
+export function generateDotDensityPoints({
+	features,
+	attribute,
+	value
+}: GenerateDotDensityPointsParams): FeatureCollection {
+	const dots = features.flatMap((feature) => {
+		const numPoints = Math.floor(feature.properties?.[attribute] / value) ?? 0;
+
+		// Obtain the bounding box of the polygon.
+		const bbox = turf.bbox(feature);
+
+		// Generate numPoints random points within the bounding box.
+		const points = turf.randomPoint(numPoints, { bbox });
+
+		return points.features.flatMap((point) => {
+			return turf.feature(point.geometry, feature.properties);
+		});
+	});
+
+	return turf.featureCollection(dots);
 }
 
 /**

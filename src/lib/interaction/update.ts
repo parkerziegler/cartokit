@@ -2,7 +2,7 @@ import type { Map, GeoJSONSource } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
 
 import { deriveColorScale } from '$lib/interaction/color';
-import { deriveSize } from '$lib/interaction/geometry';
+import { deriveSize, generateDotDensityPoints } from '$lib/interaction/geometry';
 import { addLayer } from '$lib/interaction/layer';
 import { transitionMapType } from '$lib/interaction/map-type';
 import { layers } from '$lib/stores/layers';
@@ -237,7 +237,7 @@ export function dispatchLayerUpdate({
 					lyr.style.fill = payload.color;
 
 					map.setPaintProperty(layer.id, 'fill-color', payload.color);
-				} else if (isProportionalSymbolLayer(lyr)) {
+				} else if (isProportionalSymbolLayer(lyr) || isDotDensityLayer(lyr)) {
 					lyr.style.fill = payload.color;
 
 					map.setPaintProperty(layer.id, 'circle-color', payload.color);
@@ -320,7 +320,24 @@ export function dispatchLayerUpdate({
 			layers.update((lyrs) => {
 				const lyr = lyrs[layer.id];
 
-				// TODO: This update will require recomputing and redrawing the dot density layer.
+				// This update requires recomputing and redrawing the dot density layer.
+				if (isDotDensityLayer(lyr)) {
+					lyr.style.dots.value = payload.value;
+
+					// We always use the rawGeoJSON to generate the dot density points.
+					// These _must_ be polygons to support the transition to dot density;
+					// conversely, the current layer geometry will be points, which do not
+					// allow us to generate a dot density.
+					const features = generateDotDensityPoints({
+						features: lyr.data.rawGeoJSON.features,
+						attribute: lyr.attribute,
+						value: payload.value
+					});
+
+					lyr.data.geoJSON = features;
+					// Update the source with the new data.
+					(map.getSource(layer.id) as GeoJSONSource).setData(features);
+				}
 
 				return lyrs;
 			});
