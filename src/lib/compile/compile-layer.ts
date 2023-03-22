@@ -23,7 +23,8 @@ export function compileLayer(layer: CartoKitLayer): string {
 			});
 			`;
 		}
-		case 'Proportional Symbol': {
+		case 'Proportional Symbol':
+		case 'Dot Density': {
 			const paint = compilePaint(layer);
 
 			return `

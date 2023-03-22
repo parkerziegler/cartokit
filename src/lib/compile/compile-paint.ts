@@ -1,7 +1,7 @@
 import { deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
-import { DEFAULT_FILL, DEFAULT_OPACITY } from '$lib/utils/constants';
+import { DEFAULT_FILL, DEFAULT_OPACITY, DEFAULT_RADIUS } from '$lib/utils/constants';
 
 /**
  * Compile a layer's presentational properties into a Mapbox GL JS program fragment.
@@ -34,6 +34,13 @@ export function compilePaint(layer: CartoKitLayer): string {
 			return `paint: {
 				${layer.style.fill !== DEFAULT_FILL ? `'circle-color' : '${layer.style.fill}'` : ''},
 				'circle-radius': ${JSON.stringify(deriveSize(layer))},
+				${layer.style.opacity !== DEFAULT_OPACITY ? `'circle-opacity': ${layer.style.opacity}` : ''}
+			}`;
+		}
+		case 'Dot Density': {
+			return `paint: {
+				${layer.style.fill !== DEFAULT_FILL ? `'circle-color' : '${layer.style.fill}'` : ''},
+				${layer.style.dots.size !== DEFAULT_RADIUS ? `'circle-radius' : '${layer.style.dots.size}'` : ''},
 				${layer.style.opacity !== DEFAULT_OPACITY ? `'circle-opacity': ${layer.style.opacity}` : ''}
 			}`;
 		}

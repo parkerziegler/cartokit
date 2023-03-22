@@ -43,7 +43,7 @@ export function normalizeGeoJSONToFeatureCollection(geoJSON: GeoJSON): FeatureCo
  * @returns – The type of the first Feature in the FeatureCollection.
  */
 export function getFeatureCollectionType(featureCollection: FeatureCollection): Geometry['type'] {
-	return featureCollection.features[0].geometry.type;
+	return featureCollection.features?.[0]?.geometry?.type;
 }
 
 /**
