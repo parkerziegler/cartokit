@@ -1,18 +1,18 @@
-import { compilePaint } from '$lib/compile/compile-paint';
+import { codegenPaint } from '$lib/codegen/codegen-paint';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
 /**
- * Compile the CartoKit layer IR into a Mapbox GL JS program fragment.
+ * Generate a Mapbox GL JS program fragment for a CartoKitLayer.
  *
- * @param layer – the CartoKit layer to compile.
+ * @param layer – a CartoKit layer.
  *
  * @returns – a Mapbox GL JS program fragment.
  */
-export function compileLayer(layer: CartoKitLayer): string {
+export function codegenLayer(layer: CartoKitLayer): string {
 	switch (layer.type) {
 		case 'Fill':
 		case 'Choropleth': {
-			const paint = compilePaint(layer);
+			const paint = codegenPaint(layer);
 
 			return `
 			map.addLayer({
@@ -25,7 +25,7 @@ export function compileLayer(layer: CartoKitLayer): string {
 		}
 		case 'Proportional Symbol':
 		case 'Dot Density': {
-			const paint = compilePaint(layer);
+			const paint = codegenPaint(layer);
 
 			return `
 			map.addLayer({

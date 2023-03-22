@@ -1,18 +1,14 @@
-import type {
-	CartoKitDotDensityLayer,
-	CartoKitLayer,
-	CartoKitProportionalSymbolLayer
-} from '$lib/types/CartoKitLayer';
+import type { CartoKitDotDensityLayer, CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { getFeatureCollectionType } from '$lib/utils/geojson';
 
 /**
- * Compile the data source for a CartoKit layer.
+ * Generate the data source for a CartoKit layer.
  *
  * @param layer – a CartoKit layer.
  *
  * @returns – a Mapbox GL JS program fragment.
  */
-export function compileSource(layer: CartoKitLayer): string {
+export function codegenSource(layer: CartoKitLayer): string {
 	const geometry = getFeatureCollectionType(layer.data.geoJSON);
 	const rawGeometry = getFeatureCollectionType(layer.data.rawGeoJSON);
 
@@ -25,10 +21,10 @@ export function compileSource(layer: CartoKitLayer): string {
 	) {
 		switch (layer.type) {
 			case 'Proportional Symbol':
-				({ transformation, features } = compileProportionalSymbolTransformation());
+				({ transformation, features } = codegenProportionalSymbolTransformation());
 				break;
 			case 'Dot Density':
-				({ transformation, features } = compileDotDensityTransformation(layer));
+				({ transformation, features } = codegenDotDensityTransformation(layer));
 				break;
 			default:
 				break;
@@ -54,9 +50,14 @@ interface TransformationProgramFragment {
 	features: string;
 }
 
-function compileProportionalSymbolTransformation(): TransformationProgramFragment {
+/**
+ * Generate the data transformation for a CartoKitProportionalSymbolLayer.
+ *
+ * @returns – a "transformation" and "features" program fragment.
+ */
+function codegenProportionalSymbolTransformation(): TransformationProgramFragment {
 	const transformation = `
-		const centroids = data.map((feature) => {
+		const centroids = data.features.map((feature) => {
 			return turf.feature(turf.centroid(feature).geometry, feature.properties);
 		});
 	`;
@@ -66,12 +67,19 @@ function compileProportionalSymbolTransformation(): TransformationProgramFragmen
 	return { transformation, features };
 }
 
-function compileDotDensityTransformation(
+/**
+ * Generate the data transformation for a CartoKitProportionalSymbolLayer.
+ *
+ * @param layer – a CartoKitDotDensityLayer.
+ *
+ * @returns – a "transformation" and "features" program fragment.
+ */
+function codegenDotDensityTransformation(
 	layer: CartoKitDotDensityLayer
 ): TransformationProgramFragment {
 	const transformation = `
-	const dots = features.flatMap((feature) => {
-		const numPoints = Math.floor(feature.properties?.${layer.attribute} / ${layer.style.dots.value}) ?? 0;
+	const dots = data.features.flatMap((feature) => {
+		const numPoints = Math.floor(feature.properties["${layer.attribute}"] / ${layer.style.dots.value});
 
 		const bbox = turf.bbox(feature);
 		const points = turf.randomPoint(numPoints, { bbox });
