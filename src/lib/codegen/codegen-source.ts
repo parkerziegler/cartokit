@@ -36,7 +36,7 @@ export function codegenSource(layer: CartoKitLayer): string {
 		type: 'geojson',
 		data: ${
 			transformation
-				? `{ type: "FeatureCollection", features: ${features} }`
+				? features
 				: layer.data.url
 				? `"${layer.data.url}"`
 				: JSON.stringify(layer.data.geoJSON, null, 2)
