@@ -54,10 +54,18 @@ export function generateDotDensityPoints({
 		// Obtain the bounding box of the polygon.
 		const bbox = turf.bbox(feature);
 
-		// Generate numPoints random points within the bounding box.
-		const points = turf.randomPoint(numPoints, { bbox });
+		// Begin "throwing" random points within the bounding box,
+		// keeping them only if they fall within the polygon.
+		const selectedFeatures: Feature[] = [];
+		while (selectedFeatures.length < numPoints) {
+			const candidate = turf.randomPoint(1, { bbox }).features[0];
 
-		return points.features.flatMap((point) => {
+			if (turf.booleanWithin(candidate, feature)) {
+				selectedFeatures.push(candidate);
+			}
+		}
+
+		return selectedFeatures.flatMap((point) => {
 			return turf.feature(point.geometry, feature.properties);
 		});
 	});

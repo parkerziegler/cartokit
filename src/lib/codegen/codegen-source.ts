@@ -82,9 +82,17 @@ function codegenDotDensityTransformation(
 		const numPoints = Math.floor(feature.properties["${layer.attribute}"] / ${layer.style.dots.value});
 
 		const bbox = turf.bbox(feature);
-		const points = turf.randomPoint(numPoints, { bbox });
+		const selectedFeatures = [];
 
-		return points.features.flatMap((point) => {
+		while (selectedFeatures.length < numPoints) {
+			const candidate = turf.randomPoint(1, { bbox }).features[0];
+
+			if (turf.booleanWithin(candidate, feature)) {
+				selectedFeatures.push(candidate);
+			}
+		}
+
+		return selectedFeatures.flatMap((point) => {
 			return turf.feature(point.geometry, feature.properties);
 		});
 	});
