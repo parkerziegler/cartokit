@@ -2,11 +2,16 @@ import type { Map, GeoJSONSource } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
 
 import { deriveColorScale } from '$lib/interaction/color';
-import { deriveSize, generateDotDensityPoints } from '$lib/interaction/geometry';
+import {
+	deriveDotDensityStartingValue,
+	deriveSize,
+	generateDotDensityPoints
+} from '$lib/interaction/geometry';
 import { addLayer } from '$lib/interaction/layer';
 import { transitionMapType } from '$lib/interaction/map-type';
 import { layers } from '$lib/stores/layers';
 import {
+	hasAttribute,
 	isChoroplethLayer,
 	isDotDensityLayer,
 	isFillLayer,
@@ -219,10 +224,36 @@ export function dispatchLayerUpdate({
 			layers.update((lyrs) => {
 				const lyr = lyrs[layer.id];
 
-				if (isChoroplethLayer(lyr)) {
+				if (hasAttribute(lyr)) {
 					lyr.attribute = payload.attribute;
 
-					map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+					switch (lyr.type) {
+						case 'Choropleth':
+							map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+							break;
+						case 'Proportional Symbol':
+							map.setPaintProperty(lyr.id, 'circle-radius', deriveSize(lyr));
+							break;
+						case 'Dot Density': {
+							const dotValue = deriveDotDensityStartingValue(
+								lyr.data.rawGeoJSON.features,
+								payload.attribute
+							);
+
+							const features = generateDotDensityPoints({
+								features: lyr.data.rawGeoJSON.features,
+								attribute: payload.attribute,
+								value: dotValue
+							});
+
+							lyr.data.geoJSON = features;
+							lyr.style.dots.value = dotValue;
+
+							// Update the source with the new data.
+							(map.getSource(layer.id) as GeoJSONSource).setData(features);
+							break;
+						}
+					}
 				}
 
 				return lyrs;

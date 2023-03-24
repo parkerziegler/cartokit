@@ -124,7 +124,7 @@ export function isDotDensityLayer(layer: CartoKitLayer): layer is CartoKitDotDen
  */
 export function hasAttribute(
 	layer: CartoKitLayer
-): layer is CartoKitChoroplethLayer | CartoKitProportionalSymbolLayer {
+): layer is CartoKitChoroplethLayer | CartoKitProportionalSymbolLayer | CartoKitDotDensityLayer {
 	return 'attribute' in layer;
 }
 
