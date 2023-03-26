@@ -1,5 +1,4 @@
 import { writable } from 'svelte/store';
-import * as d3 from 'd3';
 
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 

@@ -2,7 +2,11 @@ import type { Map } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
-import { instrumentPolygonHover, instrumentPointHover } from '$lib/interaction/hover';
+import {
+	instrumentPolygonHover,
+	instrumentPointHover,
+	instrumentDotDensityHover
+} from '$lib/interaction/hover';
 import { instrumentPolygonSelect, instrumentPointSelect } from '$lib/interaction/select';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
@@ -72,7 +76,7 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 				}
 			});
 
-			// TODO: Determine which geographic features we want to instrument in a dot density layer.
+			instrumentDotDensityHover(map, layer);
 			break;
 		}
 	}
