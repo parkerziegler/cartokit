@@ -1,18 +1,16 @@
 import type { Map, MapLayerMouseEvent } from 'maplibre-gl';
 
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
-
 /**
  * Add a hover effect to all features in a polygon layer.
  *
  * @param map – The top-level MapLibre GL map instance.
- * @param layer – The CartoKit layer to add the hover effect to.
+ * @param layerId – The id of the layer to instrument.
  */
-export function instrumentPolygonHover(map: Map, layer: CartoKitLayer): void {
+export function instrumentPolygonHover(map: Map, layerId: string): void {
   map.addLayer({
-    id: `${layer.id}-hover`,
+    id: `${layerId}-hover`,
     type: 'line',
-    source: layer.id,
+    source: layerId,
     paint: {
       'line-color': '#FFFFFF',
       'line-width': [
@@ -24,94 +22,46 @@ export function instrumentPolygonHover(map: Map, layer: CartoKitLayer): void {
     }
   });
 
-  addHoverListeners(map, layer.id);
+  addHoverListeners(map, layerId);
 }
 
 /**
  * Add a hover effect to all features in a point layer.
  *
  * @param map – The top-level MapLibre GL map instance.
- * @param layer – The CartoKit layer to add the hover effect to.
+ * @param layer – The id of the layer to instrument.
  */
-export function instrumentPointHover(map: Map, layer: CartoKitLayer): void {
+export function instrumentPointHover(map: Map, layerId: string): void {
   const currentStrokeWidth = map.getPaintProperty(
-    layer.id,
+    layerId,
     'circle-stroke-width'
   );
   const currentStrokeColor = map.getPaintProperty(
-    layer.id,
+    layerId,
     'circle-stroke-color'
   );
 
-  map.setPaintProperty(layer.id, 'circle-stroke-width', [
+  map.setPaintProperty(layerId, 'circle-stroke-width', [
     'case',
     ['boolean', ['feature-state', 'hover'], false],
     1,
     currentStrokeWidth ?? 0
   ]);
-  map.setPaintProperty(layer.id, 'circle-stroke-color', [
+  map.setPaintProperty(layerId, 'circle-stroke-color', [
     'case',
     ['boolean', ['feature-state', 'hover'], false],
     '#FFFFFF',
     currentStrokeColor ?? 'transparent'
   ]);
 
-  addHoverListeners(map, layer.id);
-}
-
-/**
- * Add a hover effect to enclosing polygons in a dot density layer.
- *
- * @param map – The top-level MapLibre GL map instance.
- * @param layer – The CartoKit layer to add the hover effect to.
- */
-export function instrumentDotDensityHover(
-  map: Map,
-  layer: CartoKitLayer
-): void {
-  // Add a separate source for the polygon outlines of the dot density layer.
-  // Ensure it does not already exist from a previous transition before adding it.
-  if (!map.getSource(`${layer.id}-outlines`)) {
-    map.addSource(`${layer.id}-outlines`, {
-      type: 'geojson',
-      data: layer.data.rawGeoJSON
-    });
-  }
-
-  // Add a transparent layer to the map for the outlines.
-  map.addLayer({
-    id: `${layer.id}-outlines`,
-    type: 'fill',
-    source: `${layer.id}-outlines`,
-    paint: {
-      'fill-color': 'transparent',
-      'fill-opacity': 0
-    }
-  });
-
-  map.addLayer({
-    id: `${layer.id}-hover`,
-    type: 'line',
-    source: `${layer.id}-outlines`,
-    paint: {
-      'line-color': '#FFFFFF',
-      'line-width': [
-        'case',
-        ['boolean', ['feature-state', 'hover'], false],
-        1,
-        0
-      ]
-    }
-  });
-
-  addHoverListeners(map, `${layer.id}-outlines`);
+  addHoverListeners(map, layerId);
 }
 
 /**
  * Wire up event listeners for hover effects.
  *
  * @param map – The top-level MapLibre GL map instance.
- * @param layerId – The id of the layer to wire the listeners to.
+ * @param layerId – The id of the layer to instrument.
  */
 function addHoverListeners(map: Map, layerId: string): void {
   let hoveredFeatureId: string | null = null;

@@ -4,8 +4,7 @@ import { deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
 import {
   instrumentPolygonHover,
-  instrumentPointHover,
-  instrumentDotDensityHover
+  instrumentPointHover
 } from '$lib/interaction/hover';
 import {
   instrumentPolygonSelect,
@@ -32,8 +31,8 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentPolygonHover(map, layer);
-      instrumentPolygonSelect(map, layer);
+      instrumentPolygonHover(map, layer.id);
+      instrumentPolygonSelect(map, layer.id);
       break;
     }
     case 'Choropleth': {
@@ -47,8 +46,8 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentPolygonHover(map, layer);
-      instrumentPolygonSelect(map, layer);
+      instrumentPolygonHover(map, layer.id);
+      instrumentPolygonSelect(map, layer.id);
       break;
     }
     case 'Proportional Symbol': {
@@ -63,11 +62,33 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentPointHover(map, layer);
-      instrumentPointSelect(map, layer);
+      instrumentPointHover(map, layer.id);
+      instrumentPointSelect(map, layer.id);
       break;
     }
     case 'Dot Density': {
+      // Add a separate source for the polygon outlines of the dot density layer.
+      // Ensure it does not already exist from a previous transition before adding it.
+      if (!map.getSource(`${layer.id}-outlines`)) {
+        map.addSource(`${layer.id}-outlines`, {
+          type: 'geojson',
+          data: layer.data.rawGeoJSON
+        });
+      }
+
+      // Add a transparent layer to the map for the outlines.
+      // This is the layer we'll instrument for hover and select effects.
+      map.addLayer({
+        id: `${layer.id}-outlines`,
+        type: 'fill',
+        source: `${layer.id}-outlines`,
+        paint: {
+          'fill-color': 'transparent',
+          'fill-opacity': 0
+        }
+      });
+
+      // Add the dot density layer to the map.
       map.addLayer({
         id: layer.id,
         source: layer.id,
@@ -79,7 +100,8 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentDotDensityHover(map, layer);
+      instrumentPolygonHover(map, `${layer.id}-outlines`);
+      instrumentPolygonSelect(map, `${layer.id}-outlines`);
       break;
     }
   }

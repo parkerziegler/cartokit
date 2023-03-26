@@ -7,20 +7,19 @@ import type {
 import { get } from 'svelte/store';
 
 import { selectedFeature } from '$lib/stores/feature';
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import type { CartoKitIR } from '$lib/stores/layers';
 
 /**
  * Add a selection indicator to a feature in a polygon layer.
  *
  * @param map – The top-level MapLibre GL map instance.
- * @param layer – A CartoKit layer to add a select effect to.
+ * @param layerId — The id of the layer to instrument.
  */
-export function instrumentPolygonSelect(map: Map, layer: CartoKitLayer): void {
+export function instrumentPolygonSelect(map: Map, layerId: string): void {
   map.addLayer({
-    id: `${layer.id}-select`,
+    id: `${layerId}-select`,
     type: 'line',
-    source: layer.id,
+    source: layerId,
     paint: {
       'line-color': '#A534FF',
       'line-width': [
@@ -32,55 +31,55 @@ export function instrumentPolygonSelect(map: Map, layer: CartoKitLayer): void {
     }
   });
 
-  addSelectListeners(map, layer);
+  addSelectListeners(map, layerId);
 }
 
 /**
  * Add a selection indicator to a feature in a point layer.
  *
  * @param map – The top-level MapLibre GL map instance.
- * @param layer – A CartoKit layer to add a select effect to.
+ * @param layerId – The id of the layer to instrument.
  */
-export function instrumentPointSelect(map: Map, layer: CartoKitLayer): void {
+export function instrumentPointSelect(map: Map, layerId: string): void {
   const currentStrokeWidth = map.getPaintProperty(
-    layer.id,
+    layerId,
     'circle-stroke-width'
   );
   const currentStrokeColor = map.getPaintProperty(
-    layer.id,
+    layerId,
     'circle-stroke-color'
   );
 
-  map.setPaintProperty(layer.id, 'circle-stroke-width', [
+  map.setPaintProperty(layerId, 'circle-stroke-width', [
     'case',
     ['boolean', ['feature-state', 'selected'], false],
     1,
     currentStrokeWidth ?? 0
   ]);
-  map.setPaintProperty(layer.id, 'circle-stroke-color', [
+  map.setPaintProperty(layerId, 'circle-stroke-color', [
     'case',
     ['boolean', ['feature-state', 'selected'], false],
     '#A534FF',
     currentStrokeColor ?? 'transparent'
   ]);
 
-  addSelectListeners(map, layer);
+  addSelectListeners(map, layerId);
 }
 
 /**
  * Wire up event listeners for select effects.
  *
  * @param map – The top-level MapLibre GL map instance.
- * @param layer – The CartoKit layer to wire the listeners to.
+ * @param layerId – The id of the layer to instrument.
  */
-function addSelectListeners(map: Map, layer: CartoKitLayer) {
+function addSelectListeners(map: Map, layerId: string) {
   let selectedFeatureId: string | null = null;
 
   function onClick(event: MapLayerMouseEvent): void {
     if (event.features && event.features.length > 0) {
       if (selectedFeatureId !== null) {
         map.setFeatureState(
-          { source: layer.id, id: selectedFeatureId },
+          { source: layerId, id: selectedFeatureId },
           { selected: false }
         );
       }
@@ -90,17 +89,16 @@ function addSelectListeners(map: Map, layer: CartoKitLayer) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       selectedFeatureId = event.features[0].id!.toString();
       map.setFeatureState(
-        { source: layer.id, id: selectedFeatureId },
+        { source: layerId, id: selectedFeatureId },
         { selected: true }
       );
 
-      // The types appear to be wrong here, so we cast:
-      // https://github.com/maplibre/maplibre-gl-js/blob/main/src/ui/events.ts#L11
+      // We cast for now until this PR is released: https://github.com/maplibre/maplibre-gl-js/pull/2244
       selectedFeature.set(event.features[0] as MapGeoJSONFeature);
     }
   }
 
-  map.on('click', layer.id, onClick);
+  map.on('click', layerId, onClick);
 }
 
 /**
@@ -114,23 +112,28 @@ export function onFeatureLeave(
   map: Map,
   layers: CartoKitIR
 ): (event: MapMouseEvent) => void {
-  const layerIds = Object.keys(layers);
-
   return function deselectFeature(event: MapMouseEvent) {
+    const layerIds = Object.values(layers).map((layer) => {
+      // For dot density layers, we need to deselect the outline layer.
+      if (layer.type === 'Dot Density') {
+        return `${layer.id}-outlines`;
+      }
+
+      return layer.id;
+    });
+
     const features = map.queryRenderedFeatures(event.point, {
       layers: layerIds
     });
-    const selectedFeatureId = get(selectedFeature)?.id?.toString();
+    const selFeature = get(selectedFeature);
 
-    if (features.length === 0 && selectedFeatureId) {
+    if (features.length === 0 && typeof selFeature?.id !== 'undefined') {
       selectedFeature.set(null);
 
-      layerIds.forEach((layerId) => {
-        map.removeFeatureState(
-          { source: layerId, id: selectedFeatureId },
-          'selected'
-        );
-      });
+      map.removeFeatureState(
+        { source: selFeature.layer.id, id: selFeature.id },
+        'selected'
+      );
     }
   };
 }

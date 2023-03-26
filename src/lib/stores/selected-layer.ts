@@ -9,7 +9,9 @@ export const selectedLayer = derived<
   CartoKitLayer | null
 >([selectedFeature, layers], ([$selectedFeature, $layers]) => {
   if ($selectedFeature) {
-    return $layers[$selectedFeature.layer.id];
+    return $selectedFeature.layer.id.endsWith('-outlines')
+      ? $layers[$selectedFeature.layer.id.replace('-outlines', '')]
+      : $layers[$selectedFeature.layer.id];
   }
 
   return null;

@@ -11,7 +11,9 @@ export const mapType = derived<
   MapType
 >([selectedFeature, layers], ([$selectedFeature, $layers]) => {
   if ($selectedFeature) {
-    const layer = $layers[$selectedFeature.layer.id];
+    const layer = $selectedFeature.layer.id.endsWith('-outlines')
+      ? $layers[$selectedFeature.layer.id.replace('-outlines', '')]
+      : $layers[$selectedFeature.layer.id];
 
     return layer.type;
   }
