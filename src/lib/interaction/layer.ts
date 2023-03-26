@@ -3,11 +3,14 @@ import type { Map } from 'maplibre-gl';
 import { deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
 import {
-	instrumentPolygonHover,
-	instrumentPointHover,
-	instrumentDotDensityHover
+  instrumentPolygonHover,
+  instrumentPointHover,
+  instrumentDotDensityHover
 } from '$lib/interaction/hover';
-import { instrumentPolygonSelect, instrumentPointSelect } from '$lib/interaction/select';
+import {
+  instrumentPolygonSelect,
+  instrumentPointSelect
+} from '$lib/interaction/select';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
 /**
@@ -17,67 +20,67 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
  * @param layer – The CartoKit layer to add to the map.
  */
 export function addLayer(map: Map, layer: CartoKitLayer): void {
-	switch (layer.type) {
-		case 'Fill': {
-			map.addLayer({
-				id: layer.id,
-				source: layer.id,
-				type: 'fill',
-				paint: {
-					'fill-color': layer.style.fill,
-					'fill-opacity': layer.style.opacity
-				}
-			});
+  switch (layer.type) {
+    case 'Fill': {
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'fill',
+        paint: {
+          'fill-color': layer.style.fill,
+          'fill-opacity': layer.style.opacity
+        }
+      });
 
-			instrumentPolygonHover(map, layer);
-			instrumentPolygonSelect(map, layer);
-			break;
-		}
-		case 'Choropleth': {
-			map.addLayer({
-				id: layer.id,
-				source: layer.id,
-				type: 'fill',
-				paint: {
-					'fill-color': deriveColorScale(layer),
-					'fill-opacity': layer.style.opacity
-				}
-			});
+      instrumentPolygonHover(map, layer);
+      instrumentPolygonSelect(map, layer);
+      break;
+    }
+    case 'Choropleth': {
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'fill',
+        paint: {
+          'fill-color': deriveColorScale(layer),
+          'fill-opacity': layer.style.opacity
+        }
+      });
 
-			instrumentPolygonHover(map, layer);
-			instrumentPolygonSelect(map, layer);
-			break;
-		}
-		case 'Proportional Symbol': {
-			map.addLayer({
-				id: layer.id,
-				source: layer.id,
-				type: 'circle',
-				paint: {
-					'circle-color': layer.style.fill,
-					'circle-radius': deriveSize(layer),
-					'circle-opacity': layer.style.opacity
-				}
-			});
+      instrumentPolygonHover(map, layer);
+      instrumentPolygonSelect(map, layer);
+      break;
+    }
+    case 'Proportional Symbol': {
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'circle',
+        paint: {
+          'circle-color': layer.style.fill,
+          'circle-radius': deriveSize(layer),
+          'circle-opacity': layer.style.opacity
+        }
+      });
 
-			instrumentPointHover(map, layer);
-			instrumentPointSelect(map, layer);
-			break;
-		}
-		case 'Dot Density': {
-			map.addLayer({
-				id: layer.id,
-				source: layer.id,
-				type: 'circle',
-				paint: {
-					'circle-color': layer.style.fill,
-					'circle-radius': layer.style.dots.size,
-					'circle-opacity': layer.style.opacity
-				}
-			});
+      instrumentPointHover(map, layer);
+      instrumentPointSelect(map, layer);
+      break;
+    }
+    case 'Dot Density': {
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'circle',
+        paint: {
+          'circle-color': layer.style.fill,
+          'circle-radius': layer.style.dots.size,
+          'circle-opacity': layer.style.opacity
+        }
+      });
 
-			instrumentDotDensityHover(map, layer);
-			break;
-		}
-	}
+      instrumentDotDensityHover(map, layer);
+      break;
+    }
+  }
 }

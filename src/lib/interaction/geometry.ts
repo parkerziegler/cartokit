@@ -12,26 +12,38 @@ import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
  *
  * @returns – a MapLibre GL JS expression for a proportional symbol radius scale.
  */
-export function deriveSize(layer: CartoKitProportionalSymbolLayer): ExpressionSpecification {
-	const {
-		attribute,
-		data: {
-			geoJSON: { features }
-		},
-		style: {
-			size: { min: rMin, max: rMax }
-		}
-	} = layer;
-	const extent = d3.extent(features, (d) => Math.sqrt(d.properties?.[attribute] ?? 0));
-	const [min, max] = [extent[0] ?? 0, extent[1] ?? 1];
+export function deriveSize(
+  layer: CartoKitProportionalSymbolLayer
+): ExpressionSpecification {
+  const {
+    attribute,
+    data: {
+      geoJSON: { features }
+    },
+    style: {
+      size: { min: rMin, max: rMax }
+    }
+  } = layer;
+  const extent = d3.extent(features, (d) =>
+    Math.sqrt(d.properties?.[attribute] ?? 0)
+  );
+  const [min, max] = [extent[0] ?? 0, extent[1] ?? 1];
 
-	return ['interpolate', ['linear'], ['sqrt', ['get', attribute]], min, rMin, max, rMax];
+  return [
+    'interpolate',
+    ['linear'],
+    ['sqrt', ['get', attribute]],
+    min,
+    rMin,
+    max,
+    rMax
+  ];
 }
 
 interface GenerateDotDensityPointsParams {
-	features: Feature[];
-	attribute: string;
-	value: number;
+  features: Feature[];
+  attribute: string;
+  value: number;
 }
 
 /**
@@ -44,33 +56,33 @@ interface GenerateDotDensityPointsParams {
  * @returns – a FeatureCollection of dots.
  */
 export function generateDotDensityPoints({
-	features,
-	attribute,
-	value
+  features,
+  attribute,
+  value
 }: GenerateDotDensityPointsParams): FeatureCollection {
-	const dots = features.flatMap((feature) => {
-		const numPoints = Math.floor(feature.properties?.[attribute] / value) ?? 0;
+  const dots = features.flatMap((feature) => {
+    const numPoints = Math.floor(feature.properties?.[attribute] / value) ?? 0;
 
-		// Obtain the bounding box of the polygon.
-		const bbox = turf.bbox(feature);
+    // Obtain the bounding box of the polygon.
+    const bbox = turf.bbox(feature);
 
-		// Begin "throwing" random points within the bounding box,
-		// keeping them only if they fall within the polygon.
-		const selectedFeatures: Feature[] = [];
-		while (selectedFeatures.length < numPoints) {
-			const candidate = turf.randomPoint(1, { bbox }).features[0];
+    // Begin "throwing" random points within the bounding box,
+    // keeping them only if they fall within the polygon.
+    const selectedFeatures: Feature[] = [];
+    while (selectedFeatures.length < numPoints) {
+      const candidate = turf.randomPoint(1, { bbox }).features[0];
 
-			if (turf.booleanWithin(candidate, feature)) {
-				selectedFeatures.push(candidate);
-			}
-		}
+      if (turf.booleanWithin(candidate, feature)) {
+        selectedFeatures.push(candidate);
+      }
+    }
 
-		return selectedFeatures.flatMap((point) => {
-			return turf.feature(point.geometry, feature.properties);
-		});
-	});
+    return selectedFeatures.flatMap((point) => {
+      return turf.feature(point.geometry, feature.properties);
+    });
+  });
 
-	return turf.featureCollection(dots);
+  return turf.featureCollection(dots);
 }
 
 /**
@@ -82,9 +94,12 @@ export function generateDotDensityPoints({
  *
  * @returns – A starting dot density value.
  */
-export function deriveDotDensityStartingValue(features: Feature[], attribute: string): number {
-	const max = d3.max(features, (d) => d.properties?.[attribute] ?? 0);
+export function deriveDotDensityStartingValue(
+  features: Feature[],
+  attribute: string
+): number {
+  const max = d3.max(features, (d) => d.properties?.[attribute] ?? 0);
 
-	// Aim for a ratio where the number of dots is 1% of the max data value.
-	return Math.floor(max / 100);
+  // Aim for a ratio where the number of dots is 1% of the max data value.
+  return Math.floor(max / 100);
 }

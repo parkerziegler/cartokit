@@ -7,7 +7,7 @@ import type { FillLayerSpecification, MapGeoJSONFeature } from 'maplibre-gl';
  * @returns – A Boolean value indicating whether the layer is a MapLibre fill layer.
  */
 export function isMapLibreFillLayer(
-	layer: MapGeoJSONFeature['layer']
+  layer: MapGeoJSONFeature['layer']
 ): layer is FillLayerSpecification {
-	return layer.type === 'fill';
+  return layer.type === 'fill';
 }

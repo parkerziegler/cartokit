@@ -9,12 +9,12 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
  * @returns – a Mapbox GL JS program fragment.
  */
 export function codegenLayer(layer: CartoKitLayer): string {
-	switch (layer.type) {
-		case 'Fill':
-		case 'Choropleth': {
-			const paint = codegenPaint(layer);
+  switch (layer.type) {
+    case 'Fill':
+    case 'Choropleth': {
+      const paint = codegenPaint(layer);
 
-			return `
+      return `
 			map.addLayer({
 				id: '${layer.id}',
 				source: '${layer.id}',
@@ -22,12 +22,12 @@ export function codegenLayer(layer: CartoKitLayer): string {
 				${paint}
 			});
 			`;
-		}
-		case 'Proportional Symbol':
-		case 'Dot Density': {
-			const paint = codegenPaint(layer);
+    }
+    case 'Proportional Symbol':
+    case 'Dot Density': {
+      const paint = codegenPaint(layer);
 
-			return `
+      return `
 			map.addLayer({
 				id: '${layer.id}',
 				source: '${layer.id}',
@@ -35,6 +35,6 @@ export function codegenLayer(layer: CartoKitLayer): string {
 				${paint}
 			});
 			`;
-		}
-	}
+    }
+  }
 }

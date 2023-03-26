@@ -13,11 +13,11 @@ import type { CartoKitIR } from '$lib/stores/layers';
  * @returns – a Mapbox GL JS program.
  */
 export function codegen(layers: CartoKitIR): string {
-	const compiled = codegenMap(layers);
-	const formatted = prettier.format(compiled, {
-		parser: 'babel',
-		plugins: [babylon]
-	});
+  const compiled = codegenMap(layers);
+  const formatted = prettier.format(compiled, {
+    parser: 'babel',
+    plugins: [babylon]
+  });
 
-	return formatted;
+  return formatted;
 }

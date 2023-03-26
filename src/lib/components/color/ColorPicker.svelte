@@ -1,74 +1,74 @@
 <script lang="ts">
-	import * as d3 from 'd3';
+  import * as d3 from 'd3';
 
-	import HexInput from '$lib/components/color/HexInput.svelte';
-	import OpacityInput from '$lib/components/color/OpacityInput.svelte';
-	import { dispatchLayerUpdate } from '$lib/interaction/update';
-	import { map } from '$lib/stores/map';
-	import { selectedLayer } from '$lib/stores/selected-layer';
-	import { hasFill } from '$lib/types/CartoKitLayer';
-	import { decimalToPercent } from '$lib/utils/color';
-	import { DEFAULT_FILL, DEFAULT_OPACITY } from '$lib/utils/constants';
+  import HexInput from '$lib/components/color/HexInput.svelte';
+  import OpacityInput from '$lib/components/color/OpacityInput.svelte';
+  import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { map } from '$lib/stores/map';
+  import { selectedLayer } from '$lib/stores/selected-layer';
+  import { hasFill } from '$lib/types/CartoKitLayer';
+  import { decimalToPercent } from '$lib/utils/color';
+  import { DEFAULT_FILL, DEFAULT_OPACITY } from '$lib/utils/constants';
 
-	$: color =
-		$selectedLayer && hasFill($selectedLayer)
-			? d3.color($selectedLayer.style.fill)?.formatHex() ?? DEFAULT_FILL
-			: DEFAULT_FILL;
-	$: opacity = $selectedLayer
-		? decimalToPercent($selectedLayer.style.opacity)
-		: decimalToPercent(DEFAULT_OPACITY);
+  $: color =
+    $selectedLayer && hasFill($selectedLayer)
+      ? d3.color($selectedLayer.style.fill)?.formatHex() ?? DEFAULT_FILL
+      : DEFAULT_FILL;
+  $: opacity = $selectedLayer
+    ? decimalToPercent($selectedLayer.style.opacity)
+    : decimalToPercent(DEFAULT_OPACITY);
 
-	function onColorInput(event: Event) {
-		const target = event.target as HTMLInputElement;
+  function onColorInput(event: Event) {
+    const target = event.target as HTMLInputElement;
 
-		if ($selectedLayer && $map) {
-			dispatchLayerUpdate({
-				type: 'fill',
-				map: $map,
-				layer: $selectedLayer,
-				payload: {
-					color: target.value
-				}
-			});
-		}
-	}
+    if ($selectedLayer && $map) {
+      dispatchLayerUpdate({
+        type: 'fill',
+        map: $map,
+        layer: $selectedLayer,
+        payload: {
+          color: target.value
+        }
+      });
+    }
+  }
 
-	function onHexChange(hex: string) {
-		if ($selectedLayer && $map) {
-			dispatchLayerUpdate({
-				type: 'fill',
-				map: $map,
-				layer: $selectedLayer,
-				payload: {
-					color: hex
-				}
-			});
-		}
-	}
+  function onHexChange(hex: string) {
+    if ($selectedLayer && $map) {
+      dispatchLayerUpdate({
+        type: 'fill',
+        map: $map,
+        layer: $selectedLayer,
+        payload: {
+          color: hex
+        }
+      });
+    }
+  }
 
-	function onOpacityChange(opacity: number) {
-		if ($selectedLayer && $map) {
-			dispatchLayerUpdate({
-				type: 'opacity',
-				map: $map,
-				layer: $selectedLayer,
-				payload: {
-					opacity
-				}
-			});
-		}
-	}
+  function onOpacityChange(opacity: number) {
+    if ($selectedLayer && $map) {
+      dispatchLayerUpdate({
+        type: 'opacity',
+        map: $map,
+        layer: $selectedLayer,
+        payload: {
+          opacity
+        }
+      });
+    }
+  }
 </script>
 
 <div class="flex color-picker">
-	<div class="stack-h stack-h-xs items-center">
-		<input
-			type="color"
-			class="appearance-none cursor-pointer h-4 w-4 rounded"
-			value={color}
-			on:input={onColorInput}
-		/>
-		<HexInput hex={color} {onHexChange} />
-		<OpacityInput {opacity} {onOpacityChange} />
-	</div>
+  <div class="stack-h stack-h-xs items-center">
+    <input
+      type="color"
+      class="appearance-none cursor-pointer h-4 w-4 rounded"
+      value={color}
+      on:input={onColorInput}
+    />
+    <HexInput hex={color} {onHexChange} />
+    <OpacityInput {opacity} {onOpacityChange} />
+  </div>
 </div>

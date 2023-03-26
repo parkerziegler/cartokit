@@ -1,59 +1,63 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import cs from 'classnames';
+  import { createEventDispatcher } from 'svelte';
+  import cs from 'classnames';
 
-	import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
+  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
 
-	type T = $$Generic;
+  type T = $$Generic;
 
-	interface SelectOption<T> {
-		value: T;
-		label: string;
-	}
+  interface SelectOption<T> {
+    value: T;
+    label: string;
+  }
 
-	export let className: string = '';
-	export let selected: T;
-	export let options: SelectOption<T>[] = [];
-	export let title: string = '';
+  export let className: string = '';
+  export let selected: T;
+  export let options: SelectOption<T>[] = [];
+  export let title: string = '';
 
-	const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher();
 
-	function onChange(event: Event) {
-		const target = event.target as HTMLSelectElement;
-		dispatch('change', { value: target.value });
-	}
+  function onChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    dispatch('change', { value: target.value });
+  }
 </script>
 
 {#if title}
-	<div class="stack-h stack-h-xs items-baseline">
-		<FieldLabel fieldId={title}>
-			{title}
-		</FieldLabel>
-		<select
-			class={cs(
-				'bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600',
-				className
-			)}
-			value={selected}
-			on:change={onChange}
-			id={title}
-		>
-			{#each options as option}
-				<option value={option.value} selected={option.value === selected}>{option.label}</option>
-			{/each}
-		</select>
-	</div>
+  <div class="stack-h stack-h-xs items-baseline">
+    <FieldLabel fieldId={title}>
+      {title}
+    </FieldLabel>
+    <select
+      class={cs(
+        'bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600',
+        className
+      )}
+      value={selected}
+      on:change={onChange}
+      id={title}
+    >
+      {#each options as option}
+        <option value={option.value} selected={option.value === selected}
+          >{option.label}</option
+        >
+      {/each}
+    </select>
+  </div>
 {:else}
-	<select
-		class={cs(
-			'bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600',
-			className
-		)}
-		value={selected}
-		on:change={onChange}
-	>
-		{#each options as option}
-			<option value={option.value} selected={option.value === selected}>{option.label}</option>
-		{/each}
-	</select>
+  <select
+    class={cs(
+      'bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600',
+      className
+    )}
+    value={selected}
+    on:change={onChange}
+  >
+    {#each options as option}
+      <option value={option.value} selected={option.value === selected}
+        >{option.label}</option
+      >
+    {/each}
+  </select>
 {/if}

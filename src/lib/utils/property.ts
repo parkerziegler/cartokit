@@ -10,5 +10,5 @@ import isFinite from 'lodash.isfinite';
  * @returns – a Boolean value indicating whether the property is finite and numeric.
  */
 export function isPropertyNumeric(property: unknown): property is number {
-	return isFinite(property);
+  return isFinite(property);
 }

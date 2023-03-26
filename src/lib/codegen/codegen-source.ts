@@ -1,4 +1,7 @@
-import type { CartoKitDotDensityLayer, CartoKitLayer } from '$lib/types/CartoKitLayer';
+import type {
+  CartoKitDotDensityLayer,
+  CartoKitLayer
+} from '$lib/types/CartoKitLayer';
 import { getFeatureCollectionType } from '$lib/utils/geojson';
 
 /**
@@ -9,45 +12,46 @@ import { getFeatureCollectionType } from '$lib/utils/geojson';
  * @returns – a Mapbox GL JS program fragment.
  */
 export function codegenSource(layer: CartoKitLayer): string {
-	const geometry = getFeatureCollectionType(layer.data.geoJSON);
-	const rawGeometry = getFeatureCollectionType(layer.data.rawGeoJSON);
+  const geometry = getFeatureCollectionType(layer.data.geoJSON);
+  const rawGeometry = getFeatureCollectionType(layer.data.rawGeoJSON);
 
-	let transformation = '';
-	let features = 'data';
+  let transformation = '';
+  let features = 'data';
 
-	if (
-		(geometry === 'Point' || geometry === 'MultiPoint') &&
-		(rawGeometry === 'Polygon' || rawGeometry === 'MultiPolygon')
-	) {
-		switch (layer.type) {
-			case 'Proportional Symbol':
-				({ transformation, features } = codegenProportionalSymbolTransformation());
-				break;
-			case 'Dot Density':
-				({ transformation, features } = codegenDotDensityTransformation(layer));
-				break;
-			default:
-				break;
-		}
-	}
+  if (
+    (geometry === 'Point' || geometry === 'MultiPoint') &&
+    (rawGeometry === 'Polygon' || rawGeometry === 'MultiPolygon')
+  ) {
+    switch (layer.type) {
+      case 'Proportional Symbol':
+        ({ transformation, features } =
+          codegenProportionalSymbolTransformation());
+        break;
+      case 'Dot Density':
+        ({ transformation, features } = codegenDotDensityTransformation(layer));
+        break;
+      default:
+        break;
+    }
+  }
 
-	return transformation.concat(`
+  return transformation.concat(`
   map.addSource('${layer.id}', {
 		type: 'geojson',
 		data: ${
-			transformation
-				? features
-				: layer.data.url
-				? `"${layer.data.url}"`
-				: JSON.stringify(layer.data.geoJSON, null, 2)
-		}
+      transformation
+        ? features
+        : layer.data.url
+        ? `"${layer.data.url}"`
+        : JSON.stringify(layer.data.geoJSON, null, 2)
+    }
 	});
   `);
 }
 
 interface TransformationProgramFragment {
-	transformation: string;
-	features: string;
+  transformation: string;
+  features: string;
 }
 
 /**
@@ -56,15 +60,15 @@ interface TransformationProgramFragment {
  * @returns – a "transformation" and "features" program fragment.
  */
 function codegenProportionalSymbolTransformation(): TransformationProgramFragment {
-	const transformation = `
+  const transformation = `
 		const centroids = data.features.map((feature) => {
 			return turf.feature(turf.centroid(feature).geometry, feature.properties);
 		});
 	`;
 
-	const features = 'turf.featureCollection(centroids)';
+  const features = 'turf.featureCollection(centroids)';
 
-	return { transformation, features };
+  return { transformation, features };
 }
 
 /**
@@ -75,9 +79,9 @@ function codegenProportionalSymbolTransformation(): TransformationProgramFragmen
  * @returns – a "transformation" and "features" program fragment.
  */
 function codegenDotDensityTransformation(
-	layer: CartoKitDotDensityLayer
+  layer: CartoKitDotDensityLayer
 ): TransformationProgramFragment {
-	const transformation = `
+  const transformation = `
 	const dots = data.features.flatMap((feature) => {
 		const numPoints = Math.floor(feature.properties["${layer.attribute}"] / ${layer.style.dots.value});
 
@@ -98,7 +102,7 @@ function codegenDotDensityTransformation(
 	});
 	`;
 
-	const features = 'turf.featureCollection(dots)';
+  const features = 'turf.featureCollection(dots)';
 
-	return { transformation, features };
+  return { transformation, features };
 }

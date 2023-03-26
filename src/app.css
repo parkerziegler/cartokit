@@ -4,130 +4,130 @@
 
 /* Prism Overrides */
 .token.operator {
-	background: none;
+  background: none;
 }
 
 /* Utilities */
 @layer utilities {
-	/* Block Stack */
-	.stack {
-		display: flex;
-		flex-direction: column;
-		justify-content: flex-start;
-	}
+  /* Block Stack */
+  .stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
 
-	.stack > * {
-		margin-block: 0;
-	}
+  .stack > * {
+    margin-block: 0;
+  }
 
-	.stack-xs > * + * {
-		margin-block-start: 0.5rem;
-	}
+  .stack-xs > * + * {
+    margin-block-start: 0.5rem;
+  }
 
-	.stack-sm > * + * {
-		margin-block-start: 1rem;
-	}
+  .stack-sm > * + * {
+    margin-block-start: 1rem;
+  }
 
-	.stack-md > * + * {
-		margin-block-start: 1.5rem;
-	}
+  .stack-md > * + * {
+    margin-block-start: 1.5rem;
+  }
 
-	.stack-lg > * + * {
-		margin-block-start: 2rem;
-	}
+  .stack-lg > * + * {
+    margin-block-start: 2rem;
+  }
 
-	/* Inline Stack */
-	.stack-h {
-		display: flex;
-		flex-direction: row;
-		justify-content: flex-start;
-	}
+  /* Inline Stack */
+  .stack-h {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
 
-	.stack-h > * {
-		margin-inline: 0;
-	}
+  .stack-h > * {
+    margin-inline: 0;
+  }
 
-	.stack-h-xs > * + * {
-		margin-inline-start: 0.5rem;
-	}
+  .stack-h-xs > * + * {
+    margin-inline-start: 0.5rem;
+  }
 
-	.stack-h-sm > * + * {
-		margin-inline-start: 1rem;
-	}
+  .stack-h-sm > * + * {
+    margin-inline-start: 1rem;
+  }
 
-	.stack-h-md > * + * {
-		margin-inline-start: 1.5rem;
-	}
+  .stack-h-md > * + * {
+    margin-inline-start: 1.5rem;
+  }
 
-	.stack-h-lg > * + * {
-		margin-inline-start: 2rem;
-	}
+  .stack-h-lg > * + * {
+    margin-inline-start: 2rem;
+  }
 
-	/* Stack Borders */
-	.stack-border > * + * {
-		@apply border-t border-t-slate-400;
-	}
+  /* Stack Borders */
+  .stack-border > * + * {
+    @apply border-t border-t-slate-400;
+  }
 }
 
 @layer components {
-	/* Color Picker and Color Palette */
-	.color-picker ::-webkit-color-swatch-wrapper,
-	.color-palette ::-webkit-color-swatch-wrapper {
-		padding: 0;
-	}
+  /* Color Picker and Color Palette */
+  .color-picker ::-webkit-color-swatch-wrapper,
+  .color-palette ::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
 
-	::-webkit-color-swatch {
-		border: 0;
-	}
+  ::-webkit-color-swatch {
+    border: 0;
+  }
 
-	.color-picker ::-webkit-color-swatch {
-		@apply rounded;
-	}
+  .color-picker ::-webkit-color-swatch {
+    @apply rounded;
+  }
 
-	.color-palette li:first-child ::-webkit-color-swatch {
-		@apply rounded-l;
-	}
+  .color-palette li:first-child ::-webkit-color-swatch {
+    @apply rounded-l;
+  }
 
-	.color-palette li:last-child ::-webkit-color-swatch {
-		@apply rounded-r;
-	}
+  .color-palette li:last-child ::-webkit-color-swatch {
+    @apply rounded-r;
+  }
 
-	.color-picker ::-moz-color-swatch,
-	.color-picker ::-moz-focus-inner,
-	.color-palette ::-moz-color-swatch {
-		border: 0;
-	}
+  .color-picker ::-moz-color-swatch,
+  .color-picker ::-moz-focus-inner,
+  .color-palette ::-moz-color-swatch {
+    border: 0;
+  }
 
-	.color-picker ::-moz-focus-inner,
-	.color-palette ::-moz-focus-inner {
-		padding: 0;
-	}
+  .color-picker ::-moz-focus-inner,
+  .color-palette ::-moz-focus-inner {
+    padding: 0;
+  }
 
-	/* Number input */
-	/* Chrome, Safari, Edge, Opera */
-	input::-webkit-outer-spin-button,
-	input::-webkit-inner-spin-button {
-		-webkit-appearance: none;
-		margin: 0;
-	}
+  /* Number input */
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 
-	/* Firefox */
-	input[type='number'] {
-		-moz-appearance: textfield;
-	}
+  /* Firefox */
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
 
-	/* Style Editor */
-	.style-editor {
-		max-height: calc(100% - 2rem);
-	}
+  /* Style Editor */
+  .style-editor {
+    max-height: calc(100% - 2rem);
+  }
 
-	/* Hex Input */
-	.hex-input > input:first-child {
-		@apply border-r border-transparent;
-	}
+  /* Hex Input */
+  .hex-input > input:first-child {
+    @apply border-r border-transparent;
+  }
 
-	.hex-input:hover > input:first-child,
-	.hex-input:focus-within > input:first-child {
-		@apply border-slate-600;
-	}
+  .hex-input:hover > input:first-child,
+  .hex-input:focus-within > input:first-child {
+    @apply border-slate-600;
+  }
 }

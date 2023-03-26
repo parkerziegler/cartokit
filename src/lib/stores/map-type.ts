@@ -6,15 +6,15 @@ import type { MapType } from '$lib/types/MapTypes';
 
 const DEFAULT_MAP_TYPE = 'Fill';
 
-export const mapType = derived<[typeof selectedFeature, typeof layers], MapType>(
-	[selectedFeature, layers],
-	([$selectedFeature, $layers]) => {
-		if ($selectedFeature) {
-			const layer = $layers[$selectedFeature.layer.id];
+export const mapType = derived<
+  [typeof selectedFeature, typeof layers],
+  MapType
+>([selectedFeature, layers], ([$selectedFeature, $layers]) => {
+  if ($selectedFeature) {
+    const layer = $layers[$selectedFeature.layer.id];
 
-			return layer.type;
-		}
+    return layer.type;
+  }
 
-		return DEFAULT_MAP_TYPE;
-	}
-);
+  return DEFAULT_MAP_TYPE;
+});

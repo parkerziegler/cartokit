@@ -7,27 +7,30 @@ import { normalizeGeoJSONToFeatureCollection } from './geojson';
  * @param url — The url to fetch a GeoJSON dataset from.
  */
 async function fetchGeoJSON(url: string): Promise<void> {
-	try {
-		const response = await fetch(url);
-		const data = await response.json();
-		self.postMessage(data);
-	} catch {
-		throw new Error('Failed to fetch GeoJSON at: ' + url);
-	}
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    self.postMessage(data);
+  } catch {
+    throw new Error('Failed to fetch GeoJSON at: ' + url);
+  }
 }
 
-export function sourceWorker(url: string, cb: (data: FeatureCollection) => void) {
-	const blob = new Blob([fetchGeoJSON.toString(), `fetchGeoJSON("${url}")`], {
-		type: 'text/javascript'
-	});
-	const source = URL.createObjectURL(blob);
-	const worker = new Worker(source);
+export function sourceWorker(
+  url: string,
+  cb: (data: FeatureCollection) => void
+) {
+  const blob = new Blob([fetchGeoJSON.toString(), `fetchGeoJSON("${url}")`], {
+    type: 'text/javascript'
+  });
+  const source = URL.createObjectURL(blob);
+  const worker = new Worker(source);
 
-	worker.addEventListener('message', (event: MessageEvent<GeoJSON>) => {
-		const featureCollection = normalizeGeoJSONToFeatureCollection(event.data);
-		cb(featureCollection);
+  worker.addEventListener('message', (event: MessageEvent<GeoJSON>) => {
+    const featureCollection = normalizeGeoJSONToFeatureCollection(event.data);
+    cb(featureCollection);
 
-		worker.terminate();
-		URL.revokeObjectURL(source);
-	});
+    worker.terminate();
+    URL.revokeObjectURL(source);
+  });
 }

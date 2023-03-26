@@ -9,30 +9,34 @@ import { isPropertyNumeric } from '$lib/utils/property';
  * @param geoJSON - The GeoJSON object to normalize.
  * @returns – A GeoJSON FeatureCollection.
  */
-export function normalizeGeoJSONToFeatureCollection(geoJSON: GeoJSON): FeatureCollection {
-	switch (geoJSON.type) {
-		case 'Point':
-		case 'MultiPoint':
-		case 'LineString':
-		case 'MultiLineString':
-		case 'Polygon':
-		case 'MultiPolygon': {
-			const feature = turf.feature(geoJSON);
-			const featureCollection = turf.featureCollection([feature]);
+export function normalizeGeoJSONToFeatureCollection(
+  geoJSON: GeoJSON
+): FeatureCollection {
+  switch (geoJSON.type) {
+    case 'Point':
+    case 'MultiPoint':
+    case 'LineString':
+    case 'MultiLineString':
+    case 'Polygon':
+    case 'MultiPolygon': {
+      const feature = turf.feature(geoJSON);
+      const featureCollection = turf.featureCollection([feature]);
 
-			return featureCollection;
-		}
-		case 'GeometryCollection': {
-			const features = geoJSON.geometries.map((geometry) => turf.feature(geometry));
-			const featureCollection = turf.featureCollection(features);
+      return featureCollection;
+    }
+    case 'GeometryCollection': {
+      const features = geoJSON.geometries.map((geometry) =>
+        turf.feature(geometry)
+      );
+      const featureCollection = turf.featureCollection(features);
 
-			return featureCollection;
-		}
-		case 'Feature':
-			return turf.featureCollection([geoJSON]);
-		case 'FeatureCollection':
-			return geoJSON;
-	}
+      return featureCollection;
+    }
+    case 'Feature':
+      return turf.featureCollection([geoJSON]);
+    case 'FeatureCollection':
+      return geoJSON;
+  }
 }
 
 /**
@@ -42,8 +46,10 @@ export function normalizeGeoJSONToFeatureCollection(geoJSON: GeoJSON): FeatureCo
  * @param featureCollection - The FeatureCollection to inspect.
  * @returns – The type of the first Feature in the FeatureCollection.
  */
-export function getFeatureCollectionType(featureCollection: FeatureCollection): Geometry['type'] {
-	return featureCollection.features?.[0]?.geometry?.type;
+export function getFeatureCollectionType(
+  featureCollection: FeatureCollection
+): Geometry['type'] {
+  return featureCollection.features?.[0]?.geometry?.type;
 }
 
 /**
@@ -54,13 +60,13 @@ export function getFeatureCollectionType(featureCollection: FeatureCollection): 
  * @returns – The name of the first numeric attribute found in the input GeoJSON dataset.
  */
 export function selectNumericAttribute(data: GeoJSON.Feature[]): string {
-	for (const property in data[0].properties) {
-		if (isPropertyNumeric(data[0].properties[property])) {
-			return property;
-		}
-	}
+  for (const property in data[0].properties) {
+    if (isPropertyNumeric(data[0].properties[property])) {
+      return property;
+    }
+  }
 
-	// TODO: Catch this error and display a message prompting the user
-	// to select a layer type that does not require a numeric attribute.
-	throw new Error('No numeric attributes found in dataset.');
+  // TODO: Catch this error and display a message prompting the user
+  // to select a layer type that does not require a numeric attribute.
+  throw new Error('No numeric attributes found in dataset.');
 }

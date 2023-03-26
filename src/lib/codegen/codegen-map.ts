@@ -12,15 +12,15 @@ import type { CartoKitIR } from '$lib/stores/layers';
  * @returns – a Mapbox GL JS program fragment.
  */
 export function codegenMap(layers: CartoKitIR): string {
-	const layerSources = Object.values(layers).reduce((p, layer) => {
-		return p.concat('\n\n' + codegenSource(layer));
-	}, '');
+  const layerSources = Object.values(layers).reduce((p, layer) => {
+    return p.concat('\n\n' + codegenSource(layer));
+  }, '');
 
-	const layerRenders = Object.values(layers).reduce((p, layer) => {
-		return p.concat('\n\n' + codegenLayer(layer));
-	}, '');
+  const layerRenders = Object.values(layers).reduce((p, layer) => {
+    return p.concat('\n\n' + codegenLayer(layer));
+  }, '');
 
-	const program = `
+  const program = `
   const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/dark-v10',
@@ -35,5 +35,5 @@ export function codegenMap(layers: CartoKitIR): string {
   });
   `;
 
-	return program;
+  return program;
 }

@@ -4,9 +4,9 @@
  * @returns - a random color in hexademical format.
  */
 export function randomColor(): string {
-	const candidate = Math.floor(Math.random() * 16777215).toString(16);
+  const candidate = Math.floor(Math.random() * 16777215).toString(16);
 
-	return '#000000'.slice(0, -candidate.length) + candidate;
+  return '#000000'.slice(0, -candidate.length) + candidate;
 }
 
 /**
@@ -16,7 +16,7 @@ export function randomColor(): string {
  * @returns – The decimal value of the percent between 0 and 1.
  */
 export function percentToDecimal(percent: number): number {
-	return percent / 100;
+  return percent / 100;
 }
 
 /**
@@ -26,5 +26,5 @@ export function percentToDecimal(percent: number): number {
  * @returns – The formatted percent string.
  */
 export function decimalToPercent(decimal: number): number {
-	return decimal * 100;
+  return decimal * 100;
 }

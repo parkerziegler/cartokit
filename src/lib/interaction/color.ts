@@ -14,39 +14,45 @@ import { isPropertyNumeric } from '$lib/utils/property';
  *
  * @returns A MapLibre GL JS expression for a choropleth color scale.
  */
-export function deriveColorScale(layer: CartoKitChoroplethLayer): ExpressionSpecification {
-	const {
-		attribute,
-		data: {
-			geoJSON: { features }
-		},
-		style: {
-			breaks: { scale, colors }
-		}
-	} = layer;
+export function deriveColorScale(
+  layer: CartoKitChoroplethLayer
+): ExpressionSpecification {
+  const {
+    attribute,
+    data: {
+      geoJSON: { features }
+    },
+    style: {
+      breaks: { scale, colors }
+    }
+  } = layer;
 
-	const prelude: ExpressionSpecification = ['step', ['get', layer.attribute], colors[0]];
-	let stops: (string | number)[] = [];
+  const prelude: ExpressionSpecification = [
+    'step',
+    ['get', layer.attribute],
+    colors[0]
+  ];
+  let stops: (string | number)[] = [];
 
-	switch (scale) {
-		case 'Quantile':
-			stops = deriveQuantileStops({ attribute, features, colors });
-			break;
-		case 'Quantize':
-			stops = deriveQuantizeStops({ attribute, features, colors });
-			break;
-		case 'Jenks':
-			stops = deriveJenksStops({ attribute, features, colors });
-			break;
-	}
+  switch (scale) {
+    case 'Quantile':
+      stops = deriveQuantileStops({ attribute, features, colors });
+      break;
+    case 'Quantize':
+      stops = deriveQuantizeStops({ attribute, features, colors });
+      break;
+    case 'Jenks':
+      stops = deriveJenksStops({ attribute, features, colors });
+      break;
+  }
 
-	return [...prelude, ...stops];
+  return [...prelude, ...stops];
 }
 
 interface DeriveStopsParams {
-	attribute: string;
-	features: Feature[];
-	colors: string[];
+  attribute: string;
+  features: Feature[];
+  colors: string[];
 }
 
 /**
@@ -59,18 +65,24 @@ interface DeriveStopsParams {
  * @returns A MapLibre GL JS expression for a quantile color scale.
  */
 function deriveQuantileStops({
-	attribute,
-	features,
-	colors
+  attribute,
+  features,
+  colors
 }: DeriveStopsParams): (string | number)[] {
-	// For a quantile scale, use the entirety of the data as the domain.
-	const data = features.map((feature) => feature.properties?.[attribute]).filter(isPropertyNumeric);
+  // For a quantile scale, use the entirety of the data as the domain.
+  const data = features
+    .map((feature) => feature.properties?.[attribute])
+    .filter(isPropertyNumeric);
 
-	// Derive quantiles.
-	const quantiles = d3.scaleQuantile<string>().domain(data).range(colors).quantiles();
-	const stops = buildStops(colors, quantiles);
+  // Derive quantiles.
+  const quantiles = d3
+    .scaleQuantile<string>()
+    .domain(data)
+    .range(colors)
+    .quantiles();
+  const stops = buildStops(colors, quantiles);
 
-	return stops;
+  return stops;
 }
 
 /**
@@ -81,21 +93,31 @@ function deriveQuantileStops({
  * @returns A MapLibre GL JS expression for a quantize color scale.
  */
 function deriveQuantizeStops({
-	attribute,
-	features,
-	colors
+  attribute,
+  features,
+  colors
 }: DeriveStopsParams): (string | number)[] {
-	// For a quantize scale, use the extent of the data as the domain.
-	const [min, max] = d3.extent(
-		features.map((feature) => feature.properties?.[attribute]).filter(isPropertyNumeric)
-	);
-	const data = typeof min === 'undefined' || typeof max === 'undefined' ? [0, 1] : [min, max];
+  // For a quantize scale, use the extent of the data as the domain.
+  const [min, max] = d3.extent(
+    features
+      .map((feature) => feature.properties?.[attribute])
+      .filter(isPropertyNumeric)
+  );
+  const data =
+    typeof min === 'undefined' || typeof max === 'undefined'
+      ? [0, 1]
+      : [min, max];
 
-	// Derive ticks.
-	const ticks = d3.scaleQuantize<string>().domain(data).range(colors).nice().ticks(colors.length);
-	const stops = buildStops(colors, ticks);
+  // Derive ticks.
+  const ticks = d3
+    .scaleQuantize<string>()
+    .domain(data)
+    .range(colors)
+    .nice()
+    .ticks(colors.length);
+  const stops = buildStops(colors, ticks);
 
-	return stops;
+  return stops;
 }
 
 /**
@@ -105,15 +127,23 @@ function deriveQuantizeStops({
  *
  * @returns A MapLibre GL JS expression for a Jenks color scale.
  */
-function deriveJenksStops({ attribute, features, colors }: DeriveStopsParams): (string | number)[] {
-	// For a Jenks scale, use the entirety of the data as the domain.
-	const data = features.map((feature) => feature.properties?.[attribute]).filter(isPropertyNumeric);
+function deriveJenksStops({
+  attribute,
+  features,
+  colors
+}: DeriveStopsParams): (string | number)[] {
+  // For a Jenks scale, use the entirety of the data as the domain.
+  const data = features
+    .map((feature) => feature.properties?.[attribute])
+    .filter(isPropertyNumeric);
 
-	// Derive Jenks breaks using ckmeans clustering.
-	const breaks = ckmeans(data, colors.length).map((cluster) => cluster[cluster.length - 1]);
-	const stops = buildStops(colors, breaks);
+  // Derive Jenks breaks using ckmeans clustering.
+  const breaks = ckmeans(data, colors.length).map(
+    (cluster) => cluster[cluster.length - 1]
+  );
+  const stops = buildStops(colors, breaks);
 
-	return stops;
+  return stops;
 }
 
 /**
@@ -125,8 +155,8 @@ function deriveJenksStops({ attribute, features, colors }: DeriveStopsParams): (
  * @returns – the stops portion of a MapLibre GL JS step expression.
  */
 function buildStops(colors: string[], stops: number[]): (string | number)[] {
-	return colors.reduce<(string | number)[]>(
-		(acc, color, i) => (i === 0 ? acc : acc.concat([stops[i - 1], color])),
-		[]
-	);
+  return colors.reduce<(string | number)[]>(
+    (acc, color, i) => (i === 0 ? acc : acc.concat([stops[i - 1], color])),
+    []
+  );
 }
