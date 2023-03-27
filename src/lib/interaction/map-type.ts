@@ -1,11 +1,10 @@
 import type { Map } from 'maplibre-gl';
-import * as turf from '@turf/turf';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import {
-  deriveSize,
   generateDotDensityPoints,
-  deriveDotDensityStartingValue
+  deriveDotDensityStartingValue,
+  deriveCentroids
 } from '$lib/interaction/geometry';
 import {
   type CartoKitFillLayer,
@@ -18,7 +17,11 @@ import {
 } from '$lib/types/CartoKitLayer';
 import type { MapType } from '$lib/types/MapTypes';
 import { randomColor } from '$lib/utils/color';
-import { DEFAULT_PALETTE } from '$lib/utils/constants';
+import {
+  DEFAULT_MAX_SIZE,
+  DEFAULT_MIN_SIZE,
+  DEFAULT_PALETTE
+} from '$lib/utils/constants';
 import { selectNumericAttribute } from '$lib/utils/geojson';
 
 interface TransitionMapTypeParams {
@@ -53,9 +56,9 @@ export function transitionMapType({
     case 'Choropleth':
       return transitionToChoropleth(map, layer);
     case 'Proportional Symbol':
-      return transitionToProportionalSymbol(map, layer);
+      return transitionToProportionalSymbol(layer);
     case 'Dot Density':
-      return transitionToDotDensity(map, layer);
+      return transitionToDotDensity(layer);
   }
 }
 
@@ -172,67 +175,109 @@ function transitionToChoropleth(
 /**
  * Transition a layer to a proportional symbol layer.
  *
- * @param map — The top-level MapLibre GL map instance.
  * @param layer — The CartoKit layer to transition.
  *
  * @returns – The transitioned CartoKitProportionalSymbolLayer.
  */
 function transitionToProportionalSymbol(
-  map: Map,
   layer: CartoKitLayer
 ): TransitionMapTypeReturnValue {
-  let redraw = false;
-
-  const geometry = layer.data.geoJSON.features[0].geometry;
+  const sourceLayerType = layer.type;
   const features = layer.data.geoJSON.features;
 
-  // If the layer has an attribute visualized, use it. Otherwise, select the first numeric attribute.
-  const attribute = hasAttribute(layer)
-    ? layer.attribute
-    : selectNumericAttribute(features);
+  switch (sourceLayerType) {
+    case 'Fill': {
+      const targetLayer: CartoKitProportionalSymbolLayer = {
+        ...layer,
+        type: 'Proportional Symbol',
+        data: {
+          ...layer.data,
+          geoJSON: deriveCentroids(features)
+        },
+        attribute: selectNumericAttribute(features),
+        style: {
+          size: {
+            min: DEFAULT_MIN_SIZE,
+            max: DEFAULT_MAX_SIZE
+          },
+          fill: layer.style.fill,
+          opacity: layer.style.opacity
+        }
+      };
 
-  const targetLayer: CartoKitProportionalSymbolLayer = {
-    ...layer,
-    type: 'Proportional Symbol',
-    attribute,
-    style: {
-      size: {
-        min: 1,
-        max: 50
-      },
-      fill: isFillLayer(layer) ? layer.style.fill : randomColor(),
-      opacity: layer.style.opacity
+      return {
+        targetLayer,
+        redraw: true
+      };
     }
-  };
+    case 'Choropleth': {
+      const targetLayer: CartoKitProportionalSymbolLayer = {
+        ...layer,
+        type: 'Proportional Symbol',
+        data: {
+          ...layer.data,
+          geoJSON: deriveCentroids(features)
+        },
+        attribute: layer.attribute,
+        style: {
+          size: {
+            min: DEFAULT_MIN_SIZE,
+            max: DEFAULT_MAX_SIZE
+          },
+          fill: layer.style.breaks.colors[layer.style.breaks.colors.length - 1],
+          opacity: layer.style.opacity
+        }
+      };
 
-  if (geometry.type === 'Point' || geometry.type === 'MultiPoint') {
-    // Just update the radius of the existing layer.
-    map.setPaintProperty(layer.id, 'circle-radius', deriveSize(targetLayer));
-  } else {
-    redraw = true;
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
+    case 'Dot Density': {
+      // Use the rawGeoJSON for this transition to recover the original polygons.
+      // The geoJSON for a dot density layer is a collection of points and thus is
+      // not suitable for this transition.
+      const targetLayer: CartoKitProportionalSymbolLayer = {
+        ...layer,
+        type: 'Proportional Symbol',
+        data: {
+          ...layer.data,
+          geoJSON: deriveCentroids(layer.data.rawGeoJSON.features)
+        },
+        attribute: layer.attribute,
+        style: {
+          size: {
+            min: DEFAULT_MIN_SIZE,
+            max: DEFAULT_MAX_SIZE
+          },
+          fill: layer.style.fill,
+          opacity: layer.style.opacity
+        }
+      };
 
-    const centroids = layer.data.geoJSON.features.map((feature) => {
-      return turf.feature(turf.centroid(feature).geometry, feature.properties);
-    });
-    targetLayer.data.geoJSON = turf.featureCollection(centroids);
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
+    case 'Proportional Symbol':
+      // This case is a no-op.
+      return {
+        targetLayer: layer,
+        redraw: false
+      };
   }
-
-  return {
-    targetLayer,
-    redraw
-  };
 }
 
 /**
  * Transition a layer to a dot density layer.
  *
- * @param map — The top-level MapLibre GL map instance.
  * @param layer — The CartoKit layer to transition.
  *
  * @returns – The transitioned CartoKitDotDensityLayer.
  */
 function transitionToDotDensity(
-  _map: Map,
   layer: CartoKitLayer
 ): TransitionMapTypeReturnValue {
   let redraw = false;

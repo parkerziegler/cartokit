@@ -40,6 +40,23 @@ export function deriveSize(
   ];
 }
 
+/**
+ * Derive centroids for a set of GeoJSON features.
+ *
+ * @param features – the input features to derive centroids for.
+ *
+ * @returns – a FeatureCollection of centroids.
+ */
+export function deriveCentroids(features: Feature[]): FeatureCollection {
+  const fs = features.map((feature) => {
+    const centroid = turf.centroid(feature);
+
+    return turf.feature(centroid.geometry, feature.properties);
+  });
+
+  return turf.featureCollection(fs);
+}
+
 interface GenerateDotDensityPointsParams {
   features: Feature[];
   attribute: string;
