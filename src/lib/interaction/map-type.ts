@@ -7,6 +7,7 @@ import {
   deriveCentroids
 } from '$lib/interaction/geometry';
 import { addLayer } from '$lib/interaction/layer';
+import { listeners, type LayerListeners } from '$lib/stores/listeners';
 import type {
   CartoKitFillLayer,
   CartoKitChoroplethLayer,
@@ -88,6 +89,21 @@ export function transitionMapType({
   }
 
   if (redraw) {
+    // Remove all event listeners for the existing layer.
+    listeners.update((ls) => {
+      if (ls.has(layer.id)) {
+        // This is a safe non-null assertion — we know the listeners exist via the call to .has.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        Object.entries(ls.get(layer.id)!).forEach(([event, listener]) => {
+          map.off(event as keyof LayerListeners, layer.id, listener);
+        });
+      }
+
+      ls.delete(layer.id);
+
+      return ls;
+    });
+
     // Remove the existing layer and all instrumented layers.
     map.removeLayer(layer.id);
 

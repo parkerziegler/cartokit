@@ -1,6 +1,6 @@
 import { derived } from 'svelte/store';
 
-import { selectedFeature } from '$lib/stores/feature';
+import { selectedFeature } from '$lib/stores/selected-feature';
 import { layers } from '$lib/stores/layers';
 import type { MapType } from '$lib/types/MapTypes';
 

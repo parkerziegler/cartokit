@@ -9,7 +9,7 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { map } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
-  import { selectedFeature } from '$lib/stores/feature';
+  import { selectedFeature } from '$lib/stores/selected-feature';
   import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
   import { decimalToPercent } from '$lib/utils/color';
   import { DEFAULT_OPACITY, DEFAULT_PALETTE } from '$lib/utils/constants';

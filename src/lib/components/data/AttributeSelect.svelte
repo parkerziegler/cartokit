@@ -3,7 +3,7 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { map } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
-  import { selectedFeature } from '$lib/stores/feature';
+  import { selectedFeature } from '$lib/stores/selected-feature';
   import { hasAttribute } from '$lib/types/CartoKitLayer';
   import { selectNumericAttribute } from '$lib/utils/geojson';
 

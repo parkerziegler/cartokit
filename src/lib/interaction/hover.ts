@@ -1,5 +1,7 @@
 import type { Map, MapLayerMouseEvent } from 'maplibre-gl';
 
+import { listeners } from '$lib/stores/listeners';
+
 /**
  * Add a hover effect to all features in a polygon layer.
  *
@@ -98,4 +100,20 @@ function addHoverListeners(map: Map, layerId: string): void {
 
   map.on('mousemove', layerId, onMouseMove);
   map.on('mouseleave', layerId, onMouseLeave);
+
+  listeners.update((ls) => {
+    const layerListeners = ls.get(layerId) ?? {
+      /* eslint-disable @typescript-eslint/no-empty-function */
+      click: () => {},
+      mousemove: () => {},
+      mouseleave: () => {}
+      /* eslint-enable-next-line @typescript-eslint/no-empty-function */
+    };
+
+    return ls.set(layerId, {
+      ...layerListeners,
+      mousemove: onMouseMove,
+      mouseleave: onMouseLeave
+    });
+  });
 }

@@ -14,10 +14,10 @@
   import DotControls from '$lib/components/dots/DotControls.svelte';
   import { addSource } from '$lib/interaction/source';
   import { onFeatureLeave } from '$lib/interaction/select';
-  import { map as mapStore } from '$lib/stores/map';
   import { layers } from '$lib/stores/layers';
-  import { selectedFeature } from '$lib/stores/feature';
+  import { map as mapStore } from '$lib/stores/map';
   import { mapType } from '$lib/stores/map-type';
+  import { selectedFeature } from '$lib/stores/selected-feature';
 
   let map: maplibregl.Map;
 

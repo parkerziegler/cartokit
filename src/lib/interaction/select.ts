@@ -6,8 +6,9 @@ import type {
 } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
-import { selectedFeature } from '$lib/stores/feature';
 import type { CartoKitIR } from '$lib/stores/layers';
+import { listeners } from '$lib/stores/listeners';
+import { selectedFeature } from '$lib/stores/selected-feature';
 
 /**
  * Add a selection indicator to a feature in a polygon layer.
@@ -99,6 +100,21 @@ function addSelectListeners(map: Map, layerId: string) {
   }
 
   map.on('click', layerId, onClick);
+
+  listeners.update((ls) => {
+    const layerListeners = ls.get(layerId) ?? {
+      /* eslint-disable @typescript-eslint/no-empty-function */
+      click: () => {},
+      mousemove: () => {},
+      mouseleave: () => {}
+      /* eslint-enable @typescript-eslint/no-empty-function */
+    };
+
+    return ls.set(layerId, {
+      ...layerListeners,
+      click: onClick
+    });
+  });
 }
 
 /**
@@ -127,9 +143,20 @@ export function onFeatureLeave(
     });
     const selFeature = get(selectedFeature);
 
+    // If the mouse event intersects no features and there is a currently selected feature, deselect it.
     if (features.length === 0 && typeof selFeature?.id !== 'undefined') {
       selectedFeature.set(null);
 
+      map.removeFeatureState(
+        { source: selFeature.layer.id, id: selFeature.id },
+        'selected'
+      );
+      // If the mouse event intersects features but the selected feature is different, deselect it.
+    } else if (
+      features.length > 0 &&
+      selFeature &&
+      features[0].id !== selFeature.id
+    ) {
       map.removeFeatureState(
         { source: selFeature.layer.id, id: selFeature.id },
         'selected'

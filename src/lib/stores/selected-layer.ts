@@ -1,7 +1,7 @@
 import { derived } from 'svelte/store';
 
-import { selectedFeature } from '$lib/stores/feature';
 import { layers } from '$lib/stores/layers';
+import { selectedFeature } from '$lib/stores/selected-feature';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
 export const selectedLayer = derived<
