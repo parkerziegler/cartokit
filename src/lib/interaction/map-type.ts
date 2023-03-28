@@ -7,14 +7,12 @@ import {
   deriveCentroids
 } from '$lib/interaction/geometry';
 import { addLayer } from '$lib/interaction/layer';
-import {
-  type CartoKitFillLayer,
-  type CartoKitChoroplethLayer,
-  type CartoKitProportionalSymbolLayer,
-  type CartoKitDotDensityLayer,
-  type CartoKitLayer,
-  hasAttribute,
-  isFillLayer
+import type {
+  CartoKitFillLayer,
+  CartoKitChoroplethLayer,
+  CartoKitProportionalSymbolLayer,
+  CartoKitDotDensityLayer,
+  CartoKitLayer
 } from '$lib/types/CartoKitLayer';
 import type { MapType } from '$lib/types/MapTypes';
 import { randomColor } from '$lib/utils/color';
@@ -23,7 +21,10 @@ import {
   DEFAULT_MIN_SIZE,
   DEFAULT_PALETTE
 } from '$lib/utils/constants';
-import { selectNumericAttribute } from '$lib/utils/geojson';
+import {
+  getFeatureCollectionType,
+  selectNumericAttribute
+} from '$lib/utils/geojson';
 import { getInstrumetedLayerIds } from '$lib/utils/layer';
 
 interface TransitionMapTypeParams {
@@ -120,42 +121,91 @@ function transitionToFill(
   map: Map,
   layer: CartoKitLayer
 ): TransitionMapTypeReturnValue {
-  let redraw = false;
+  const sourceLayerType = layer.type;
 
-  const geometry = layer.data.geoJSON.features[0].geometry;
-  const rawGeometry = layer.data.rawGeoJSON.features[0].geometry;
+  switch (sourceLayerType) {
+    case 'Choropleth': {
+      const fill = randomColor();
 
-  const fill = randomColor();
-  const targetLayer: CartoKitFillLayer = {
-    ...layer,
-    type: 'Fill',
-    style: {
-      fill,
-      opacity: layer.style.opacity
+      const targetLayer: CartoKitFillLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Fill',
+        data: layer.data,
+        style: {
+          fill,
+          opacity: layer.style.opacity
+        }
+      };
+
+      // Just update the fill-color of the existing layer.
+      map.setPaintProperty(layer.id, 'fill-color', fill);
+
+      return {
+        targetLayer,
+        redraw: false
+      };
     }
-  };
+    case 'Proportional Symbol': {
+      const rawFeatureCollectionType = getFeatureCollectionType(
+        layer.data.rawGeoJSON
+      );
 
-  if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
-    // Just update the fill color of the existing layer.
-    map.setPaintProperty(layer.id, 'fill-color', fill);
-  } else if (
-    rawGeometry.type === 'Polygon' ||
-    rawGeometry.type === 'MultiPolygon'
-  ) {
-    // Recover polygons from the raw data.
-    layer.data.geoJSON = layer.data.rawGeoJSON;
+      if (
+        rawFeatureCollectionType !== 'Polygon' &&
+        rawFeatureCollectionType !== 'MultiPolygon'
+      ) {
+        throw new Error(
+          `Unsupported geometry transition. Transition initiated from ${rawFeatureCollectionType} to Polygon.`
+        );
+      }
 
-    // Indicate redrawing layers is required.
-    redraw = true;
-  } else {
-    // Throw an error — the geometry transition is not supported.
-    throw new Error('Geometry transition not supported.');
+      const targetLayer: CartoKitFillLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Fill',
+        data: {
+          ...layer.data,
+          geoJSON: layer.data.rawGeoJSON
+        },
+        style: {
+          fill: layer.style.fill,
+          opacity: layer.style.opacity
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
+    case 'Dot Density': {
+      const targetLayer: CartoKitFillLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Fill',
+        data: {
+          ...layer.data,
+          geoJSON: layer.data.rawGeoJSON
+        },
+        style: {
+          fill: layer.style.fill,
+          opacity: layer.style.opacity
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
+    case 'Fill': {
+      return {
+        targetLayer: layer,
+        redraw: false
+      };
+    }
   }
-
-  return {
-    targetLayer,
-    redraw
-  };
 }
 
 /**
@@ -170,52 +220,105 @@ function transitionToChoropleth(
   map: Map,
   layer: CartoKitLayer
 ): TransitionMapTypeReturnValue {
-  let redraw = false;
+  const sourceLayerType = layer.type;
 
-  const geometry = layer.data.geoJSON.features[0].geometry;
-  const rawGeometry = layer.data.rawGeoJSON.features[0].geometry;
+  switch (sourceLayerType) {
+    case 'Fill': {
+      const targetLayer: CartoKitChoroplethLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Choropleth',
+        data: layer.data,
+        attribute: selectNumericAttribute(layer.data.geoJSON.features),
+        style: {
+          breaks: {
+            scale: 'Quantile',
+            colors: DEFAULT_PALETTE
+          },
+          opacity: layer.style.opacity
+        }
+      };
 
-  // If the layer has an attribute visualized, use it. Otherwise, select the first numeric attribute.
-  const attribute = hasAttribute(layer)
-    ? layer.attribute
-    : selectNumericAttribute(layer.data.geoJSON.features);
+      // Just update the fill-color of the existing layer.
+      map.setPaintProperty(
+        layer.id,
+        'fill-color',
+        deriveColorScale(targetLayer)
+      );
 
-  const targetLayer: CartoKitChoroplethLayer = {
-    id: layer.id,
-    displayName: layer.displayName,
-    type: 'Choropleth',
-    data: layer.data,
-    attribute,
-    style: {
-      breaks: {
-        scale: 'Quantile',
-        colors: DEFAULT_PALETTE
-      },
-      opacity: layer.style.opacity
+      return {
+        targetLayer,
+        redraw: false
+      };
     }
-  };
+    case 'Proportional Symbol': {
+      const rawFeatureCollectionType = getFeatureCollectionType(
+        layer.data.rawGeoJSON
+      );
 
-  if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
-    // Just update the fill color of the existing layer.
-    map.setPaintProperty(layer.id, 'fill-color', deriveColorScale(targetLayer));
-  } else if (
-    rawGeometry.type === 'Polygon' ||
-    rawGeometry.type === 'MultiPolygon'
-  ) {
-    // Recover polygons from the raw data.
-    layer.data.geoJSON = layer.data.rawGeoJSON;
+      if (
+        rawFeatureCollectionType !== 'Polygon' &&
+        rawFeatureCollectionType !== 'MultiPolygon'
+      ) {
+        throw new Error(
+          `Unsupported geometry transition. Transition initiated from ${rawFeatureCollectionType} to Polygon.`
+        );
+      }
 
-    // Indicate redrawing layers is required.
-    redraw = true;
-  } else {
-    // Throw an error — the geometry transition is not supported.
-    throw new Error('Geometry transition not supported.');
+      const targetLayer: CartoKitChoroplethLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Choropleth',
+        data: {
+          ...layer.data,
+          geoJSON: layer.data.rawGeoJSON
+        },
+        attribute: layer.attribute,
+        style: {
+          breaks: {
+            scale: 'Quantile',
+            colors: DEFAULT_PALETTE
+          },
+          opacity: layer.style.opacity
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
+    case 'Dot Density': {
+      const targetLayer: CartoKitChoroplethLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Choropleth',
+        data: {
+          ...layer.data,
+          geoJSON: layer.data.rawGeoJSON
+        },
+        attribute: layer.attribute,
+        style: {
+          breaks: {
+            scale: 'Quantile',
+            colors: DEFAULT_PALETTE
+          },
+          opacity: layer.style.opacity
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
+    case 'Choropleth': {
+      return {
+        targetLayer: layer,
+        redraw: false
+      };
+    }
   }
-
-  return {
-    targetLayer,
-    redraw
-  };
 }
 
 /**
@@ -234,7 +337,8 @@ function transitionToProportionalSymbol(
   switch (sourceLayerType) {
     case 'Fill': {
       const targetLayer: CartoKitProportionalSymbolLayer = {
-        ...layer,
+        id: layer.id,
+        displayName: layer.displayName,
         type: 'Proportional Symbol',
         data: {
           ...layer.data,
@@ -258,7 +362,8 @@ function transitionToProportionalSymbol(
     }
     case 'Choropleth': {
       const targetLayer: CartoKitProportionalSymbolLayer = {
-        ...layer,
+        id: layer.id,
+        displayName: layer.displayName,
         type: 'Proportional Symbol',
         data: {
           ...layer.data,
@@ -281,11 +386,9 @@ function transitionToProportionalSymbol(
       };
     }
     case 'Dot Density': {
-      // Use the rawGeoJSON for this transition to recover the original polygons.
-      // The geoJSON for a dot density layer is a collection of points and thus is
-      // not suitable for this transition.
       const targetLayer: CartoKitProportionalSymbolLayer = {
-        ...layer,
+        id: layer.id,
+        displayName: layer.displayName,
         type: 'Proportional Symbol',
         data: {
           ...layer.data,
@@ -308,7 +411,6 @@ function transitionToProportionalSymbol(
       };
     }
     case 'Proportional Symbol':
-      // This case is a no-op.
       return {
         targetLayer: layer,
         redraw: false
@@ -326,57 +428,124 @@ function transitionToProportionalSymbol(
 function transitionToDotDensity(
   layer: CartoKitLayer
 ): TransitionMapTypeReturnValue {
-  let redraw = false;
+  const sourceLayerType = layer.type;
 
-  const geometry = layer.data.geoJSON.features[0].geometry;
-  const features = layer.data.geoJSON.features;
+  switch (sourceLayerType) {
+    case 'Fill': {
+      const features = layer.data.geoJSON.features;
+      const attribute = selectNumericAttribute(features);
+      const dotValue = deriveDotDensityStartingValue(features, attribute);
 
-  const rawGeometry = layer.data.rawGeoJSON.features[0].geometry;
-  const rawFeatures = layer.data.rawGeoJSON.features;
+      const targetLayer: CartoKitDotDensityLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Dot Density',
+        attribute,
+        data: {
+          ...layer.data,
+          geoJSON: generateDotDensityPoints({
+            features,
+            attribute,
+            value: dotValue
+          })
+        },
+        style: {
+          dots: {
+            size: 1,
+            value: dotValue
+          },
+          fill: layer.style.fill,
+          opacity: layer.style.opacity
+        }
+      };
 
-  // If the layer has an attribute visualized, use it. Otherwise, select the first numeric attribute.
-  const attribute = hasAttribute(layer)
-    ? layer.attribute
-    : selectNumericAttribute(features);
-
-  const targetLayer: CartoKitDotDensityLayer = {
-    ...layer,
-    type: 'Dot Density',
-    attribute,
-    style: {
-      dots: {
-        size: 1,
-        value: deriveDotDensityStartingValue(features, attribute)
-      },
-      fill: isFillLayer(layer) ? layer.style.fill : randomColor(),
-      opacity: layer.style.opacity
+      return {
+        targetLayer,
+        redraw: true
+      };
     }
-  };
+    case 'Choropleth': {
+      const features = layer.data.geoJSON.features;
+      const dotValue = deriveDotDensityStartingValue(features, layer.attribute);
 
-  if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
-    targetLayer.data.geoJSON = generateDotDensityPoints({
-      features,
-      attribute,
-      value: targetLayer.style.dots.value
-    });
-    redraw = true;
-  } else if (
-    rawGeometry.type === 'Polygon' ||
-    rawGeometry.type === 'MultiPolygon'
-  ) {
-    targetLayer.data.geoJSON = generateDotDensityPoints({
-      features: rawFeatures,
-      attribute,
-      value: targetLayer.style.dots.value
-    });
-    redraw = true;
-  } else {
-    // Throw an error — the geometry transition is not supported.
-    throw new Error('Geometry transition not supported.');
+      const targetLayer: CartoKitDotDensityLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Dot Density',
+        attribute: layer.attribute,
+        data: {
+          ...layer.data,
+          geoJSON: generateDotDensityPoints({
+            features,
+            attribute: layer.attribute,
+            value: dotValue
+          })
+        },
+        style: {
+          dots: {
+            size: 1,
+            value: dotValue
+          },
+          fill: randomColor(),
+          opacity: layer.style.opacity
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
+    case 'Proportional Symbol': {
+      const rawFeatureCollectionType = getFeatureCollectionType(
+        layer.data.rawGeoJSON
+      );
+
+      if (
+        rawFeatureCollectionType !== 'Polygon' &&
+        rawFeatureCollectionType !== 'MultiPolygon'
+      ) {
+        throw new Error(
+          `Unsupported geometry transition. Transition initiated from ${rawFeatureCollectionType} to Polygon.`
+        );
+      }
+
+      const features = layer.data.rawGeoJSON.features;
+      const dotValue = deriveDotDensityStartingValue(features, layer.attribute);
+
+      const targetLayer: CartoKitDotDensityLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Dot Density',
+        attribute: layer.attribute,
+        data: {
+          ...layer.data,
+          geoJSON: generateDotDensityPoints({
+            features,
+            attribute: layer.attribute,
+            value: dotValue
+          })
+        },
+        style: {
+          dots: {
+            size: 1,
+            value: dotValue
+          },
+          fill: layer.style.fill,
+          opacity: layer.style.opacity
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
+    case 'Dot Density': {
+      return {
+        targetLayer: layer,
+        redraw: false
+      };
+    }
   }
-
-  return {
-    targetLayer,
-    redraw
-  };
 }
