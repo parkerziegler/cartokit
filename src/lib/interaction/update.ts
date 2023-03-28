@@ -7,7 +7,6 @@ import {
   deriveSize,
   generateDotDensityPoints
 } from '$lib/interaction/geometry';
-import { addLayer } from '$lib/interaction/layer';
 import { transitionMapType } from '$lib/interaction/map-type';
 import { layers } from '$lib/stores/layers';
 import {
@@ -135,32 +134,11 @@ export function dispatchLayerUpdate({
 }: DispatchLayerUpdateParams): void {
   switch (type) {
     case 'map-type': {
-      const { targetLayer, redraw } = transitionMapType({
+      const targetLayer = transitionMapType({
         map,
         layer,
         targetMapType: payload.mapType
       });
-
-      if (redraw) {
-        // Remove the existing layer and all instrumented layers.
-        map.removeLayer(layer.id);
-
-        if (map.getLayer(`${layer.id}-hover`)) {
-          map.removeLayer(`${layer.id}-hover`);
-        }
-
-        if (map.getLayer(`${layer.id}-select`)) {
-          map.removeLayer(`${layer.id}-select`);
-        }
-
-        // Update the source with the new data.
-        (map.getSource(layer.id) as GeoJSONSource).setData(
-          targetLayer.data.geoJSON
-        );
-
-        // Add the new layer. This function call includes instrumentation.
-        addLayer(map, targetLayer);
-      }
 
       layers.update((lyrs) => {
         lyrs[layer.id] = targetLayer;

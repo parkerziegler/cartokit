@@ -1,4 +1,4 @@
-import type { Map } from 'maplibre-gl';
+import type { Map, GeoJSONSource } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import {
@@ -6,6 +6,7 @@ import {
   deriveDotDensityStartingValue,
   deriveCentroids
 } from '$lib/interaction/geometry';
+import { addLayer } from '$lib/interaction/layer';
 import {
   type CartoKitFillLayer,
   type CartoKitChoroplethLayer,
@@ -23,6 +24,7 @@ import {
   DEFAULT_PALETTE
 } from '$lib/utils/constants';
 import { selectNumericAttribute } from '$lib/utils/geojson';
+import { getInstrumetedLayerIds } from '$lib/utils/layer';
 
 interface TransitionMapTypeParams {
   map: Map;
@@ -49,17 +51,61 @@ export function transitionMapType({
   map,
   layer,
   targetMapType
-}: TransitionMapTypeParams): TransitionMapTypeReturnValue {
+}: TransitionMapTypeParams): CartoKitLayer {
+  let redraw = false;
+  let targetLayer: CartoKitLayer;
+
   switch (targetMapType) {
-    case 'Fill':
-      return transitionToFill(map, layer);
-    case 'Choropleth':
-      return transitionToChoropleth(map, layer);
-    case 'Proportional Symbol':
-      return transitionToProportionalSymbol(layer);
-    case 'Dot Density':
-      return transitionToDotDensity(layer);
+    case 'Fill': {
+      const { redraw: rd, targetLayer: tl } = transitionToFill(map, layer);
+      redraw = rd;
+      targetLayer = tl;
+      break;
+    }
+    case 'Choropleth': {
+      const { redraw: rd, targetLayer: tl } = transitionToChoropleth(
+        map,
+        layer
+      );
+      redraw = rd;
+      targetLayer = tl;
+      break;
+    }
+    case 'Proportional Symbol': {
+      const { redraw: rd, targetLayer: tl } =
+        transitionToProportionalSymbol(layer);
+      redraw = rd;
+      targetLayer = tl;
+      break;
+    }
+    case 'Dot Density': {
+      const { redraw: rd, targetLayer: tl } = transitionToDotDensity(layer);
+      redraw = rd;
+      targetLayer = tl;
+      break;
+    }
   }
+
+  if (redraw) {
+    // Remove the existing layer and all instrumented layers.
+    map.removeLayer(layer.id);
+
+    getInstrumetedLayerIds(layer).forEach((id) => {
+      if (map.getLayer(id)) {
+        map.removeLayer(id);
+      }
+    });
+
+    // Update the source with the new data.
+    (map.getSource(layer.id) as GeoJSONSource).setData(
+      targetLayer.data.geoJSON
+    );
+
+    // Add the new layer. This function call includes instrumentation.
+    addLayer(map, targetLayer);
+  }
+
+  return targetLayer;
 }
 
 /**
