@@ -18,6 +18,8 @@
   import { map as mapStore } from '$lib/stores/map';
   import { mapType } from '$lib/stores/map-type';
   import { selectedFeature } from '$lib/stores/selected-feature';
+  import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
+  import AddLayer from '$lib/components/layers/AddLayer.svelte';
 
   let map: maplibregl.Map;
 
@@ -53,6 +55,12 @@
 <main class="absolute inset-0">
   <div class="grid grid-cols-12 h-full w-full">
     <div class="col-span-12" id="map" />
+    <Menu className="absolute top-4 left-4 max-w-xl overflow-auto">
+      <MenuItem title="Layers">
+        <AddLayer slot="action" />
+        <LayerPanel />
+      </MenuItem>
+    </Menu>
     <Menu
       className="absolute top-4 right-4 max-w-xl overflow-auto style-editor"
     >

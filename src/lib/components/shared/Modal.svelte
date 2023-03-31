@@ -44,10 +44,8 @@
 
 <svelte:window on:keydown={handle_keydown} />
 
-<div class="modal-bg fixed top-0 left-0 w-full h-full z-10" on:click={close} />
-
 <div
-  class="modal absolute left-1/2 top-1/2 stack stack-md max-w-lg overflow-auto -translate-x-1/2 -translate-y-1/2 p-4 rounded bg-white z-10"
+  class="modal fixed left-1/2 top-1/2 max-w-2xl overflow-auto -translate-x-1/2 -translate-y-1/2 font-sans rounded bg-slate-900 z-10"
   role="dialog"
   aria-modal="true"
   bind:this={modal}
@@ -56,14 +54,10 @@
   <slot name="body" />
 
   <!-- svelte-ignore a11y-autofocus -->
-  <Button on:click={close} className="self-end">Close</Button>
+  <!-- <Button on:click={close} className="self-end">Close</Button> -->
 </div>
 
 <style>
-  .modal-bg {
-    background: rgba(15, 23, 42, 0.8);
-  }
-
   .modal {
     width: calc(100vw - 4em);
     max-height: calc(100vh - 4em);
