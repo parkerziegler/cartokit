@@ -21,5 +21,5 @@
   {size}
   {value}
   on:change={onChange}
-  class="bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600"
+  class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
 />

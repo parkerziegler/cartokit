@@ -11,7 +11,7 @@
 
 <button class={className} on:click>
   <div class="stack stack-xs">
-    <p class="font-semibold self-start"><em>{mapType}</em></p>
+    <p class="self-start font-semibold"><em>{mapType}</em></p>
     <img
       src={mapTypeToImage.get(mapType)}
       alt={mapType}

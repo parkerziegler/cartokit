@@ -53,5 +53,5 @@
   </button>
 </div>
 {#if programVisible}
-  <pre class="overflow-auto mt-2">{@html formattedProgram}</pre>
+  <pre class="mt-2 overflow-auto">{@html formattedProgram}</pre>
 {/if}

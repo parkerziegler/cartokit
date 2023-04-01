@@ -9,6 +9,6 @@
 
 <button
   on:click={click}
-  class="text-white text-sm bg-slate-700 px-4 py-2 rounded {$$props.class}"
+  class="rounded bg-slate-700 px-4 py-2 text-sm text-white {$$props.class}"
   ><slot /></button
 >

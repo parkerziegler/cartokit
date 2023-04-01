@@ -104,14 +104,14 @@
   <ColorStopsSelect />
 </div>
 <div class="stack-h stack-h-xs">
-  <ul class="flex py-2 color-palette">
+  <ul class="color-palette flex py-2">
     {#each colors as color, i}
       <li>
         <input
           type="color"
-          class="appearance-none cursor-pointer bg-transparent p-0 h-4 w-4 {color ===
+          class="h-4 w-4 cursor-pointer appearance-none bg-transparent p-0 {color ===
           selectedColor
-            ? 'relative outline outline-2 outline-white z-10'
+            ? 'relative z-10 outline outline-2 outline-white'
             : ''}"
           value={color}
           on:input={onColorInput(i)}

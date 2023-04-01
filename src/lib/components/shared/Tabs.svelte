@@ -23,7 +23,7 @@
   <ul class="stack-h stack-h-md {$$props.class}">
     {#each tabs as tab, i}
       <li
-        class="text-base pb-2 border-b-2 transition-all duration-200"
+        class="border-b-2 pb-2 text-base transition-all duration-200"
         class:active={activeIndex === i}
         class:inactive={activeIndex !== i}
       >
@@ -42,10 +42,10 @@
 
 <style>
   .active {
-    @apply text-white font-semibold border-b-slate-400;
+    @apply border-b-slate-400 font-semibold text-white;
   }
 
   .inactive {
-    @apply text-slate-400 font-light border-b-transparent;
+    @apply border-b-transparent font-light text-slate-400;
   }
 </style>

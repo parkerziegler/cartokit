@@ -60,11 +60,11 @@
   }
 </script>
 
-<div class="flex color-picker">
+<div class="color-picker flex">
   <div class="stack-h stack-h-xs items-center">
     <input
       type="color"
-      class="appearance-none cursor-pointer h-4 w-4 rounded"
+      class="h-4 w-4 cursor-pointer appearance-none rounded"
       value={color}
       on:input={onColorInput}
     />

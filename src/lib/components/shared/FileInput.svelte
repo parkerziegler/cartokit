@@ -1,6 +1,4 @@
 <script lang="ts">
-  import cs from 'classnames';
-
   export let id = '';
   export let onChange: (fileInput: HTMLSpanElement, event: Event) => void;
   export let file: File;
@@ -14,10 +12,11 @@
     on:change={(event) => onChange(fileInput, event)}
     type="file"
     tabindex="0"
-    class="min-w-0 m-0 opacity-0"
+    class="m-0 min-w-0 opacity-0"
   />
   <span
-    class={cs('file-prompt', file && 'file-prompt--uploaded')}
+    class="file-prompt"
+    class:file-prompt--uploaded={file}
     bind:this={fileInput}
     data-content="Choose file..."
   />
@@ -34,7 +33,7 @@
   }
 
   .file-prompt {
-    @apply absolute top-0 left-0 right-0 h-full border border-slate-700 z-10 p-2 bg-inherit shadow-inner;
+    @apply absolute top-0 left-0 right-0 z-10 h-full border border-slate-700 bg-inherit p-2 shadow-inner;
     line-height: 1.5;
   }
 
@@ -43,7 +42,7 @@
   }
 
   .file-prompt::before {
-    @apply absolute block z-20 p-2 text-white bg-slate-700;
+    @apply absolute z-20 block bg-slate-700 p-2 text-white;
     content: 'Browse';
     top: -0.075rem;
     right: -0.075rem;

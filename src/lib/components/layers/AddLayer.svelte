@@ -43,6 +43,6 @@
 <Modal bind:showModal>
   <h2 slot="header" class="text-xl font-semibold">Add Layer</h2>
   <div slot="body">
-    <Tabs {tabs} class="px-4 border-b border-b-slate-400" />
+    <Tabs {tabs} class="border-b border-b-slate-400 px-4" />
   </div>
 </Modal>

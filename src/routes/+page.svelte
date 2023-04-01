@@ -53,7 +53,7 @@
 </script>
 
 <main class="absolute inset-0">
-  <div class="grid grid-cols-12 h-full w-full">
+  <div class="grid h-full w-full grid-cols-12">
     <div class="col-span-12" id="map" />
     <Menu class="absolute top-4 left-4 max-w-xl overflow-auto">
       <MenuItem title="Layers">
@@ -61,7 +61,7 @@
         <LayerPanel />
       </MenuItem>
     </Menu>
-    <Menu class="absolute top-4 right-4 max-w-xl overflow-auto style-editor">
+    <Menu class="style-editor absolute top-4 right-4 max-w-xl overflow-auto">
       {#if $selectedFeature}
         <MenuItem title="Map Type">
           <MapTypeSelect />

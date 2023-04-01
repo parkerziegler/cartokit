@@ -18,5 +18,5 @@
   {placeholder}
   {id}
   on:change={onChange}
-  class="bg-inherit p-2 border border-slate-700 hover:border-slate-600 focus:border-slate-600 {$$props.class}"
+  class="border border-slate-700 bg-inherit p-2 hover:border-slate-600 focus:border-slate-600 {$$props.class}"
 />

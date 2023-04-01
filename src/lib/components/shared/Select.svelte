@@ -28,7 +28,7 @@
       {title}
     </FieldLabel>
     <select
-      class="bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600 {$$props.class}"
+      class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600 {$$props.class}"
       value={selected}
       on:change={onChange}
       id={title}
@@ -42,7 +42,7 @@
   </div>
 {:else}
   <select
-    class="bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600 {$$props.class}"
+    class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600 {$$props.class}"
     value={selected}
     on:change={onChange}
   >

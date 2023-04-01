@@ -13,7 +13,7 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <dialog
-  class="max-w-lg overflow-auto font-sans rounded bg-slate-900 text-white"
+  class="max-w-lg overflow-auto rounded bg-slate-900 font-sans text-white"
   bind:this={dialog}
   on:close={() => (showModal = false)}
   on:click|self={() => dialog.close()}
