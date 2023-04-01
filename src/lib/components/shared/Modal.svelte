@@ -1,65 +1,75 @@
+<!-- Core implementation adapted from: https://svelte.dev/examples/modal -->
 <script lang="ts">
-  import { createEventDispatcher, onDestroy } from 'svelte';
-  import Button from './Button.svelte';
+  export let showModal: boolean;
 
-  const dispatch = createEventDispatcher();
-  const close = () => dispatch('close');
+  let dialog: HTMLDialogElement;
 
-  let modal: HTMLDivElement;
-
-  const handle_keydown = (event: KeyboardEvent) => {
-    // Close the modal on Escape.
-    if (event.key === 'Escape') {
-      close();
-      return;
-    }
-
-    // Trap focus within the modal.
-    if (event.key === 'Tab') {
-      const nodes = modal.querySelectorAll<HTMLElement>('*');
-      const tabbable = Array.from(nodes).filter((n) => n.tabIndex >= 0);
-
-      let index = document.activeElement
-        ? tabbable.indexOf(document.activeElement as HTMLElement)
-        : -1;
-      if (index === -1 && event.shiftKey) index = 0;
-
-      index += tabbable.length + (event.shiftKey ? -1 : 1);
-      index %= tabbable.length;
-
-      tabbable[index].focus();
-      event.preventDefault();
-    }
-  };
-
-  const previously_focused =
-    typeof document !== 'undefined' && document.activeElement;
-
-  if (previously_focused) {
-    onDestroy(() => {
-      (previously_focused as HTMLElement).focus();
-    });
+  $: if (dialog && showModal) {
+    dialog.showModal();
   }
 </script>
 
-<svelte:window on:keydown={handle_keydown} />
-
-<div
-  class="modal fixed left-1/2 top-1/2 max-w-2xl overflow-auto -translate-x-1/2 -translate-y-1/2 font-sans rounded bg-slate-900 z-10"
-  role="dialog"
-  aria-modal="true"
-  bind:this={modal}
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<dialog
+  class="max-w-lg overflow-auto font-sans rounded bg-slate-900 text-white"
+  bind:this={dialog}
+  on:close={() => (showModal = false)}
+  on:click|self={() => dialog.close()}
 >
-  <slot name="header" />
+  <div class="flex items-center justify-between p-4">
+    <slot name="header" />
+    <button on:click={() => dialog.close()}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+  </div>
   <slot name="body" />
-
-  <!-- svelte-ignore a11y-autofocus -->
-  <!-- <Button on:click={close} className="self-end">Close</Button> -->
-</div>
+</dialog>
 
 <style>
-  .modal {
+  dialog {
     width: calc(100vw - 4em);
     max-height: calc(100vh - 4em);
+  }
+
+  dialog::backdrop {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  dialog[open] {
+    animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes zoom {
+    from {
+      transform: scale(0.95);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  dialog[open]::backdrop {
+    animation: fade 0.2s ease-out;
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 </style>
