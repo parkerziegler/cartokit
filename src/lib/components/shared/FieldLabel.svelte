@@ -3,6 +3,6 @@
 </script>
 
 <label
-  class="font-sans text-slate-400 text-sm underline decoration-dotted underline-offset-4 py-2"
+  class="font-sans text-slate-400 text-sm underline decoration-dotted underline-offset-4"
   for={fieldId}><slot /></label
 >

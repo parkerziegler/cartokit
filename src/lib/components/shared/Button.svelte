@@ -1,8 +1,5 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import cs from 'classnames';
-
-  export let className: string = '';
 
   const dispatch = createEventDispatcher();
   function click() {
@@ -12,6 +9,6 @@
 
 <button
   on:click={click}
-  class={cs('text-white text-xs bg-slate-700 p-2 rounded', className)}
+  class="text-white text-sm bg-slate-700 px-4 py-2 rounded {$$props.class}"
   ><slot /></button
 >

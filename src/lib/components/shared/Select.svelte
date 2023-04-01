@@ -1,6 +1,5 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import cs from 'classnames';
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
 
@@ -11,7 +10,6 @@
     label: string;
   }
 
-  export let className: string = '';
   export let selected: T;
   export let options: SelectOption<T>[] = [];
   export let title: string = '';
@@ -30,10 +28,7 @@
       {title}
     </FieldLabel>
     <select
-      class={cs(
-        'bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600',
-        className
-      )}
+      class="bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600 {$$props.class}"
       value={selected}
       on:change={onChange}
       id={title}
@@ -47,10 +42,7 @@
   </div>
 {:else}
   <select
-    class={cs(
-      'bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600',
-      className
-    )}
+    class="bg-inherit p-2 border border-transparent hover:border-slate-600 focus:border-slate-600 {$$props.class}"
     value={selected}
     on:change={onChange}
   >
