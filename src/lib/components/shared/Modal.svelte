@@ -6,6 +6,8 @@
 
   $: if (dialog && showModal) {
     dialog.showModal();
+  } else if (dialog && !showModal) {
+    dialog.close();
   }
 </script>
 
