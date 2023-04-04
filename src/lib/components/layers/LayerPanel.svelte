@@ -1,9 +1,10 @@
 <script lang="ts">
+  import LayerEntry from '$lib/components/layers/LayerEntry.svelte';
   import { layers } from '$lib/stores/layers';
 </script>
 
-<ul class="pt-4">
+<ul class="stack stack-sm pt-4">
   {#each Object.values($layers) as layer}
-    <li>{layer.displayName}</li>
+    <LayerEntry {layer} />
   {/each}
 </ul>
