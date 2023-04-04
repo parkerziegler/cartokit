@@ -43,7 +43,7 @@ export function codegenSource(layer: CartoKitLayer): string {
         ? features
         : layer.data.url
         ? `"${layer.data.url}"`
-        : JSON.stringify(layer.data.geoJSON, null, 2)
+        : 'LocalFile' // TODO: Implement a DataViewer component: https://github.com/parkerziegler/cartokit/issues/5
     }
 	});
   `);

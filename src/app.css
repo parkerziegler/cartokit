@@ -2,9 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Prism Overrides */
-.token.operator {
-  background: none;
+/* CodeMirror */
+.cm-editor {
+  max-height: 100vh;
+}
+
+.cm-editor .cm-scroller {
+  @apply font-mono text-xs;
 }
 
 /* Utilities */

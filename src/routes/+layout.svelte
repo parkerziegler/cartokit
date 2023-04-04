@@ -1,7 +1,4 @@
 <script>
-  import 'prismjs/themes/prism.css';
-  import 'prism-theme-night-owl/build/style.css';
-
   import '../app.css';
 </script>
 

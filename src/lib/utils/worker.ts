@@ -16,6 +16,12 @@ async function fetchGeoJSON(url: string): Promise<void> {
   }
 }
 
+/**
+ * A function to fetch GeoJSON from a url in a Web Worker.
+ *
+ * @param url – The url to fetch a GeoJSON dataset from.
+ * @param cb – A callback function to run when the GeoJSON is fetched.
+ */
 export function sourceWorker(
   url: string,
   cb: (data: FeatureCollection) => void

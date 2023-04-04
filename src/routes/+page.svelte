@@ -50,55 +50,80 @@
       map.remove();
     };
   });
+
+  let programVisible = false;
+
+  function toggleProgramVisibility() {
+    programVisible = !programVisible;
+  }
 </script>
 
 <main class="absolute inset-0">
   <div class="grid h-full w-full grid-cols-12">
-    <div class="col-span-12" id="map" />
-    <Menu class="absolute top-4 left-4 max-w-xl overflow-auto">
-      <MenuItem title="Layers" variant="header">
-        <AddLayer slot="action" />
-        <LayerPanel />
-      </MenuItem>
-    </Menu>
-    <Menu class="style-editor absolute top-4 right-4 max-w-xs overflow-auto">
-      {#if $selectedFeature}
-        <MenuItem title="Map Type">
-          <MapTypeSelect />
+    <div
+      class="relative col-span-12"
+      id="map"
+      class:col-span-8={programVisible}
+    >
+      <Menu class="absolute top-4 left-4 z-10 max-w-xl overflow-auto">
+        <MenuItem title="Layers" variant="header">
+          <AddLayer slot="action" />
+          <LayerPanel />
         </MenuItem>
-      {/if}
-      {#if $mapType === 'Choropleth' && $selectedFeature}
-        <MenuItem title="Attribute">
-          <AttributeSelect />
-        </MenuItem>
-        <MenuItem title="Palette">
-          <ColorPalette />
-        </MenuItem>
-      {:else if $mapType === 'Proportional Symbol' && $selectedFeature}
-        <MenuItem title="Attribute">
-          <AttributeSelect />
-        </MenuItem>
-        <MenuItem title="Size">
-          <SizeControls />
-        </MenuItem>
-        <MenuItem title="Fill">
-          <ColorPicker />
-        </MenuItem>
-      {:else if $mapType === 'Dot Density' && $selectedFeature}
-        <MenuItem title="Attribute">
-          <AttributeSelect />
-        </MenuItem>
-        <MenuItem title="Dots">
-          <DotControls />
-        </MenuItem>
-        <MenuItem title="Fill">
-          <ColorPicker />
-        </MenuItem>
-      {:else}
-        <MenuItem title="Fill">
-          <ColorPicker />
-        </MenuItem>
-      {/if}
-    </Menu>
+      </Menu>
+      <Menu
+        class="style-editor absolute top-4 right-4 z-10 max-w-xs overflow-auto"
+      >
+        {#if $selectedFeature}
+          <MenuItem title="Map Type">
+            <MapTypeSelect />
+          </MenuItem>
+        {/if}
+        {#if $mapType === 'Choropleth' && $selectedFeature}
+          <MenuItem title="Attribute">
+            <AttributeSelect />
+          </MenuItem>
+          <MenuItem title="Palette">
+            <ColorPalette />
+          </MenuItem>
+        {:else if $mapType === 'Proportional Symbol' && $selectedFeature}
+          <MenuItem title="Attribute">
+            <AttributeSelect />
+          </MenuItem>
+          <MenuItem title="Size">
+            <SizeControls />
+          </MenuItem>
+          <MenuItem title="Fill">
+            <ColorPicker />
+          </MenuItem>
+        {:else if $mapType === 'Dot Density' && $selectedFeature}
+          <MenuItem title="Attribute">
+            <AttributeSelect />
+          </MenuItem>
+          <MenuItem title="Dots">
+            <DotControls />
+          </MenuItem>
+          <MenuItem title="Fill">
+            <ColorPicker />
+          </MenuItem>
+        {:else}
+          <MenuItem title="Fill">
+            <ColorPicker />
+          </MenuItem>
+        {/if}
+      </Menu>
+      <div class="absolute bottom-8 right-4 z-10 rounded-md bg-slate-900">
+        <button
+          on:click={toggleProgramVisibility}
+          class="p-2 font-mono text-xs text-white"
+          >{programVisible ? 'Hide Source' : 'View Source'}</button
+        >
+      </div>
+    </div>
+    {#if programVisible}
+      <div class="col-span-4">
+        <Program />
+      </div>
+    {/if}
   </div>
 </main>
