@@ -42,12 +42,11 @@
   }
 </script>
 
-<div class="stack-h stack-h-xs">
+<div class="stack-h stack-h-xs items-center">
   <FieldLabel fieldId="Dot Size">Dot Size</FieldLabel>
   <NumberInput
     min={1}
     max={Infinity}
-    size={4}
     value={size}
     on:change={onDotSizeChange}
   />
@@ -55,7 +54,6 @@
   <NumberInput
     min={1}
     max={Infinity}
-    size={4}
     value={dotValue}
     on:change={onDotValueChange}
   />

@@ -31,12 +31,11 @@
   }
 </script>
 
-<div class="stack-h stack-h-xs">
+<div class="stack-h stack-h-xs items-center">
   <FieldLabel fieldId="Min">Min</FieldLabel>
   <NumberInput
     min={1}
     max={Infinity}
-    size={4}
     value={min}
     on:change={onSizeChange('min')}
   />
@@ -44,7 +43,6 @@
   <NumberInput
     min={1}
     max={Infinity}
-    size={4}
     value={max}
     on:change={onSizeChange('max')}
   />

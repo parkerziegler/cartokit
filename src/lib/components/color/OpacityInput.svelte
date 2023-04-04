@@ -22,7 +22,7 @@
 
 <input
   size="4"
-  class="border border-transparent bg-inherit p-2 text-right hover:border-slate-600 focus:border-slate-600"
+  class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
   value={`${opacity}%`}
   on:change={validateOpacity}
 />

@@ -61,7 +61,7 @@
         <LayerPanel />
       </MenuItem>
     </Menu>
-    <Menu class="style-editor absolute top-4 right-4 max-w-xl overflow-auto">
+    <Menu class="style-editor absolute top-4 right-4 max-w-xs overflow-auto">
       {#if $selectedFeature}
         <MenuItem title="Map Type">
           <MapTypeSelect />
@@ -99,9 +99,6 @@
           <ColorPicker />
         </MenuItem>
       {/if}
-      <MenuItem title="Program">
-        <Program />
-      </MenuItem>
     </Menu>
   </div>
 </main>
