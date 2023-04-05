@@ -4,11 +4,14 @@
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
   import ColorPicker from '$lib/components/color/ColorPicker.svelte';
+  import AddLayer from '$lib/components/layers/AddLayer.svelte';
+  import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import Program from '$lib/components/program/Program.svelte';
   import ColorPalette from '$lib/components/color/ColorPalette.svelte';
-  import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
+  import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
+  import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
   import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
   import SizeControls from '$lib/components/size/SizeControls.svelte';
   import DotControls from '$lib/components/dots/DotControls.svelte';
@@ -18,8 +21,6 @@
   import { map as mapStore } from '$lib/stores/map';
   import { mapType } from '$lib/stores/map-type';
   import { selectedFeature } from '$lib/stores/selected-feature';
-  import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
-  import AddLayer from '$lib/components/layers/AddLayer.svelte';
 
   let map: maplibregl.Map;
 
@@ -66,52 +67,54 @@
       class:col-span-8={programVisible}
     >
       <Menu class="absolute top-4 left-4 z-10 max-w-xl overflow-auto">
-        <MenuItem title="Layers" variant="header">
+        <MenuTitle>
+          Layers
           <AddLayer slot="action" />
-          <LayerPanel />
-        </MenuItem>
+        </MenuTitle>
+        <LayerPanel />
       </Menu>
-      <Menu
-        class="style-editor absolute top-4 right-4 z-10 max-w-xs overflow-auto"
-      >
-        {#if $selectedFeature}
+      {#if $selectedFeature}
+        <Menu
+          class="style-editor absolute top-4 right-4 z-10 max-w-xs overflow-auto"
+        >
+          <MenuTitle>Properties</MenuTitle>
           <MenuItem title="Map Type">
             <MapTypeSelect />
           </MenuItem>
-        {/if}
-        {#if $mapType === 'Choropleth' && $selectedFeature}
-          <MenuItem title="Attribute">
-            <AttributeSelect />
-          </MenuItem>
-          <MenuItem title="Palette">
-            <ColorPalette />
-          </MenuItem>
-        {:else if $mapType === 'Proportional Symbol' && $selectedFeature}
-          <MenuItem title="Attribute">
-            <AttributeSelect />
-          </MenuItem>
-          <MenuItem title="Size">
-            <SizeControls />
-          </MenuItem>
-          <MenuItem title="Fill">
-            <ColorPicker />
-          </MenuItem>
-        {:else if $mapType === 'Dot Density' && $selectedFeature}
-          <MenuItem title="Attribute">
-            <AttributeSelect />
-          </MenuItem>
-          <MenuItem title="Dots">
-            <DotControls />
-          </MenuItem>
-          <MenuItem title="Fill">
-            <ColorPicker />
-          </MenuItem>
-        {:else}
-          <MenuItem title="Fill">
-            <ColorPicker />
-          </MenuItem>
-        {/if}
-      </Menu>
+          {#if $mapType === 'Choropleth'}
+            <MenuItem title="Attribute">
+              <AttributeSelect />
+            </MenuItem>
+            <MenuItem title="Palette">
+              <ColorPalette />
+            </MenuItem>
+          {:else if $mapType === 'Proportional Symbol'}
+            <MenuItem title="Attribute">
+              <AttributeSelect />
+            </MenuItem>
+            <MenuItem title="Size">
+              <SizeControls />
+            </MenuItem>
+            <MenuItem title="Fill">
+              <ColorPicker />
+            </MenuItem>
+          {:else if $mapType === 'Dot Density'}
+            <MenuItem title="Attribute">
+              <AttributeSelect />
+            </MenuItem>
+            <MenuItem title="Dots">
+              <DotControls />
+            </MenuItem>
+            <MenuItem title="Fill">
+              <ColorPicker />
+            </MenuItem>
+          {:else}
+            <MenuItem title="Fill">
+              <ColorPicker />
+            </MenuItem>
+          {/if}
+        </Menu>
+      {/if}
       <div class="absolute bottom-8 right-4 z-10 rounded-md bg-slate-900">
         <button
           on:click={toggleProgramVisibility}

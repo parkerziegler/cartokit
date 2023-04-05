@@ -3,7 +3,7 @@
   import { layers } from '$lib/stores/layers';
 </script>
 
-<ul class="stack stack-sm pt-4">
+<ul class="stack stack-sm p-4 font-mono text-white">
   {#each Object.values($layers) as layer}
     <LayerEntry {layer} />
   {/each}
