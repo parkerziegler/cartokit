@@ -23,9 +23,11 @@ export function deriveColorScale(
       geoJSON: { features }
     },
     style: {
-      breaks: { scale, colors }
+      breaks: { scale, scheme, count }
     }
   } = layer;
+
+  const colors = scheme[count].slice();
 
   const prelude: ExpressionSpecification = [
     'step',

@@ -4,7 +4,7 @@
   import { map } from '$lib/stores/map';
   import { mapType } from '$lib/stores/map-type';
   import { selectedLayer } from '$lib/stores/selected-layer';
-  import { MAP_TYPES, type MapType } from '$lib/types/MapTypes';
+  import { MAP_TYPES, type MapType } from '$lib/types/map-types';
 
   const options = MAP_TYPES.map((mapType) => ({
     value: mapType,

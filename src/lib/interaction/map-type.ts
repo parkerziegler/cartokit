@@ -1,4 +1,5 @@
 import type { Map, GeoJSONSource } from 'maplibre-gl';
+import * as d3 from 'd3';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import {
@@ -15,12 +16,14 @@ import type {
   CartoKitDotDensityLayer,
   CartoKitLayer
 } from '$lib/types/CartoKitLayer';
-import type { MapType } from '$lib/types/MapTypes';
+import type { MapType } from '$lib/types/map-types';
 import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_MAX_SIZE,
   DEFAULT_MIN_SIZE,
-  DEFAULT_PALETTE
+  DEFAULT_COUNT,
+  DEFAULT_SCALE,
+  DEFAULT_SCHEME
 } from '$lib/utils/constants';
 import {
   getFeatureCollectionType,
@@ -248,8 +251,9 @@ function transitionToChoropleth(
         attribute: selectNumericAttribute(layer.data.geoJSON.features),
         style: {
           breaks: {
-            scale: 'Quantile',
-            colors: DEFAULT_PALETTE
+            scale: DEFAULT_SCALE,
+            scheme: DEFAULT_SCHEME,
+            count: DEFAULT_COUNT
           },
           opacity: layer.style.opacity
         }
@@ -292,8 +296,9 @@ function transitionToChoropleth(
         attribute: layer.attribute,
         style: {
           breaks: {
-            scale: 'Quantile',
-            colors: DEFAULT_PALETTE
+            scale: DEFAULT_SCALE,
+            scheme: DEFAULT_SCHEME,
+            count: DEFAULT_COUNT
           },
           opacity: layer.style.opacity
         }
@@ -316,8 +321,9 @@ function transitionToChoropleth(
         attribute: layer.attribute,
         style: {
           breaks: {
-            scale: 'Quantile',
-            colors: DEFAULT_PALETTE
+            scale: DEFAULT_SCALE,
+            scheme: DEFAULT_SCHEME,
+            count: DEFAULT_COUNT
           },
           opacity: layer.style.opacity
         }
@@ -391,7 +397,7 @@ function transitionToProportionalSymbol(
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
-          fill: layer.style.breaks.colors[layer.style.breaks.colors.length - 1],
+          fill: randomColor(),
           opacity: layer.style.opacity
         }
       };

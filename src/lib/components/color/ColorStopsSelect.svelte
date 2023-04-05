@@ -9,9 +9,9 @@
 
   const selected =
     $selectedLayer && isChoroplethLayer($selectedLayer)
-      ? $selectedLayer.style.breaks.colors.length
+      ? $selectedLayer.style.breaks.count
       : 3;
-  const options = d3.range(3, 12).map((_, i) => ({
+  const options = d3.range(3, 10).map((_, i) => ({
     value: i + 3,
     label: `${i + 3}`
   }));
@@ -19,7 +19,7 @@
   function onChange(event: CustomEvent<{ value: number }>) {
     if ($map && $selectedLayer) {
       dispatchLayerUpdate({
-        type: 'color-palette-stops',
+        type: 'color-count',
         map: $map,
         layer: $selectedLayer,
         payload: {

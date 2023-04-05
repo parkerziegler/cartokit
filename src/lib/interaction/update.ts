@@ -17,9 +17,8 @@ import {
   isProportionalSymbolLayer,
   type CartoKitLayer
 } from '$lib/types/CartoKitLayer';
-import type { ColorScale } from '$lib/types/ColorScales';
-import type { MapType } from '$lib/types/MapTypes';
-import { randomColor } from '$lib/utils/color';
+import type { ColorScale, ColorScheme } from '$lib/types/color';
+import type { MapType } from '$lib/types/map-types';
 
 interface LayerUpdate {
   map: Map;
@@ -33,23 +32,22 @@ interface MapTypeUpdate extends LayerUpdate {
   };
 }
 
-interface ColorScaleTypeUpdate extends LayerUpdate {
-  type: 'color-scale-type';
+interface ColorScaleUpdate extends LayerUpdate {
+  type: 'color-scale';
   payload: {
     scale: ColorScale;
   };
 }
 
-interface ColorPaletteColorUpdate extends LayerUpdate {
-  type: 'color-palette-color';
+interface ColorSchemeUpdate extends LayerUpdate {
+  type: 'color-scheme';
   payload: {
-    index: number;
-    color: string;
+    scheme: ColorScheme;
   };
 }
 
-interface ColorPaletteStopsUpdate extends LayerUpdate {
-  type: 'color-palette-stops';
+interface ColorCountUpdate extends LayerUpdate {
+  type: 'color-count';
   payload: {
     count: number;
   };
@@ -107,13 +105,13 @@ interface DotValueUpdate extends LayerUpdate {
 
 type DispatchLayerUpdateParams =
   | MapTypeUpdate
-  | ColorScaleTypeUpdate
-  | ColorPaletteColorUpdate
-  | ColorPaletteStopsUpdate
+  | InitialDataUpdate
   | AttributeUpdate
   | FillUpdate
   | FillOpacityUpdate
-  | InitialDataUpdate
+  | ColorScaleUpdate
+  | ColorSchemeUpdate
+  | ColorCountUpdate
   | SizeUpdate
   | DotSizeUpdate
   | DotValueUpdate;
@@ -147,7 +145,7 @@ export function dispatchLayerUpdate({
       });
       break;
     }
-    case 'color-scale-type': {
+    case 'color-scale': {
       layers.update((lyrs) => {
         const lyr = lyrs[layer.id];
 
@@ -161,12 +159,12 @@ export function dispatchLayerUpdate({
       });
       break;
     }
-    case 'color-palette-color': {
+    case 'color-scheme': {
       layers.update((lyrs) => {
         const lyr = lyrs[layer.id];
 
         if (isChoroplethLayer(lyr)) {
-          lyr.style.breaks.colors[payload.index] = payload.color;
+          lyr.style.breaks.scheme = payload.scheme;
 
           map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
         }
@@ -175,23 +173,12 @@ export function dispatchLayerUpdate({
       });
       break;
     }
-    case 'color-palette-stops': {
+    case 'color-count': {
       layers.update((lyrs) => {
         const lyr = lyrs[layer.id];
 
         if (isChoroplethLayer(lyr)) {
-          const diff = payload.count - lyr.style.breaks.colors.length;
-
-          if (Math.sign(diff) === 1) {
-            lyr.style.breaks.colors = lyr.style.breaks.colors.concat(
-              new Array(diff).fill(undefined).map(randomColor)
-            );
-          } else if (Math.sign(diff) === -1) {
-            lyr.style.breaks.colors = lyr.style.breaks.colors.slice(
-              0,
-              lyr.style.breaks.colors.length + diff
-            );
-          }
+          lyr.style.breaks.count = payload.count;
 
           map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
         }

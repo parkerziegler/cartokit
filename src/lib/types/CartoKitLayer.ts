@@ -1,7 +1,7 @@
 import type { FeatureCollection } from 'geojson';
 
-import type { MapType } from '$lib/types/MapTypes';
-import type { ColorScale } from '$lib/types/ColorScales';
+import type { MapType } from '$lib/types/map-types';
+import type { ColorScale, ColorScheme } from '$lib/types/color';
 
 interface Layer {
   id: string;
@@ -31,7 +31,8 @@ export interface CartoKitChoroplethLayer extends Layer {
   style: {
     breaks: {
       scale: ColorScale;
-      colors: string[];
+      scheme: ColorScheme;
+      count: number;
     };
     opacity: number;
   };

@@ -2,7 +2,7 @@ import { derived } from 'svelte/store';
 
 import { selectedFeature } from '$lib/stores/selected-feature';
 import { layers } from '$lib/stores/layers';
-import type { MapType } from '$lib/types/MapTypes';
+import type { MapType } from '$lib/types/map-types';
 
 const DEFAULT_MAP_TYPE = 'Fill';
 
