@@ -1,0 +1,40 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+>
+  <rect
+    x="2"
+    y="2"
+    width="14"
+    height="7"
+    fill="currentColor"
+    fill-opacity="0.2"
+  />
+  <rect x="5" y="9" width="8" height="10" fill="currentColor" />
+  <rect
+    x="13"
+    y="14"
+    width="9"
+    height="8"
+    fill="currentColor"
+    fill-opacity="0.4"
+  />
+  <rect
+    x="16"
+    y="5"
+    width="6"
+    height="4"
+    fill="currentColor"
+    fill-opacity="0.6"
+  />
+  <rect
+    x="13"
+    y="9"
+    width="6"
+    height="5"
+    fill="currentColor"
+    fill-opacity="0.8"
+  />
+</svg>

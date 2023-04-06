@@ -4,7 +4,7 @@
 
 /* CodeMirror */
 .cm-editor {
-  max-height: 100vh;
+  height: 100vh;
 }
 
 .cm-editor .cm-scroller {

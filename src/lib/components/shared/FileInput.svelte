@@ -24,7 +24,7 @@
 
 <style>
   .file {
-    height: 34px;
+    height: 38px;
   }
 
   .file:focus-within {
