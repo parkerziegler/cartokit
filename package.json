@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@sveltejs/adapter-vercel": "^2.4.1",
-    "@sveltejs/kit": "^1.0.0",
+    "@sveltejs/kit": "^1.15.2",
     "@types/d3": "^7.4.0",
     "@types/geojson": "^7946.0.10",
     "@types/lodash.isfinite": "^3.3.7",
