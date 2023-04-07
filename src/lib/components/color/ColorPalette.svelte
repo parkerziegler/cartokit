@@ -29,6 +29,6 @@
 <div class="stack stack-xs">
   <ColorScaleSelect {layer} />
   <ColorStopsSelect {layer} />
-  <ColorSchemeDropdown />
+  <ColorSchemeDropdown {layer} />
   <OpacityInput {opacity} {onOpacityChange} />
 </div>
