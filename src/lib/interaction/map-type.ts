@@ -1,5 +1,4 @@
 import type { Map, GeoJSONSource } from 'maplibre-gl';
-import * as d3 from 'd3';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import {
@@ -23,7 +22,8 @@ import {
   DEFAULT_MIN_SIZE,
   DEFAULT_COUNT,
   DEFAULT_SCALE,
-  DEFAULT_SCHEME
+  DEFAULT_SCHEME,
+  DEFAULT_THRESHOLDS
 } from '$lib/utils/constants';
 import {
   getFeatureCollectionType,
@@ -243,17 +243,23 @@ function transitionToChoropleth(
 
   switch (sourceLayerType) {
     case 'Fill': {
+      const attribute = selectNumericAttribute(layer.data.geoJSON.features);
+
       const targetLayer: CartoKitChoroplethLayer = {
         id: layer.id,
         displayName: layer.displayName,
         type: 'Choropleth',
         data: layer.data,
-        attribute: selectNumericAttribute(layer.data.geoJSON.features),
+        attribute,
         style: {
           breaks: {
             scale: DEFAULT_SCALE,
             scheme: DEFAULT_SCHEME,
-            count: DEFAULT_COUNT
+            count: DEFAULT_COUNT,
+            thresholds: DEFAULT_THRESHOLDS(
+              attribute,
+              layer.data.geoJSON.features
+            )
           },
           opacity: layer.style.opacity
         }
@@ -298,7 +304,11 @@ function transitionToChoropleth(
           breaks: {
             scale: DEFAULT_SCALE,
             scheme: DEFAULT_SCHEME,
-            count: DEFAULT_COUNT
+            count: DEFAULT_COUNT,
+            thresholds: DEFAULT_THRESHOLDS(
+              layer.attribute,
+              layer.data.geoJSON.features
+            )
           },
           opacity: layer.style.opacity
         }
@@ -323,7 +333,11 @@ function transitionToChoropleth(
           breaks: {
             scale: DEFAULT_SCALE,
             scheme: DEFAULT_SCHEME,
-            count: DEFAULT_COUNT
+            count: DEFAULT_COUNT,
+            thresholds: DEFAULT_THRESHOLDS(
+              layer.attribute,
+              layer.data.geoJSON.features
+            )
           },
           opacity: layer.style.opacity
         }

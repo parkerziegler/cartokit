@@ -4,24 +4,22 @@
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { map } from '$lib/stores/map';
-  import { selectedLayer } from '$lib/stores/selected-layer';
-  import { isChoroplethLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
 
-  const selected =
-    $selectedLayer && isChoroplethLayer($selectedLayer)
-      ? $selectedLayer.style.breaks.count
-      : 3;
+  export let layer: CartoKitChoroplethLayer;
+
+  $: selected = layer.style.breaks.count;
   const options = d3.range(3, 10).map((_, i) => ({
     value: i + 3,
     label: `${i + 3}`
   }));
 
   function onChange(event: CustomEvent<{ value: number }>) {
-    if ($map && $selectedLayer) {
+    if ($map) {
       dispatchLayerUpdate({
         type: 'color-count',
         map: $map,
-        layer: $selectedLayer,
+        layer,
         payload: {
           count: event.detail.value
         }

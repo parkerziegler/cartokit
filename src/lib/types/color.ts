@@ -1,6 +1,11 @@
 import * as d3 from 'd3';
 
-export const COLOR_SCALES = ['Quantile', 'Equal Interval', 'Jenks'] as const;
+export const COLOR_SCALES = [
+  'Quantile',
+  'Equal Interval',
+  'Jenks',
+  'Manual'
+] as const;
 export type ColorScale = (typeof COLOR_SCALES)[number];
 
 export const COLOR_SCHEMES = [

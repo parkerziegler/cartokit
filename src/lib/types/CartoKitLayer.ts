@@ -33,6 +33,7 @@ export interface CartoKitChoroplethLayer extends Layer {
       scale: ColorScale;
       scheme: ColorScheme;
       count: number;
+      thresholds: number[];
     };
     opacity: number;
   };

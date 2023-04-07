@@ -8,6 +8,7 @@ import {
   generateDotDensityPoints
 } from '$lib/interaction/geometry';
 import { transitionMapType } from '$lib/interaction/map-type';
+import { deriveThresholds } from '$lib/interaction/scales';
 import { layers } from '$lib/stores/layers';
 import {
   hasAttribute,
@@ -50,6 +51,14 @@ interface ColorCountUpdate extends LayerUpdate {
   type: 'color-count';
   payload: {
     count: number;
+  };
+}
+
+interface ColorThresholdUpdate extends LayerUpdate {
+  type: 'color-threshold';
+  payload: {
+    index: number;
+    threshold: number;
   };
 }
 
@@ -112,6 +121,7 @@ type DispatchLayerUpdateParams =
   | ColorScaleUpdate
   | ColorSchemeUpdate
   | ColorCountUpdate
+  | ColorThresholdUpdate
   | SizeUpdate
   | DotSizeUpdate
   | DotValueUpdate;
@@ -151,6 +161,13 @@ export function dispatchLayerUpdate({
 
         if (isChoroplethLayer(lyr)) {
           lyr.style.breaks.scale = payload.scale;
+          lyr.style.breaks.thresholds = deriveThresholds({
+            scale: payload.scale,
+            layer: lyr,
+            attribute: lyr.attribute,
+            features: lyr.data.geoJSON.features,
+            range: [...lyr.style.breaks.scheme[lyr.style.breaks.count]]
+          });
 
           map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
         }
@@ -179,6 +196,27 @@ export function dispatchLayerUpdate({
 
         if (isChoroplethLayer(lyr)) {
           lyr.style.breaks.count = payload.count;
+          lyr.style.breaks.thresholds = deriveThresholds({
+            scale: lyr.style.breaks.scale,
+            layer: lyr,
+            attribute: lyr.attribute,
+            features: lyr.data.geoJSON.features,
+            range: [...lyr.style.breaks.scheme[payload.count]]
+          });
+
+          map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+        }
+
+        return lyrs;
+      });
+      break;
+    }
+    case 'color-threshold': {
+      layers.update((lyrs) => {
+        const lyr = lyrs[layer.id];
+
+        if (isChoroplethLayer(lyr)) {
+          lyr.style.breaks.thresholds[payload.index] = payload.threshold;
 
           map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
         }

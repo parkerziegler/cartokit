@@ -21,6 +21,7 @@
   import { map as mapStore } from '$lib/stores/map';
   import { mapType } from '$lib/stores/map-type';
   import { selectedFeature } from '$lib/stores/selected-feature';
+  import { selectedLayer } from '$lib/stores/selected-layer';
 
   let map: maplibregl.Map;
 
@@ -75,18 +76,18 @@
       </Menu>
       {#if $selectedFeature}
         <Menu
-          class="style-editor absolute top-4 right-4 z-10 max-w-xs overflow-auto"
+          class="style-editor absolute top-4 right-4 z-10 max-w-sm overflow-auto"
         >
           <MenuTitle>Properties</MenuTitle>
           <MenuItem title="Map Type">
             <MapTypeSelect />
           </MenuItem>
-          {#if $mapType === 'Choropleth'}
+          {#if $selectedLayer?.type === 'Choropleth'}
             <MenuItem title="Attribute">
               <AttributeSelect />
             </MenuItem>
             <MenuItem title="Palette">
-              <ColorPalette />
+              <ColorPalette layer={$selectedLayer} />
             </MenuItem>
           {:else if $mapType === 'Proportional Symbol'}
             <MenuItem title="Attribute">

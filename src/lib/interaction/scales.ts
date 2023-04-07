@@ -3,6 +3,8 @@ import type { Feature } from 'geojson';
 import { ckmeans } from 'simple-statistics';
 
 import { isPropertyNumeric } from '$lib/utils/property';
+import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
+import type { ColorScale } from '$lib/types/color';
 
 /**
  * Derive the extent for a given attribute of a GeoJSON FeatureCollection.
@@ -113,5 +115,43 @@ export function deriveJenksBreaks({
     (cluster) => cluster[cluster.length - 1]
   );
 
+  // Remove the last break—this corresponds to the max.
+  breaks.pop();
+
   return breaks;
+}
+
+interface DeriveThresholdsParams<T> extends DeriveBreaksParams<T> {
+  scale: ColorScale;
+  layer: CartoKitChoroplethLayer;
+}
+
+/**
+ * Obtain the thresholds for a given attribute of a GeoJSON FeatureCollection.
+ *
+ * @param params – Input parameters to compute thresholds over a GeoJSON FeatureCollection.
+ * @param scale – The scale method to use.
+ * @param layer – The CartoKit layer to derive thresholds from.
+ * @param attribute – The data attribute to compute thresholds over.
+ * @param features – The GeoJSON features of the dataset.
+ * @param range – The output range of the scale.
+ * @returns – The thresholds of the dataset based on the scale, attribute, features, and range supplied.
+ */
+export function deriveThresholds({
+  scale,
+  layer,
+  attribute,
+  features,
+  range
+}: DeriveThresholdsParams<string>) {
+  switch (scale) {
+    case 'Quantile':
+      return deriveQuantiles({ attribute, features, range });
+    case 'Equal Interval':
+      return deriveEqualIntervals({ attribute, features, range });
+    case 'Jenks':
+      return deriveJenksBreaks({ attribute, features, range });
+    case 'Manual':
+      return layer.style.breaks.thresholds;
+  }
 }
