@@ -34,7 +34,6 @@
 
   .file-prompt {
     @apply absolute top-0 left-0 right-0 z-10 h-full border border-slate-700 bg-inherit p-2 shadow-inner;
-    line-height: 1.5;
   }
 
   .file-prompt:hover {
@@ -47,7 +46,7 @@
     top: -0.075rem;
     right: -0.075rem;
     bottom: -0.075rem;
-    line-height: 1.5;
+    line-height: 1.75;
   }
 
   .file-prompt:hover::before {

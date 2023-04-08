@@ -13,6 +13,7 @@
   export let selected: T;
   export let options: SelectOption<T>[] = [];
   export let title: string = '';
+  let ref: HTMLSelectElement | HTMLDivElement;
 
   const dispatch = createEventDispatcher();
 
@@ -20,10 +21,14 @@
     const target = event.target as HTMLSelectElement;
     dispatch('change', { value: target.value });
   }
+
+  export function getBoundingClientRect(): DOMRect {
+    return ref.getBoundingClientRect();
+  }
 </script>
 
 {#if title}
-  <div class="stack-h stack-h-xs items-baseline">
+  <div class="stack-h stack-h-xs items-baseline" bind:this={ref}>
     <FieldLabel fieldId={title}>
       {title}
     </FieldLabel>
@@ -45,6 +50,7 @@
     class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600 {$$props.class}"
     value={selected}
     on:change={onChange}
+    bind:this={ref}
   >
     {#each options as option}
       <option value={option.value} selected={option.value === selected}

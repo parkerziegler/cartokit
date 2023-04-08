@@ -9,6 +9,7 @@
   import { hasFill } from '$lib/types/CartoKitLayer';
   import { decimalToPercent } from '$lib/utils/color';
   import { DEFAULT_FILL, DEFAULT_OPACITY } from '$lib/utils/constants';
+  import FieldLabel from '../shared/FieldLabel.svelte';
 
   $: color =
     $selectedLayer && hasFill($selectedLayer)
@@ -60,8 +61,9 @@
   }
 </script>
 
-<div class="color-picker flex">
+<div class="color-picker stack stack-xs">
   <div class="stack-h stack-h-xs items-center">
+    <FieldLabel fieldId="fill">Fill</FieldLabel>
     <input
       type="color"
       class="h-4 w-4 cursor-pointer appearance-none rounded"
@@ -69,6 +71,6 @@
       on:input={onColorInput}
     />
     <HexInput hex={color} {onHexChange} />
-    <OpacityInput {opacity} {onOpacityChange} />
   </div>
+  <OpacityInput {opacity} {onOpacityChange} />
 </div>

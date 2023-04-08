@@ -1,22 +1,23 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
 
+  export let target: HTMLElement = document.body;
   let ref: HTMLDivElement;
   let portal: HTMLDivElement;
 
   onMount(() => {
     portal = document.createElement('div');
-    document.body.appendChild(portal);
+    target.appendChild(portal);
     portal.appendChild(ref);
   });
 
   onDestroy(() => {
-    document.body.removeChild(portal);
+    target.removeChild(portal);
   });
 </script>
 
 <div class="hidden">
-  <div bind:this={ref} class={$$props.class}>
+  <div bind:this={ref} class={$$props.class} style={$$props.style}>
     <slot />
   </div>
 </div>

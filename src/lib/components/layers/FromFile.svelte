@@ -51,7 +51,7 @@
           },
           style: {
             fill: randomColor(),
-            opacity: 1
+            opacity: 0.75
           }
         };
 

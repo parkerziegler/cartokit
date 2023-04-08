@@ -110,7 +110,7 @@
               <ColorPicker />
             </MenuItem>
           {:else}
-            <MenuItem title="Fill">
+            <MenuItem title="Style">
               <ColorPicker />
             </MenuItem>
           {/if}
