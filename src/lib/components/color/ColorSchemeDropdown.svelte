@@ -3,7 +3,6 @@
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { map } from '$lib/stores/map';
   import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
   import { type ColorScheme, COLOR_SCHEMES } from '$lib/types/color';
 
@@ -28,18 +27,15 @@
   }
 
   function onSchemeSelect(scheme: ColorScheme) {
-    if ($map) {
-      dispatchLayerUpdate({
-        type: 'color-scheme',
-        map: $map,
-        layer,
-        payload: {
-          scheme
-        }
-      });
+    dispatchLayerUpdate({
+      type: 'color-scheme',
+      layer,
+      payload: {
+        scheme
+      }
+    });
 
-      togglePaletteDropdown();
-    }
+    togglePaletteDropdown();
   }
 
   $: if (showDropdown && firstScheme) {

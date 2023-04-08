@@ -2,31 +2,21 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { selectedLayer } from '$lib/stores/selected-layer';
-  import { map } from '$lib/stores/map';
-  import { isProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
 
-  $: min =
-    $selectedLayer && isProportionalSymbolLayer($selectedLayer)
-      ? $selectedLayer.style.size.min
-      : 0;
-  $: max =
-    $selectedLayer && isProportionalSymbolLayer($selectedLayer)
-      ? $selectedLayer.style.size.max
-      : 50;
+  export let layer: CartoKitProportionalSymbolLayer;
+  $: min = layer.style.size.min;
+  $: max = layer.style.size.max;
 
   function onSizeChange(field: 'min' | 'max') {
     return function handleSizeChange(event: CustomEvent<{ value: number }>) {
-      if ($selectedLayer && $map && isProportionalSymbolLayer($selectedLayer)) {
-        dispatchLayerUpdate({
-          type: 'size',
-          map: $map,
-          layer: $selectedLayer,
-          payload: {
-            [field]: event.detail.value
-          }
-        });
-      }
+      dispatchLayerUpdate({
+        type: 'size',
+        layer,
+        payload: {
+          [field]: event.detail.value
+        }
+      });
     };
   }
 </script>

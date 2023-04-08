@@ -7,10 +7,7 @@
   import ProportionalSymbolIcon from '$lib/components/layers/icons/ProportionalSymbolIcon.svelte';
   import ChoroplethLegend from '$lib/components/layers/legends/ChoroplethLegend.svelte';
   import { map } from '$lib/stores/map';
-  import {
-    isChoroplethLayer,
-    type CartoKitLayer
-  } from '$lib/types/CartoKitLayer';
+  import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
   export let layer: CartoKitLayer;
 
@@ -49,7 +46,7 @@
       </button>
     {/if}
   </p>
-  {#if isChoroplethLayer(layer)}
+  {#if layer.type === 'Choropleth'}
     <ChoroplethLegend {layer} />
   {/if}
 </li>

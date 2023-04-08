@@ -2,43 +2,31 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { selectedLayer } from '$lib/stores/selected-layer';
-  import { map } from '$lib/stores/map';
-  import { isDotDensityLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitDotDensityLayer } from '$lib/types/CartoKitLayer';
 
-  $: size =
-    $selectedLayer && isDotDensityLayer($selectedLayer)
-      ? $selectedLayer.style.dots.size
-      : 0;
-  $: dotValue =
-    $selectedLayer && isDotDensityLayer($selectedLayer)
-      ? $selectedLayer.style.dots.value
-      : 1;
+  export let layer: CartoKitDotDensityLayer;
+
+  $: size = layer.style.dots.size;
+  $: dotValue = layer.style.dots.value;
 
   function onDotSizeChange(event: CustomEvent<{ value: number }>) {
-    if ($selectedLayer && $map && isDotDensityLayer($selectedLayer)) {
-      dispatchLayerUpdate({
-        type: 'dot-size',
-        map: $map,
-        layer: $selectedLayer,
-        payload: {
-          size: event.detail.value
-        }
-      });
-    }
+    dispatchLayerUpdate({
+      type: 'dot-size',
+      layer,
+      payload: {
+        size: event.detail.value
+      }
+    });
   }
 
   function onDotValueChange(event: CustomEvent<{ value: number }>) {
-    if ($selectedLayer && $map && isDotDensityLayer($selectedLayer)) {
-      dispatchLayerUpdate({
-        type: 'dot-value',
-        map: $map,
-        layer: $selectedLayer,
-        payload: {
-          value: event.detail.value
-        }
-      });
-    }
+    dispatchLayerUpdate({
+      type: 'dot-value',
+      layer,
+      payload: {
+        value: event.detail.value
+      }
+    });
   }
 </script>
 

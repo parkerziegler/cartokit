@@ -3,7 +3,6 @@
   import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { map } from '$lib/stores/map';
   import { COLOR_SCALES, type ColorScale } from '$lib/types/color';
   import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
 
@@ -37,16 +36,13 @@
       displayBreaksEditor = true;
     }
 
-    if ($map) {
-      dispatchLayerUpdate({
-        type: 'color-scale',
-        map: $map,
-        layer,
-        payload: {
-          scale: event.detail.value
-        }
-      });
-    }
+    dispatchLayerUpdate({
+      type: 'color-scale',
+      layer,
+      payload: {
+        scale: event.detail.value
+      }
+    });
   }
 
   function toggleBreaksEditorVisibility() {

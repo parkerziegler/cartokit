@@ -4,7 +4,6 @@
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { deriveExtent } from '$lib/interaction/scales';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { map } from '$lib/stores/map';
   import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
 
   export let layer: CartoKitChoroplethLayer;
@@ -19,17 +18,14 @@
     return function handleThresholdChange(
       event: CustomEvent<{ value: number }>
     ) {
-      if ($map) {
-        dispatchLayerUpdate({
-          type: 'color-threshold',
-          layer,
-          map: $map,
-          payload: {
-            index: i,
-            threshold: event.detail.value
-          }
-        });
-      }
+      dispatchLayerUpdate({
+        type: 'color-threshold',
+        layer,
+        payload: {
+          index: i,
+          threshold: event.detail.value
+        }
+      });
     };
   }
 </script>

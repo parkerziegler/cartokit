@@ -4,7 +4,6 @@
   import ColorStopsSelect from '$lib/components/color/ColorStopsSelect.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { map } from '$lib/stores/map';
   import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
   import { decimalToPercent } from '$lib/utils/color';
 
@@ -13,16 +12,13 @@
   $: opacity = decimalToPercent(layer.style.opacity);
 
   function onOpacityChange(opacity: number) {
-    if ($map) {
-      dispatchLayerUpdate({
-        type: 'opacity',
-        map: $map,
-        layer,
-        payload: {
-          opacity
-        }
-      });
-    }
+    dispatchLayerUpdate({
+      type: 'opacity',
+      layer,
+      payload: {
+        opacity
+      }
+    });
   }
 </script>
 

@@ -17,7 +17,6 @@ export function addSource(map: Map, layer: CartoKitLayer) {
     sourceWorker(layer.data.url, (data) => {
       dispatchLayerUpdate({
         type: 'initial-data',
-        map,
         layer,
         payload: {
           geoJSON: data

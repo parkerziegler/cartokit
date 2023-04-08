@@ -19,8 +19,6 @@
   import { onFeatureLeave } from '$lib/interaction/select';
   import { layers } from '$lib/stores/layers';
   import { map as mapStore } from '$lib/stores/map';
-  import { mapType } from '$lib/stores/map-type';
-  import { selectedFeature } from '$lib/stores/selected-feature';
   import { selectedLayer } from '$lib/stores/selected-layer';
 
   let map: maplibregl.Map;
@@ -29,7 +27,7 @@
     map = new maplibregl.Map({
       container: 'map',
       style: `https://api.maptiler.com/maps/dataviz-light/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
-      center: [-105.43649607942392, 35.90953012430907],
+      center: [-105.436, 35.909],
       zoom: 5
     });
 
@@ -74,7 +72,7 @@
         </MenuTitle>
         <LayerPanel />
       </Menu>
-      {#if $selectedFeature}
+      {#if $selectedLayer}
         <Menu
           class="style-editor absolute top-4 right-4 z-10 max-w-sm overflow-auto"
         >
@@ -82,36 +80,36 @@
           <MenuItem title="Map Type">
             <MapTypeSelect />
           </MenuItem>
-          {#if $selectedLayer?.type === 'Choropleth'}
+          {#if $selectedLayer.type === 'Choropleth'}
             <MenuItem title="Attribute">
-              <AttributeSelect />
+              <AttributeSelect layer={$selectedLayer} />
             </MenuItem>
             <MenuItem title="Palette">
               <ColorPalette layer={$selectedLayer} />
             </MenuItem>
-          {:else if $mapType === 'Proportional Symbol'}
+          {:else if $selectedLayer.type === 'Proportional Symbol'}
             <MenuItem title="Attribute">
-              <AttributeSelect />
+              <AttributeSelect layer={$selectedLayer} />
             </MenuItem>
             <MenuItem title="Size">
-              <SizeControls />
+              <SizeControls layer={$selectedLayer} />
             </MenuItem>
             <MenuItem title="Fill">
-              <ColorPicker />
+              <ColorPicker layer={$selectedLayer} />
             </MenuItem>
-          {:else if $mapType === 'Dot Density'}
+          {:else if $selectedLayer.type === 'Dot Density'}
             <MenuItem title="Attribute">
-              <AttributeSelect />
+              <AttributeSelect layer={$selectedLayer} />
             </MenuItem>
             <MenuItem title="Dots">
-              <DotControls />
+              <DotControls layer={$selectedLayer} />
             </MenuItem>
             <MenuItem title="Fill">
-              <ColorPicker />
+              <ColorPicker layer={$selectedLayer} />
             </MenuItem>
           {:else}
             <MenuItem title="Style">
-              <ColorPicker />
+              <ColorPicker layer={$selectedLayer} />
             </MenuItem>
           {/if}
         </Menu>
