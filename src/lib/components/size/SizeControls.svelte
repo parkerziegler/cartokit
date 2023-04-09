@@ -21,19 +21,13 @@
   }
 </script>
 
-<div class="stack-h stack-h-xs items-center">
-  <FieldLabel fieldId="Min">Min</FieldLabel>
-  <NumberInput
-    min={1}
-    max={Infinity}
-    value={min}
-    on:change={onSizeChange('min')}
-  />
-  <FieldLabel fieldId="Max">Max</FieldLabel>
-  <NumberInput
-    min={1}
-    max={Infinity}
-    value={max}
-    on:change={onSizeChange('max')}
-  />
+<div class="stack stack-xs">
+  <div class="stack-h stack-h-xs items-center">
+    <FieldLabel fieldId="Min">Min</FieldLabel>
+    <NumberInput min={1} value={min} on:change={onSizeChange('min')} />
+  </div>
+  <div class="stack-h stack-h-xs items-center">
+    <FieldLabel fieldId="Max">Max</FieldLabel>
+    <NumberInput min={1} value={max} on:change={onSizeChange('max')} />
+  </div>
 </div>

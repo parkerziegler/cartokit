@@ -30,19 +30,23 @@
   }
 </script>
 
-<div class="stack-h stack-h-xs items-center">
-  <FieldLabel fieldId="Dot Size">Dot Size</FieldLabel>
-  <NumberInput
-    min={1}
-    max={Infinity}
-    value={size}
-    on:change={onDotSizeChange}
-  />
-  <FieldLabel fieldId="Dot Value">Dot Value</FieldLabel>
-  <NumberInput
-    min={1}
-    max={Infinity}
-    value={dotValue}
-    on:change={onDotValueChange}
-  />
+<div class="stack stack-xs">
+  <div class="stack-h stack-h-xs items-center">
+    <FieldLabel fieldId="Dot Size">Dot Size</FieldLabel>
+    <NumberInput
+      min={1}
+      max={Infinity}
+      value={size}
+      on:change={onDotSizeChange}
+    />
+  </div>
+  <div class="stack-h stack-h-xs items-center">
+    <FieldLabel fieldId="Dot Value">Dot Value</FieldLabel>
+    <NumberInput
+      min={1}
+      max={Infinity}
+      value={dotValue}
+      on:change={onDotValueChange}
+    />
+  </div>
 </div>

@@ -58,7 +58,7 @@
     <FieldLabel fieldId="fill">Fill</FieldLabel>
     <input
       type="color"
-      class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded p-2"
+      class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
       value={color}
       on:input={onColorInput}
     />

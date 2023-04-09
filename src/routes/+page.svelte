@@ -26,7 +26,7 @@
   onMount(() => {
     map = new maplibregl.Map({
       container: 'map',
-      style: `https://api.maptiler.com/maps/dataviz-light/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
+      style: `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
       center: [-105.436, 35.909],
       zoom: 5
     });
