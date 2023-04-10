@@ -1,7 +1,7 @@
 # cartokit
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/parkerziegler/cartokit/main/assets/cartokit-banner.png" alt="Example screenshots from cartokit" width="640" height="400" />
+  <img src="assets/cartokit-banner.png" alt="Example screenshots from cartokit" width="640" height="400" />
 </div>
 
 `cartokit` is a direct manipulation programming environment for interactive cartography on the web.
