@@ -65,8 +65,8 @@
       id="map"
       class:col-span-8={programVisible}
     >
-      <Menu class="absolute top-4 left-4 z-10 max-w-xl overflow-auto">
-        <MenuTitle>
+      <Menu class="min-w-xs absolute top-4 left-4 z-10 max-w-xl overflow-auto">
+        <MenuTitle class="mr-4">
           Layers
           <AddLayer slot="action" />
         </MenuTitle>
