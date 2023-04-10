@@ -1,3 +1,5 @@
+import type { Map } from 'maplibre-gl';
+
 import { codegenSource } from '$lib/codegen/codegen-source';
 import { codegenLayer } from '$lib/codegen/codegen-layer';
 import type { CartoKitIR } from '$lib/stores/layers';
@@ -6,12 +8,12 @@ import type { CartoKitIR } from '$lib/stores/layers';
  * Generate a Mapbox GL JS program fragment for layer sources, layer renders,
  * the top-level map instance.
  *
- * @param map – the Mapbox GL JS map instance.
- * @param layers – the CartoKit IR.
+ * @param map – The MapLibre GL JS map instance.
+ * @param layers – The CartoKit IR.
  *
- * @returns – a Mapbox GL JS program fragment.
+ * @returns – A Mapbox GL JS program fragment.
  */
-export function codegenMap(layers: CartoKitIR): string {
+export function codegenMap(map: Map, layers: CartoKitIR): string {
   const layerSources = Object.values(layers).reduce((p, layer) => {
     return p.concat('\n\n' + codegenSource(layer));
   }, '');
@@ -20,12 +22,14 @@ export function codegenMap(layers: CartoKitIR): string {
     return p.concat('\n\n' + codegenLayer(layer));
   }, '');
 
+  const { lng, lat } = map.getCenter();
+
   const program = `
   const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/dark-v10',
-    center: [-81, 26.5],
-    zoom: 7
+    center: [${lng}, ${lat}],
+    zoom: ${map.getZoom()}
   });
 
   map.on('load', () => {

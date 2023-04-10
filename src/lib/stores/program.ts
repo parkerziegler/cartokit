@@ -1,6 +1,9 @@
 import { derived } from 'svelte/store';
 
-import { layers } from '$lib/stores/layers';
 import { codegen } from '$lib/codegen';
+import { layers } from '$lib/stores/layers';
+import { map } from '$lib/stores/map';
 
-export const program = derived([layers], ([$layers]) => codegen($layers));
+export const program = derived([map, layers], ([$map, $layers]) =>
+  codegen($map, $layers)
+);

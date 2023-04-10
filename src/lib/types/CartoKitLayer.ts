@@ -11,6 +11,7 @@ interface Layer {
     url?: string;
     geoJSON: FeatureCollection;
     rawGeoJSON: FeatureCollection;
+    fileName?: string;
   };
   style: {
     opacity: number;

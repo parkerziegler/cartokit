@@ -1,3 +1,5 @@
+import camelCase from 'lodash.camelcase';
+
 import type {
   CartoKitDotDensityLayer,
   CartoKitLayer
@@ -43,7 +45,7 @@ export function codegenSource(layer: CartoKitLayer): string {
         ? features
         : layer.data.url
         ? `"${layer.data.url}"`
-        : 'LocalFile' // TODO: Implement a DataViewer component: https://github.com/parkerziegler/cartokit/issues/5
+        : `${camelCase(layer.data.fileName)}`
     }
 	});
   `);

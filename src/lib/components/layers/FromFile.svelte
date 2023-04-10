@@ -47,7 +47,8 @@
           type: 'Fill',
           data: {
             geoJSON: normalizeGeoJSONToFeatureCollection(geojson),
-            rawGeoJSON: normalizeGeoJSONToFeatureCollection(geojson)
+            rawGeoJSON: normalizeGeoJSONToFeatureCollection(geojson),
+            fileName: file.name
           },
           style: {
             fill: randomColor(),
@@ -57,10 +58,7 @@
 
         layers.update((lyrs) => {
           lyrs[layer.id] = layer;
-
-          if ($map) {
-            addSource($map, layer);
-          }
+          addSource($map, layer);
 
           return lyrs;
         });
