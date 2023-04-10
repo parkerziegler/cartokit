@@ -26,9 +26,12 @@ export function sourceWorker(
   url: string,
   cb: (data: FeatureCollection) => void
 ) {
-  const blob = new Blob([fetchGeoJSON.toString(), `fetchGeoJSON("${url}")`], {
-    type: 'text/javascript'
-  });
+  const blob = new Blob(
+    [fetchGeoJSON.toString(), `${fetchGeoJSON.name}("${url}")`],
+    {
+      type: 'text/javascript'
+    }
+  );
   const source = URL.createObjectURL(blob);
   const worker = new Worker(source);
 
