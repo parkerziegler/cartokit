@@ -2,18 +2,23 @@ import camelCase from 'lodash.camelcase';
 
 import type {
   CartoKitDotDensityLayer,
-  CartoKitLayer
+  CartoKitLayer,
+  CartoKitProportionalSymbolLayer
 } from '$lib/types/CartoKitLayer';
 import { getFeatureCollectionType } from '$lib/utils/geojson';
 
 /**
  * Generate the data source for a CartoKit layer.
  *
- * @param layer – a CartoKit layer.
+ * @param layer – A CartoKitProportionalSymbolLayer.
+ * @param dataTable – A symbol table mapping layer ids to identifiers referencing imported source data.
  *
  * @returns – a Mapbox GL JS program fragment.
  */
-export function codegenSource(layer: CartoKitLayer): string {
+export function codegenSource(
+  layer: CartoKitLayer,
+  dataTable: Map<string, string>
+): string {
   const geometry = getFeatureCollectionType(layer.data.geoJSON);
   const rawGeometry = getFeatureCollectionType(layer.data.rawGeoJSON);
 
@@ -26,11 +31,16 @@ export function codegenSource(layer: CartoKitLayer): string {
   ) {
     switch (layer.type) {
       case 'Proportional Symbol':
-        ({ transformation, features } =
-          codegenProportionalSymbolTransformation());
+        ({ transformation, features } = codegenProportionalSymbolTransformation(
+          layer,
+          dataTable
+        ));
         break;
       case 'Dot Density':
-        ({ transformation, features } = codegenDotDensityTransformation(layer));
+        ({ transformation, features } = codegenDotDensityTransformation(
+          layer,
+          dataTable
+        ));
         break;
       default:
         break;
@@ -61,9 +71,14 @@ interface TransformationProgramFragment {
  *
  * @returns – a "transformation" and "features" program fragment.
  */
-function codegenProportionalSymbolTransformation(): TransformationProgramFragment {
+function codegenProportionalSymbolTransformation(
+  layer: CartoKitProportionalSymbolLayer,
+  dataTable: Map<string, string>
+): TransformationProgramFragment {
+  const dataIdent = dataTable.get(layer.id) ?? 'data';
+
   const transformation = `
-		const centroids = data.features.map((feature) => {
+		const centroids = ${dataIdent}.features.map((feature) => {
 			return turf.feature(turf.centroid(feature).geometry, feature.properties);
 		});
 	`;
@@ -76,15 +91,19 @@ function codegenProportionalSymbolTransformation(): TransformationProgramFragmen
 /**
  * Generate the data transformation for a CartoKitProportionalSymbolLayer.
  *
- * @param layer – a CartoKitDotDensityLayer.
+ * @param layer – A CartoKitDotDensityLayer.
+ * @param dataTable – A symbol table mapping layer ids to identifiers referencing imported source data.
  *
- * @returns – a "transformation" and "features" program fragment.
+ * @returns – A "transformation" and "features" program fragment.
  */
 function codegenDotDensityTransformation(
-  layer: CartoKitDotDensityLayer
+  layer: CartoKitDotDensityLayer,
+  dataTable: Map<string, string>
 ): TransformationProgramFragment {
+  const dataIdent = dataTable.get(layer.id) ?? 'data';
+
   const transformation = `
-	const dots = data.features.flatMap((feature) => {
+	const dots = ${dataIdent}.features.flatMap((feature) => {
 		const numPoints = Math.floor(feature.properties["${layer.attribute}"] / ${layer.style.dots.value});
 
 		const bbox = turf.bbox(feature);

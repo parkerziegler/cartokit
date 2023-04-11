@@ -1,4 +1,4 @@
-import type { Map } from 'maplibre-gl';
+import type { Map as MapLibreMap } from 'maplibre-gl';
 
 import { codegenSource } from '$lib/codegen/codegen-source';
 import { codegenLayer } from '$lib/codegen/codegen-layer';
@@ -10,12 +10,17 @@ import type { CartoKitIR } from '$lib/stores/layers';
  *
  * @param map – The MapLibre GL JS map instance.
  * @param layers – The CartoKit IR.
+ * @param dataTable – A symbol table mapping layer ids to identifiers referencing imported source data.
  *
  * @returns – A Mapbox GL JS program fragment.
  */
-export function codegenMap(map: Map, layers: CartoKitIR): string {
+export function codegenMap(
+  map: MapLibreMap,
+  layers: CartoKitIR,
+  dataTable: Map<string, string>
+): string {
   const layerSources = Object.values(layers).reduce((p, layer) => {
-    return p.concat('\n\n' + codegenSource(layer));
+    return p.concat('\n\n' + codegenSource(layer, dataTable));
   }, '');
 
   const layerRenders = Object.values(layers).reduce((p, layer) => {
