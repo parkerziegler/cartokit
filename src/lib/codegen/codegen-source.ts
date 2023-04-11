@@ -23,7 +23,7 @@ export function codegenSource(
   const rawGeometry = getFeatureCollectionType(layer.data.rawGeoJSON);
 
   let transformation = '';
-  let features = 'data';
+  let features = '';
 
   if (
     (geometry === 'Point' || geometry === 'MultiPoint') &&
