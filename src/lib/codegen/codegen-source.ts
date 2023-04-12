@@ -1,8 +1,8 @@
 import camelCase from 'lodash.camelcase';
 
 import type {
-  CartoKitDotDensityLayer,
   CartoKitLayer,
+  CartoKitDotDensityLayer,
   CartoKitProportionalSymbolLayer
 } from '$lib/types/CartoKitLayer';
 import { getFeatureCollectionType } from '$lib/utils/geojson';
@@ -10,14 +10,14 @@ import { getFeatureCollectionType } from '$lib/utils/geojson';
 /**
  * Generate the data source for a CartoKit layer.
  *
- * @param layer – A CartoKitProportionalSymbolLayer.
- * @param dataTable – A symbol table mapping layer ids to identifiers referencing imported source data.
+ * @param layer – A CartoKitLayer
+ * @param uploadTable – The symbol table tracking file uploads.
  *
- * @returns – a Mapbox GL JS program fragment.
+ * @returns – A Mapbox GL JS program fragment.
  */
 export function codegenSource(
   layer: CartoKitLayer,
-  dataTable: Map<string, string>
+  uploadTable: Map<string, string>
 ): string {
   const geometry = getFeatureCollectionType(layer.data.geoJSON);
   const rawGeometry = getFeatureCollectionType(layer.data.rawGeoJSON);
@@ -33,13 +33,13 @@ export function codegenSource(
       case 'Proportional Symbol':
         ({ transformation, features } = codegenProportionalSymbolTransformation(
           layer,
-          dataTable
+          uploadTable
         ));
         break;
       case 'Dot Density':
         ({ transformation, features } = codegenDotDensityTransformation(
           layer,
-          dataTable
+          uploadTable
         ));
         break;
       default:
@@ -55,7 +55,7 @@ export function codegenSource(
         ? features
         : layer.data.url
         ? `"${layer.data.url}"`
-        : `${camelCase(layer.data.fileName)}`
+        : `${camelCase(layer.displayName)}`
     }
 	});
   `);
@@ -69,16 +69,19 @@ interface TransformationProgramFragment {
 /**
  * Generate the data transformation for a CartoKitProportionalSymbolLayer.
  *
- * @returns – a "transformation" and "features" program fragment.
+ * @param layer – A CartoKitProportionalSymbolLayer.
+ * @param uploadTable – The symbol table tracking file uploads.
+ *
+ * @returns – A "transformation" and "features" program fragment.
  */
 function codegenProportionalSymbolTransformation(
   layer: CartoKitProportionalSymbolLayer,
-  dataTable: Map<string, string>
+  uploadTable: Map<string, string>
 ): TransformationProgramFragment {
-  const dataIdent = dataTable.get(layer.id) ?? 'data';
+  const dataIdent = uploadTable.get(layer.id) ?? camelCase(layer.displayName);
   const fetchData =
-    layer.data.url && dataIdent === 'data'
-      ? `const data = await fetchGeoJSON('${layer.data.url}');\n`
+    layer.data.url && !uploadTable.has(layer.id)
+      ? `const ${dataIdent} = await fetchGeoJSON('${layer.data.url}');\n`
       : '';
 
   const transformation = `
@@ -97,25 +100,26 @@ function codegenProportionalSymbolTransformation(
  * Generate the data transformation for a CartoKitProportionalSymbolLayer.
  *
  * @param layer – A CartoKitDotDensityLayer.
- * @param dataTable – A symbol table mapping layer ids to identifiers referencing imported source data.
+ * @param uploadTable – The symbol table tracking file uploads.
  *
  * @returns – A "transformation" and "features" program fragment.
  */
 function codegenDotDensityTransformation(
   layer: CartoKitDotDensityLayer,
-  dataTable: Map<string, string>
+  uploadTable: Map<string, string>
 ): TransformationProgramFragment {
-  const dataIdent = dataTable.get(layer.id) ?? 'data';
-
+  const dataIdent = uploadTable.get(layer.id) ?? camelCase(layer.displayName);
   const fetchData =
-    layer.data.url && dataIdent === 'data'
-      ? `const data = await fetchGeoJSON('${layer.data.url}')\n`
+    layer.data.url && !uploadTable.has(layer.id)
+      ? `const ${dataIdent} = await fetchGeoJSON('${layer.data.url}');\n`
       : '';
 
   const transformation = `
   ${fetchData}
 	const dots = ${dataIdent}.features.flatMap((feature) => {
-		const numPoints = Math.floor(feature.properties["${layer.attribute}"] / ${layer.style.dots.value});
+		const numPoints = Math.floor(
+      feature.properties['${layer.attribute}'] / ${layer.style.dots.value}
+    );
 
 		const bbox = turf.bbox(feature);
 		const selectedFeatures = [];

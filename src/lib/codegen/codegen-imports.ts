@@ -18,7 +18,7 @@ import { getFeatureCollectionType } from '$lib/utils/geojson';
 export function codegenImports(map: MapLibreMap, layers: CartoKitIR) {
   // Create a symbol table mapping layer ids to identifiers referencing imported
   // source data.
-  const dataTable = new Map<string, string>();
+  const uploadTable = new Map<string, string>();
 
   // Create a symbol table to track which layers performed cross-geometry data
   // transformations.
@@ -30,8 +30,8 @@ export function codegenImports(map: MapLibreMap, layers: CartoKitIR) {
     }
 
     if (layer.data.fileName) {
-      const dataIdent = camelCase(layer.data.fileName);
-      dataTable.set(layer.id, dataIdent);
+      const dataIdent = camelCase(layer.displayName);
+      uploadTable.set(layer.id, dataIdent);
 
       return acc.concat(`import ${dataIdent} from './${layer.data.fileName}';`);
     }
@@ -49,7 +49,7 @@ export function codegenImports(map: MapLibreMap, layers: CartoKitIR) {
 
   ${codegenFns(layers, transformTable)}
   
-  ${codegenMap({ map, layers, dataTable, transformTable })}`;
+  ${codegenMap({ map, layers, uploadTable, transformTable })}`;
 }
 
 /**
@@ -58,8 +58,8 @@ export function codegenImports(map: MapLibreMap, layers: CartoKitIR) {
  *
  * @param layer – A CartoKit layer.
  *
- * @returns – A Boolean value indicating if a cross-geometry transformation was
- * performed on the input layer.
+ * @returns – A Boolean value indicating whether a cross-geometry transformation
+ * was performed on the input layer.
  */
 function isTransformRequired(layer: CartoKitLayer): boolean {
   const geometry = getFeatureCollectionType(layer.data.geoJSON);

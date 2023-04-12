@@ -8,19 +8,19 @@ import type { CartoKitIR } from '$lib/stores/layers';
 interface CodegenMapParams {
   map: MapLibreMap;
   layers: CartoKitIR;
-  dataTable: Map<string, string>;
+  uploadTable: Map<string, string>;
   transformTable: Map<string, boolean>;
 }
 
 /**
  * Generate a Mapbox GL JS program fragment for layer sources, layer renders,
- * the top-level map instance.
+ * and the top-level map instance.
  *
  * @params params – Required parameters to generate the Mapbox GL JS program
  * fragment.
  * @param map – The MapLibre GL JS map instance.
  * @param layers – The CartoKit IR.
- * @param dataTable – The source data symbol table.
+ * @param uploadTable – The symbol table tracking file uploads.
  * @param transformTable – The transformation symbol table.
  *
  * @returns – A Mapbox GL JS program fragment.
@@ -28,11 +28,11 @@ interface CodegenMapParams {
 export function codegenMap({
   map,
   layers,
-  dataTable,
+  uploadTable,
   transformTable
 }: CodegenMapParams): string {
   const layerSources = Object.values(layers).reduce((p, layer) => {
-    return p.concat('\n\n' + codegenSource(layer, dataTable));
+    return p.concat('\n\n' + codegenSource(layer, uploadTable));
   }, '');
 
   const layerRenders = Object.values(layers).reduce((p, layer) => {
@@ -40,7 +40,7 @@ export function codegenMap({
   }, '');
 
   const { lng, lat } = map.getCenter();
-  const isAsync = isFetchGeoJSONRequired(layers, transformTable);
+  const isLoadAsync = isFetchGeoJSONRequired(layers, transformTable);
 
   const program = `
   const map = new mapboxgl.Map({
@@ -50,7 +50,7 @@ export function codegenMap({
     zoom: ${map.getZoom()}
   });
 
-  map.on('load', ${isAsync ? 'async' : ''}() => {
+  map.on('load', ${isLoadAsync ? 'async' : ''}() => {
     ${layerSources}
 
     ${layerRenders}

@@ -4,9 +4,9 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 /**
  * Generate a Mapbox GL JS program fragment for a CartoKitLayer.
  *
- * @param layer – a CartoKit layer.
+ * @param layer – A CartoKit layer.
  *
- * @returns – a Mapbox GL JS program fragment.
+ * @returns – A Mapbox GL JS program fragment.
  */
 export function codegenLayer(layer: CartoKitLayer): string {
   switch (layer.type) {

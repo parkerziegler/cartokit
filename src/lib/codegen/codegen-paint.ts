@@ -8,11 +8,13 @@ import {
 } from '$lib/utils/constants';
 
 /**
- * Generate a Mapbox GL JS program fragment representing the layer's presentational properties.
+ * Generate a Mapbox GL JS program fragment representing the layer's
+ * presentational properties.
  *
- * @param layer – a CartoKit layer.
+ * @param layer – A CartoKit layer.
  *
- * @returns – a Mapbox GL JS program fragment representing the layer's presentational properties.
+ * @returns – A Mapbox GL JS program fragment representing the layer's
+ * presentational properties.
  */
 export function codegenPaint(layer: CartoKitLayer): string {
   switch (layer.type) {
@@ -54,14 +56,14 @@ export function codegenPaint(layer: CartoKitLayer): string {
 }
 
 /**
- * Return a Mapbox GL JS program fragment representing a property-value pair, unless
- * the value is the same as the default value.
+ * Return a Mapbox GL JS program fragment representing a property-value pair,
+ * unless the value is the same as the default value.
  *
- * @param mapboxProperty – the Mapbox GL JS property name.
- * @param cartokitValue – the value of the property in the CartoKit IR.
- * @param defaultValue – the default Mapbox GL JS value for the property.
+ * @param mapboxProperty – The Mapbox GL JS property name.
+ * @param cartokitValue – The value of the property in the CartoKit IR.
+ * @param defaultValue – The default Mapbox GL JS value for the property.
  *
- * @returns – a (potentially empty) Mapbox GL JS program fragment.
+ * @returns – A (potentially empty) Mapbox GL JS program fragment.
  */
 function withDefault<T extends string | number>(
   mapboxProperty: string,
