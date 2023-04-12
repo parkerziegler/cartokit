@@ -48,15 +48,16 @@
         <line x1="6" y1="6" x2="18" y2="18" />
       </svg>
     </button>
-    <div class="breaks-grid grid gap-2">
+    <div class="breaks-grid grid gap-x-2 gap-y-1">
       {#each [min, ...thresholds] as threshold, i}
-        <span class="h-4 self-center" style="background-color: {colors[i]};" />
+        <span class="h-6 self-center" style="background-color: {colors[i]};" />
         <span class="self-center">{threshold.toFixed(2)}</span>
         <span class="self-center">to</span>
         <NumberInput
           value={thresholds[i] ?? max}
           step={0.01}
           class="self-center p-1"
+          disabled={i === thresholds.length}
           on:change={onThresholdChange(i)}
         />
       {/each}
@@ -66,6 +67,6 @@
 
 <style>
   .breaks-grid {
-    grid-template-columns: 1.5rem 1fr 1rem 1fr;
+    grid-template-columns: 0.75rem 1fr 1rem 1fr;
   }
 </style>
