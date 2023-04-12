@@ -76,8 +76,13 @@ function codegenProportionalSymbolTransformation(
   dataTable: Map<string, string>
 ): TransformationProgramFragment {
   const dataIdent = dataTable.get(layer.id) ?? 'data';
+  const fetchData =
+    layer.data.url && dataIdent === 'data'
+      ? `const data = await fetchGeoJSON('${layer.data.url}');\n`
+      : '';
 
   const transformation = `
+    ${fetchData}
 		const centroids = ${dataIdent}.features.map((feature) => {
 			return turf.feature(turf.centroid(feature).geometry, feature.properties);
 		});
@@ -102,7 +107,13 @@ function codegenDotDensityTransformation(
 ): TransformationProgramFragment {
   const dataIdent = dataTable.get(layer.id) ?? 'data';
 
+  const fetchData =
+    layer.data.url && dataIdent === 'data'
+      ? `const data = await fetchGeoJSON('${layer.data.url}')\n`
+      : '';
+
   const transformation = `
+  ${fetchData}
 	const dots = ${dataIdent}.features.flatMap((feature) => {
 		const numPoints = Math.floor(feature.properties["${layer.attribute}"] / ${layer.style.dots.value});
 
