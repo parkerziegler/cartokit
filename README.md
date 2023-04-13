@@ -1,7 +1,7 @@
 # cartokit
 
 <div align="center">
-  <img src="assets/cartokit-banner.png" alt="Example screenshots from cartokit" width="640" height="400" />
+  <img src="assets/logo-2x.png" alt="cartokit" width="640" height="256">
 </div>
 
 `cartokit` is a direct manipulation programming environment for interactive cartography on the web.
@@ -9,6 +9,10 @@
 Try it now at [alpha.cartokit.dev](https://alpha.cartokit.dev).
 
 ## Cartography with `cartokit`
+
+<div align="center">
+  <img src="assets/banner.png" alt="Example screenshots from cartokit" width="100%" />
+</div>
 
 Many cartographers make heavy use of direct manipulation interfaces for map design. Whether these are built-in cartography tools in [QGIS](https://www.qgis.org/en/site/) or [ArcGIS](https://www.qgis.org/en/site/), vector editing software like Figma or Adobe Illustrator, or style specification editors like [Mapbox Studio](https://www.mapbox.com/mapbox-studio) or [Maputnik](https://maputnik.github.io/), direct manipulation tools help us create maps faster.
 
