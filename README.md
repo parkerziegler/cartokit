@@ -1,12 +1,10 @@
 # cartokit
 
 <div align="center">
-  <img src="assets/logo-2x.png" alt="cartokit" width="640" height="256">
+  <img src="assets/logo.png" alt="cartokit" width="559" height="171">
 </div>
 
-`cartokit` is a direct manipulation programming environment for interactive cartography on the web.
-
-Try it now at [alpha.cartokit.dev](https://alpha.cartokit.dev).
+`cartokit` is a direct manipulation programming environment for interactive cartography on the web. Try it now at [alpha.cartokit.dev](https://alpha.cartokit.dev).
 
 ## Cartography with `cartokit`
 
@@ -19,6 +17,14 @@ Many cartographers make heavy use of direct manipulation interfaces for map desi
 As cartography has shifted to the web, however, our material for mapping has expanded. We can now make maps by writing **programs** in addition to working with static media. Libraries like [D3](https://d3js.org/), [Leaflet](https://leafletjs.com/), and [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/guides/) are incredibly powerful for data-intensive mapping on the web. However, these tools also have steep learning curves—you need to be a proficient JavaScript developer just to get started.
 
 Could we have the best of both worlds? Can we give users access to rich direct manipulation interfaces for styling maps while _automatically_ writing programs for them? This is `cartokit`'s central goal.
+
+## Demo
+
+To get a sense of how to use `cartokit`—and to see its expressive power for map design—check out this 9-minute demo!
+
+<video controls width="640">
+  <source src="assets/cartokit-demo-4k.mp4" type="video/mp4">
+</video>
 
 ## System Goals
 
