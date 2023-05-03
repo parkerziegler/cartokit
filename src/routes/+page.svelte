@@ -26,7 +26,7 @@
   onMount(() => {
     map = new maplibregl.Map({
       container: 'map',
-      style: `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
+      style: `https://api.maptiler.com/maps/dataviz-light/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
       center: [-105.436, 35.909],
       zoom: 5
     });
@@ -65,7 +65,7 @@
       id="map"
       class:col-span-8={programVisible}
     >
-      <Menu class="min-w-xs absolute top-4 left-4 z-10 max-w-xl overflow-auto">
+      <Menu class="min-w-xs absolute top-4 left-4 z-10 max-w-lg overflow-auto">
         <MenuTitle class="mr-4">
           Layers
           <AddLayer slot="action" />
