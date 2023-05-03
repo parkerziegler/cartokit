@@ -57,7 +57,7 @@
     <ChoroplethLegend {layer} />
   {:else if layer.type === 'Proportional Symbol'}
     <ProportionalSymbolLegend {layer} />
-  {:else}
+  {:else if layer.type === 'Dot Density'}
     <DotDensityLegend {layer} />
   {/if}
 </li>

@@ -8,16 +8,13 @@
 
   $: sizeMin = layer.style.size.min;
   $: sizeMax = layer.style.size.max;
-  $: [_min, max] = deriveExtent(layer.attribute, layer.data.geoJSON.features);
+  $: [min, max] = deriveExtent(layer.attribute, layer.data.geoJSON.features);
 
   const padding = { top: 4, right: 4, bottom: 4, left: 4 };
   // Dynamically compute the label width based on the max value.
   $: labelWidth = max.toFixed(2).length * 9;
 
-  $: scale = d3.scaleLinear(
-    [sizeMin, sizeMax],
-    deriveExtent(layer.attribute, layer.data.geoJSON.features)
-  );
+  $: scale = d3.scaleLinear([sizeMin, sizeMax], [min, max]);
   $: intervals = [
     {
       size: (sizeMax * 2) / 3,
