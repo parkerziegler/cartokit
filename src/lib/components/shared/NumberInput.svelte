@@ -1,11 +1,15 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import cs from 'classnames';
 
   export let min: number = 0;
   export let max: number = Infinity;
   export let step: number = 1;
   export let value: number;
   export let disabled: boolean = false;
+
+  let className = '';
+  export { className as class };
 
   const dispatch = createEventDispatcher();
 
@@ -23,7 +27,10 @@
   {step}
   {disabled}
   on:change={onChange}
-  class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600 {$$props.class}"
+  class={cs(
+    'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
+    className
+  )}
 />
 
 <style>

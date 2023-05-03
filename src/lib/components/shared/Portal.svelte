@@ -5,6 +5,9 @@
   let ref: HTMLDivElement;
   let portal: HTMLDivElement;
 
+  let className = '';
+  export { className as class };
+
   onMount(() => {
     portal = document.createElement('div');
     target.appendChild(portal);
@@ -17,7 +20,7 @@
 </script>
 
 <div class="hidden">
-  <div bind:this={ref} class={$$props.class} style={$$props.style}>
+  <div bind:this={ref} class={className} style={$$props.style}>
     <slot />
   </div>
 </div>
