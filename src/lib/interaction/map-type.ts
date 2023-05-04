@@ -144,7 +144,8 @@ function transitionToFill(
 
   switch (sourceLayerType) {
     case 'Choropleth': {
-      const fill = randomColor();
+      const color = randomColor();
+      const strokeWidth = 1.5;
 
       const targetLayer: CartoKitFillLayer = {
         id: layer.id,
@@ -152,13 +153,18 @@ function transitionToFill(
         type: 'Fill',
         data: layer.data,
         style: {
-          fill,
+          fill: color,
+          stroke: color,
+          strokeWidth: strokeWidth,
           opacity: layer.style.opacity
         }
       };
 
-      // Just update the fill-color of the existing layer.
-      map.setPaintProperty(layer.id, 'fill-color', fill);
+      // Just update the fill-color, line-color, and line-width of the existing
+      // layers.
+      map.setPaintProperty(layer.id, 'fill-color', color);
+      map.setPaintProperty(`${layer.id}-stroke`, 'line-color', color);
+      map.setPaintProperty(`${layer.id}-stroke`, 'line-width', strokeWidth);
 
       return {
         targetLayer,
@@ -189,6 +195,8 @@ function transitionToFill(
         },
         style: {
           fill: layer.style.fill,
+          stroke: layer.style.stroke,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };
@@ -209,6 +217,8 @@ function transitionToFill(
         },
         style: {
           fill: layer.style.fill,
+          stroke: layer.style.stroke,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };
@@ -261,6 +271,8 @@ function transitionToChoropleth(
               layer.data.geoJSON.features
             )
           },
+          stroke: layer.style.stroke,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };
@@ -310,6 +322,8 @@ function transitionToChoropleth(
               layer.data.geoJSON.features
             )
           },
+          stroke: layer.style.stroke,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };
@@ -339,6 +353,8 @@ function transitionToChoropleth(
               layer.data.geoJSON.features
             )
           },
+          stroke: layer.style.stroke,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };
@@ -387,6 +403,8 @@ function transitionToProportionalSymbol(
             max: DEFAULT_MAX_SIZE
           },
           fill: layer.style.fill,
+          stroke: layer.style.stroke,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };
@@ -397,6 +415,8 @@ function transitionToProportionalSymbol(
       };
     }
     case 'Choropleth': {
+      const colors = layer.style.breaks.scheme[layer.style.breaks.count];
+
       const targetLayer: CartoKitProportionalSymbolLayer = {
         id: layer.id,
         displayName: layer.displayName,
@@ -411,7 +431,9 @@ function transitionToProportionalSymbol(
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
-          fill: randomColor(),
+          fill: colors[colors.length - 1],
+          stroke: layer.style.stroke,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };
@@ -437,6 +459,8 @@ function transitionToProportionalSymbol(
             max: DEFAULT_MAX_SIZE
           },
           fill: layer.style.fill,
+          stroke: layer.style.stroke,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };
@@ -491,6 +515,8 @@ function transitionToDotDensity(
             value: dotValue
           },
           fill: layer.style.fill,
+          stroke: layer.style.stroke,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };
@@ -503,6 +529,7 @@ function transitionToDotDensity(
     case 'Choropleth': {
       const features = layer.data.geoJSON.features;
       const dotValue = deriveDotDensityStartingValue(features, layer.attribute);
+      const colors = layer.style.breaks.scheme[layer.style.breaks.count];
 
       const targetLayer: CartoKitDotDensityLayer = {
         id: layer.id,
@@ -522,7 +549,9 @@ function transitionToDotDensity(
             size: 1,
             value: dotValue
           },
-          fill: randomColor(),
+          fill: colors[colors.length - 1],
+          stroke: layer.style.stroke,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };
@@ -568,6 +597,8 @@ function transitionToDotDensity(
             value: dotValue
           },
           fill: layer.style.fill,
+          stroke: layer.style.stroke,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };

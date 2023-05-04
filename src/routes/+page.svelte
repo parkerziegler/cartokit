@@ -80,7 +80,11 @@
           <MenuItem title="Map Type">
             <MapTypeSelect />
           </MenuItem>
-          {#if $selectedLayer.type === 'Choropleth'}
+          {#if $selectedLayer.type === 'Fill'}
+            <MenuItem title="Style">
+              <ColorPicker layer={$selectedLayer} />
+            </MenuItem>
+          {:else if $selectedLayer.type === 'Choropleth'}
             <MenuItem title="Attribute">
               <AttributeSelect layer={$selectedLayer} />
             </MenuItem>
@@ -94,7 +98,7 @@
             <MenuItem title="Size">
               <SizeControls layer={$selectedLayer} />
             </MenuItem>
-            <MenuItem title="Fill">
+            <MenuItem title="Style">
               <ColorPicker layer={$selectedLayer} />
             </MenuItem>
           {:else if $selectedLayer.type === 'Dot Density'}
@@ -104,10 +108,6 @@
             <MenuItem title="Dots">
               <DotControls layer={$selectedLayer} />
             </MenuItem>
-            <MenuItem title="Fill">
-              <ColorPicker layer={$selectedLayer} />
-            </MenuItem>
-          {:else}
             <MenuItem title="Style">
               <ColorPicker layer={$selectedLayer} />
             </MenuItem>

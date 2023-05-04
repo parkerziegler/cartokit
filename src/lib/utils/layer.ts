@@ -8,13 +8,17 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
  * @returns – an array of instrumented layer ids.
  */
 export function getInstrumetedLayerIds(layer: CartoKitLayer): string[] {
-  if (layer.type === 'Dot Density') {
-    return [
-      `${layer.id}-outlines`,
-      `${layer.id}-outlines-hover`,
-      `${layer.id}-outlines-select`
-    ];
+  switch (layer.type) {
+    case 'Fill':
+    case 'Choropleth':
+      return [`${layer.id}-stroke`, `${layer.id}-hover`, `${layer.id}-select`];
+    case 'Proportional Symbol':
+      return [`${layer.id}-hover`, `${layer.id}-select`];
+    case 'Dot Density':
+      return [
+        `${layer.id}-outlines`,
+        `${layer.id}-outlines-hover`,
+        `${layer.id}-outlines-select`
+      ];
   }
-
-  return [`${layer.id}-hover`, `${layer.id}-select`];
 }

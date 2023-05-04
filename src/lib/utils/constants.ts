@@ -3,8 +3,10 @@ import type { Feature } from 'geojson';
 
 import { deriveQuantiles } from '$lib/interaction/scales';
 
-export const DEFAULT_OPACITY = 1;
+export const DEFAULT_OPACITY = 0.75;
 export const DEFAULT_FILL = '#FFFFFF';
+export const DEFAULT_STROKE = '#FFFFFF';
+export const DEFAULT_STROKE_WIDTH = 1;
 
 export const DEFAULT_SCALE = 'Quantile';
 export const DEFAULT_SCHEME = d3.schemeOranges;
