@@ -145,7 +145,6 @@ function transitionToFill(
   switch (sourceLayerType) {
     case 'Choropleth': {
       const color = randomColor();
-      const strokeWidth = 1.5;
 
       const targetLayer: CartoKitFillLayer = {
         id: layer.id,
@@ -155,16 +154,15 @@ function transitionToFill(
         style: {
           fill: color,
           stroke: color,
-          strokeWidth: strokeWidth,
+          strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
         }
       };
 
-      // Just update the fill-color, line-color, and line-width of the existing
-      // layers.
+      // Just update the fill-color and line-color of the existing layer.
+      // All other paint properties should be unchanged.
       map.setPaintProperty(layer.id, 'fill-color', color);
       map.setPaintProperty(`${layer.id}-stroke`, 'line-color', color);
-      map.setPaintProperty(`${layer.id}-stroke`, 'line-width', strokeWidth);
 
       return {
         targetLayer,

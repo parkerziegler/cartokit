@@ -95,6 +95,7 @@
     <NumberInput
       value={layer.style.strokeWidth}
       on:change={onStrokeWidthChange}
+      class="w-12"
     />
   </div>
   <OpacityInput {opacity} {onOpacityChange} />

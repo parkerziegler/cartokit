@@ -19,7 +19,26 @@ export function codegenLayer(layer: CartoKitLayer): string {
 				id: '${layer.id}',
 				source: '${layer.id}',
 				type: 'fill',
-				${paint}
+				${
+          paint.fill
+            ? `paint: {
+					${paint.fill}
+				}`
+            : ''
+        }
+			});
+
+			map.addLayer({
+				id: '${layer.id}-stroke',
+				source: '${layer.id}',
+				type: 'line',
+				${
+          paint.stroke
+            ? `paint: {
+					${paint.stroke}
+				}`
+            : ''
+        }
 			});
 			`;
     }
@@ -32,7 +51,14 @@ export function codegenLayer(layer: CartoKitLayer): string {
 				id: '${layer.id}',
 				source: '${layer.id}',
 				type: 'circle',
-				${paint}
+				${
+          paint.fill || paint.stroke
+            ? `paint: {
+					${paint.fill},
+					${paint.stroke}
+				}`
+            : ''
+        }
 			});
 			`;
     }

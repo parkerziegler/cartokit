@@ -12,8 +12,8 @@
   import { map } from '$lib/stores/map';
   import type { CartoKitFillLayer } from '$lib/types/CartoKitLayer';
   import { randomColor } from '$lib/utils/color';
-  import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
   import { DEFAULT_OPACITY, DEFAULT_STROKE_WIDTH } from '$lib/utils/constants';
+  import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
 
   const closeModal = getContext<() => void>('close-modal');
 
