@@ -1,4 +1,4 @@
-import { codegenPaint } from '$lib/codegen/codegen-paint';
+import { codegenFill, codegenStroke } from '$lib/codegen/codegen-paint';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
 /**
@@ -12,7 +12,8 @@ export function codegenLayer(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Fill':
     case 'Choropleth': {
-      const { fill, stroke } = codegenPaint(layer);
+      const fill = codegenFill(layer);
+      const stroke = codegenStroke(layer);
 
       return `
         map.addLayer({
@@ -32,7 +33,8 @@ export function codegenLayer(layer: CartoKitLayer): string {
     }
     case 'Proportional Symbol':
     case 'Dot Density': {
-      const { fill, stroke } = codegenPaint(layer);
+      const fill = codegenFill(layer);
+      const stroke = codegenStroke(layer);
 
       return `
         map.addLayer({

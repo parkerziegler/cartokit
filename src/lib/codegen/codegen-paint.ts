@@ -4,32 +4,13 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { MAPBOX_DEFAULTS } from '$lib/utils/constants';
 
 /**
- * Generate a Mapbox GL JS program fragment representing the layer's paint
- * properties.
- *
- * @param layer – A CartoKit layer.
- *
- * @returns – A Mapbox GL JS program fragment representing the layer's paint
- * properties.
- */
-export function codegenPaint(layer: CartoKitLayer): {
-  fill: string;
-  stroke: string;
-} {
-  return {
-    fill: codegenFill(layer),
-    stroke: codegenStroke(layer)
-  };
-}
-
-/**
  * Generate a Mapbox GL JS program fragment representing the layer's fill.
  *
  * @param layer – A CartoKit layer.
  *
  * @returns – A Mapbox GL JS program fragment representing the layer's fill.
  */
-function codegenFill(layer: CartoKitLayer): string {
+export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Fill': {
       return intersperse(
@@ -110,7 +91,7 @@ function codegenFill(layer: CartoKitLayer): string {
  * @param layer – A CartoKit layer.
  * @returns – A Mapbox GL JS program fragment representing the layer's stroke.
  */
-function codegenStroke(layer: CartoKitLayer): string {
+export function codegenStroke(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Fill':
     case 'Choropleth': {
