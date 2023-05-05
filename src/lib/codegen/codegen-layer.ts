@@ -12,55 +12,36 @@ export function codegenLayer(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Fill':
     case 'Choropleth': {
-      const paint = codegenPaint(layer);
+      const { fill, stroke } = codegenPaint(layer);
 
       return `
-			map.addLayer({
-				id: '${layer.id}',
-				source: '${layer.id}',
-				type: 'fill',
-				${
-          paint.fill
-            ? `paint: {
-					${paint.fill}
-				}`
-            : ''
-        }
-			});
+map.addLayer({
+	id: '${layer.id}',
+	source: '${layer.id}',
+	type: 'fill',
+	${fill ? `paint: { ${fill} }` : ''}
+});
 
-			map.addLayer({
-				id: '${layer.id}-stroke',
-				source: '${layer.id}',
-				type: 'line',
-				${
-          paint.stroke
-            ? `paint: {
-					${paint.stroke}
-				}`
-            : ''
-        }
-			});
-			`;
+map.addLayer({
+	id: '${layer.id}-stroke',
+	source: '${layer.id}',
+	type: 'line',
+	${stroke ? `paint: { ${stroke} }` : ''}
+});
+`;
     }
     case 'Proportional Symbol':
     case 'Dot Density': {
-      const paint = codegenPaint(layer);
+      const { fill, stroke } = codegenPaint(layer);
 
       return `
-			map.addLayer({
-				id: '${layer.id}',
-				source: '${layer.id}',
-				type: 'circle',
-				${
-          paint.fill || paint.stroke
-            ? `paint: {
-					${paint.fill},
-					${paint.stroke}
-				}`
-            : ''
-        }
-			});
-			`;
+map.addLayer({
+	id: '${layer.id}',
+	source: '${layer.id}',
+	type: 'circle',
+	${fill || stroke ? `paint: { ${fill ? fill + ',\n' : ''} ${stroke} }` : ''}
+});
+`;
     }
   }
 }
