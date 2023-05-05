@@ -15,33 +15,37 @@ export function codegenLayer(layer: CartoKitLayer): string {
       const { fill, stroke } = codegenPaint(layer);
 
       return `
-map.addLayer({
-	id: '${layer.id}',
-	source: '${layer.id}',
-	type: 'fill',
-	${fill ? `paint: { ${fill} }` : ''}
-});
+        map.addLayer({
+          id: '${layer.id}',
+          source: '${layer.id}',
+          type: 'fill',
+          ${fill ? `paint: { ${fill} }` : ''}
+        });
 
-map.addLayer({
-	id: '${layer.id}-stroke',
-	source: '${layer.id}',
-	type: 'line',
-	${stroke ? `paint: { ${stroke} }` : ''}
-});
-`;
+        map.addLayer({
+          id: '${layer.id}-stroke',
+          source: '${layer.id}',
+          type: 'line',
+          ${stroke ? `paint: { ${stroke} }` : ''}
+        });
+      `;
     }
     case 'Proportional Symbol':
     case 'Dot Density': {
       const { fill, stroke } = codegenPaint(layer);
 
       return `
-map.addLayer({
-	id: '${layer.id}',
-	source: '${layer.id}',
-	type: 'circle',
-	${fill || stroke ? `paint: { ${fill ? fill + ',\n' : ''} ${stroke} }` : ''}
-});
-`;
+        map.addLayer({
+          id: '${layer.id}',
+          source: '${layer.id}',
+          type: 'circle',
+          ${
+            fill || stroke
+              ? `paint: { ${fill ? fill + ',\n' : ''} ${stroke} }`
+              : ''
+          }
+        });
+      `;
     }
   }
 }
