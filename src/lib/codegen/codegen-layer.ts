@@ -43,7 +43,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
           type: 'circle',
           ${
             fill || stroke
-              ? `paint: { ${fill ? fill + ',\n' : ''} ${stroke} }`
+              ? `paint: { ${[fill, stroke].filter(Boolean).join(',\n')} }`
               : ''
           }
         });
