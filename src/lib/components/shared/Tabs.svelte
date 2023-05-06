@@ -7,10 +7,14 @@
 
 <script lang="ts">
   import type { SvelteComponent } from 'svelte';
+  import cs from 'classnames';
 
   export let tabs: Tab[] = [];
 
   let activeIndex = 0;
+
+  let className = '';
+  export { className as class };
 
   function setActiveTab(i: number) {
     return function onTabClick() {
@@ -20,7 +24,7 @@
 </script>
 
 <div class="stack">
-  <ul class="stack-h stack-h-md {$$props.class}">
+  <ul class={cs('stack-h stack-h-md', className)}>
     {#each tabs as tab, i}
       <li
         class="border-b-2 pb-2 text-base transition-all duration-200"

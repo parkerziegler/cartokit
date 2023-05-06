@@ -1,6 +1,13 @@
+<script lang="ts">
+  import cs from 'classnames';
+
+  let className = '';
+  export { className as class };
+</script>
+
 {#if $$slots.action}
   <div class="flex items-center justify-between p-4 text-white">
-    <p class="font-sans text-xl font-medium tracking-wider {$$props.class}">
+    <p class={cs('font-sans text-xl font-medium tracking-wider', className)}>
       <slot />
     </p>
     <slot name="action" />
