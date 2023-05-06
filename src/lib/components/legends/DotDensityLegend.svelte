@@ -2,8 +2,6 @@
   import type { CartoKitDotDensityLayer } from '$lib/types/CartoKitLayer';
 
   export let layer: CartoKitDotDensityLayer;
-
-  $: radius = layer.style.dots.size;
 </script>
 
 <div class="stack stack-xs ml-8">

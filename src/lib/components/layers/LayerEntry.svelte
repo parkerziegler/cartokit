@@ -5,10 +5,10 @@
   import DotDensityLegend from '$lib/components/legends/DotDensityLegend.svelte';
   import FillIcon from '$lib/components/icons/FillIcon.svelte';
   import FillLegend from '$lib/components/legends/FillLegend.svelte';
-  import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
-  import LayerVisibleIcon from '$lib/components/icons/LayerVisibleIcon.svelte';
   import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
+  import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
+  import LayerVisibleIcon from '$lib/components/icons/LayerVisibleIcon.svelte';
   import { map } from '$lib/stores/map';
   import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
