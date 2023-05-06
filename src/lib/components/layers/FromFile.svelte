@@ -12,6 +12,7 @@
   import { map } from '$lib/stores/map';
   import type { CartoKitFillLayer } from '$lib/types/CartoKitLayer';
   import { randomColor } from '$lib/utils/color';
+  import { DEFAULT_OPACITY, DEFAULT_STROKE_WIDTH } from '$lib/utils/constants';
   import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
 
   const closeModal = getContext<() => void>('close-modal');
@@ -41,6 +42,7 @@
       if (typeof theFile.target?.result === 'string') {
         const geojson = JSON.parse(theFile.target.result);
 
+        const color = randomColor();
         const layer: CartoKitFillLayer = {
           id: uniqueId(kebabCase(displayName)),
           displayName,
@@ -51,8 +53,10 @@
             fileName: file.name
           },
           style: {
-            fill: randomColor(),
-            opacity: 0.75
+            fill: color,
+            stroke: color,
+            strokeWidth: DEFAULT_STROKE_WIDTH,
+            opacity: DEFAULT_OPACITY
           }
         };
 

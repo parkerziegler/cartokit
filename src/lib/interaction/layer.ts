@@ -31,6 +31,17 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         }
       });
 
+      // Add a separate layer for the stroke.
+      map.addLayer({
+        id: `${layer.id}-stroke`,
+        source: layer.id,
+        type: 'line',
+        paint: {
+          'line-color': layer.style.stroke,
+          'line-width': layer.style.strokeWidth
+        }
+      });
+
       instrumentPolygonHover(map, layer.id);
       instrumentPolygonSelect(map, layer.id);
       break;
@@ -46,6 +57,17 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         }
       });
 
+      // Add a separate layer for the stroke.
+      map.addLayer({
+        id: `${layer.id}-stroke`,
+        source: layer.id,
+        type: 'line',
+        paint: {
+          'line-color': layer.style.stroke,
+          'line-width': layer.style.strokeWidth
+        }
+      });
+
       instrumentPolygonHover(map, layer.id);
       instrumentPolygonSelect(map, layer.id);
       break;
@@ -58,7 +80,9 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         paint: {
           'circle-color': layer.style.fill,
           'circle-radius': deriveSize(layer),
-          'circle-opacity': layer.style.opacity
+          'circle-opacity': layer.style.opacity,
+          'circle-stroke-color': layer.style.stroke,
+          'circle-stroke-width': layer.style.strokeWidth
         }
       });
 
@@ -96,7 +120,9 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         paint: {
           'circle-color': layer.style.fill,
           'circle-radius': layer.style.dots.size,
-          'circle-opacity': layer.style.opacity
+          'circle-opacity': layer.style.opacity,
+          'circle-stroke-color': layer.style.stroke,
+          'circle-stroke-width': layer.style.strokeWidth
         }
       });
 

@@ -3,8 +3,7 @@ import { derived } from 'svelte/store';
 import { selectedFeature } from '$lib/stores/selected-feature';
 import { layers } from '$lib/stores/layers';
 import type { MapType } from '$lib/types/map-types';
-
-const DEFAULT_MAP_TYPE = 'Fill';
+import { DEFAULT_MAP_TYPE } from '$lib/utils/constants';
 
 export const mapType = derived<
   [typeof selectedFeature, typeof layers],

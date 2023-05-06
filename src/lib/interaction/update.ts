@@ -62,6 +62,22 @@ interface FillUpdate extends LayerUpdate {
     | CartoKitDotDensityLayer;
 }
 
+interface StrokeUpdate extends LayerUpdate {
+  type: 'stroke';
+  payload: {
+    color: string;
+  };
+  layer: CartoKitLayer;
+}
+
+interface StrokeWidthUpdate extends LayerUpdate {
+  type: 'stroke-width';
+  payload: {
+    strokeWidth: number;
+  };
+  layer: CartoKitLayer;
+}
+
 interface OpacityUpdate extends LayerUpdate {
   type: 'opacity';
   payload: {
@@ -132,6 +148,8 @@ type DispatchLayerUpdateParams =
   | MapTypeUpdate
   | AttributeUpdate
   | FillUpdate
+  | StrokeUpdate
+  | StrokeWidthUpdate
   | OpacityUpdate
   | ColorScaleUpdate
   | ColorSchemeUpdate
@@ -240,6 +258,62 @@ export function dispatchLayerUpdate({
           case 'Proportional Symbol':
           case 'Dot Density':
             map.setPaintProperty(layer.id, 'circle-color', payload.color);
+            break;
+        }
+
+        return lyrs;
+      });
+      break;
+    }
+    case 'stroke': {
+      layers.update((lyrs) => {
+        const lyr = lyrs[layer.id];
+        lyr.style.stroke = payload.color;
+
+        switch (lyr.type) {
+          case 'Fill':
+          case 'Choropleth':
+            map.setPaintProperty(
+              `${layer.id}-stroke`,
+              'line-color',
+              payload.color
+            );
+            break;
+          case 'Proportional Symbol':
+          case 'Dot Density':
+            map.setPaintProperty(
+              layer.id,
+              'circle-stroke-color',
+              payload.color
+            );
+            break;
+        }
+
+        return lyrs;
+      });
+      break;
+    }
+    case 'stroke-width': {
+      layers.update((lyrs) => {
+        const lyr = lyrs[layer.id];
+        lyr.style.strokeWidth = payload.strokeWidth;
+
+        switch (lyr.type) {
+          case 'Fill':
+          case 'Choropleth':
+            map.setPaintProperty(
+              `${layer.id}-stroke`,
+              'line-width',
+              payload.strokeWidth
+            );
+            break;
+          case 'Proportional Symbol':
+          case 'Dot Density':
+            map.setPaintProperty(
+              layer.id,
+              'circle-stroke-width',
+              payload.strokeWidth
+            );
             break;
         }
 

@@ -22,6 +22,8 @@ export interface CartoKitFillLayer extends Layer {
   type: 'Fill';
   style: {
     fill: string;
+    stroke: string;
+    strokeWidth: number;
     opacity: number;
   };
 }
@@ -36,6 +38,8 @@ export interface CartoKitChoroplethLayer extends Layer {
       count: number;
       thresholds: number[];
     };
+    stroke: string;
+    strokeWidth: number;
     opacity: number;
   };
 }
@@ -49,6 +53,8 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
       max: number;
     };
     fill: string;
+    stroke: string;
+    strokeWidth: number;
     opacity: number;
   };
 }
@@ -62,6 +68,8 @@ export interface CartoKitDotDensityLayer extends Layer {
       value: number;
     };
     fill: string;
+    stroke: string;
+    strokeWidth: number;
     opacity: number;
   };
 }

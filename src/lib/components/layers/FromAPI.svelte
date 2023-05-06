@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+  import type { MapSourceDataEvent } from 'maplibre-gl';
   import * as turf from '@turf/turf';
   import kebabCase from 'lodash.kebabcase';
   import uniqueId from 'lodash.uniqueid';
-  import { getContext } from 'svelte';
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
@@ -12,7 +13,7 @@
   import { map } from '$lib/stores/map';
   import type { CartoKitFillLayer } from '$lib/types/CartoKitLayer';
   import { randomColor } from '$lib/utils/color';
-  import type { MapSourceDataEvent } from 'maplibre-gl';
+  import { DEFAULT_OPACITY, DEFAULT_STROKE_WIDTH } from '$lib/utils/constants';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -41,6 +42,7 @@
   function onSubmit() {
     dataLoading = true;
 
+    const color = randomColor();
     const layer: CartoKitFillLayer = {
       id: uniqueId(kebabCase(displayName)),
       displayName,
@@ -51,8 +53,10 @@
         rawGeoJSON: turf.featureCollection([])
       },
       style: {
-        fill: randomColor(),
-        opacity: 1
+        fill: color,
+        stroke: color,
+        strokeWidth: DEFAULT_STROKE_WIDTH,
+        opacity: DEFAULT_OPACITY
       }
     };
 
@@ -90,7 +94,7 @@
   </div>
   <Button class="self-end">
     {#if dataLoading}
-      <span class="loader" />
+      <span class="loader align-text-top" />
     {:else}
       Add
     {/if}

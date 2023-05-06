@@ -1,56 +1,127 @@
 import { deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
-import {
-  DEFAULT_FILL,
-  DEFAULT_OPACITY,
-  DEFAULT_RADIUS
-} from '$lib/utils/constants';
+import { MAPBOX_DEFAULTS } from '$lib/utils/constants';
 
 /**
- * Generate a Mapbox GL JS program fragment representing the layer's
- * presentational properties.
+ * Generate a Mapbox GL JS program fragment representing the layer's fill.
  *
  * @param layer – A CartoKit layer.
  *
- * @returns – A Mapbox GL JS program fragment representing the layer's
- * presentational properties.
+ * @returns – A Mapbox GL JS program fragment representing the layer's fill.
  */
-export function codegenPaint(layer: CartoKitLayer): string {
+export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Fill': {
-      if (
-        layer.style.fill === DEFAULT_FILL &&
-        layer.style.opacity === DEFAULT_OPACITY
-      ) {
-        return '';
-      }
-
-      return `paint: {
-				${withDefault('fill-color', layer.style.fill, DEFAULT_FILL)},
-				${withDefault('fill-opacity', layer.style.opacity, DEFAULT_OPACITY)}
-			}
-			`;
+      return [
+        withDefault(
+          'fill-color',
+          layer.style.fill,
+          MAPBOX_DEFAULTS['fill-color']
+        ),
+        withDefault(
+          'fill-opacity',
+          layer.style.opacity,
+          MAPBOX_DEFAULTS['fill-opacity']
+        )
+      ]
+        .filter(Boolean)
+        .join(',\n');
     }
     case 'Choropleth': {
-      return `paint: {
-				'fill-color': ${JSON.stringify(deriveColorScale(layer))},
-				${withDefault('fill-opacity', layer.style.opacity, DEFAULT_OPACITY)}
-			}`;
+      return [
+        `'fill-color': ${JSON.stringify(deriveColorScale(layer))}`,
+        withDefault(
+          'fill-opacity',
+          layer.style.opacity,
+          MAPBOX_DEFAULTS['fill-opacity']
+        )
+      ]
+        .filter(Boolean)
+        .join(',\n');
     }
     case 'Proportional Symbol': {
-      return `paint: {
-				${withDefault('circle-color', layer.style.fill, DEFAULT_FILL)},
-				'circle-radius': ${JSON.stringify(deriveSize(layer))},
-				${withDefault('circle-opacity', layer.style.opacity, DEFAULT_OPACITY)}
-			}`;
+      return [
+        withDefault(
+          'circle-color',
+          layer.style.fill,
+          MAPBOX_DEFAULTS['circle-color']
+        ),
+        `'circle-radius': ${JSON.stringify(deriveSize(layer))}`,
+        withDefault(
+          'circle-opacity',
+          layer.style.opacity,
+          MAPBOX_DEFAULTS['fill-opacity']
+        )
+      ]
+        .filter(Boolean)
+        .join(',\n');
     }
     case 'Dot Density': {
-      return `paint: {
-				${withDefault('circle-color', layer.style.fill, DEFAULT_FILL)},
-				${withDefault('circle-radius', layer.style.dots.size, DEFAULT_RADIUS)},
-				${withDefault('circle-opacity', layer.style.opacity, DEFAULT_OPACITY)}
-			}`;
+      return [
+        withDefault(
+          'circle-color',
+          layer.style.fill,
+          MAPBOX_DEFAULTS['circle-color']
+        ),
+        withDefault(
+          'circle-radius',
+          layer.style.dots.size,
+          MAPBOX_DEFAULTS['circle-radius']
+        ),
+        withDefault(
+          'circle-opacity',
+          layer.style.opacity,
+          MAPBOX_DEFAULTS['circle-opacity']
+        )
+      ]
+        .filter(Boolean)
+        .join(',\n');
+    }
+  }
+}
+
+/**
+ * Generate a Mapbox GL JS program fragment representing the layer's stroke.
+ *
+ * @param layer – A CartoKit layer.
+ * @returns – A Mapbox GL JS program fragment representing the layer's stroke.
+ */
+export function codegenStroke(layer: CartoKitLayer): string {
+  switch (layer.type) {
+    case 'Fill':
+    case 'Choropleth': {
+      return [
+        withDefault(
+          'line-color',
+          layer.style.stroke,
+          MAPBOX_DEFAULTS['line-color']
+        ),
+        withDefault(
+          'line-width',
+          layer.style.strokeWidth,
+          MAPBOX_DEFAULTS['line-width']
+        )
+      ]
+        .filter(Boolean)
+        .join(',\n');
+    }
+    case 'Proportional Symbol':
+    case 'Dot Density': {
+      return [
+        withDefault(
+          'circle-stroke-color',
+          layer.style.stroke,
+          MAPBOX_DEFAULTS['circle-stroke-color']
+        ),
+        withDefault(
+          'circle-stroke-width',
+          layer.style.strokeWidth,
+          MAPBOX_DEFAULTS['circle-stroke-width']
+        )
+      ]
+        .filter(Boolean)
+        .join(',\n');
     }
   }
 }
