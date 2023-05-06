@@ -25,7 +25,7 @@
 
 <Select
   {options}
-  selected={layer.style.breaks.count}
+  selected={layer.style.fill.count}
   on:change={onChange}
   title="Steps"
 />

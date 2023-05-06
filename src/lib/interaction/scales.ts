@@ -152,6 +152,6 @@ export function deriveThresholds({
     case 'Jenks':
       return deriveJenksBreaks({ attribute, features, range });
     case 'Manual':
-      return layer.style.breaks.thresholds;
+      return layer.style.fill.thresholds;
   }
 }

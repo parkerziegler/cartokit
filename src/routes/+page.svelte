@@ -85,16 +85,10 @@
               <ColorPicker layer={$selectedLayer} />
             </MenuItem>
           {:else if $selectedLayer.type === 'Choropleth'}
-            <MenuItem title="Attribute">
-              <AttributeSelect layer={$selectedLayer} />
-            </MenuItem>
             <MenuItem title="Palette">
               <ColorPalette layer={$selectedLayer} />
             </MenuItem>
           {:else if $selectedLayer.type === 'Proportional Symbol'}
-            <MenuItem title="Attribute">
-              <AttributeSelect layer={$selectedLayer} />
-            </MenuItem>
             <MenuItem title="Size">
               <SizeControls layer={$selectedLayer} />
             </MenuItem>
@@ -102,9 +96,6 @@
               <ColorPicker layer={$selectedLayer} />
             </MenuItem>
           {:else if $selectedLayer.type === 'Dot Density'}
-            <MenuItem title="Attribute">
-              <AttributeSelect layer={$selectedLayer} />
-            </MenuItem>
             <MenuItem title="Dots">
               <DotControls layer={$selectedLayer} />
             </MenuItem>

@@ -7,8 +7,8 @@
     CartoKitProportionalSymbolLayer,
     CartoKitDotDensityLayer
   } from '$lib/types/CartoKitLayer';
-  import { selectNumericAttribute } from '$lib/utils/geojson';
 
+  export let selected: string;
   export let layer:
     | CartoKitChoroplethLayer
     | CartoKitProportionalSymbolLayer
@@ -20,8 +20,6 @@
       label: attribute
     })
   );
-  $: selected =
-    layer.attribute || selectNumericAttribute(layer.data.geoJSON.features);
 
   function onChange(event: CustomEvent<{ value: string }>) {
     const attribute = event.detail.value;
@@ -35,4 +33,6 @@
   }
 </script>
 
-<Select {options} {selected} on:change={onChange} />
+<div class="stack-h stack-h-xs items-center">
+  <Select {options} {selected} on:change={onChange} title="Attribute" />
+</div>

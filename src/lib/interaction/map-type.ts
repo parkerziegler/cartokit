@@ -258,9 +258,9 @@ function transitionToChoropleth(
         displayName: layer.displayName,
         type: 'Choropleth',
         data: layer.data,
-        attribute,
         style: {
-          breaks: {
+          fill: {
+            attribute,
             scale: DEFAULT_SCALE,
             scheme: DEFAULT_SCHEME,
             count: DEFAULT_COUNT,
@@ -309,14 +309,14 @@ function transitionToChoropleth(
           ...layer.data,
           geoJSON: layer.data.rawGeoJSON
         },
-        attribute: layer.attribute,
         style: {
-          breaks: {
+          fill: {
+            attribute: layer.style.size.attribute,
             scale: DEFAULT_SCALE,
             scheme: DEFAULT_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
-              layer.attribute,
+              layer.style.size.attribute,
               layer.data.geoJSON.features
             )
           },
@@ -340,14 +340,14 @@ function transitionToChoropleth(
           ...layer.data,
           geoJSON: layer.data.rawGeoJSON
         },
-        attribute: layer.attribute,
         style: {
-          breaks: {
+          fill: {
+            attribute: layer.style.dots.attribute,
             scale: DEFAULT_SCALE,
             scheme: DEFAULT_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
-              layer.attribute,
+              layer.style.dots.attribute,
               layer.data.geoJSON.features
             )
           },
@@ -394,9 +394,9 @@ function transitionToProportionalSymbol(
           ...layer.data,
           geoJSON: deriveCentroids(features)
         },
-        attribute: selectNumericAttribute(features),
         style: {
           size: {
+            attribute: selectNumericAttribute(features),
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
@@ -413,7 +413,7 @@ function transitionToProportionalSymbol(
       };
     }
     case 'Choropleth': {
-      const colors = layer.style.breaks.scheme[layer.style.breaks.count];
+      const colors = layer.style.fill.scheme[layer.style.fill.count];
 
       const targetLayer: CartoKitProportionalSymbolLayer = {
         id: layer.id,
@@ -423,9 +423,9 @@ function transitionToProportionalSymbol(
           ...layer.data,
           geoJSON: deriveCentroids(features)
         },
-        attribute: layer.attribute,
         style: {
           size: {
+            attribute: layer.style.fill.attribute,
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
@@ -451,9 +451,9 @@ function transitionToProportionalSymbol(
           ...layer.data,
           geoJSON: deriveCentroids(layer.data.rawGeoJSON.features)
         },
-        attribute: layer.attribute,
         style: {
           size: {
+            attribute: layer.style.dots.attribute,
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
@@ -499,7 +499,6 @@ function transitionToDotDensity(
         id: layer.id,
         displayName: layer.displayName,
         type: 'Dot Density',
-        attribute,
         data: {
           ...layer.data,
           geoJSON: generateDotDensityPoints({
@@ -510,6 +509,7 @@ function transitionToDotDensity(
         },
         style: {
           dots: {
+            attribute,
             size: 1,
             value: dotValue
           },
@@ -527,24 +527,27 @@ function transitionToDotDensity(
     }
     case 'Choropleth': {
       const features = layer.data.geoJSON.features;
-      const dotValue = deriveDotDensityStartingValue(features, layer.attribute);
-      const colors = layer.style.breaks.scheme[layer.style.breaks.count];
+      const colors = layer.style.fill.scheme[layer.style.fill.count];
+      const dotValue = deriveDotDensityStartingValue(
+        features,
+        layer.style.fill.attribute
+      );
 
       const targetLayer: CartoKitDotDensityLayer = {
         id: layer.id,
         displayName: layer.displayName,
         type: 'Dot Density',
-        attribute: layer.attribute,
         data: {
           ...layer.data,
           geoJSON: generateDotDensityPoints({
             features,
-            attribute: layer.attribute,
+            attribute: layer.style.fill.attribute,
             value: dotValue
           })
         },
         style: {
           dots: {
+            attribute: layer.style.fill.attribute,
             size: 1,
             value: dotValue
           },
@@ -576,23 +579,26 @@ function transitionToDotDensity(
       }
 
       const features = layer.data.rawGeoJSON.features;
-      const dotValue = deriveDotDensityStartingValue(features, layer.attribute);
+      const dotValue = deriveDotDensityStartingValue(
+        features,
+        layer.style.size.attribute
+      );
 
       const targetLayer: CartoKitDotDensityLayer = {
         id: layer.id,
         displayName: layer.displayName,
         type: 'Dot Density',
-        attribute: layer.attribute,
         data: {
           ...layer.data,
           geoJSON: generateDotDensityPoints({
             features,
-            attribute: layer.attribute,
+            attribute: layer.style.size.attribute,
             value: dotValue
           })
         },
         style: {
           dots: {
+            attribute: layer.style.size.attribute,
             size: 1,
             value: dotValue
           },

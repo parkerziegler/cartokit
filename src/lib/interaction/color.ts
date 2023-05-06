@@ -14,7 +14,7 @@ export function deriveColorScale(
 ): ExpressionSpecification {
   const {
     style: {
-      breaks: { scheme, count, thresholds }
+      fill: { scheme, count, thresholds }
     }
   } = layer;
 
@@ -22,7 +22,7 @@ export function deriveColorScale(
 
   const prelude: ExpressionSpecification = [
     'step',
-    ['get', layer.attribute],
+    ['get', layer.style.fill.attribute],
     colors[0]
   ];
   const stops = colors.reduce<(string | number)[]>(

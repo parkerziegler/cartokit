@@ -118,7 +118,7 @@ function codegenDotDensityTransformation(
   ${fetchData}
 	const dots = ${dataIdent}.features.flatMap((feature) => {
 		const numPoints = Math.floor(
-      feature.properties['${layer.attribute}'] / ${layer.style.dots.value}
+      feature.properties['${layer.style.dots.attribute}'] / ${layer.style.dots.value}
     );
 
 		const bbox = turf.bbox(feature);

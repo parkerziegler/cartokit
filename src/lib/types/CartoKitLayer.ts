@@ -30,9 +30,9 @@ export interface CartoKitFillLayer extends Layer {
 
 export interface CartoKitChoroplethLayer extends Layer {
   type: 'Choropleth';
-  attribute: string;
   style: {
-    breaks: {
+    fill: {
+      attribute: string;
       scale: ColorScale;
       scheme: ColorScheme;
       count: number;
@@ -46,9 +46,9 @@ export interface CartoKitChoroplethLayer extends Layer {
 
 export interface CartoKitProportionalSymbolLayer extends Layer {
   type: 'Proportional Symbol';
-  attribute: string;
   style: {
     size: {
+      attribute: string;
       min: number;
       max: number;
     };
@@ -61,9 +61,9 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
 
 export interface CartoKitDotDensityLayer extends Layer {
   type: 'Dot Density';
-  attribute: string;
   style: {
     dots: {
+      attribute: string;
       size: number;
       value: number;
     };

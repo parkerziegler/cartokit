@@ -1,4 +1,5 @@
 <script lang="ts">
+  import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
@@ -22,6 +23,7 @@
 </script>
 
 <div class="stack stack-xs">
+  <AttributeSelect {layer} selected={layer.style.size.attribute} />
   <div class="stack-h stack-h-xs items-center">
     <FieldLabel fieldId="Min">Min</FieldLabel>
     <NumberInput min={1} value={min} on:change={onSizeChange('min')} />
