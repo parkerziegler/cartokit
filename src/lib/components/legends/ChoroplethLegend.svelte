@@ -8,7 +8,7 @@
   $: count = layer.style.breaks.count;
   // This cast allows the calls to deriveQuantiles, dervieEqulaIntervals,
   // and deriveJenksBreaks to type check. The type of layer.style.breaks.scheme[count]
-  // is readonly string[]. These functions do not mutate the array in anyway.
+  // is readonly string[]. These functions do not mutate the array in any way.
   $: colors = layer.style.breaks.scheme[count] as string[];
 
   $: [min, max] = deriveExtent(layer.attribute, layer.data.geoJSON.features);
@@ -21,7 +21,7 @@
   });
 </script>
 
-<div class="stack stack-xs text-white">
+<div class="stack stack-xs ml-8 text-white">
   <p>{layer.attribute}</p>
   <div class="stack-h stack-h-xs rounded-md bg-slate-900">
     <ul class="stack stack-xs items-end">
