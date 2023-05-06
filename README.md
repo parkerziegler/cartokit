@@ -9,7 +9,7 @@
 ## Cartography with `cartokit`
 
 <div align="center">
-  <img src="assets/banner.png" alt="Example screenshots from cartokit" width="100%" />
+  <img src="assets/banner.png" alt="Example screenshots from cartokit" />
 </div>
 
 Many cartographers make heavy use of direct manipulation interfaces for map design. Whether these are built-in cartography tools in [QGIS](https://www.qgis.org/en/site/) or [ArcGIS](https://www.qgis.org/en/site/), vector editing software like Figma or Adobe Illustrator, or style specification editors like [Mapbox Studio](https://www.mapbox.com/mapbox-studio) or [Maputnik](https://maputnik.github.io/), direct manipulation tools help us create maps faster.
@@ -17,7 +17,6 @@ Many cartographers make heavy use of direct manipulation interfaces for map desi
 As cartography has shifted to the web, however, our material for mapping has expanded. We can now make maps by writing **programs** in addition to working with static media. Libraries like [D3](https://d3js.org/), [Leaflet](https://leafletjs.com/), and [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/guides/) are incredibly powerful for data-intensive mapping on the web. However, these tools also have steep learning curves—you need to be a proficient JavaScript developer just to get started.
 
 Could we have the best of both worlds? Can we give users access to rich direct manipulation interfaces for styling maps while _automatically_ writing programs for them? This is `cartokit`'s central goal.
-
 
 ## System Goals
 
