@@ -429,7 +429,8 @@ function transitionToProportionalSymbol(
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
-          fill: colors[colors.length - 1],
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          fill: colors.at(-1)!,
           stroke: layer.style.stroke,
           strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
@@ -547,7 +548,8 @@ function transitionToDotDensity(
             size: 1,
             value: dotValue
           },
-          fill: colors[colors.length - 1],
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          fill: colors.at(-1)!,
           stroke: layer.style.stroke,
           strokeWidth: layer.style.strokeWidth,
           opacity: layer.style.opacity
