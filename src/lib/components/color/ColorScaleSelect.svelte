@@ -22,7 +22,7 @@
     toJSON: () => {}
   };
 
-  $: selected = layer.style.breaks.scale;
+  $: selected = layer.style.fill.scale;
   const options = COLOR_SCALES.map((scale) => ({
     value: scale,
     label: scale

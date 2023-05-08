@@ -209,16 +209,18 @@ export function dispatchLayerUpdate({
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer;
-        lyr.attribute = payload.attribute;
 
         switch (lyr.type) {
           case 'Choropleth':
+            lyr.style.fill.attribute = payload.attribute;
             map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
             break;
           case 'Proportional Symbol':
+            lyr.style.size.attribute = payload.attribute;
             map.setPaintProperty(lyr.id, 'circle-radius', deriveSize(lyr));
             break;
           case 'Dot Density': {
+            lyr.style.dots.attribute = payload.attribute;
             const dotValue = deriveDotDensityStartingValue(
               lyr.data.rawGeoJSON.features,
               payload.attribute
@@ -347,13 +349,13 @@ export function dispatchLayerUpdate({
         // this update. Therefore, accessing that same layer in the store by id
         // guarantees that lyr is also a CartoKitChoroplethLayer.
         const lyr = lyrs[layer.id] as CartoKitChoroplethLayer;
-        lyr.style.breaks.scale = payload.scale;
-        lyr.style.breaks.thresholds = deriveThresholds({
+        lyr.style.fill.scale = payload.scale;
+        lyr.style.fill.thresholds = deriveThresholds({
           scale: payload.scale,
           layer: lyr,
-          attribute: lyr.attribute,
+          attribute: lyr.style.fill.attribute,
           features: lyr.data.geoJSON.features,
-          range: [...lyr.style.breaks.scheme[lyr.style.breaks.count]]
+          range: [...lyr.style.fill.scheme[lyr.style.fill.count]]
         });
 
         map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
@@ -365,7 +367,7 @@ export function dispatchLayerUpdate({
     case 'color-scheme': {
       layers.update((lyrs) => {
         const lyr = lyrs[layer.id] as CartoKitChoroplethLayer;
-        lyr.style.breaks.scheme = payload.scheme;
+        lyr.style.fill.scheme = payload.scheme;
 
         map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
 
@@ -376,13 +378,13 @@ export function dispatchLayerUpdate({
     case 'color-count': {
       layers.update((lyrs) => {
         const lyr = lyrs[layer.id] as CartoKitChoroplethLayer;
-        lyr.style.breaks.count = payload.count;
-        lyr.style.breaks.thresholds = deriveThresholds({
-          scale: lyr.style.breaks.scale,
+        lyr.style.fill.count = payload.count;
+        lyr.style.fill.thresholds = deriveThresholds({
+          scale: lyr.style.fill.scale,
           layer: lyr,
-          attribute: lyr.attribute,
+          attribute: lyr.style.fill.attribute,
           features: lyr.data.geoJSON.features,
-          range: [...lyr.style.breaks.scheme[payload.count]]
+          range: [...lyr.style.fill.scheme[payload.count]]
         });
 
         map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
@@ -394,7 +396,7 @@ export function dispatchLayerUpdate({
     case 'color-threshold': {
       layers.update((lyrs) => {
         const lyr = lyrs[layer.id] as CartoKitChoroplethLayer;
-        lyr.style.breaks.thresholds[payload.index] = payload.threshold;
+        lyr.style.fill.thresholds[payload.index] = payload.threshold;
 
         map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
 
@@ -436,7 +438,7 @@ export function dispatchLayerUpdate({
         // allow us to generate a dot density.
         const features = generateDotDensityPoints({
           features: lyr.data.rawGeoJSON.features,
-          attribute: lyr.attribute,
+          attribute: lyr.style.dots.attribute,
           value: payload.value
         });
 

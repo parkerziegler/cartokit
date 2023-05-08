@@ -9,10 +9,13 @@
   export let layer: CartoKitChoroplethLayer;
   export let toggleBreaksEditorVisibility: () => void;
 
-  $: count = layer.style.breaks.count;
-  $: colors = layer.style.breaks.scheme[count] as string[];
-  $: [min, max] = deriveExtent(layer.attribute, layer.data.geoJSON.features);
-  $: thresholds = layer.style.breaks.thresholds;
+  $: count = layer.style.fill.count;
+  $: colors = layer.style.fill.scheme[count];
+  $: [min, max] = deriveExtent(
+    layer.style.fill.attribute,
+    layer.data.geoJSON.features
+  );
+  $: thresholds = layer.style.fill.thresholds;
 
   function onThresholdChange(i: number) {
     return function handleThresholdChange(

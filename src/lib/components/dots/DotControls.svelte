@@ -1,4 +1,5 @@
 <script lang="ts">
+  import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
@@ -31,6 +32,7 @@
 </script>
 
 <div class="stack stack-xs">
+  <AttributeSelect {layer} selected={layer.style.dots.attribute} />
   <div class="stack-h stack-h-xs items-center">
     <FieldLabel fieldId="Dot Size">Dot Size</FieldLabel>
     <NumberInput

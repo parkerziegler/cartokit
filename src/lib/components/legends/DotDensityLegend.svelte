@@ -5,7 +5,7 @@
 </script>
 
 <div class="stack stack-xs ml-8">
-  <span>{layer.attribute}</span>
+  <span>{layer.style.dots.attribute}</span>
   <div class="stack-h stack-h-xs items-center">
     <svg
       viewBox="0 0 {layer.style.dots.size * 2} {layer.style.dots.size * 2}"

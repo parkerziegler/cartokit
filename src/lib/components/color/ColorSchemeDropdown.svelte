@@ -8,8 +8,8 @@
 
   export let layer: CartoKitChoroplethLayer;
 
-  $: count = layer.style.breaks.count;
-  $: colors = layer.style.breaks.scheme[count];
+  $: count = layer.style.fill.count;
+  $: colors = layer.style.fill.scheme[count];
 
   let showDropdown = false;
   let offsetHeight = 0;

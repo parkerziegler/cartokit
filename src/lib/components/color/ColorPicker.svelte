@@ -3,6 +3,7 @@
 
   import HexInput from '$lib/components/color/HexInput.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
+  import StrokePicker from '$lib/components/color/StrokePicker.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
@@ -20,40 +21,25 @@
     | CartoKitDotDensityLayer;
 
   $: fill = d3.color(layer.style.fill)?.formatHex() ?? DEFAULT_FILL;
-  $: stroke = d3.color(layer.style.stroke)?.formatHex() ?? DEFAULT_FILL;
   $: opacity = decimalToPercent(layer.style.opacity);
 
-  function onColorInput(property: 'fill' | 'stroke') {
-    return function handleColorInput(event: Event) {
-      const target = event.target as HTMLInputElement;
-      dispatchLayerUpdate({
-        type: property,
-        layer,
-        payload: {
-          color: target.value
-        }
-      });
-    };
-  }
-
-  function onHexChange(property: 'fill' | 'stroke') {
-    return function handleHexChange(hex: string) {
-      dispatchLayerUpdate({
-        type: property,
-        layer,
-        payload: {
-          color: hex
-        }
-      });
-    };
-  }
-
-  function onStrokeWidthChange(event: CustomEvent<{ value: number }>) {
+  function onFillInput(event: Event) {
+    const target = event.target as HTMLInputElement;
     dispatchLayerUpdate({
-      type: 'stroke-width',
+      type: 'fill',
       layer,
       payload: {
-        strokeWidth: event.detail.value
+        color: target.value
+      }
+    });
+  }
+
+  function onFillHexChange(hex: string) {
+    dispatchLayerUpdate({
+      type: 'fill',
+      layer,
+      payload: {
+        color: hex
       }
     });
   }
@@ -76,27 +62,10 @@
       type="color"
       class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
       value={fill}
-      on:input={onColorInput('fill')}
+      on:input={onFillInput}
     />
-    <HexInput hex={fill} onHexChange={onHexChange('fill')} />
+    <HexInput hex={fill} onHexChange={onFillHexChange} />
   </div>
-  <div class="flex items-center">
-    <FieldLabel fieldId="stroke">Stroke</FieldLabel>
-    <input
-      type="color"
-      class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
-      value={stroke}
-      on:input={onColorInput('stroke')}
-    />
-    <HexInput hex={stroke} onHexChange={onHexChange('stroke')} />
-  </div>
-  <div class="stack-h stack-h-xs items-center">
-    <FieldLabel fieldId="stroke-width">Stroke Width</FieldLabel>
-    <NumberInput
-      value={layer.style.strokeWidth}
-      on:change={onStrokeWidthChange}
-      class="w-12"
-    />
-  </div>
+  <StrokePicker {layer} />
   <OpacityInput {opacity} {onOpacityChange} />
 </div>

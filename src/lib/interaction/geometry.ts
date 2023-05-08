@@ -16,12 +16,11 @@ export function deriveSize(
   layer: CartoKitProportionalSymbolLayer
 ): ExpressionSpecification {
   const {
-    attribute,
     data: {
       geoJSON: { features }
     },
     style: {
-      size: { min: rMin, max: rMax }
+      size: { attribute, min: rMin, max: rMax }
     }
   } = layer;
   const extent = d3.extent(features, (d) =>

@@ -8,7 +8,10 @@
 
   $: sizeMin = layer.style.size.min;
   $: sizeMax = layer.style.size.max;
-  $: [min, max] = deriveExtent(layer.attribute, layer.data.geoJSON.features);
+  $: [min, max] = deriveExtent(
+    layer.style.size.attribute,
+    layer.data.geoJSON.features
+  );
 
   const padding = { top: 4, right: 4, bottom: 4, left: 4 };
   // Dynamically compute the label width based on the max value.
@@ -27,7 +30,7 @@
 <div class="stack stack-xs ml-8">
   <span
     style="margin-left: {sizeMax * 2 + padding.left * 2 + padding.right * 2}px;"
-    >{layer.attribute}</span
+    >{layer.style.size.attribute}</span
   >
   <svg
     viewBox="0 0 {sizeMax * 2 +
