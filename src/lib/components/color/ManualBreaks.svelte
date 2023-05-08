@@ -10,7 +10,7 @@
   export let toggleBreaksEditorVisibility: () => void;
 
   $: count = layer.style.fill.count;
-  $: colors = layer.style.fill.scheme[count] as string[];
+  $: colors = layer.style.fill.scheme[count];
   $: [min, max] = deriveExtent(
     layer.style.fill.attribute,
     layer.data.geoJSON.features
