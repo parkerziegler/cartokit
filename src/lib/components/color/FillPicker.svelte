@@ -36,16 +36,6 @@
   function onFillHexChange(hex: string) {
     dispatchFillUpdate(hex);
   }
-
-  function onOpacityChange(fillOpacity: number) {
-    dispatchLayerUpdate({
-      type: 'fill-opacity',
-      layer,
-      payload: {
-        opacity: fillOpacity
-      }
-    });
-  }
 </script>
 
 {#if layer.style.fill}
@@ -64,10 +54,6 @@
         onHexChange={onFillHexChange}
       />
     </div>
-    <OpacityInput
-      opacity={layer.style.fill.opacity}
-      {onOpacityChange}
-      property="fill"
-    />
+    <OpacityInput {layer} property="fill" />
   </div>
 {/if}

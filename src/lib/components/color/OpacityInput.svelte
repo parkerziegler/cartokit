@@ -1,10 +1,16 @@
 <script lang="ts">
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
+  import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
   import { percentToDecimal, decimalToPercent } from '$lib/utils/color';
+  import { DEFAULT_OPACITY } from '$lib/utils/constants';
 
-  export let opacity: number;
-  export let onOpacityChange: (opacity: number) => void;
+  export let layer: CartoKitLayer;
   export let property: 'fill' | 'stroke';
+
+  $: opacity = decimalToPercent(
+    layer.style[property]?.opacity ?? DEFAULT_OPACITY
+  );
 
   function validateOpacity(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -20,15 +26,23 @@
       onOpacityChange(percentToDecimal(Math.min(100, Math.max(0, +output))));
     }
   }
+
+  function onOpacityChange(opacity: number) {
+    dispatchLayerUpdate({
+      type: `${property}-opacity`,
+      layer,
+      payload: { opacity }
+    });
+  }
 </script>
 
 <div class="stack-h stack-h-xs items-center">
-  <FieldLabel fieldId="opacity">Opacity</FieldLabel>
+  <FieldLabel fieldId={`${property}-opacity`}>Opacity</FieldLabel>
   <input
     id={`${property}-opacity`}
     size="4"
     class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
-    value={`${decimalToPercent(opacity)}%`}
+    value={`${opacity}%`}
     on:change={validateOpacity}
   />
 </div>

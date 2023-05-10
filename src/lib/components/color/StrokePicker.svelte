@@ -3,12 +3,12 @@
   import * as d3 from 'd3';
 
   import HexInput from '$lib/components/color/HexInput.svelte';
+  import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
   import { DEFAULT_STROKE } from '$lib/utils/constants';
-  import OpacityInput from './OpacityInput.svelte';
 
   export let layer: CartoKitLayer;
 
@@ -42,16 +42,6 @@
       }
     });
   }
-
-  function onStrokeOpacityChange(opacity: number) {
-    dispatchLayerUpdate({
-      type: 'stroke-opacity',
-      layer,
-      payload: {
-        opacity
-      }
-    });
-  }
 </script>
 
 {#if layer.style.stroke}
@@ -80,10 +70,6 @@
         class="w-12"
       />
     </div>
-    <OpacityInput
-      opacity={layer.style.stroke.opacity}
-      onOpacityChange={onStrokeOpacityChange}
-      property="stroke"
-    />
+    <OpacityInput {layer} property="stroke" />
   </div>
 {/if}
