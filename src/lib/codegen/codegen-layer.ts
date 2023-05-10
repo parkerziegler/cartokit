@@ -10,26 +10,54 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
  */
 export function codegenLayer(layer: CartoKitLayer): string {
   switch (layer.type) {
-    case 'Fill':
-    case 'Choropleth': {
-      const fill = codegenFill(layer);
-      const stroke = codegenStroke(layer);
+    case 'Fill': {
+      let fillLayer = '';
+      let strokeLayer = '';
 
-      return `
-        map.addLayer({
+      if (layer.style.fill) {
+        const fill = codegenFill(layer);
+        fillLayer = `map.addLayer({
           id: '${layer.id}',
           source: '${layer.id}',
           type: 'fill',
           ${fill ? `paint: { ${fill} }` : ''}
-        });
+        });`;
+      }
 
-        map.addLayer({
+      if (layer.style.stroke) {
+        const stroke = codegenStroke(layer);
+        strokeLayer = `map.addLayer({
           id: '${layer.id}-stroke',
           source: '${layer.id}',
           type: 'line',
           ${stroke ? `paint: { ${stroke} }` : ''}
-        });
-      `;
+        });`;
+      }
+
+      return [fillLayer, strokeLayer].filter(Boolean).join('\n\n');
+    }
+    case 'Choropleth': {
+      const fill = codegenFill(layer);
+      const fillLayer = `map.addLayer({
+        id: '${layer.id}',
+        source: '${layer.id}',
+        type: 'fill',
+        ${fill ? `paint: { ${fill} }` : ''}
+      });`;
+
+      let strokeLayer = '';
+
+      if (layer.style.stroke) {
+        const stroke = codegenStroke(layer);
+        strokeLayer = `map.addLayer({
+          id: '${layer.id}-stroke',
+          source: '${layer.id}',
+          type: 'line',
+          ${stroke ? `paint: { ${stroke} }` : ''}
+        });`;
+      }
+
+      return [fillLayer, strokeLayer].filter(Boolean).join('\n\n');
     }
     case 'Proportional Symbol':
     case 'Dot Density': {

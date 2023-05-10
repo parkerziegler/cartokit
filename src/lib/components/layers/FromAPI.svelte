@@ -53,10 +53,15 @@
         rawGeoJSON: turf.featureCollection([])
       },
       style: {
-        fill: color,
-        stroke: color,
-        strokeWidth: DEFAULT_STROKE_WIDTH,
-        opacity: DEFAULT_OPACITY
+        fill: {
+          color,
+          opacity: DEFAULT_OPACITY
+        },
+        stroke: {
+          color,
+          width: DEFAULT_STROKE_WIDTH,
+          opacity: 1
+        }
       }
     };
 

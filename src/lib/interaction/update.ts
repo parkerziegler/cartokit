@@ -21,6 +21,12 @@ import type {
 } from '$lib/types/CartoKitLayer';
 import type { ColorScale, ColorScheme } from '$lib/types/color';
 import type { MapType } from '$lib/types/map-types';
+import {
+  DEFAULT_FILL,
+  DEFAULT_OPACITY,
+  DEFAULT_STROKE,
+  DEFAULT_STROKE_WIDTH
+} from '$lib/utils/constants';
 
 interface LayerUpdate {
   layer: CartoKitLayer;
@@ -62,6 +68,31 @@ interface FillUpdate extends LayerUpdate {
     | CartoKitDotDensityLayer;
 }
 
+interface FillOpacityUpdate extends LayerUpdate {
+  type: 'fill-opacity';
+  payload: {
+    opacity: number;
+  };
+}
+
+interface AddFillUpdate extends LayerUpdate {
+  type: 'add-fill';
+  payload: Record<string, never>;
+  layer:
+    | CartoKitFillLayer
+    | CartoKitProportionalSymbolLayer
+    | CartoKitDotDensityLayer;
+}
+
+interface RemoveFillUpdate extends LayerUpdate {
+  type: 'remove-fill';
+  payload: Record<string, never>;
+  layer:
+    | CartoKitFillLayer
+    | CartoKitProportionalSymbolLayer
+    | CartoKitDotDensityLayer;
+}
+
 interface StrokeUpdate extends LayerUpdate {
   type: 'stroke';
   payload: {
@@ -78,11 +109,24 @@ interface StrokeWidthUpdate extends LayerUpdate {
   layer: CartoKitLayer;
 }
 
-interface OpacityUpdate extends LayerUpdate {
-  type: 'opacity';
+interface StrokeOpacityUpdate extends LayerUpdate {
+  type: 'stroke-opacity';
   payload: {
     opacity: number;
   };
+  layer: CartoKitLayer;
+}
+
+interface AddStrokeUpdate extends LayerUpdate {
+  type: 'add-stroke';
+  payload: Record<string, never>;
+  layer: CartoKitLayer;
+}
+
+interface RemoveStrokeUpdate extends LayerUpdate {
+  type: 'remove-stroke';
+  payload: Record<string, never>;
+  layer: CartoKitLayer;
 }
 
 interface ColorScaleUpdate extends LayerUpdate {
@@ -148,9 +192,14 @@ type DispatchLayerUpdateParams =
   | MapTypeUpdate
   | AttributeUpdate
   | FillUpdate
+  | FillOpacityUpdate
+  | AddFillUpdate
+  | RemoveFillUpdate
   | StrokeUpdate
   | StrokeWidthUpdate
-  | OpacityUpdate
+  | StrokeOpacityUpdate
+  | AddStrokeUpdate
+  | RemoveStrokeUpdate
   | ColorScaleUpdate
   | ColorSchemeUpdate
   | ColorCountUpdate
@@ -251,15 +300,89 @@ export function dispatchLayerUpdate({
           | CartoKitFillLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer;
-        lyr.style.fill = payload.color;
+
+        if (lyr.style.fill) {
+          lyr.style.fill.color = payload.color;
+
+          switch (lyr.type) {
+            case 'Fill':
+              map.setPaintProperty(layer.id, 'fill-color', payload.color);
+              break;
+            case 'Proportional Symbol':
+            case 'Dot Density':
+              map.setPaintProperty(layer.id, 'circle-color', payload.color);
+              break;
+          }
+        }
+
+        return lyrs;
+      });
+      break;
+    }
+    case 'fill-opacity': {
+      layers.update((lyrs) => {
+        const lyr = lyrs[layer.id];
+
+        if (lyr.style.fill) {
+          lyr.style.fill.opacity = payload.opacity;
+
+          switch (lyr.type) {
+            case 'Fill':
+            case 'Choropleth':
+              map.setPaintProperty(layer.id, 'fill-opacity', payload.opacity);
+              break;
+            case 'Proportional Symbol':
+            case 'Dot Density':
+              map.setPaintProperty(layer.id, 'circle-opacity', payload.opacity);
+              break;
+          }
+        }
+
+        return lyrs;
+      });
+      break;
+    }
+    case 'add-fill': {
+      layers.update((lyrs) => {
+        const lyr = lyrs[layer.id];
+        lyr.style.fill = {
+          color: DEFAULT_FILL,
+          opacity: DEFAULT_OPACITY
+        };
 
         switch (lyr.type) {
           case 'Fill':
-            map.setPaintProperty(layer.id, 'fill-color', payload.color);
+          case 'Choropleth':
+            map.setPaintProperty(layer.id, 'fill-color', DEFAULT_FILL);
+            map.setPaintProperty(layer.id, 'fill-opacity', DEFAULT_OPACITY);
             break;
           case 'Proportional Symbol':
           case 'Dot Density':
-            map.setPaintProperty(layer.id, 'circle-color', payload.color);
+            map.setPaintProperty(layer.id, 'circle-color', DEFAULT_FILL);
+            map.setPaintProperty(layer.id, 'circle-opacity', DEFAULT_OPACITY);
+            break;
+        }
+
+        return lyrs;
+      });
+      break;
+    }
+    case 'remove-fill': {
+      layers.update((lyrs) => {
+        const lyr = lyrs[layer.id];
+        lyr.style.fill = undefined;
+
+        switch (lyr.type) {
+          case 'Fill':
+            map.setPaintProperty(layer.id, 'fill-color', 'transparent');
+            map.setPaintProperty(layer.id, 'fill-opacity', 0);
+            break;
+          case 'Proportional Symbol':
+          case 'Dot Density':
+            map.setPaintProperty(layer.id, 'circle-color', 'transparent');
+            map.setPaintProperty(layer.id, 'circle-opacity', 0);
+            break;
+          default:
             break;
         }
 
@@ -270,25 +393,27 @@ export function dispatchLayerUpdate({
     case 'stroke': {
       layers.update((lyrs) => {
         const lyr = lyrs[layer.id];
-        lyr.style.stroke = payload.color;
+        if (lyr.style.stroke) {
+          lyr.style.stroke.color = payload.color;
 
-        switch (lyr.type) {
-          case 'Fill':
-          case 'Choropleth':
-            map.setPaintProperty(
-              `${layer.id}-stroke`,
-              'line-color',
-              payload.color
-            );
-            break;
-          case 'Proportional Symbol':
-          case 'Dot Density':
-            map.setPaintProperty(
-              layer.id,
-              'circle-stroke-color',
-              payload.color
-            );
-            break;
+          switch (lyr.type) {
+            case 'Fill':
+            case 'Choropleth':
+              map.setPaintProperty(
+                `${layer.id}-stroke`,
+                'line-color',
+                payload.color
+              );
+              break;
+            case 'Proportional Symbol':
+            case 'Dot Density':
+              map.setPaintProperty(
+                layer.id,
+                'circle-stroke-color',
+                payload.color
+              );
+              break;
+          }
         }
 
         return lyrs;
@@ -298,24 +423,103 @@ export function dispatchLayerUpdate({
     case 'stroke-width': {
       layers.update((lyrs) => {
         const lyr = lyrs[layer.id];
-        lyr.style.strokeWidth = payload.strokeWidth;
+
+        if (lyr.style.stroke) {
+          lyr.style.stroke.width = payload.strokeWidth;
+
+          switch (lyr.type) {
+            case 'Fill':
+            case 'Choropleth':
+              map.setPaintProperty(
+                `${layer.id}-stroke`,
+                'line-width',
+                payload.strokeWidth
+              );
+              break;
+            case 'Proportional Symbol':
+            case 'Dot Density':
+              map.setPaintProperty(
+                layer.id,
+                'circle-stroke-width',
+                payload.strokeWidth
+              );
+              break;
+          }
+        }
+
+        return lyrs;
+      });
+      break;
+    }
+    case 'stroke-opacity': {
+      layers.update((lyrs) => {
+        const lyr = lyrs[layer.id];
+
+        if (lyr.style.stroke) {
+          lyr.style.stroke.opacity = payload.opacity;
+
+          switch (lyr.type) {
+            case 'Fill':
+            case 'Choropleth':
+              map.setPaintProperty(
+                `${layer.id}-stroke`,
+                'line-opacity',
+                payload.opacity
+              );
+              break;
+            case 'Proportional Symbol':
+            case 'Dot Density':
+              map.setPaintProperty(
+                layer.id,
+                'circle-stroke-opacity',
+                payload.opacity
+              );
+              break;
+          }
+        }
+
+        return lyrs;
+      });
+      break;
+    }
+    case 'add-stroke': {
+      layers.update((lyrs) => {
+        const lyr = lyrs[layer.id];
+        // Create a default stroke.
+        lyr.style.stroke = {
+          color: DEFAULT_STROKE,
+          width: DEFAULT_STROKE_WIDTH,
+          opacity: 1
+        };
 
         switch (lyr.type) {
           case 'Fill':
           case 'Choropleth':
             map.setPaintProperty(
               `${layer.id}-stroke`,
-              'line-width',
-              payload.strokeWidth
+              'line-color',
+              DEFAULT_STROKE
             );
+            map.setPaintProperty(
+              `${layer.id}-stroke`,
+              'line-width',
+              DEFAULT_STROKE_WIDTH
+            );
+            map.setPaintProperty(`${layer.id}-stroke`, 'line-opacity', 1);
             break;
           case 'Proportional Symbol':
           case 'Dot Density':
             map.setPaintProperty(
               layer.id,
-              'circle-stroke-width',
-              payload.strokeWidth
+              'circle-stroke-color',
+              DEFAULT_STROKE
             );
+            map.setPaintProperty(
+              layer.id,
+              'circle-stroke-width',
+              DEFAULT_STROKE_WIDTH
+            );
+            map.setPaintProperty(layer.id, 'circle-stroke-opacity', 1);
             break;
         }
 
@@ -323,19 +527,33 @@ export function dispatchLayerUpdate({
       });
       break;
     }
-    case 'opacity': {
+    case 'remove-stroke': {
       layers.update((lyrs) => {
         const lyr = lyrs[layer.id];
-        lyr.style.opacity = payload.opacity;
+        lyr.style.stroke = undefined;
 
         switch (lyr.type) {
           case 'Fill':
           case 'Choropleth':
-            map.setPaintProperty(layer.id, 'fill-opacity', payload.opacity);
+            map.setPaintProperty(
+              `${layer.id}-stroke`,
+              'line-color',
+              'transparent'
+            );
+            map.setPaintProperty(`${layer.id}-stroke`, 'line-width', 0);
+            map.setPaintProperty(`${layer.id}-stroke`, 'line-opacity', 0);
             break;
           case 'Proportional Symbol':
           case 'Dot Density':
-            map.setPaintProperty(layer.id, 'circle-opacity', payload.opacity);
+            map.setPaintProperty(
+              layer.id,
+              'circle-stroke-color',
+              'transparent'
+            );
+            map.setPaintProperty(layer.id, 'circle-stroke-width', 0);
+            map.setPaintProperty(layer.id, 'circle-stroke-opacity', 0);
+            break;
+          default:
             break;
         }
 

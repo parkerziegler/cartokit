@@ -1,9 +1,10 @@
 <script lang="ts">
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import { percentToDecimal } from '$lib/utils/color';
+  import { percentToDecimal, decimalToPercent } from '$lib/utils/color';
 
   export let opacity: number;
   export let onOpacityChange: (opacity: number) => void;
+  export let property: 'fill' | 'stroke';
 
   function validateOpacity(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -24,10 +25,10 @@
 <div class="stack-h stack-h-xs items-center">
   <FieldLabel fieldId="opacity">Opacity</FieldLabel>
   <input
-    id="opacity"
+    id={`${property}-opacity`}
     size="4"
     class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
-    value={`${opacity}%`}
+    value={`${decimalToPercent(opacity)}%`}
     on:change={validateOpacity}
   />
 </div>

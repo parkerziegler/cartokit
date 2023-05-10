@@ -8,7 +8,12 @@
 </script>
 
 <div class="stack-h stack-h-xs ml-8 items-center">
-  <span class="h-4 w-4" style="background-color: {layer.style.fill};" />
+  <span
+    class="h-4 w-4"
+    style="background-color: {layer.style.fill?.color ??
+      'transparent'}; border: {`${layer.style.stroke?.width}px` ??
+      '0px'} solid {layer.style.stroke?.color ?? 'transparent'};"
+  />
   <span
     >{featureCount} {featureType + (featureType.length !== 1 ? 's' : '')}</span
   >

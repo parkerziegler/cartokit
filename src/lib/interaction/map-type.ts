@@ -16,8 +16,8 @@ import type {
   CartoKitLayer
 } from '$lib/types/CartoKitLayer';
 import type { MapType } from '$lib/types/map-types';
-import { randomColor } from '$lib/utils/color';
 import {
+  DEFAULT_OPACITY,
   DEFAULT_MAX_SIZE,
   DEFAULT_MIN_SIZE,
   DEFAULT_COUNT,
@@ -144,7 +144,9 @@ function transitionToFill(
 
   switch (sourceLayerType) {
     case 'Choropleth': {
-      const color = randomColor();
+      const colors = layer.style.fill.scheme[layer.style.fill.count];
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const color = colors.at(-1)!;
 
       const targetLayer: CartoKitFillLayer = {
         id: layer.id,
@@ -152,17 +154,17 @@ function transitionToFill(
         type: 'Fill',
         data: layer.data,
         style: {
-          fill: color,
-          stroke: color,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          fill: {
+            color,
+            opacity: layer.style.fill.opacity
+          },
+          stroke: layer.style.stroke
         }
       };
 
-      // Just update the fill-color and line-color of the existing layer.
+      // Just update the fill-color of the existing layer.
       // All other paint properties should be unchanged.
       map.setPaintProperty(layer.id, 'fill-color', color);
-      map.setPaintProperty(`${layer.id}-stroke`, 'line-color', color);
 
       return {
         targetLayer,
@@ -193,9 +195,7 @@ function transitionToFill(
         },
         style: {
           fill: layer.style.fill,
-          stroke: layer.style.stroke,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          stroke: layer.style.stroke
         }
       };
 
@@ -215,9 +215,7 @@ function transitionToFill(
         },
         style: {
           fill: layer.style.fill,
-          stroke: layer.style.stroke,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          stroke: layer.style.stroke
         }
       };
 
@@ -267,11 +265,12 @@ function transitionToChoropleth(
             thresholds: DEFAULT_THRESHOLDS(
               attribute,
               layer.data.geoJSON.features
-            )
+            ),
+            // A Choropleth layer should always have an opacity, even if the
+            // Fill layer from which we're transitioning had no fill.
+            opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
-          stroke: layer.style.stroke,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          stroke: layer.style.stroke
         }
       };
 
@@ -318,11 +317,10 @@ function transitionToChoropleth(
             thresholds: DEFAULT_THRESHOLDS(
               layer.style.size.attribute,
               layer.data.geoJSON.features
-            )
+            ),
+            opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
-          stroke: layer.style.stroke,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          stroke: layer.style.stroke
         }
       };
 
@@ -349,11 +347,10 @@ function transitionToChoropleth(
             thresholds: DEFAULT_THRESHOLDS(
               layer.style.dots.attribute,
               layer.data.geoJSON.features
-            )
+            ),
+            opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
-          stroke: layer.style.stroke,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          stroke: layer.style.stroke
         }
       };
 
@@ -401,9 +398,7 @@ function transitionToProportionalSymbol(
             max: DEFAULT_MAX_SIZE
           },
           fill: layer.style.fill,
-          stroke: layer.style.stroke,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          stroke: layer.style.stroke
         }
       };
 
@@ -429,11 +424,12 @@ function transitionToProportionalSymbol(
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          fill: colors.at(-1)!,
-          stroke: layer.style.stroke,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          fill: {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            color: colors.at(-1)!,
+            opacity: layer.style.fill.opacity
+          },
+          stroke: layer.style.stroke
         }
       };
 
@@ -458,9 +454,7 @@ function transitionToProportionalSymbol(
             max: DEFAULT_MAX_SIZE
           },
           fill: layer.style.fill,
-          stroke: layer.style.stroke,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          stroke: layer.style.stroke
         }
       };
 
@@ -514,9 +508,7 @@ function transitionToDotDensity(
             value: dotValue
           },
           fill: layer.style.fill,
-          stroke: layer.style.stroke,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          stroke: layer.style.stroke
         }
       };
 
@@ -551,11 +543,12 @@ function transitionToDotDensity(
             size: 1,
             value: dotValue
           },
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          fill: colors.at(-1)!,
-          stroke: layer.style.stroke,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          fill: {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            color: colors.at(-1)!,
+            opacity: layer.style.fill.opacity
+          },
+          stroke: layer.style.stroke
         }
       };
 
@@ -603,9 +596,7 @@ function transitionToDotDensity(
             value: dotValue
           },
           fill: layer.style.fill,
-          stroke: layer.style.stroke,
-          strokeWidth: layer.style.strokeWidth,
-          opacity: layer.style.opacity
+          stroke: layer.style.stroke
         }
       };
 

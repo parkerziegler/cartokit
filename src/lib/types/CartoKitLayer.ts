@@ -13,18 +13,20 @@ interface Layer {
     rawGeoJSON: FeatureCollection;
     fileName?: string;
   };
-  style: {
-    opacity: number;
-  };
 }
 
 export interface CartoKitFillLayer extends Layer {
   type: 'Fill';
   style: {
-    fill: string;
-    stroke: string;
-    strokeWidth: number;
-    opacity: number;
+    fill?: {
+      color: string;
+      opacity: number;
+    };
+    stroke?: {
+      color: string;
+      width: number;
+      opacity: number;
+    };
   };
 }
 
@@ -37,10 +39,13 @@ export interface CartoKitChoroplethLayer extends Layer {
       scheme: ColorScheme;
       count: number;
       thresholds: number[];
+      opacity: number;
     };
-    stroke: string;
-    strokeWidth: number;
-    opacity: number;
+    stroke?: {
+      color: string;
+      width: number;
+      opacity: number;
+    };
   };
 }
 
@@ -52,10 +57,15 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
       min: number;
       max: number;
     };
-    fill: string;
-    stroke: string;
-    strokeWidth: number;
-    opacity: number;
+    fill?: {
+      color: string;
+      opacity: number;
+    };
+    stroke?: {
+      color: string;
+      width: number;
+      opacity: number;
+    };
   };
 }
 
@@ -67,10 +77,15 @@ export interface CartoKitDotDensityLayer extends Layer {
       size: number;
       value: number;
     };
-    fill: string;
-    stroke: string;
-    strokeWidth: number;
-    opacity: number;
+    fill?: {
+      color: string;
+      opacity: number;
+    };
+    stroke?: {
+      color: string;
+      width: number;
+      opacity: number;
+    };
   };
 }
 

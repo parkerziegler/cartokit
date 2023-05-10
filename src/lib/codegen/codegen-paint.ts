@@ -13,15 +13,19 @@ import { MAPBOX_DEFAULTS } from '$lib/utils/constants';
 export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Fill': {
+      if (!layer.style.fill) {
+        return '';
+      }
+
       return [
         withDefault(
           'fill-color',
-          layer.style.fill,
+          layer.style.fill?.color,
           MAPBOX_DEFAULTS['fill-color']
         ),
         withDefault(
           'fill-opacity',
-          layer.style.opacity,
+          layer.style.fill.opacity,
           MAPBOX_DEFAULTS['fill-opacity']
         )
       ]
@@ -33,7 +37,7 @@ export function codegenFill(layer: CartoKitLayer): string {
         `'fill-color': ${JSON.stringify(deriveColorScale(layer))}`,
         withDefault(
           'fill-opacity',
-          layer.style.opacity,
+          layer.style.fill.opacity,
           MAPBOX_DEFAULTS['fill-opacity']
         )
       ]
@@ -41,16 +45,20 @@ export function codegenFill(layer: CartoKitLayer): string {
         .join(',\n');
     }
     case 'Proportional Symbol': {
+      if (!layer.style.fill) {
+        return '';
+      }
+
       return [
         withDefault(
           'circle-color',
-          layer.style.fill,
+          layer.style.fill.color,
           MAPBOX_DEFAULTS['circle-color']
         ),
         `'circle-radius': ${JSON.stringify(deriveSize(layer))}`,
         withDefault(
           'circle-opacity',
-          layer.style.opacity,
+          layer.style.fill.opacity,
           MAPBOX_DEFAULTS['fill-opacity']
         )
       ]
@@ -58,10 +66,14 @@ export function codegenFill(layer: CartoKitLayer): string {
         .join(',\n');
     }
     case 'Dot Density': {
+      if (!layer.style.fill) {
+        return '';
+      }
+
       return [
         withDefault(
           'circle-color',
-          layer.style.fill,
+          layer.style.fill.color,
           MAPBOX_DEFAULTS['circle-color']
         ),
         withDefault(
@@ -71,7 +83,7 @@ export function codegenFill(layer: CartoKitLayer): string {
         ),
         withDefault(
           'circle-opacity',
-          layer.style.opacity,
+          layer.style.fill.opacity,
           MAPBOX_DEFAULTS['circle-opacity']
         )
       ]
@@ -91,16 +103,25 @@ export function codegenStroke(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Fill':
     case 'Choropleth': {
+      if (!layer.style.stroke) {
+        return '';
+      }
+
       return [
         withDefault(
           'line-color',
-          layer.style.stroke,
+          layer.style.stroke.color,
           MAPBOX_DEFAULTS['line-color']
         ),
         withDefault(
           'line-width',
-          layer.style.strokeWidth,
+          layer.style.stroke.width,
           MAPBOX_DEFAULTS['line-width']
+        ),
+        withDefault(
+          'line-opacity',
+          layer.style.stroke.opacity,
+          MAPBOX_DEFAULTS['line-opacity']
         )
       ]
         .filter(Boolean)
@@ -108,16 +129,25 @@ export function codegenStroke(layer: CartoKitLayer): string {
     }
     case 'Proportional Symbol':
     case 'Dot Density': {
+      if (!layer.style.stroke) {
+        return '';
+      }
+
       return [
         withDefault(
           'circle-stroke-color',
-          layer.style.stroke,
+          layer.style.stroke.color,
           MAPBOX_DEFAULTS['circle-stroke-color']
         ),
         withDefault(
           'circle-stroke-width',
-          layer.style.strokeWidth,
+          layer.style.stroke.width,
           MAPBOX_DEFAULTS['circle-stroke-width']
+        ),
+        withDefault(
+          'circle-stroke-opacity',
+          layer.style.stroke.opacity,
+          MAPBOX_DEFAULTS['circle-stroke-opacity']
         )
       ]
         .filter(Boolean)

@@ -45,7 +45,7 @@
       cx={sizeMax + padding.left}
       cy={sizeMax + padding.top}
       stroke="#ffffff"
-      fill={layer.style.fill}
+      fill={layer.style.fill?.color ?? 'transparent'}
     />
     <text
       x={sizeMax * 2 + padding.left * 2 + padding.right * 2}
@@ -59,7 +59,7 @@
         cx={sizeMax + padding.left}
         cy={sizeMax * 2 - interval.size + padding.top}
         stroke="#ffffff"
-        fill={layer.style.fill}
+        fill={layer.style.fill?.color ?? 'transparent'}
       />
       <text
         x={sizeMax * 2 + padding.left * 2 + padding.right * 2}

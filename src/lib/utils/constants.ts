@@ -29,9 +29,11 @@ export const MAPBOX_DEFAULTS = {
   'fill-color': '#000000',
   'line-color': '#000000',
   'fill-opacity': 1,
+  'line-opacity': 1,
   'line-width': 1,
   'circle-color': '#000000',
   'circle-opacity': 1,
   'circle-stroke-color': '#000000',
-  'circle-stroke-width': 0
+  'circle-stroke-width': 0,
+  'circle-stroke-opacity': 1
 };
