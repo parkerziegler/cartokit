@@ -20,7 +20,7 @@ export function codegenFill(layer: CartoKitLayer): string {
       return [
         withDefault(
           'fill-color',
-          layer.style.fill?.color,
+          layer.style.fill.color,
           MAPBOX_DEFAULTS['fill-color']
         ),
         withDefault(
