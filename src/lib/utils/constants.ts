@@ -6,9 +6,10 @@ import { deriveQuantiles } from '$lib/interaction/scales';
 // CartoKit default values.
 export const DEFAULT_MAP_TYPE = 'Fill';
 export const DEFAULT_FILL = '#FFFFFF';
+export const DEFAULT_OPACITY = 0.75;
 export const DEFAULT_STROKE = '#000000';
 export const DEFAULT_STROKE_WIDTH = 1;
-export const DEFAULT_OPACITY = 0.75;
+export const DEFAULT_STROKE_OPACITY = 1;
 export const DEFAULT_SCALE = 'Quantile';
 export const DEFAULT_SCHEME = d3.schemeOranges;
 export const DEFAULT_COUNT = 5;

@@ -25,6 +25,7 @@ import {
   DEFAULT_FILL,
   DEFAULT_OPACITY,
   DEFAULT_STROKE,
+  DEFAULT_STROKE_OPACITY,
   DEFAULT_STROKE_WIDTH
 } from '$lib/utils/constants';
 
@@ -489,7 +490,7 @@ export function dispatchLayerUpdate({
         lyr.style.stroke = {
           color: DEFAULT_STROKE,
           width: DEFAULT_STROKE_WIDTH,
-          opacity: 1
+          opacity: DEFAULT_STROKE_OPACITY
         };
 
         switch (lyr.type) {

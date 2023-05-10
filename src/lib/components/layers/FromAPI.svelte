@@ -13,7 +13,11 @@
   import { map } from '$lib/stores/map';
   import type { CartoKitFillLayer } from '$lib/types/CartoKitLayer';
   import { randomColor } from '$lib/utils/color';
-  import { DEFAULT_OPACITY, DEFAULT_STROKE_WIDTH } from '$lib/utils/constants';
+  import {
+    DEFAULT_OPACITY,
+    DEFAULT_STROKE_OPACITY,
+    DEFAULT_STROKE_WIDTH
+  } from '$lib/utils/constants';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -60,7 +64,7 @@
         stroke: {
           color,
           width: DEFAULT_STROKE_WIDTH,
-          opacity: 1
+          opacity: DEFAULT_STROKE_OPACITY
         }
       }
     };
