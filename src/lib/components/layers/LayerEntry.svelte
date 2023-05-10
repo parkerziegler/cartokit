@@ -18,9 +18,17 @@
 
   function toggleLayerVisibility() {
     if (layerVisible) {
-      $map?.setLayoutProperty(layer.id, 'visibility', 'none');
+      $map.setLayoutProperty(layer.id, 'visibility', 'none');
+
+      if ($map.getLayer(`${layer.id}-stroke`)) {
+        $map.setLayoutProperty(`${layer.id}-stroke`, 'visibility', 'none');
+      }
     } else {
-      $map?.setLayoutProperty(layer.id, 'visibility', 'visible');
+      $map.setLayoutProperty(layer.id, 'visibility', 'visible');
+
+      if ($map.getLayer(`${layer.id}-stroke`)) {
+        $map.setLayoutProperty(`${layer.id}-stroke`, 'visibility', 'visible');
+      }
     }
 
     layerVisible = !layerVisible;
