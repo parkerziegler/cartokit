@@ -44,8 +44,11 @@
       r={sizeMax}
       cx={sizeMax + padding.left}
       cy={sizeMax + padding.top}
-      stroke="#ffffff"
-      fill={layer.style.fill?.color ?? 'transparent'}
+      fill={layer.style.fill?.color ?? 'none'}
+      fill-opacity={layer.style.fill?.opacity ?? 0}
+      stroke={layer.style.stroke?.color ?? 'none'}
+      stroke-width={layer.style.stroke?.width ?? 0}
+      stroke-opacity={layer.style.stroke?.opacity ?? 0}
     />
     <text
       x={sizeMax * 2 + padding.left * 2 + padding.right * 2}
@@ -58,8 +61,11 @@
         r={interval.size}
         cx={sizeMax + padding.left}
         cy={sizeMax * 2 - interval.size + padding.top}
-        stroke="#ffffff"
-        fill={layer.style.fill?.color ?? 'transparent'}
+        fill={layer.style.fill?.color ?? 'none'}
+        fill-opacity={layer.style.fill?.opacity ?? 0}
+        stroke={layer.style.stroke?.color ?? 'none'}
+        stroke-width={layer.style.stroke?.width ?? 0}
+        stroke-opacity={layer.style.stroke?.opacity ?? 0}
       />
       <text
         x={sizeMax * 2 + padding.left * 2 + padding.right * 2}

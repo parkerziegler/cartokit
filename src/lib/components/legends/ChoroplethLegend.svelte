@@ -38,7 +38,19 @@
     <ul class="stack stack-xs mt-3">
       {#each colors as color}
         <li class="stack stack-xs stack-h stack-h-xs">
-          <span class="h-4 w-8" style="background-color: {color}" />
+          <svg viewBox="0 0 32 16" width="32" height="16">
+            <rect
+              x="0"
+              y="0"
+              width="32"
+              height="16"
+              fill={color}
+              fill-opacity={layer.style.fill.opacity}
+              stroke={layer.style.stroke?.color ?? 'none'}
+              stroke-width={layer.style.stroke?.width ?? '0'}
+              stroke-opacity={layer.style.stroke?.opacity ?? '0'}
+            />
+          </svg>
         </li>
       {/each}
     </ul>
