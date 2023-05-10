@@ -18,12 +18,12 @@
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer;
 
-  function dispatchFillUpdate(update: string) {
+  function dispatchFillUpdate(color: string) {
     dispatchLayerUpdate({
       type: 'fill',
       layer,
       payload: {
-        color: update
+        color
       }
     });
   }
