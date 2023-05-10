@@ -8,12 +8,19 @@
 </script>
 
 <div class="stack-h stack-h-xs ml-8 items-center">
-  <span
-    class="h-4 w-4"
-    style="background-color: {layer.style.fill?.color ??
-      'transparent'}; border: {`${layer.style.stroke?.width}px` ??
-      '0px'} solid {layer.style.stroke?.color ?? 'transparent'};"
-  />
+  <svg viewBox="0 0 16 16" width="16" height="16">
+    <rect
+      x="0"
+      y="0"
+      width="16"
+      height="16"
+      fill={layer.style.fill?.color ?? 'transparent'}
+      fill-opacity={layer.style.fill?.opacity ?? 1}
+      stroke={layer.style.stroke?.color ?? 'transparent'}
+      stroke-width={layer.style.stroke?.width ?? 0}
+      stroke-opacity={layer.style.stroke?.opacity ?? 1}
+    />
+  </svg>
   <span
     >{featureCount} {featureType + (featureType.length !== 1 ? 's' : '')}</span
   >
