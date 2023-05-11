@@ -267,19 +267,25 @@ function transitionToChoropleth(
               layer.data.geoJSON.features
             ),
             // A Choropleth layer should always have an opacity, even if the
-            // Fill layer from which we're transitioning had no fill.
+            // Fill layer we're transitioning from had no fill.
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
           stroke: layer.style.stroke
         }
       };
 
-      // Just update the fill-color of the existing layer.
+      // Set the fill-color of polygons based on the choropleth color scale.
       map.setPaintProperty(
         layer.id,
         'fill-color',
         deriveColorScale(targetLayer)
       );
+
+      // If the Fill layer we're transitioning from had no fill, set the opacity
+      // to the default to ensure the fill is visible.
+      if (!layer.style.fill?.opacity) {
+        map.setPaintProperty(layer.id, 'fill-opacity', DEFAULT_OPACITY);
+      }
 
       return {
         targetLayer,
