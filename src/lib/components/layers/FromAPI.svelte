@@ -13,7 +13,11 @@
   import { map } from '$lib/stores/map';
   import type { CartoKitFillLayer } from '$lib/types/CartoKitLayer';
   import { randomColor } from '$lib/utils/color';
-  import { DEFAULT_OPACITY, DEFAULT_STROKE_WIDTH } from '$lib/utils/constants';
+  import {
+    DEFAULT_OPACITY,
+    DEFAULT_STROKE_OPACITY,
+    DEFAULT_STROKE_WIDTH
+  } from '$lib/utils/constants';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -53,10 +57,15 @@
         rawGeoJSON: turf.featureCollection([])
       },
       style: {
-        fill: color,
-        stroke: color,
-        strokeWidth: DEFAULT_STROKE_WIDTH,
-        opacity: DEFAULT_OPACITY
+        fill: {
+          color,
+          opacity: DEFAULT_OPACITY
+        },
+        stroke: {
+          color,
+          width: DEFAULT_STROKE_WIDTH,
+          opacity: DEFAULT_STROKE_OPACITY
+        }
       }
     };
 

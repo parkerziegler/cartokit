@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { slide } from 'svelte/transition';
   import * as d3 from 'd3';
 
   import HexInput from '$lib/components/color/HexInput.svelte';
+  import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
@@ -9,8 +11,6 @@
   import { DEFAULT_STROKE } from '$lib/utils/constants';
 
   export let layer: CartoKitLayer;
-
-  $: stroke = d3.color(layer.style.stroke)?.formatHex() ?? DEFAULT_STROKE;
 
   function onStrokeInput(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -44,21 +44,32 @@
   }
 </script>
 
-<div class="color-picker flex items-center">
-  <FieldLabel fieldId="stroke">Stroke</FieldLabel>
-  <input
-    type="color"
-    class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
-    value={stroke}
-    on:input={onStrokeInput}
-  />
-  <HexInput hex={stroke} onHexChange={onStrokeHexChange} />
-</div>
-<div class="stack-h stack-h-xs items-center">
-  <FieldLabel fieldId="stroke-width">Stroke Width</FieldLabel>
-  <NumberInput
-    value={layer.style.strokeWidth}
-    on:change={onStrokeWidthChange}
-    class="w-12"
-  />
-</div>
+{#if layer.style.stroke}
+  <div class="color-picker stack stack-xs" transition:slide|local>
+    <div class="flex items-center">
+      <FieldLabel fieldId="stroke-color">Color</FieldLabel>
+      <input
+        type="color"
+        id="stroke-color"
+        class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
+        value={d3.color(layer.style.stroke.color)?.formatHex() ??
+          DEFAULT_STROKE}
+        on:input={onStrokeInput}
+      />
+      <HexInput
+        hex={d3.color(layer.style.stroke.color)?.formatHex() ?? DEFAULT_STROKE}
+        onHexChange={onStrokeHexChange}
+      />
+    </div>
+    <div class="stack-h stack-h-xs items-center">
+      <FieldLabel fieldId="stroke-width">Width</FieldLabel>
+      <NumberInput
+        id="stroke-width"
+        value={layer.style.stroke.width}
+        on:change={onStrokeWidthChange}
+        class="w-12"
+      />
+    </div>
+    <OpacityInput {layer} property="stroke" />
+  </div>
+{/if}

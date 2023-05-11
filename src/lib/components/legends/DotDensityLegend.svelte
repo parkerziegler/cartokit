@@ -16,7 +16,11 @@
         r={layer.style.dots.size}
         cx={layer.style.dots.size}
         cy={layer.style.dots.size}
-        fill={layer.style.fill}
+        fill={layer.style.fill?.color ?? 'none'}
+        fill-opacity={layer.style.fill?.opacity ?? '0'}
+        stroke={layer.style.stroke?.color ?? 'none'}
+        stroke-width={layer.style.stroke?.width ?? '0'}
+        stroke-opacity={layer.style.stroke?.opacity ?? '0'}
       />
     </svg>
     <span class="text-2xs">1 dot = {layer.style.dots.value} units</span>

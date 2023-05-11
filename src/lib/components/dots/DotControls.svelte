@@ -34,8 +34,9 @@
 <div class="stack stack-xs">
   <AttributeSelect {layer} selected={layer.style.dots.attribute} />
   <div class="stack-h stack-h-xs items-center">
-    <FieldLabel fieldId="Dot Size">Dot Size</FieldLabel>
+    <FieldLabel fieldId="dot-size">Dot Size</FieldLabel>
     <NumberInput
+      id="dot-size"
       min={1}
       max={Infinity}
       value={size}
@@ -43,8 +44,9 @@
     />
   </div>
   <div class="stack-h stack-h-xs items-center">
-    <FieldLabel fieldId="Dot Value">Dot Value</FieldLabel>
+    <FieldLabel fieldId="dot-value">Dot Value</FieldLabel>
     <NumberInput
+      id="dot-value"
       min={1}
       max={Infinity}
       value={dotValue}

@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import cs from 'classnames';
 
+  export let id: string = '';
   export let min: number = 0;
   export let max: number = Infinity;
   export let step: number = 1;
@@ -21,6 +22,7 @@
 
 <input
   type="number"
+  {id}
   {min}
   {max}
   {value}

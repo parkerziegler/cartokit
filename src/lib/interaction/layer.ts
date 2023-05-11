@@ -21,26 +21,31 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 export function addLayer(map: Map, layer: CartoKitLayer): void {
   switch (layer.type) {
     case 'Fill': {
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        type: 'fill',
-        paint: {
-          'fill-color': layer.style.fill,
-          'fill-opacity': layer.style.opacity
-        }
-      });
+      if (layer.style.fill) {
+        map.addLayer({
+          id: layer.id,
+          source: layer.id,
+          type: 'fill',
+          paint: {
+            'fill-color': layer.style.fill.color,
+            'fill-opacity': layer.style.fill.opacity
+          }
+        });
+      }
 
-      // Add a separate layer for the stroke.
-      map.addLayer({
-        id: `${layer.id}-stroke`,
-        source: layer.id,
-        type: 'line',
-        paint: {
-          'line-color': layer.style.stroke,
-          'line-width': layer.style.strokeWidth
-        }
-      });
+      // Add a separate layer for the stroke, if a stroke exists.
+      if (layer.style.stroke) {
+        map.addLayer({
+          id: `${layer.id}-stroke`,
+          source: layer.id,
+          type: 'line',
+          paint: {
+            'line-color': layer.style.stroke.color,
+            'line-width': layer.style.stroke.width,
+            'line-opacity': layer.style.stroke.opacity
+          }
+        });
+      }
 
       instrumentPolygonHover(map, layer.id);
       instrumentPolygonSelect(map, layer.id);
@@ -53,36 +58,51 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         type: 'fill',
         paint: {
           'fill-color': deriveColorScale(layer),
-          'fill-opacity': layer.style.opacity
+          'fill-opacity': layer.style.fill.opacity
         }
       });
 
       // Add a separate layer for the stroke.
-      map.addLayer({
-        id: `${layer.id}-stroke`,
-        source: layer.id,
-        type: 'line',
-        paint: {
-          'line-color': layer.style.stroke,
-          'line-width': layer.style.strokeWidth
-        }
-      });
+      if (layer.style.stroke) {
+        map.addLayer({
+          id: `${layer.id}-stroke`,
+          source: layer.id,
+          type: 'line',
+          paint: {
+            'line-color': layer.style.stroke.color,
+            'line-width': layer.style.stroke.width,
+            'line-opacity': layer.style.stroke.opacity
+          }
+        });
+      }
 
       instrumentPolygonHover(map, layer.id);
       instrumentPolygonSelect(map, layer.id);
       break;
     }
     case 'Proportional Symbol': {
+      const fillProperties = layer.style.fill
+        ? {
+            'circle-color': layer.style.fill.color,
+            'circle-opacity': layer.style.fill.opacity
+          }
+        : {};
+      const strokeProperties = layer.style.stroke
+        ? {
+            'circle-stroke-color': layer.style.stroke.color,
+            'circle-stroke-width': layer.style.stroke.width,
+            'circle-stroke-opacity': layer.style.stroke.opacity
+          }
+        : {};
+
       map.addLayer({
         id: layer.id,
         source: layer.id,
         type: 'circle',
         paint: {
-          'circle-color': layer.style.fill,
-          'circle-radius': deriveSize(layer),
-          'circle-opacity': layer.style.opacity,
-          'circle-stroke-color': layer.style.stroke,
-          'circle-stroke-width': layer.style.strokeWidth
+          ...fillProperties,
+          ...strokeProperties,
+          'circle-radius': deriveSize(layer)
         }
       });
 
@@ -113,16 +133,28 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
       });
 
       // Add the dot density layer to the map.
+      const fillProperties = layer.style.fill
+        ? {
+            'circle-color': layer.style.fill.color,
+            'circle-opacity': layer.style.fill.opacity
+          }
+        : {};
+      const strokeProperties = layer.style.stroke
+        ? {
+            'circle-stroke-color': layer.style.stroke.color,
+            'circle-stroke-width': layer.style.stroke.width,
+            'circle-stroke-opacity': layer.style.stroke.opacity
+          }
+        : {};
+
       map.addLayer({
         id: layer.id,
         source: layer.id,
         type: 'circle',
         paint: {
-          'circle-color': layer.style.fill,
-          'circle-radius': layer.style.dots.size,
-          'circle-opacity': layer.style.opacity,
-          'circle-stroke-color': layer.style.stroke,
-          'circle-stroke-width': layer.style.strokeWidth
+          ...fillProperties,
+          ...strokeProperties,
+          'circle-radius': layer.style.dots.size
         }
       });
 

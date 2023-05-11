@@ -3,16 +3,18 @@
   import maplibregl from 'maplibre-gl';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
-  import ColorPicker from '$lib/components/color/ColorPicker.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import Program from '$lib/components/program/Program.svelte';
   import ColorPalette from '$lib/components/color/ColorPalette.svelte';
+  import FillModifier from '$lib/components/color/FillModifier.svelte';
+  import FillPicker from '$lib/components/color/FillPicker.svelte';
+  import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
+  import StrokePicker from '$lib/components/color/StrokePicker.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
   import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
-  import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
   import SizeControls from '$lib/components/size/SizeControls.svelte';
   import DotControls from '$lib/components/dots/DotControls.svelte';
   import { addSource } from '$lib/interaction/source';
@@ -81,26 +83,45 @@
             <MapTypeSelect />
           </MenuItem>
           {#if $selectedLayer.type === 'Fill'}
-            <MenuItem title="Style">
-              <ColorPicker layer={$selectedLayer} />
+            <MenuItem title="Fill">
+              <FillPicker layer={$selectedLayer} />
+              <FillModifier layer={$selectedLayer} slot="action" />
+            </MenuItem>
+            <MenuItem title="Stroke">
+              <StrokePicker layer={$selectedLayer} />
+              <StrokeModifier layer={$selectedLayer} slot="action" />
             </MenuItem>
           {:else if $selectedLayer.type === 'Choropleth'}
-            <MenuItem title="Palette">
+            <MenuItem title="Fill">
               <ColorPalette layer={$selectedLayer} />
+            </MenuItem>
+            <MenuItem title="Stroke">
+              <StrokePicker layer={$selectedLayer} />
+              <StrokeModifier layer={$selectedLayer} slot="action" />
             </MenuItem>
           {:else if $selectedLayer.type === 'Proportional Symbol'}
             <MenuItem title="Size">
               <SizeControls layer={$selectedLayer} />
             </MenuItem>
-            <MenuItem title="Style">
-              <ColorPicker layer={$selectedLayer} />
+            <MenuItem title="Fill">
+              <FillPicker layer={$selectedLayer} />
+              <FillModifier layer={$selectedLayer} slot="action" />
+            </MenuItem>
+            <MenuItem title="Stroke">
+              <StrokePicker layer={$selectedLayer} />
+              <StrokeModifier layer={$selectedLayer} slot="action" />
             </MenuItem>
           {:else if $selectedLayer.type === 'Dot Density'}
             <MenuItem title="Dots">
               <DotControls layer={$selectedLayer} />
             </MenuItem>
-            <MenuItem title="Style">
-              <ColorPicker layer={$selectedLayer} />
+            <MenuItem title="Fill">
+              <FillPicker layer={$selectedLayer} />
+              <FillModifier layer={$selectedLayer} slot="action" />
+            </MenuItem>
+            <MenuItem title="Stroke">
+              <StrokePicker layer={$selectedLayer} />
+              <StrokeModifier layer={$selectedLayer} slot="action" />
             </MenuItem>
           {/if}
         </Menu>
