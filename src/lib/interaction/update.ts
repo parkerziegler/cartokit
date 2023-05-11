@@ -506,7 +506,11 @@ export function dispatchLayerUpdate({
               'line-width',
               DEFAULT_STROKE_WIDTH
             );
-            map.setPaintProperty(`${layer.id}-stroke`, 'line-opacity', 1);
+            map.setPaintProperty(
+              `${layer.id}-stroke`,
+              'line-opacity',
+              DEFAULT_STROKE_OPACITY
+            );
             break;
           case 'Proportional Symbol':
           case 'Dot Density':
@@ -520,7 +524,11 @@ export function dispatchLayerUpdate({
               'circle-stroke-width',
               DEFAULT_STROKE_WIDTH
             );
-            map.setPaintProperty(layer.id, 'circle-stroke-opacity', 1);
+            map.setPaintProperty(
+              layer.id,
+              'circle-stroke-opacity',
+              DEFAULT_STROKE_OPACITY
+            );
             break;
         }
 
