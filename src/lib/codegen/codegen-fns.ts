@@ -1,4 +1,4 @@
-import type { CartoKitIR } from '$lib/stores/layers';
+import type { CartoKitIR } from '$lib/stores/ir';
 
 /**
  * Generate top-level reusable functions within the JS module.
@@ -9,7 +9,7 @@ import type { CartoKitIR } from '$lib/stores/layers';
  * @returns – A program fragment.
  */
 export function codegenFns(
-  layers: CartoKitIR,
+  layers: CartoKitIR['layers'],
   transformTable: Map<string, boolean>
 ): string {
   const fns: string[] = [];
@@ -41,7 +41,7 @@ export function codegenFns(
  * fetch GeoJSON hosted at a remote URL.
  */
 export function isFetchGeoJSONRequired(
-  layers: CartoKitIR,
+  layers: CartoKitIR['layers'],
   transformTable: Map<string, boolean>
 ): boolean {
   for (const layer of Object.values(layers)) {

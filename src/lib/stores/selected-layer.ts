@@ -1,17 +1,17 @@
 import { derived } from 'svelte/store';
 
-import { layers } from '$lib/stores/layers';
+import { ir } from '$lib/stores/ir';
 import { selectedFeature } from '$lib/stores/selected-feature';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
 export const selectedLayer = derived<
-  [typeof selectedFeature, typeof layers],
+  [typeof selectedFeature, typeof ir],
   CartoKitLayer | null
->([selectedFeature, layers], ([$selectedFeature, $layers]) => {
+>([selectedFeature, ir], ([$selectedFeature, $ir]) => {
   if ($selectedFeature) {
     return $selectedFeature.layer.id.endsWith('-outlines')
-      ? $layers[$selectedFeature.layer.id.replace('-outlines', '')]
-      : $layers[$selectedFeature.layer.id];
+      ? $ir.layers[$selectedFeature.layer.id.replace('-outlines', '')]
+      : $ir.layers[$selectedFeature.layer.id];
   }
 
   return null;

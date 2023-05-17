@@ -8,7 +8,7 @@
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { addSource } from '$lib/interaction/source';
-  import { layers } from '$lib/stores/layers';
+  import { ir } from '$lib/stores/ir';
   import { map } from '$lib/stores/map';
   import type { CartoKitFillLayer } from '$lib/types/CartoKitLayer';
   import { randomColor } from '$lib/utils/color';
@@ -69,11 +69,11 @@
           }
         };
 
-        layers.update((lyrs) => {
-          lyrs[layer.id] = layer;
+        ir.update((_ir) => {
+          _ir.layers[layer.id] = layer;
           addSource($map, layer);
 
-          return lyrs;
+          return _ir;
         });
 
         closeModal();

@@ -11,6 +11,16 @@
   @apply font-mono text-xs;
 }
 
+/* Basemap Inset */
+[id^='inset'] .maplibregl-ctrl-bottom-right,
+[id^='tiles'] .maplibregl-ctrl-bottom-right {
+  display: none;
+}
+
+[id^='inset'] .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: pointer;
+}
+
 /* Utilities */
 @layer utilities {
   /* Block Stack */

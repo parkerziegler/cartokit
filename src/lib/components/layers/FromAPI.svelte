@@ -9,7 +9,7 @@
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import { addSource } from '$lib/interaction/source';
-  import { layers } from '$lib/stores/layers';
+  import { ir } from '$lib/stores/ir';
   import { map } from '$lib/stores/map';
   import type { CartoKitFillLayer } from '$lib/types/CartoKitLayer';
   import { randomColor } from '$lib/utils/color';
@@ -69,11 +69,11 @@
       }
     };
 
-    layers.update((lyrs) => {
-      lyrs[layer.id] = layer;
+    ir.update((ir) => {
+      ir.layers[layer.id] = layer;
       addSource($map, layer);
 
-      return lyrs;
+      return ir;
     });
 
     $map.on('sourcedata', onDataLoaded(layer));

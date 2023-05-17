@@ -1,6 +1,10 @@
 <!-- Core implementation adapted from: https://svelte.dev/examples/modal -->
 <script lang="ts">
+  import cs from 'classnames';
+
   export let showModal: boolean;
+  let className = '';
+  export { className as class };
 
   let dialog: HTMLDialogElement;
 
@@ -13,7 +17,10 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <dialog
-  class="max-w-lg overflow-auto rounded bg-slate-900 font-sans text-white"
+  class={cs(
+    'max-w-lg overflow-auto rounded bg-slate-900 font-sans text-white',
+    className
+  )}
   bind:this={dialog}
   on:close={() => (showModal = false)}
   on:click|self={() => dialog.close()}
