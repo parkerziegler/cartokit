@@ -15,32 +15,20 @@
   let showModal = false;
 
   const tabs: Tab[] = [{ name: 'MapTiler', content: MaptilerBasemapGrid }];
+  const mapStyles = ['outdoor-v2', 'hybrid', 'toner-v2'];
 
   onMount(() => {
-    const outdoorMap = new maplibregl.Map({
-      container: 'inset-outdoor',
-      style: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
-      center: $ir.center,
-      zoom: $ir.zoom
-    });
+    maps = mapStyles.map((style) => {
+      const map = new maplibregl.Map({
+        container: `inset-${style}`,
+        style: `https://api.maptiler.com/maps/${style}/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
+        center: $ir.center,
+        zoom: $ir.zoom
+      });
 
-    const satelliteMap = new maplibregl.Map({
-      container: 'inset-satellite',
-      style: `https://api.maptiler.com/maps/hybrid/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
-      center: $ir.center,
-      zoom: $ir.zoom
-    });
-
-    const tonerMap = new maplibregl.Map({
-      container: 'inset-toner',
-      style: `https://api.maptiler.com/maps/toner-v2/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
-      center: $ir.center,
-      zoom: $ir.zoom
-    });
-
-    maps = [outdoorMap, satelliteMap, tonerMap];
-    maps.forEach((map) => {
       map.scrollZoom.disable();
+
+      return map;
     });
   });
 
@@ -60,14 +48,14 @@
     map.setZoom($ir.zoom);
   }
 
-  $: if (maps.length > 0 && picker && $map && $ir) {
+  $: if (maps.length > 0 && $map && $ir) {
     updateMapThumbnail(maps[0], picker);
   }
 
   // Only update hidden map thumbnails when the picker is hovered.
   // This is a small perf optimization to avoid updating all three
   // thumbnails while two are out of view.
-  $: if (hovered) {
+  $: if (hovered && $map && $ir) {
     maps.slice(1).forEach((map) => updateMapThumbnail(map, picker));
   }
 </script>
@@ -79,14 +67,17 @@
   on:mouseleave={() => (hovered = false)}
   on:click={() => (showModal = true)}
 >
-  <div id="inset-outdoor" class="z-10 h-16 w-16 cursor-pointer rounded" />
   <div
-    id="inset-satellite"
-    class="absolute bottom-0 h-16 w-16 rounded transition-transform group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:rotate-12"
+    id={`inset-${mapStyles[0]}`}
+    class="z-10 h-16 w-16 cursor-pointer rounded border-2 border-white"
   />
   <div
-    id="inset-toner"
-    class="absolute bottom-0 h-16 w-16 rounded transition-transform group-hover:-translate-x-2 group-hover:-translate-y-2 group-hover:-rotate-12"
+    id={`inset-${mapStyles[1]}`}
+    class="absolute bottom-0 h-16 w-16 rounded border-2 border-white transition-transform group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:rotate-12"
+  />
+  <div
+    id={`inset-${mapStyles[2]}`}
+    class="absolute bottom-0 h-16 w-16 rounded border-2 border-white transition-transform group-hover:-translate-x-2 group-hover:-translate-y-2 group-hover:-rotate-12"
   />
 </button>
 <Modal bind:showModal class="max-w-3xl">
