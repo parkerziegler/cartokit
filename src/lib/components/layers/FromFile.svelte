@@ -69,11 +69,11 @@
           }
         };
 
-        ir.update((_ir) => {
-          _ir.layers[layer.id] = layer;
+        ir.update((ir) => {
+          ir.layers[layer.id] = layer;
           addSource($map, layer);
 
-          return _ir;
+          return ir;
         });
 
         closeModal();

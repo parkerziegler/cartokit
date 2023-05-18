@@ -43,19 +43,19 @@
     });
 
     map.on('move', (event) => {
-      ir.update((_ir) => {
+      ir.update((ir) => {
         const { lng, lat } = event.target.getCenter();
-        _ir.center = [lng, lat];
+        ir.center = [lng, lat];
 
-        return _ir;
+        return ir;
       });
     });
 
     map.on('zoom', (event) => {
-      ir.update((_ir) => {
-        _ir.zoom = event.target.getZoom();
+      ir.update((ir) => {
+        ir.zoom = event.target.getZoom();
 
-        return _ir;
+        return ir;
       });
     });
 

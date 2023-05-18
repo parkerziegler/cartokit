@@ -126,10 +126,10 @@ function addSelectListeners(map: Map, layerId: string) {
  */
 export function onFeatureLeave(
   map: Map,
-  ir: CartoKitIR
+  { layers }: CartoKitIR
 ): (event: MapMouseEvent) => void {
   return function deselectFeature(event: MapMouseEvent) {
-    const layerIds = Object.values(ir.layers).map((layer) => {
+    const layerIds = Object.values(layers).map((layer) => {
       // For dot density layers, we need to deselect the outline layer.
       if (layer.type === 'Dot Density') {
         return `${layer.id}-outlines`;
