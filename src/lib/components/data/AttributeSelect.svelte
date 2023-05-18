@@ -7,6 +7,7 @@
     CartoKitProportionalSymbolLayer,
     CartoKitDotDensityLayer
   } from '$lib/types/CartoKitLayer';
+  import { isPropertyNumeric } from '$lib/utils/property';
 
   export let selected: string;
   export let layer:
@@ -14,12 +15,20 @@
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer;
 
-  $: options = Object.keys($selectedFeature?.properties ?? {}).map(
-    (attribute) => ({
-      value: attribute,
-      label: attribute
-    })
+  $: properties = Object.keys($selectedFeature?.properties ?? {}).filter(
+    (prop) => {
+      switch (layer.type) {
+        case 'Choropleth':
+        case 'Proportional Symbol':
+        case 'Dot Density':
+          return isPropertyNumeric($selectedFeature?.properties[prop]);
+      }
+    }
   );
+  $: options = properties.map((attribute) => ({
+    value: attribute,
+    label: attribute
+  }));
 
   function onChange(event: CustomEvent<{ value: string }>) {
     const attribute = event.detail.value;
