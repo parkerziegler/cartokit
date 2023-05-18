@@ -3,23 +3,23 @@
   import maplibregl from 'maplibre-gl';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
-  import AddLayer from '$lib/components/layers/AddLayer.svelte';
-  import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
-  import Menu from '$lib/components/shared/Menu.svelte';
-  import Program from '$lib/components/program/Program.svelte';
+  import BasemapPicker from '$lib/components/basemap/BasemapPicker.svelte';
   import ColorPalette from '$lib/components/color/ColorPalette.svelte';
   import FillModifier from '$lib/components/color/FillModifier.svelte';
   import FillPicker from '$lib/components/color/FillPicker.svelte';
   import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
+  import DotControls from '$lib/components/dots/DotControls.svelte';
+  import AddLayer from '$lib/components/layers/AddLayer.svelte';
+  import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
+  import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
+  import Program from '$lib/components/program/Program.svelte';
+  import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
-  import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
   import SizeControls from '$lib/components/size/SizeControls.svelte';
-  import DotControls from '$lib/components/dots/DotControls.svelte';
-  import { addSource } from '$lib/interaction/source';
   import { onFeatureLeave } from '$lib/interaction/select';
-  import { layers } from '$lib/stores/layers';
+  import { ir } from '$lib/stores/ir';
   import { map as mapStore } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
 
@@ -28,24 +28,35 @@
   onMount(() => {
     map = new maplibregl.Map({
       container: 'map',
-      style: `https://api.maptiler.com/maps/dataviz-light/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
-      center: [-105.436, 35.909],
-      zoom: 5
-    });
-
-    map.on('load', () => {
-      Object.values($layers).forEach((layer) => {
-        addSource(map, layer);
-      });
+      style: $ir.basemap.url,
+      center: $ir.center,
+      zoom: $ir.zoom
     });
 
     // Add an event listener to handle feature deselection.
-    map.on('click', onFeatureLeave(map, $layers));
+    map.on('click', onFeatureLeave(map, $ir));
 
     // When the map first reaches an idle state, set it in the store.
     // This _should_ ensure that the map's styles and data have fully loaded.
     map.once('idle', () => {
       mapStore.set(map);
+    });
+
+    map.on('move', (event) => {
+      ir.update((ir) => {
+        const { lng, lat } = event.target.getCenter();
+        ir.center = [lng, lat];
+
+        return ir;
+      });
+    });
+
+    map.on('zoom', (event) => {
+      ir.update((ir) => {
+        ir.zoom = event.target.getZoom();
+
+        return ir;
+      });
     });
 
     return () => {
@@ -126,6 +137,7 @@
           {/if}
         </Menu>
       {/if}
+      <BasemapPicker />
       <div class="absolute bottom-8 right-4 z-10 rounded-md bg-slate-900">
         <button
           on:click={toggleProgramVisibility}

@@ -6,7 +6,7 @@ import type {
 } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
-import type { CartoKitIR } from '$lib/stores/layers';
+import type { CartoKitIR } from '$lib/stores/ir';
 import { listeners } from '$lib/stores/listeners';
 import { selectedFeature } from '$lib/stores/selected-feature';
 
@@ -121,12 +121,12 @@ function addSelectListeners(map: Map, layerId: string) {
  * A global event listener for deselecting features.
  *
  * @param map – The top-level MapLibre GL map instance.
- * @param layers – The CartoKit IR.
+ * @param ir – The CartoKit IR.
  * @returns – deselectFeature, a callback to run when a map mouse event intersects no features.
  */
 export function onFeatureLeave(
   map: Map,
-  layers: CartoKitIR
+  { layers }: CartoKitIR
 ): (event: MapMouseEvent) => void {
   return function deselectFeature(event: MapMouseEvent) {
     const layerIds = Object.values(layers).map((layer) => {

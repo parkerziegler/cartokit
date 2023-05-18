@@ -10,7 +10,7 @@ import {
 } from '$lib/interaction/geometry';
 import { transitionMapType } from '$lib/interaction/map-type';
 import { deriveThresholds } from '$lib/interaction/scales';
-import { layers } from '$lib/stores/layers';
+import { ir } from '$lib/stores/ir';
 import { map as mapStore } from '$lib/stores/map';
 import type {
   CartoKitLayer,
@@ -226,36 +226,36 @@ export function dispatchLayerUpdate({
 
   switch (type) {
     case 'initial-data': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id];
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id];
         lyr.data.geoJSON = payload.geoJSON;
         // The initial data loaded for a layer gets preserved in the rawGeoJSON property.
         // This allows us to recover polygons when we do things like transition to points
         // and subsequently back to polygons.
         lyr.data.rawGeoJSON = payload.geoJSON;
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'map-type': {
-      layers.update((lyrs) => {
-        lyrs[layer.id] = transitionMapType({
+      ir.update((ir) => {
+        ir.layers[layer.id] = transitionMapType({
           map,
           layer,
           targetMapType: payload.mapType
         });
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'attribute': {
-      layers.update((lyrs) => {
+      ir.update((ir) => {
         // We guarantee that layer is a CartoKitLayer with an attribute when we dispatch
         // this update. Therefore, accessing that same layer in the store by id
         // guarantees that lyr has an attribute property.
-        const lyr = lyrs[layer.id] as
+        const lyr = ir.layers[layer.id] as
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer;
@@ -291,13 +291,13 @@ export function dispatchLayerUpdate({
           }
         }
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'fill': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id] as
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id] as
           | CartoKitFillLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer;
@@ -316,13 +316,13 @@ export function dispatchLayerUpdate({
           }
         }
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'fill-opacity': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id];
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id];
 
         if (lyr.style.fill) {
           lyr.style.fill.opacity = payload.opacity;
@@ -339,13 +339,13 @@ export function dispatchLayerUpdate({
           }
         }
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'add-fill': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id];
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id];
         lyr.style.fill = {
           color: DEFAULT_FILL,
           opacity: DEFAULT_OPACITY
@@ -364,13 +364,13 @@ export function dispatchLayerUpdate({
             break;
         }
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'remove-fill': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id];
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id];
         lyr.style.fill = undefined;
 
         switch (lyr.type) {
@@ -387,13 +387,13 @@ export function dispatchLayerUpdate({
             break;
         }
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'stroke': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id];
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id];
         if (lyr.style.stroke) {
           lyr.style.stroke.color = payload.color;
 
@@ -417,13 +417,13 @@ export function dispatchLayerUpdate({
           }
         }
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'stroke-width': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id];
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id];
 
         if (lyr.style.stroke) {
           lyr.style.stroke.width = payload.strokeWidth;
@@ -448,13 +448,13 @@ export function dispatchLayerUpdate({
           }
         }
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'stroke-opacity': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id];
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id];
 
         if (lyr.style.stroke) {
           lyr.style.stroke.opacity = payload.opacity;
@@ -479,13 +479,13 @@ export function dispatchLayerUpdate({
           }
         }
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'add-stroke': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id];
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id];
         // Create a default stroke.
         lyr.style.stroke = {
           color: DEFAULT_STROKE,
@@ -532,13 +532,13 @@ export function dispatchLayerUpdate({
             break;
         }
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'remove-stroke': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id];
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id];
         lyr.style.stroke = undefined;
 
         switch (lyr.type) {
@@ -566,16 +566,16 @@ export function dispatchLayerUpdate({
             break;
         }
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'color-scale': {
-      layers.update((lyrs) => {
+      ir.update((ir) => {
         // We guarantee that layer is a CartoKitChoroplethLayer when we dispatch
         // this update. Therefore, accessing that same layer in the store by id
         // guarantees that lyr is also a CartoKitChoroplethLayer.
-        const lyr = lyrs[layer.id] as CartoKitChoroplethLayer;
+        const lyr = ir.layers[layer.id] as CartoKitChoroplethLayer;
         lyr.style.fill.scale = payload.scale;
         lyr.style.fill.thresholds = deriveThresholds({
           scale: payload.scale,
@@ -587,24 +587,24 @@ export function dispatchLayerUpdate({
 
         map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'color-scheme': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id] as CartoKitChoroplethLayer;
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id] as CartoKitChoroplethLayer;
         lyr.style.fill.scheme = payload.scheme;
 
         map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'color-count': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id] as CartoKitChoroplethLayer;
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id] as CartoKitChoroplethLayer;
         lyr.style.fill.count = payload.count;
         lyr.style.fill.thresholds = deriveThresholds({
           scale: lyr.style.fill.scale,
@@ -616,47 +616,47 @@ export function dispatchLayerUpdate({
 
         map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'color-threshold': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id] as CartoKitChoroplethLayer;
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id] as CartoKitChoroplethLayer;
         lyr.style.fill.thresholds[payload.index] = payload.threshold;
 
         map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'size': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id] as CartoKitProportionalSymbolLayer;
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id] as CartoKitProportionalSymbolLayer;
         lyr.style.size.min = payload.min ?? lyr.style.size.min;
         lyr.style.size.max = payload.max ?? lyr.style.size.max;
 
         map.setPaintProperty(layer.id, 'circle-radius', deriveSize(lyr));
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'dot-size': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id] as CartoKitDotDensityLayer;
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id] as CartoKitDotDensityLayer;
         lyr.style.dots.size = payload.size;
 
         map.setPaintProperty(layer.id, 'circle-radius', payload.size);
 
-        return lyrs;
+        return ir;
       });
       break;
     }
     case 'dot-value': {
-      layers.update((lyrs) => {
-        const lyr = lyrs[layer.id] as CartoKitDotDensityLayer;
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id] as CartoKitDotDensityLayer;
         lyr.style.dots.value = payload.value;
 
         // We always use the rawGeoJSON to generate the dot density points.
@@ -673,7 +673,7 @@ export function dispatchLayerUpdate({
         // Update the source with the new data.
         (map.getSource(layer.id) as GeoJSONSource).setData(features);
 
-        return lyrs;
+        return ir;
       });
       break;
     }

@@ -3,7 +3,7 @@ import camelCase from 'lodash.camelcase';
 
 import { codegenFns } from '$lib/codegen/codegen-fns';
 import { codegenMap } from '$lib/codegen/codegen-map';
-import type { CartoKitIR } from '$lib/stores/layers';
+import type { CartoKitIR } from '$lib/stores/ir';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { getFeatureCollectionType } from '$lib/utils/geojson';
 
@@ -11,11 +11,11 @@ import { getFeatureCollectionType } from '$lib/utils/geojson';
  * Generate a program fragment for all library and data source imports.
  *
  * @param map – The MapLibre GL JS map instance.
- * @param layers – The CartoKit IR.
+ * @param ir – The CartoKit IR.
  *
  * @returns – A program fragment.
  */
-export function codegenImports(map: MapLibreMap, layers: CartoKitIR) {
+export function codegenImports(map: MapLibreMap, ir: CartoKitIR) {
   // Create a symbol table mapping layer ids to identifiers referencing imported
   // source data.
   const uploadTable = new Map<string, string>();
@@ -24,7 +24,7 @@ export function codegenImports(map: MapLibreMap, layers: CartoKitIR) {
   // transformations.
   const transformTable = new Map<string, boolean>();
 
-  const fileImports = Object.values(layers).reduce((acc, layer) => {
+  const fileImports = Object.values(ir.layers).reduce((acc, layer) => {
     if (isTransformRequired(layer)) {
       transformTable.set(layer.id, true);
     }
@@ -47,9 +47,9 @@ export function codegenImports(map: MapLibreMap, layers: CartoKitIR) {
 
   return `${imports}
 
-  ${codegenFns(layers, transformTable)}
+  ${codegenFns(ir, transformTable)}
   
-  ${codegenMap({ map, layers, uploadTable, transformTable })}`;
+  ${codegenMap({ map, ir, uploadTable, transformTable })}`;
 }
 
 /**

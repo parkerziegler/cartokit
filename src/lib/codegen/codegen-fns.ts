@@ -1,20 +1,20 @@
-import type { CartoKitIR } from '$lib/stores/layers';
+import type { CartoKitIR } from '$lib/stores/ir';
 
 /**
  * Generate top-level reusable functions within the JS module.
  *
- * @param layers – The CartoKit IR.
+ * @param ir – The CartoKit IR.
  * @param transformTable — The transformation symbol table.
  *
  * @returns – A program fragment.
  */
 export function codegenFns(
-  layers: CartoKitIR,
+  ir: CartoKitIR,
   transformTable: Map<string, boolean>
 ): string {
   const fns: string[] = [];
 
-  if (isFetchGeoJSONRequired(layers, transformTable)) {
+  if (isFetchGeoJSONRequired(ir, transformTable)) {
     fns.push(`async function fetchGeoJSON(url) {
       try {
         const response = await fetch(url);
@@ -34,14 +34,14 @@ export function codegenFns(
  * Determine whether we need to inline a function to fetch GeoJSON hosted at a
  * remote URL.
  *
- * @param layers – The CartoKit IR.
+ * @param ir – The CartoKit IR.
  * @param transformTable – The transformation symbol table.
  *
  * @returns – A Boolean value indicting whether we need to inline a function to
  * fetch GeoJSON hosted at a remote URL.
  */
 export function isFetchGeoJSONRequired(
-  layers: CartoKitIR,
+  { layers }: CartoKitIR,
   transformTable: Map<string, boolean>
 ): boolean {
   for (const layer of Object.values(layers)) {

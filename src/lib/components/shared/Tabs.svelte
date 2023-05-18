@@ -1,12 +1,12 @@
 <script context="module" lang="ts">
   export interface Tab {
     name: string;
-    content: typeof SvelteComponent;
+    content: ComponentType;
   }
 </script>
 
 <script lang="ts">
-  import type { SvelteComponent } from 'svelte';
+  import type { ComponentType } from 'svelte';
   import cs from 'classnames';
 
   export let tabs: Tab[] = [];
