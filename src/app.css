@@ -12,8 +12,7 @@
 }
 
 /* Basemap Inset */
-[id^='inset'] .maplibregl-ctrl-bottom-right,
-[id^='tiles'] .maplibregl-ctrl-bottom-right {
+[id^='inset'] .maplibregl-ctrl-bottom-right {
   display: none;
 }
 

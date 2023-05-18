@@ -47,7 +47,7 @@ export function codegenImports(map: MapLibreMap, ir: CartoKitIR) {
 
   return `${imports}
 
-  ${codegenFns(ir.layers, transformTable)}
+  ${codegenFns(ir, transformTable)}
   
   ${codegenMap({ map, ir, uploadTable, transformTable })}`;
 }
