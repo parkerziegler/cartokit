@@ -41,7 +41,7 @@ export function codegenMap({
   }, '');
 
   const { lng, lat } = map.getCenter();
-  const isLoadAsync = isFetchGeoJSONRequired(ir.layers, transformTable);
+  const isLoadAsync = isFetchGeoJSONRequired(ir, transformTable);
 
   const program = `
   const map = new mapboxgl.Map({
