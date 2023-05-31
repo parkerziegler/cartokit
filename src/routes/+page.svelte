@@ -8,12 +8,11 @@
   import FillPicker from '$lib/components/color/FillPicker.svelte';
   import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
-  import DataTable from '$lib/components/data/DataTable.svelte';
   import DotControls from '$lib/components/dots/DotControls.svelte';
+  import Editor from '$lib/components/editor/Editor.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
-  import Program from '$lib/components/program/Program.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
@@ -135,17 +134,14 @@
       {/if}
       <BasemapPicker />
       <button
-        class="absolute bottom-8 right-4 z-10 rounded-md bg-slate-900 px-4 py-2 text-sm tracking-wider text-white shadow-lg"
+        class="absolute bottom-8 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg"
         on:click={toggleEditorVisibility}
       >
         {editorOpen ? 'Close Editor' : 'Open Editor'}
       </button>
     </div>
-    {#if editorOpen && $selectedLayer}
-      <div class="col-span-4 flex flex-col overflow-hidden">
-        <Program />
-        <DataTable data={$selectedLayer.data.geoJSON.features} />
-      </div>
+    {#if editorOpen}
+      <Editor />
     {/if}
   </div>
 </main>
