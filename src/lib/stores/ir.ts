@@ -1,5 +1,4 @@
 import { writable } from 'svelte/store';
-import * as turf from '@turf/turf';
 
 import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
@@ -15,10 +14,7 @@ export interface CartoKitIR {
 }
 
 export const ir = writable<CartoKitIR>({
-  center: turf.randomPosition([-180, -45, 180, 45]).slice(0, 2) as [
-    number,
-    number
-  ],
+  center: [-105, 37],
   basemap: {
     url: `https://api.maptiler.com/maps/dataviz-light/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
     provider: 'Maptiler'
