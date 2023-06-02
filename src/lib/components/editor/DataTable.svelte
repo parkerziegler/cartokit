@@ -31,8 +31,8 @@
       }
 
       array.push(value);
-      array = array;
     }
+    array = array;
   }
 
   function onScroll() {

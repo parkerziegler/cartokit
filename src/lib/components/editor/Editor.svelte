@@ -9,7 +9,7 @@
     : Object.values($ir.layers)[0]?.data.geoJSON.features ?? [];
 </script>
 
-<div class="col-span-4 flex flex-col overflow-hidden">
+<div class="z-10 col-span-4 flex flex-col overflow-hidden shadow-lg">
   <Program />
   <DataTable {data} />
 </div>
