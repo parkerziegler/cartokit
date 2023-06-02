@@ -25,4 +25,4 @@
   }
 </script>
 
-<div bind:this={editor} />
+<div bind:this={editor} class="grow overflow-auto" />

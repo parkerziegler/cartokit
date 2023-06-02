@@ -5,6 +5,6 @@
   export { className as class };
 </script>
 
-<div class={cs('stack-border rounded-md bg-slate-900', className)}>
+<div class={cs('stack-border rounded-md bg-slate-900 shadow-lg', className)}>
   <slot />
 </div>

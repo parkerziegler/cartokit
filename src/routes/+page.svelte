@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import maplibregl from 'maplibre-gl';
 
-  import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
   import BasemapPicker from '$lib/components/basemap/BasemapPicker.svelte';
   import ColorPalette from '$lib/components/color/ColorPalette.svelte';
   import FillModifier from '$lib/components/color/FillModifier.svelte';
@@ -10,10 +9,10 @@
   import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
   import DotControls from '$lib/components/dots/DotControls.svelte';
+  import Editor from '$lib/components/editor/Editor.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
-  import Program from '$lib/components/program/Program.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
@@ -64,20 +63,16 @@
     };
   });
 
-  let programVisible = false;
+  let editorOpen = false;
 
-  function toggleProgramVisibility() {
-    programVisible = !programVisible;
+  function toggleEditorVisibility() {
+    editorOpen = !editorOpen;
   }
 </script>
 
 <main class="absolute inset-0">
   <div class="grid h-full w-full grid-cols-12">
-    <div
-      class="relative col-span-12"
-      id="map"
-      class:col-span-8={programVisible}
-    >
+    <div class="relative col-span-12" id="map" class:col-span-8={editorOpen}>
       <Menu class="min-w-xs absolute top-4 left-4 z-10 max-w-lg overflow-auto">
         <MenuTitle class="mr-4">
           Layers
@@ -138,18 +133,15 @@
         </Menu>
       {/if}
       <BasemapPicker />
-      <div class="absolute bottom-8 right-4 z-10 rounded-md bg-slate-900">
-        <button
-          on:click={toggleProgramVisibility}
-          class="p-2 font-mono text-xs text-white"
-          >{programVisible ? 'Hide Source' : 'View Source'}</button
-        >
-      </div>
+      <button
+        class="absolute bottom-8 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg"
+        on:click={toggleEditorVisibility}
+      >
+        {editorOpen ? 'Close Editor' : 'Open Editor'}
+      </button>
     </div>
-    {#if programVisible}
-      <div class="col-span-4">
-        <Program />
-      </div>
+    {#if editorOpen}
+      <Editor />
     {/if}
   </div>
 </main>
