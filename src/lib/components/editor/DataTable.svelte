@@ -27,10 +27,10 @@
     return Math.min(N, length);
   }
 
-  function materialize(d: Feature[]) {
+  function materialize(data: Feature[]) {
     // Empty array and reinstantiate the iterator and n.
     array = [];
-    iterator = d[Symbol.iterator]();
+    iterator = data[Symbol.iterator]();
     n = minlengthof(rows * 2);
 
     // Add the first n rows.
@@ -60,7 +60,7 @@
         desc: sort.col === col ? !sort.desc : true
       };
 
-      const d = orderBy(data, `properties.['${sort.col}']`, [
+      const d = orderBy(data, `properties['${sort.col}']`, [
         sort.desc ? 'desc' : 'asc'
       ]);
 
@@ -92,16 +92,16 @@
     {tableName}
   </span>
   <div
-    class="w-full overflow-auto border-t border-slate-400 text-2xs text-white"
+    class="w-full overflow-auto border-t border-slate-400 bg-slate-900 text-2xs text-white"
     bind:this={root}
     on:scroll={onScroll}
   >
-    <table class="border-collapse bg-slate-900">
+    <table class="border-collapse">
       <thead>
         <tr class="sticky top-0">
           {#each cols as col}
             <th
-              class="relative bg-slate-900 px-4 py-2 text-left font-semibold text-slate-400"
+              class="bg-slate-900 px-4 py-2 text-left font-semibold text-slate-400"
               class:sort-desc={sort.col === col && sort.desc}
               class:sort-asc={sort.col === col && !sort.desc}
               on:click={resort(col)}
