@@ -83,18 +83,20 @@
 </script>
 
 <div
-  class="flex flex-col overflow-hidden bg-slate-900 font-mono"
+  class="flex flex-col overflow-hidden bg-slate-700 font-mono"
   style="flex: 0 0 {(rows + 1) * ROW_HEIGHT - 1 + TAB_HEIGHT}px;"
 >
-  <span class="self-start bg-slate-700 px-3 py-2 text-xs text-slate-300">
+  <span
+    class="table-name relative self-start border-r border-r-slate-400 bg-slate-900 px-3 py-2 text-xs text-white"
+  >
     {tableName}
   </span>
   <div
-    class="w-full overflow-auto border border-t border-slate-700 text-2xs text-white"
+    class="w-full overflow-auto border-t border-slate-400 text-2xs text-white"
     bind:this={root}
     on:scroll={onScroll}
   >
-    <table class="border-collapse">
+    <table class="border-collapse bg-slate-900">
       <thead>
         <tr class="sticky top-0">
           {#each cols as col}
@@ -124,6 +126,13 @@
 </div>
 
 <style>
+  .table-name::after {
+    @apply absolute left-0 w-full bg-slate-900;
+    content: '';
+    height: 1px;
+    bottom: -1px;
+  }
+
   th:first-child,
   td:first-child {
     padding-left: 1rem;
