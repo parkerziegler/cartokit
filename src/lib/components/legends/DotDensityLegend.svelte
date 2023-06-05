@@ -23,6 +23,6 @@
         stroke-opacity={layer.style.stroke?.opacity ?? '0'}
       />
     </svg>
-    <span class="text-2xs">1 dot = {layer.style.dots.value} units</span>
+    <span class="text-3xs">1 dot = {layer.style.dots.value} units</span>
   </div>
 </div>
