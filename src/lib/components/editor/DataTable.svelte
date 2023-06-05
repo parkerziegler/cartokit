@@ -5,8 +5,8 @@
   import type { Feature } from 'geojson';
   import orderBy from 'lodash.orderby';
 
-  const ROW_HEIGHT = 32.5;
-  const TAB_HEIGHT = 32;
+  const ROW_HEIGHT = 33;
+  const TAB_HEIGHT = 33;
 
   export let data: Feature[];
   export let tableName: string;
