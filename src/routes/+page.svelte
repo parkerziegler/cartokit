@@ -82,6 +82,7 @@
       </Menu>
       {#if $selectedLayer}
         <Menu
+          id="properties"
           class="style-editor absolute top-4 right-4 z-10 max-w-sm overflow-auto"
         >
           <MenuTitle>Properties</MenuTitle>

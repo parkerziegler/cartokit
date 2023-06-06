@@ -1,4 +1,7 @@
 <script lang="ts">
+  import AttributeEditor from '$lib/components/data/AttributeEditor.svelte';
+  import GearIcon from '$lib/components/icons/GearIcon.svelte';
+  import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { selectedFeature } from '$lib/stores/selected-feature';
@@ -14,6 +17,15 @@
     | CartoKitChoroplethLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer;
+
+  let target = document.getElementById('map') ?? document.body;
+  let propertiesMenu = document.getElementById('properties') ?? document.body;
+  let ref: Select<string>;
+  let dimensions: { top: number; left: number; right: number } = {
+    top: 0,
+    left: 0,
+    right: 0
+  };
 
   $: properties = Object.keys($selectedFeature?.properties ?? {}).filter(
     (prop) => {
@@ -40,8 +52,46 @@
       }
     });
   }
+
+  let attributeEditorVisible = false;
+
+  function onClickComputedAttribute() {
+    attributeEditorVisible = true;
+
+    if (propertiesMenu) {
+      const { top } = ref.getBoundingClientRect();
+      const { left, right } = propertiesMenu.getBoundingClientRect();
+      dimensions = {
+        left,
+        right,
+        top
+      };
+    }
+  }
+
+  function onCloseComputedAttribute() {
+    attributeEditorVisible = false;
+  }
 </script>
 
 <div class="stack-h stack-h-xs items-center">
-  <Select {options} {selected} on:change={onChange} title="Attribute" />
+  <Select
+    {options}
+    {selected}
+    on:change={onChange}
+    title="Attribute"
+    bind:this={ref}
+  />
+  <button on:click={onClickComputedAttribute}><GearIcon /></button>
 </div>
+{#if attributeEditorVisible}
+  <Portal
+    class="absolute"
+    {target}
+    style="top: {dimensions.top}px; right: {dimensions.right -
+      dimensions.left +
+      32}px;"
+  >
+    <AttributeEditor onClose={onCloseComputedAttribute} />
+  </Portal>
+{/if}

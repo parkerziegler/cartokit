@@ -3,8 +3,12 @@
 
   let className = '';
   export { className as class };
+  export let id = '';
 </script>
 
-<div class={cs('stack-border rounded-md bg-slate-900 shadow-lg', className)}>
+<div
+  {id}
+  class={cs('stack-border rounded-md bg-slate-900 shadow-lg', className)}
+>
   <slot />
 </div>

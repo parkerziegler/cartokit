@@ -8,19 +8,14 @@
 
   export let layer: CartoKitChoroplethLayer;
 
-  let target = document.getElementById('map') ?? undefined;
+  let target = document.getElementById('map') ?? document.body;
   let ref: Select<ColorScale>;
-  let dimensions: DOMRect = {
-    bottom: 0,
-    height: 0,
-    left: 0,
-    right: 0,
-    top: 0,
-    width: 0,
+  let dimensions: DOMRect = DOMRect.fromRect({
     x: 0,
     y: 0,
-    toJSON: () => {}
-  };
+    width: 0,
+    height: 0
+  });
 
   $: selected = layer.style.fill.scale;
   const options = COLOR_SCALES.map((scale) => ({
