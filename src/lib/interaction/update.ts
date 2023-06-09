@@ -1,6 +1,7 @@
 import type { GeoJSONSource } from 'maplibre-gl';
-import type { FeatureCollection } from 'geojson';
+import type { FeatureCollection, Feature } from 'geojson';
 import { get } from 'svelte/store';
+import * as turf from '@turf/turf';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import {
@@ -188,6 +189,17 @@ interface DotValueUpdate extends LayerUpdate {
   layer: CartoKitDotDensityLayer;
 }
 
+interface ComputedAttributeUpdate extends LayerUpdate {
+  type: 'computed-attribute';
+  payload: {
+    features: Feature[];
+  };
+  layer:
+    | CartoKitChoroplethLayer
+    | CartoKitProportionalSymbolLayer
+    | CartoKitDotDensityLayer;
+}
+
 type DispatchLayerUpdateParams =
   | InitialDataUpdate
   | MapTypeUpdate
@@ -207,7 +219,8 @@ type DispatchLayerUpdateParams =
   | ColorThresholdUpdate
   | SizeUpdate
   | DotSizeUpdate
-  | DotValueUpdate;
+  | DotValueUpdate
+  | ComputedAttributeUpdate;
 
 /**
  * Dispatch standardized updates to specific layers.
@@ -676,6 +689,18 @@ export function dispatchLayerUpdate({
         return ir;
       });
       break;
+    }
+    case 'computed-attribute': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id];
+        const featureCollection = turf.featureCollection(payload.features);
+        lyr.data.geoJSON = featureCollection;
+
+        // Update the source with the new data.
+        (map.getSource(layer.id) as GeoJSONSource).setData(featureCollection);
+
+        return ir;
+      });
     }
   }
 }

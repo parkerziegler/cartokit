@@ -1,4 +1,5 @@
-import type { GeoJSON, FeatureCollection } from 'geojson';
+import type { GeoJSON, FeatureCollection, Feature } from 'geojson';
+
 import { normalizeGeoJSONToFeatureCollection } from './geojson';
 
 /**
@@ -38,6 +39,52 @@ export function sourceWorker(
   worker.addEventListener('message', (event: MessageEvent<GeoJSON>) => {
     const featureCollection = normalizeGeoJSONToFeatureCollection(event.data);
     cb(featureCollection);
+
+    worker.terminate();
+    URL.revokeObjectURL(source);
+  });
+}
+
+type TransformationWorkerMessage =
+  | { type: 'data'; data: Feature[] }
+  | { type: 'error'; error: Error };
+
+export function transformationWorker(
+  program: string,
+  featureCollection: Feature[],
+  cb: (data: TransformationWorkerMessage) => void
+) {
+  const blob = new Blob(
+    // Invoke user transformation code using an IIFE.
+    [
+      `try {
+        const data = (${program})(${JSON.stringify(featureCollection)});
+        self.postMessage({ type: 'data', data });
+      } catch (error) {
+        self.postMessage({ type: 'error', error });
+      }`
+    ],
+    { type: 'text/javascript' }
+  );
+
+  const source = URL.createObjectURL(blob);
+  const worker = new Worker(source);
+
+  worker.addEventListener(
+    'message',
+    (event: MessageEvent<TransformationWorkerMessage>) => {
+      cb(event.data);
+
+      worker.terminate();
+      URL.revokeObjectURL(source);
+    }
+  );
+
+  worker.addEventListener('error', (event: ErrorEvent) => {
+    cb({
+      type: 'error',
+      error: new Error(`${event.message}. ${event.lineno}:${event.colno}.`)
+    });
 
     worker.terminate();
     URL.revokeObjectURL(source);

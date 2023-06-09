@@ -13,6 +13,8 @@
 
 <button
   on:click={click}
-  class={cs('rounded bg-slate-700 px-4 py-2 text-sm text-white', className)}
-  ><slot /></button
+  class={cs(
+    'rounded bg-slate-700 px-3 py-2 text-sm text-white transition-opacity hover:opacity-75',
+    className
+  )}><slot /></button
 >
