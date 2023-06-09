@@ -49,13 +49,22 @@ type TransformationWorkerMessage =
   | { type: 'data'; data: Feature[] }
   | { type: 'error'; error: Error };
 
+/**
+ * A function to run a user-defined transformation function in a Web Worker.
+ *
+ * @param program – The user-defined transformation function.
+ * @param featureCollection – The GeoJSON FeatureCollection to transform.
+ * @param cb – A callback function to run on success or failure of the
+ * transformation.
+ */
 export function transformationWorker(
   program: string,
   featureCollection: Feature[],
-  cb: (data: TransformationWorkerMessage) => void
+  cb: (message: TransformationWorkerMessage) => void
 ) {
   const blob = new Blob(
     // Invoke user transformation code using an IIFE.
+    // Wrap in a try-catch so we can send errors back to the main thread.
     [
       `try {
         const data = (${program})(${JSON.stringify(featureCollection)});

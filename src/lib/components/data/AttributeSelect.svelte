@@ -19,6 +19,7 @@
 
   const target = document.getElementById('map')!;
   let ref: Select<string>;
+  let editor: AttributeEditor;
   let dimensions: { top: number; left: number; right: number } = {
     top: 0,
     left: 0,
@@ -33,7 +34,7 @@
       case 'Proportional Symbol':
       case 'Dot Density':
         return isPropertyNumeric(
-          layer.data.geoJSON.features[0]?.properties?.[prop]
+          layer.data.geoJSON.features[0].properties?.[prop]
         );
     }
   });
@@ -57,6 +58,7 @@
 
   function onClickComputedAttribute() {
     attributeEditorVisible = true;
+
     const propertiesMenu = document.getElementById('properties')!;
     const { top } = ref.getBoundingClientRect();
     const { left, right } = propertiesMenu.getBoundingClientRect();
@@ -69,6 +71,11 @@
 
   function onCloseComputedAttribute() {
     attributeEditorVisible = false;
+  }
+
+  // When the editor opens, focus it.
+  $: if (editor) {
+    editor.focus();
   }
 </script>
 
@@ -90,6 +97,10 @@
       dimensions.left +
       32}px;"
   >
-    <AttributeEditor onClose={onCloseComputedAttribute} {layer} />
+    <AttributeEditor
+      onClose={onCloseComputedAttribute}
+      {layer}
+      bind:this={editor}
+    />
   </Portal>
 {/if}

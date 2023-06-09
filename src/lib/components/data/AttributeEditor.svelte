@@ -11,13 +11,13 @@
   import Button from '$lib/components/shared/Button.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
+  import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type {
     CartoKitChoroplethLayer,
     CartoKitDotDensityLayer,
     CartoKitProportionalSymbolLayer
   } from '$lib/types/CartoKitLayer';
   import { transformationWorker } from '$lib/utils/worker';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
 
   export let onClose: () => void;
   export let layer:
@@ -31,7 +31,11 @@
   let success: boolean = false;
   let timeoutId: number | undefined;
 
-  const doc = `function(features) {
+  export function focus() {
+    view.focus();
+  }
+
+  const doc = `function transformFeatures(features) {
   return features;
 }`;
 
@@ -84,7 +88,7 @@
     <button on:click={onClose} slot="action"><CloseIcon /></button>
     <div class="stack stack-sm">
       <p class="font-sans">
-        Use the editor below to add new attributes to your dataset.
+        Use the editor below to transform your dataset using JavaScript.
       </p>
       <div bind:this={editor} class="-mx-4 overflow-auto bg-white text-black" />
       {#if error}
