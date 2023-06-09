@@ -92,7 +92,7 @@ export function transformationWorker(
   worker.addEventListener('error', (event: ErrorEvent) => {
     cb({
       type: 'error',
-      error: new Error(`${event.message}. ${event.lineno}:${event.colno}.`)
+      error: new Error(`${event.message}. ${event.lineno - 1}:${event.colno}.`)
     });
 
     worker.terminate();
