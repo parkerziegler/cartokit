@@ -1,4 +1,5 @@
-import type { GeoJSON, FeatureCollection } from 'geojson';
+import type { GeoJSON, FeatureCollection, Feature } from 'geojson';
+
 import { normalizeGeoJSONToFeatureCollection } from './geojson';
 
 /**
@@ -38,6 +39,61 @@ export function sourceWorker(
   worker.addEventListener('message', (event: MessageEvent<GeoJSON>) => {
     const featureCollection = normalizeGeoJSONToFeatureCollection(event.data);
     cb(featureCollection);
+
+    worker.terminate();
+    URL.revokeObjectURL(source);
+  });
+}
+
+type TransformationWorkerMessage =
+  | { type: 'data'; data: Feature[] }
+  | { type: 'error'; error: Error };
+
+/**
+ * A function to run a user-defined transformation function in a Web Worker.
+ *
+ * @param program – The user-defined transformation function.
+ * @param featureCollection – The GeoJSON FeatureCollection to transform.
+ * @param cb – A callback function to run on success or failure of the
+ * transformation.
+ */
+export function transformationWorker(
+  program: string,
+  featureCollection: Feature[],
+  cb: (message: TransformationWorkerMessage) => void
+) {
+  const blob = new Blob(
+    // Invoke user transformation code using an IIFE.
+    // Wrap in a try-catch so we can send errors back to the main thread.
+    [
+      `try {
+        const data = (${program})(${JSON.stringify(featureCollection)});
+        self.postMessage({ type: 'data', data });
+      } catch (error) {
+        self.postMessage({ type: 'error', error });
+      }`
+    ],
+    { type: 'text/javascript' }
+  );
+
+  const source = URL.createObjectURL(blob);
+  const worker = new Worker(source);
+
+  worker.addEventListener(
+    'message',
+    (event: MessageEvent<TransformationWorkerMessage>) => {
+      cb(event.data);
+
+      worker.terminate();
+      URL.revokeObjectURL(source);
+    }
+  );
+
+  worker.addEventListener('error', (event: ErrorEvent) => {
+    cb({
+      type: 'error',
+      error: new Error(`${event.message}. ${event.lineno - 1}:${event.colno}.`)
+    });
 
     worker.terminate();
     URL.revokeObjectURL(source);
