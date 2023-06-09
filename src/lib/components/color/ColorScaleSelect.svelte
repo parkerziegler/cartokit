@@ -8,14 +8,13 @@
 
   export let layer: CartoKitChoroplethLayer;
 
-  let target = document.getElementById('map') ?? document.body;
+  const target = document.getElementById('map')!;
   let ref: Select<ColorScale>;
-  let dimensions: DOMRect = DOMRect.fromRect({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0
-  });
+  let dimensions = {
+    top: 0,
+    left: 0,
+    right: 0
+  };
 
   $: selected = layer.style.fill.scale;
   const options = COLOR_SCALES.map((scale) => ({
@@ -27,7 +26,8 @@
 
   function onChange(event: CustomEvent<{ value: ColorScale }>) {
     if (event.detail.value === 'Manual') {
-      dimensions = ref.getBoundingClientRect();
+      const { top, left, right } = ref.getBoundingClientRect();
+      dimensions = { top, left, right };
       displayBreaksEditor = true;
     }
 
