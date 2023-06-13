@@ -29,7 +29,7 @@
   <div class="stack-h stack-h-xs rounded-md bg-slate-900">
     <ul class="stack stack-xs items-end">
       {#each [min, ...stops, max] as stop}
-        <li class="stack-h stack-h-xs text-3xs h-4 font-mono">
+        <li class="stack-h stack-h-xs h-4 font-mono text-3xs">
           <span>{stop.toFixed(2)}</span>
           <span class="text-slate-400"> → </span>
         </li>
