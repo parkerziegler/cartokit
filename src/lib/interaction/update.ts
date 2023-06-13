@@ -1,7 +1,7 @@
 import type { GeoJSONSource } from 'maplibre-gl';
 import type { FeatureCollection, Feature } from 'geojson';
 import { get } from 'svelte/store';
-import * as turf from '@turf/turf';
+import { featureCollection as turfFeatureCollection } from '@turf/helpers';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import {
@@ -693,7 +693,7 @@ export function dispatchLayerUpdate({
     case 'computed-attribute': {
       ir.update((ir) => {
         const lyr = ir.layers[layer.id];
-        const featureCollection = turf.featureCollection(payload.features);
+        const featureCollection = turfFeatureCollection(payload.features);
         lyr.data.geoJSON = featureCollection;
 
         // Update the source with the new data.
