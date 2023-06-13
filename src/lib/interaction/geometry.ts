@@ -1,5 +1,12 @@
 import * as d3 from 'd3';
-import * as turf from '@turf/turf';
+import turfBbox from '@turf/bbox';
+import turfBooleanWithin from '@turf/boolean-within';
+import turfCentroid from '@turf/centroid';
+import {
+  feature as turfFeature,
+  featureCollection as turfFeatureCollection
+} from '@turf/helpers';
+import { randomPoint as turfRandomPoint } from '@turf/random';
 import type { ExpressionSpecification } from 'maplibre-gl';
 import type { Feature, FeatureCollection } from 'geojson';
 
@@ -47,13 +54,13 @@ export function deriveSize(
  * @returns – a FeatureCollection of centroids.
  */
 export function deriveCentroids(features: Feature[]): FeatureCollection {
-  const fs = features.map((feature) => {
-    const centroid = turf.centroid(feature);
+  const feats = features.map((feature) => {
+    const centroid = turfCentroid(feature);
 
-    return turf.feature(centroid.geometry, feature.properties);
+    return turfFeature(centroid.geometry, feature.properties);
   });
 
-  return turf.featureCollection(fs);
+  return turfFeatureCollection(feats);
 }
 
 interface GenerateDotDensityPointsParams {
@@ -80,25 +87,25 @@ export function generateDotDensityPoints({
     const numPoints = Math.floor(feature.properties?.[attribute] / value) ?? 0;
 
     // Obtain the bounding box of the polygon.
-    const bbox = turf.bbox(feature);
+    const bbox = turfBbox(feature);
 
     // Begin "throwing" random points within the bounding box,
     // keeping them only if they fall within the polygon.
     const selectedFeatures: Feature[] = [];
     while (selectedFeatures.length < numPoints) {
-      const candidate = turf.randomPoint(1, { bbox }).features[0];
+      const candidate = turfRandomPoint(1, { bbox }).features[0];
 
-      if (turf.booleanWithin(candidate, feature)) {
+      if (turfBooleanWithin(candidate, feature)) {
         selectedFeatures.push(candidate);
       }
     }
 
     return selectedFeatures.flatMap((point) => {
-      return turf.feature(point.geometry, feature.properties);
+      return turfFeature(point.geometry, feature.properties);
     });
   });
 
-  return turf.featureCollection(dots);
+  return turfFeatureCollection(dots);
 }
 
 /**
