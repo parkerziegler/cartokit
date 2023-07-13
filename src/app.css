@@ -2,25 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* CodeMirror */
-.cm-editor {
-  @apply h-full;
-}
-
-.cm-editor .cm-scroller {
-  @apply font-mono text-xs;
-}
-
-/* Basemap Inset */
-[id^='inset'] .maplibregl-ctrl-bottom-right {
-  display: none;
-}
-
-[id^='inset'] .maplibregl-canvas-container.maplibregl-interactive {
-  cursor: pointer;
-}
-
-/* Utilities */
 @layer utilities {
   /* Block Stack */
   .stack {
@@ -143,4 +124,30 @@
   .hex-input:focus-within > input:first-child {
     @apply border-slate-600;
   }
+
+  .transformation-editor .cm-editor {
+    max-height: 148px;
+  }
+}
+
+/*************
+ * Overrides *
+ *************/
+
+/* CodeMirror */
+.cm-editor {
+  @apply h-full;
+}
+
+.cm-editor .cm-scroller {
+  @apply font-mono text-xs;
+}
+
+/* Basemap Inset */
+[id^='inset'] .maplibregl-ctrl-bottom-right {
+  display: none;
+}
+
+[id^='inset'] .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: pointer;
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext } from 'svelte';
   import type { MapSourceDataEvent } from 'maplibre-gl';
-  import { featureCollection } from '@turf/helpers';
+  import { featureCollection as turfFeatureCollection } from '@turf/helpers';
   import kebabCase from 'lodash.kebabcase';
   import uniqueId from 'lodash.uniqueid';
 
@@ -53,8 +53,8 @@
       type: 'Fill',
       data: {
         url: endpoint,
-        geoJSON: featureCollection([]),
-        rawGeoJSON: featureCollection([])
+        geoJSON: turfFeatureCollection([]),
+        rawGeoJSON: turfFeatureCollection([])
       },
       style: {
         fill: {
