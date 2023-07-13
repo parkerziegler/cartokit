@@ -4,6 +4,7 @@
   import { javascript } from '@codemirror/lang-javascript';
   import { json } from '@codemirror/lang-json';
 
+  import TransformationAlert from '$lib/components/data/TransformationAlert.svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import PlayCircle from '$lib/components/icons/PlayCircle.svelte';
   import Button from '$lib/components/shared/Button.svelte';
@@ -17,7 +18,6 @@
     CartoKitProportionalSymbolLayer
   } from '$lib/types/CartoKitLayer';
   import { transformationWorker } from '$lib/utils/worker';
-  import TransformationAlert from './TransformationAlert.svelte';
 
   export let onClose: () => void;
   export let layer:
