@@ -7,6 +7,7 @@
   import TransformationAlert from '$lib/components/data/TransformationAlert.svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import PlayCircle from '$lib/components/icons/PlayCircle.svelte';
+  import TerminalIcon from '$lib/components/icons/TerminalIcon.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
@@ -48,6 +49,9 @@
       )
     : '';
 
+  // Console state.
+  let consoleOutput: string[] = [];
+
   export function focus() {
     view.focus();
   }
@@ -79,26 +83,31 @@
     const program = view.state.doc.toString();
 
     transformationWorker(program, layer.data.geoJSON.features, (message) => {
-      if (message.type === 'data') {
-        dispatchLayerUpdate({
-          type: 'computed-attribute',
-          layer,
-          payload: {
-            features: message.data
-          }
-        });
+      switch (message.type) {
+        case 'data':
+          dispatchLayerUpdate({
+            type: 'computed-attribute',
+            layer,
+            payload: {
+              features: message.data
+            }
+          });
 
-        success = true;
-        // Clear any errors on successful transformation.
-        error = '';
+          success = true;
+          // Clear any errors on successful transformation.
+          error = '';
 
-        // Set a timeout to hide the success message.
-        timeoutId = window.setTimeout(() => {
+          // Set a timeout to hide the success message.
+          timeoutId = window.setTimeout(() => {
+            success = false;
+          }, 3000);
+          break;
+        case 'console':
+          break;
+        case 'error':
           success = false;
-        }, 3000);
-      } else {
-        success = false;
-        error = message.error.message;
+          error = message.error.message;
+          break;
       }
     });
   }
@@ -112,25 +121,34 @@
         // - message.data?.[0] is strictly a GeoJSON feature.
         // - message.data?.[0] is _not_ a GeoJSON feature (warning).
         // - message.data is null (warning).
-        if (message.type === 'data' && message.data?.[0]) {
-          previewError = '';
+        switch (message.type) {
+          case 'data':
+            previewError = '';
 
-          previewDoc = JSON.stringify(
-            {
-              type: message.data[0].type,
-              properties: message.data[0].properties,
-              geometry: message.data[0].geometry
-            },
-            null,
-            2
-          );
-        } else if (message.type === 'data') {
-          previewError = '';
-
-          previewDoc = JSON.stringify(message.data?.[0], null, 2);
-        } else {
-          previewDoc = '';
-          previewError = message.error.message;
+            if (message.data?.[0]) {
+              previewDoc = JSON.stringify(
+                {
+                  type: message.data[0].type,
+                  properties: message.data[0].properties,
+                  geometry: message.data[0].geometry
+                },
+                null,
+                2
+              );
+            } else {
+              previewDoc = JSON.stringify(message.data?.[0], null, 2);
+            }
+            break;
+          case 'console':
+            message.args.forEach((entry) => {
+              consoleOutput.push(JSON.stringify(entry, null, 2));
+            });
+            consoleOutput = consoleOutput;
+            break;
+          case 'error':
+            previewDoc = '';
+            previewError = message.error.message;
+            break;
         }
       });
     }
@@ -184,5 +202,18 @@
       <TransformationAlert alert={{ kind: 'error', message: previewError }} />
     {/if}
   </MenuItem>
-  <MenuItem title="Console" />
+  <MenuItem title="Console">
+    <ul class="-mx-4 max-h-[148px] overflow-auto">
+      {#each consoleOutput as entry}
+        <li
+          class="border-b border-slate-700 py-2 px-4 text-white first:border-t"
+        >
+          {entry}
+        </li>
+      {/each}
+      <li class="py-2 px-4 text-white">
+        <TerminalIcon />
+      </li>
+    </ul>
+  </MenuItem>
 </Menu>
