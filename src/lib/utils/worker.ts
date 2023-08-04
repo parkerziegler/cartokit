@@ -67,8 +67,8 @@ export function transformationWorker(
     // Invoke user transformation code using an IIFE.
     // Wrap in a try-catch so we can send errors back to the main thread.
     [
-      `try {
-        (${interceptConsoleInWebWorker.toString()})();
+      `(${interceptConsoleInWebWorker.toString()})();
+      try {
         const data = (${program})(${JSON.stringify(featureCollection)});
         self.postMessage({ type: 'data', data });
       } catch (error) {
@@ -97,8 +97,8 @@ export function transformationWorker(
       error: new Error(
         `${event.message}. ${
           event.lineno -
-          1 -
-          interceptConsoleInWebWorker.toString().split('\n').length
+          interceptConsoleInWebWorker.toString().split('\n').length -
+          1
         }:${event.colno}.`
       )
     });

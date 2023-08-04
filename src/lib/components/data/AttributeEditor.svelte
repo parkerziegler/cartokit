@@ -140,6 +140,8 @@
             }
             break;
           case 'console':
+            previewError = '';
+
             message.args.forEach((entry) => {
               consoleOutput.push(JSON.stringify(entry, null, 2));
             });
