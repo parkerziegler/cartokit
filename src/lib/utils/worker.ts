@@ -47,6 +47,7 @@ export function sourceWorker(
 
 type TransformationWorkerMessage =
   | { type: 'data'; data: Feature[] }
+  | { type: 'console'; args: unknown[] }
   | { type: 'error'; error: Error };
 
 /**
@@ -66,7 +67,8 @@ export function transformationWorker(
     // Invoke user transformation code using an IIFE.
     // Wrap in a try-catch so we can send errors back to the main thread.
     [
-      `try {
+      `(${interceptConsoleInWebWorker.toString()})();
+      try {
         const data = (${program})(${JSON.stringify(featureCollection)});
         self.postMessage({ type: 'data', data });
       } catch (error) {
@@ -92,10 +94,28 @@ export function transformationWorker(
   worker.addEventListener('error', (event: ErrorEvent) => {
     cb({
       type: 'error',
-      error: new Error(`${event.message}. ${event.lineno - 1}:${event.colno}.`)
+      error: new Error(
+        `${event.message}. ${
+          event.lineno -
+          interceptConsoleInWebWorker.toString().split('\n').length -
+          1
+        }:${event.colno}.`
+      )
     });
 
     worker.terminate();
     URL.revokeObjectURL(source);
   });
+}
+
+/**
+ * A function to intercept console.log calls in a Web Worker and send them back
+ * to the main thread.
+ */
+function interceptConsoleInWebWorker(): void {
+  const log = console.log.bind(console);
+  console.log = (...args) => {
+    self.postMessage({ type: 'console', args });
+    log(...args);
+  };
 }
