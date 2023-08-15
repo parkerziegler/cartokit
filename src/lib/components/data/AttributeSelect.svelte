@@ -59,15 +59,17 @@
   function onClickComputedAttribute() {
     attributeEditorVisible = true;
 
-    const propertiesMenu =
-      document.getElementById('properties') ?? document.body;
-    const { top } = ref.getBoundingClientRect();
-    const { left, right } = propertiesMenu.getBoundingClientRect();
-    dimensions = {
-      left,
-      right,
-      top
-    };
+    const propertiesMenu = document.getElementById('properties');
+
+    if (propertiesMenu) {
+      const { top } = ref.getBoundingClientRect();
+      const { left, right } = propertiesMenu.getBoundingClientRect();
+      dimensions = {
+        left,
+        right,
+        top
+      };
+    }
   }
 
   function onCloseComputedAttribute() {
