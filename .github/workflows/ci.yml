@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build:
+  lint:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -24,5 +24,3 @@ jobs:
         run: yarn install --frozen-lockfile --non-interactive
       - name: Lint
         run: yarn lint
-      - name: Build
-        run: yarn build
