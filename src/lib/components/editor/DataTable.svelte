@@ -10,7 +10,7 @@
 
   export let data: Feature[];
   export let tableName: string;
-  export let rows: number = 11.5;
+  export let rows = 11.5;
 
   $: cols = Object.keys(data[0]?.properties ?? {});
   let root: HTMLDivElement;

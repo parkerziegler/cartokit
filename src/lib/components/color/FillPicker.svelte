@@ -39,7 +39,7 @@
 </script>
 
 {#if layer.style.fill}
-  <div class="color-picker stack stack-xs" transition:slide|local>
+  <div class="color-picker stack stack-xs" transition:slide>
     <div class="flex items-center">
       <FieldLabel fieldId="fill-color">Color</FieldLabel>
       <input

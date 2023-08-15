@@ -2,12 +2,12 @@
   import { createEventDispatcher } from 'svelte';
   import cs from 'classnames';
 
-  export let id: string = '';
-  export let min: number = 0;
-  export let max: number = Infinity;
-  export let step: number = 1;
+  export let id = '';
+  export let min = 0;
+  export let max = Infinity;
+  export let step = 1;
   export let value: number;
-  export let disabled: boolean = false;
+  export let disabled = false;
 
   let className = '';
   export { className as class };

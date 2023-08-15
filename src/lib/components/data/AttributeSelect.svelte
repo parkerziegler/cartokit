@@ -17,7 +17,7 @@
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer;
 
-  const target = document.getElementById('map')!;
+  const target = document.getElementById('map') ?? document.body;
   let ref: Select<string>;
   let editor: AttributeEditor;
   let dimensions: { top: number; left: number; right: number } = {
@@ -59,7 +59,8 @@
   function onClickComputedAttribute() {
     attributeEditorVisible = true;
 
-    const propertiesMenu = document.getElementById('properties')!;
+    const propertiesMenu =
+      document.getElementById('properties') ?? document.body;
     const { top } = ref.getBoundingClientRect();
     const { left, right } = propertiesMenu.getBoundingClientRect();
     dimensions = {

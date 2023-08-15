@@ -12,7 +12,7 @@
   export let alert: Alert;
 </script>
 
-<div class="stack stack-xs" transition:slide>
+<div class="stack stack-xs" transition:slide|local>
   {#if alert.kind === 'error'}
     <div
       class="stack stack-xs rounded border border-red-400 bg-red-400 bg-opacity-50 px-2 py-1"

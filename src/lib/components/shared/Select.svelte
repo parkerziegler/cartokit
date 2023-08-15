@@ -1,11 +1,11 @@
-<script lang="ts">
+<script lang="ts" generics="T">
+  // ESLint sees the generic T as an undefined variable; flag it as a "global"
+  // to suppress the warning.
+  /* global T */
   import { createEventDispatcher } from 'svelte';
   import cs from 'classnames';
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-
-  type T = $$Generic;
-
   interface SelectOption<T> {
     value: T;
     label: string;
@@ -13,7 +13,7 @@
 
   export let selected: T;
   export let options: SelectOption<T>[] = [];
-  export let title: string = '';
+  export let title = '';
   let ref: HTMLSelectElement | HTMLDivElement;
 
   let className = '';

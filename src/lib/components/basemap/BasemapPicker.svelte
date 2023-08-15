@@ -7,7 +7,7 @@
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs, { type Tab } from '$lib/components/shared/Tabs.svelte';
   import { ir } from '$lib/stores/ir';
-  import { map } from '$lib/stores/map';
+  import { map as mapStore } from '$lib/stores/map';
 
   let picker: HTMLButtonElement;
   let maps: maplibregl.Map[] = [];
@@ -44,18 +44,18 @@
 
   function updateMapThumbnail(map: maplibregl.Map, node: HTMLButtonElement) {
     const { top, left } = node.getBoundingClientRect();
-    map.setCenter($map.unproject([left + 32, top + 32]));
+    map.setCenter($mapStore.unproject([left + 32, top + 32]));
     map.setZoom($ir.zoom);
   }
 
-  $: if (maps.length > 0 && $map && $ir) {
+  $: if (maps.length > 0 && $mapStore && $ir) {
     updateMapThumbnail(maps[0], picker);
   }
 
   // Only update hidden map thumbnails when the picker is hovered.
   // This is a small perf optimization to avoid updating all three
   // thumbnails while two are out of view.
-  $: if (hovered && $map && $ir) {
+  $: if (hovered && $mapStore && $ir) {
     maps.slice(1).forEach((map) => updateMapThumbnail(map, picker));
   }
 </script>

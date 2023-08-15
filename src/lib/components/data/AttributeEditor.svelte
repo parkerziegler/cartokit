@@ -29,14 +29,14 @@
   // Main editor state.
   let editor: HTMLDivElement;
   let view: EditorView;
-  let error: string = '';
-  let success: boolean = false;
+  let error = '';
+  let success = false;
   let timeoutId: number | undefined;
 
   // Preview editor state.
   let previewEditor: HTMLDivElement;
   let preview: EditorView;
-  let previewError: string = '';
+  let previewError = '';
   let previewDoc: string = $selectedFeature
     ? JSON.stringify(
         {
