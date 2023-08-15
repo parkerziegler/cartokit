@@ -33,7 +33,7 @@
   }
 
   .file-prompt {
-    @apply absolute top-0 left-0 right-0 z-10 h-full border border-slate-700 bg-inherit p-2 shadow-inner;
+    @apply absolute left-0 right-0 top-0 z-10 h-full border border-slate-700 bg-inherit p-2 shadow-inner;
   }
 
   .file-prompt:hover {

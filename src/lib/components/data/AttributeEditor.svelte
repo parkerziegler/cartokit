@@ -208,12 +208,12 @@
     <ul class="-mx-4 max-h-[148px] overflow-auto">
       {#each consoleOutput as entry}
         <li
-          class="border-b border-slate-700 py-2 px-4 text-white first:border-t"
+          class="border-b border-slate-700 px-4 py-2 text-white first:border-t"
         >
           {entry}
         </li>
       {/each}
-      <li class="py-2 px-4 text-white">
+      <li class="px-4 py-2 text-white">
         <TerminalIcon />
       </li>
     </ul>

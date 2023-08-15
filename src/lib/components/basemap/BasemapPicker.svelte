@@ -73,7 +73,7 @@
   />
   <div
     id={`inset-${mapStyles[1]}`}
-    class="absolute bottom-0 h-16 w-16 rounded border-2 border-white transition-transform group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:rotate-12"
+    class="absolute bottom-0 h-16 w-16 rounded border-2 border-white transition-transform group-hover:-translate-y-2 group-hover:translate-x-2 group-hover:rotate-12"
     style="position: inherit;"
   />
   <div
