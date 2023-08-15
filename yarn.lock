@@ -1129,15 +1129,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/maplibre-gl@npm:^1.14.0":
-  version: 1.14.0
-  resolution: "@types/maplibre-gl@npm:1.14.0"
-  dependencies:
-    maplibre-gl: "*"
-  checksum: 9eb47f2e1c5d14feac59033b3711f2678ceb05ebccc8c0b96ee07857948e38c03540243357ac41f72c8e6616861e1540964d14cb8cf3aa3adb6cfbdb46a6fc84
-  languageName: node
-  linkType: hard
-
 "@types/pbf@npm:*, @types/pbf@npm:^3.0.2":
   version: 3.0.2
   resolution: "@types/pbf@npm:3.0.2"
@@ -1684,7 +1675,6 @@ __metadata:
     "@types/lodash.kebabcase": ^4.1.7
     "@types/lodash.orderby": ^4.6.7
     "@types/lodash.uniqueid": ^4.0.7
-    "@types/maplibre-gl": ^1.14.0
     "@types/prettier": ^2.7.2
     "@typescript-eslint/eslint-plugin": ^5.45.0
     "@typescript-eslint/parser": ^5.45.0
@@ -3494,7 +3484,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"maplibre-gl@npm:*, maplibre-gl@npm:^2.4.0":
+"maplibre-gl@npm:^2.4.0":
   version: 2.4.0
   resolution: "maplibre-gl@npm:2.4.0"
   dependencies:
