@@ -73,7 +73,7 @@
 <main class="absolute inset-0">
   <div class="grid h-full w-full grid-cols-12">
     <div class="relative col-span-12" id="map" class:col-span-8={editorOpen}>
-      <Menu class="min-w-xs absolute top-4 left-4 z-10 max-w-lg overflow-auto">
+      <Menu class="min-w-xs absolute left-4 top-4 z-10 max-w-lg overflow-auto">
         <MenuTitle class="mr-4">
           Layers
           <AddLayer slot="action" />
@@ -83,7 +83,7 @@
       {#if $selectedLayer}
         <Menu
           id="properties"
-          class="style-editor absolute top-4 right-4 z-10 max-w-sm overflow-auto"
+          class="style-editor absolute right-4 top-4 z-10 max-w-sm overflow-auto"
         >
           <MenuTitle>Properties</MenuTitle>
           <MenuItem title="Map Type">

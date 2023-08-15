@@ -22,7 +22,7 @@
   const closeModal = getContext<() => void>('close-modal');
 
   let file: File;
-  let displayName: string = '';
+  let displayName = '';
 
   function onFileUpload(fileInput: HTMLSpanElement, event: Event) {
     const { files } = event.target as HTMLInputElement;

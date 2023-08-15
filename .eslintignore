@@ -1,13 +1,25 @@
+# OS
 .DS_Store
+
+# Node
 node_modules
+
+# SvelteKit
 /build
 /.svelte-kit
 /package
+
+# Environment Variables
 .env
 .env.*
 !.env.example
 
-# Ignore files for PNPM, NPM and YARN
-pnpm-lock.yaml
-package-lock.json
+# Yarn
 yarn.lock
+/.yarn
+
+# Vercel
+/.vercel
+
+# VSCode
+/.vscode

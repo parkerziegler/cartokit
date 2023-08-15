@@ -29,14 +29,14 @@
   // Main editor state.
   let editor: HTMLDivElement;
   let view: EditorView;
-  let error: string = '';
-  let success: boolean = false;
+  let error = '';
+  let success = false;
   let timeoutId: number | undefined;
 
   // Preview editor state.
   let previewEditor: HTMLDivElement;
   let preview: EditorView;
-  let previewError: string = '';
+  let previewError = '';
   let previewDoc: string = $selectedFeature
     ? JSON.stringify(
         {
@@ -208,12 +208,12 @@
     <ul class="-mx-4 max-h-[148px] overflow-auto">
       {#each consoleOutput as entry}
         <li
-          class="border-b border-slate-700 py-2 px-4 text-white first:border-t"
+          class="border-b border-slate-700 px-4 py-2 text-white first:border-t"
         >
           {entry}
         </li>
       {/each}
-      <li class="py-2 px-4 text-white">
+      <li class="px-4 py-2 text-white">
         <TerminalIcon />
       </li>
     </ul>

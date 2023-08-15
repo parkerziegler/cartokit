@@ -8,7 +8,7 @@
 
   export let layer: CartoKitChoroplethLayer;
 
-  const target = document.getElementById('map')!;
+  const target = document.getElementById('map') ?? document.body;
   let ref: Select<ColorScale>;
   let dimensions = {
     top: 0,

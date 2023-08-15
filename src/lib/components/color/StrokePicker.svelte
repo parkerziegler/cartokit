@@ -45,7 +45,7 @@
 </script>
 
 {#if layer.style.stroke}
-  <div class="color-picker stack stack-xs" transition:slide|local>
+  <div class="color-picker stack stack-xs" transition:slide>
     <div class="flex items-center">
       <FieldLabel fieldId="stroke-color">Color</FieldLabel>
       <input
