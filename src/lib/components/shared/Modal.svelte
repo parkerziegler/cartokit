@@ -18,7 +18,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 <dialog
   class={cs(
-    'max-w-lg overflow-auto rounded bg-slate-900 font-sans text-white',
+    'overflow-auto rounded bg-slate-900 font-sans text-white',
     className
   )}
   bind:this={dialog}

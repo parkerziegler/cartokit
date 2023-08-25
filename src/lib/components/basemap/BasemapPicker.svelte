@@ -3,19 +3,28 @@
   import maplibregl from 'maplibre-gl';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
-  import MaptilerBasemapGrid from '$lib/components/basemap/MaptilerBasemapGrid.svelte';
+  import BasemapGrid from '$lib/components/basemap/BasemapGrid.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs, { type Tab } from '$lib/components/shared/Tabs.svelte';
   import { ir } from '$lib/stores/ir';
   import { map as mapStore } from '$lib/stores/map';
+  import { BASEMAPS, type BasemapProvider } from '$lib/utils/basemap';
 
   let picker: HTMLButtonElement;
   let maps: maplibregl.Map[] = [];
   let hovered = false;
   let showModal = false;
 
-  const tabs: Tab[] = [{ name: 'MapTiler', content: MaptilerBasemapGrid }];
-  const mapStyles = ['outdoor-v2', 'hybrid', 'toner-v2'];
+  const tabs: Tab<{ provider: BasemapProvider }>[] = Object.keys(BASEMAPS).map(
+    (provider) => {
+      return {
+        name: provider,
+        content: BasemapGrid,
+        props: { provider: provider as BasemapProvider }
+      };
+    }
+  );
+  const mapStyles = ['outdoor-v2', 'winter-v2', 'satellite'];
 
   onMount(() => {
     maps = mapStyles.map((style) => {
@@ -82,7 +91,7 @@
     style="position: inherit;"
   />
 </button>
-<Modal bind:showModal class="max-w-3xl">
+<Modal bind:showModal class="max-w-2xl">
   <h2 slot="header" class="text-xl font-semibold">Select Basemap</h2>
-  <Tabs {tabs} slot="body" class="mx-4 border-b border-b-slate-400" />
+  <Tabs {tabs} slot="body" class="h-[32rem]" />
 </Modal>

@@ -1,7 +1,8 @@
 <script context="module" lang="ts">
-  export interface Tab {
+  export interface Tab<Props = Record<string, unknown>> {
     name: string;
     content: ComponentType;
+    props?: Props;
   }
 </script>
 
@@ -24,7 +25,7 @@
 </script>
 
 <div class="stack">
-  <ul class={cs('stack-h stack-h-md', className)}>
+  <ul class="stack-h stack-h-md border-b border-b-slate-400 px-4">
     {#each tabs as tab, i}
       <li
         class="border-b-2 pb-2 text-base transition-all duration-200"
@@ -35,10 +36,10 @@
       </li>
     {/each}
   </ul>
-  <div class="p-4">
+  <div class={cs('p-4', className)}>
     {#each tabs as tab, i}
       {#if activeIndex === i}
-        <svelte:component this={tab.content} />
+        <svelte:component this={tab.content} {...tab.props} />
       {/if}
     {/each}
   </div>
