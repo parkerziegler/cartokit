@@ -26,9 +26,7 @@
 <button on:click={onClick}>
   <PlusIcon />
 </button>
-<Modal bind:showModal>
+<Modal bind:showModal class="max-w-lg">
   <h2 slot="header" class="text-xl font-semibold">Add Layer</h2>
-  <div slot="body">
-    <Tabs {tabs} class="border-b border-b-slate-400 px-4" />
-  </div>
+  <Tabs {tabs} slot="body" />
 </Modal>
