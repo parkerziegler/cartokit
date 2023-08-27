@@ -448,9 +448,9 @@
     esbuild "^0.18.11"
 
 "@sveltejs/kit@^1.20.4":
-  version "1.22.6"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.22.6.tgz#74eb42eeda4b2b58502314ca6bf04fec0c48f91a"
-  integrity sha512-SDKxI/QpsReCwIn5czjT53fKlPBybbmMk67d317gUqfeORroBAFN1Z6s/x0E1JYi+04i7kKllS+Sz9wVfmUkAQ==
+  version "1.23.0"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.23.0.tgz#14d8f634be548ac489fd860d354412640b0a8b1d"
+  integrity sha512-MuDM6afpSMnPFMtEsE1O+Qn6NVPNHDqsDYYZE/8/+Z3IvGmE+GKHC+za6fEmCfwXLqNlxFZiV8s8kKOeNVJP+g==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^2.4.1"
     "@types/cookie" "^0.5.1"
@@ -466,9 +466,9 @@
     undici "~5.23.0"
 
 "@sveltejs/vite-plugin-svelte-inspector@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte-inspector/-/vite-plugin-svelte-inspector-1.0.3.tgz#fdbf80b43bfaa20deaa5ff6d0676351aa9aecbcc"
-  integrity sha512-Khdl5jmmPN6SUsVuqSXatKpQTMIifoQPDanaxC84m9JxIibWvSABJyHpyys0Z+1yYrxY5TTEQm+6elh0XCMaOA==
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte-inspector/-/vite-plugin-svelte-inspector-1.0.4.tgz#c99fcb73aaa845a3e2c0563409aeb3ee0b863add"
+  integrity sha512-zjiuZ3yydBtwpF3bj0kQNV0YXe+iKE545QGZVTaylW3eAzFr+pJ/cwK8lZEaRp4JtaJXhD5DyWAV4AxLh6DgaQ==
   dependencies:
     debug "^4.3.4"
 
@@ -2334,9 +2334,9 @@ magic-string@^0.27.0:
     "@jridgewell/sourcemap-codec" "^1.4.13"
 
 magic-string@^0.30.0, magic-string@^0.30.2:
-  version "0.30.2"
-  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.2.tgz#dcf04aad3d0d1314bc743d076c50feb29b3c7aca"
-  integrity sha512-lNZdu7pewtq/ZvWUp9Wpf/x7WzMTsR26TWV03BRZrXFsv+BI6dy8RAiKgm1uM/kyR0rCfUcqvOlXKG66KhIGug==
+  version "0.30.3"
+  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.3.tgz#403755dfd9d6b398dfa40635d52e96c5ac095b85"
+  integrity sha512-B7xGbll2fG/VjP+SWg4sX3JynwIU0mjoTc6MPpKNuIvftk6u6vqhDnk1R80b8C2GBR6ywqy+1DcKBrevBg+bmw==
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.4.15"
 
