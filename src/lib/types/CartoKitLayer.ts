@@ -2,6 +2,7 @@ import type { FeatureCollection } from 'geojson';
 
 import type { MapType } from '$lib/types/map-types';
 import type { ColorScale, ColorScheme } from '$lib/types/color';
+import type { Transformation } from '$lib/types/transformation';
 
 interface Layer {
   id: string;
@@ -12,6 +13,7 @@ interface Layer {
     geoJSON: FeatureCollection;
     rawGeoJSON: FeatureCollection;
     fileName?: string;
+    transformations: Transformation[];
   };
 }
 

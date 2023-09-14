@@ -3,6 +3,7 @@
   import { basicSetup, EditorView } from 'codemirror';
   import { javascript } from '@codemirror/lang-javascript';
   import { json } from '@codemirror/lang-json';
+  import { featureCollection as turfFeatureCollection } from '@turf/helpers';
 
   import TransformationAlert from '$lib/components/data/TransformationAlert.svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
@@ -57,8 +58,8 @@
   }
   onMount(() => {
     view = new EditorView({
-      doc: `function transformFeatures(features) {
-  return features;
+      doc: `function transform(geoJSON) {
+  return geoJSON;
 }`,
       extensions: [
         basicSetup,
@@ -82,14 +83,21 @@
   function onClick() {
     const program = view.state.doc.toString();
 
-    transformationWorker(program, layer.data.geoJSON.features, (message) => {
+    transformationWorker(program, layer.data.geoJSON, (message) => {
       switch (message.type) {
-        case 'data':
+        case 'data': {
+          const name = /^function\s+([\w$]+)\s*\(/.exec(program);
+
           dispatchLayerUpdate({
-            type: 'computed-attribute',
+            type: 'transformation',
             layer,
             payload: {
-              features: message.data
+              geoJSON: message.data,
+              transformation: {
+                name: name ? name[1] : 'anonymous',
+                definition: program,
+                type: 'statistical'
+              }
             }
           });
 
@@ -102,6 +110,7 @@
             success = false;
           }, 3000);
           break;
+        }
         case 'console':
           break;
         case 'error':
@@ -116,43 +125,51 @@
     const program = view.state.doc.toString();
 
     if ($selectedFeature) {
-      transformationWorker(program, [$selectedFeature], (message) => {
-        // TODO: Split out the additional edge cases here.
-        // - message.data?.[0] is strictly a GeoJSON feature.
-        // - message.data?.[0] is _not_ a GeoJSON feature (warning).
-        // - message.data is null (warning).
-        switch (message.type) {
-          case 'data':
-            previewError = '';
+      transformationWorker(
+        program,
+        turfFeatureCollection([$selectedFeature]),
+        (message) => {
+          // TODO: Split out the additional edge cases here.
+          // - message.data?.[0] is strictly a GeoJSON feature.
+          // - message.data?.[0] is _not_ a GeoJSON feature (warning).
+          // - message.data is null (warning).
+          switch (message.type) {
+            case 'data':
+              previewError = '';
 
-            if (message.data?.[0]) {
-              previewDoc = JSON.stringify(
-                {
-                  type: message.data[0].type,
-                  properties: message.data[0].properties,
-                  geometry: message.data[0].geometry
-                },
-                null,
-                2
-              );
-            } else {
-              previewDoc = JSON.stringify(message.data?.[0], null, 2);
-            }
-            break;
-          case 'console':
-            previewError = '';
+              if (message.data.features?.[0]) {
+                previewDoc = JSON.stringify(
+                  {
+                    type: message.data.features[0].type,
+                    properties: message.data.features[0].properties,
+                    geometry: message.data.features[0].geometry
+                  },
+                  null,
+                  2
+                );
+              } else {
+                previewDoc = JSON.stringify(
+                  message.data.features?.[0],
+                  null,
+                  2
+                );
+              }
+              break;
+            case 'console':
+              previewError = '';
 
-            message.args.forEach((entry) => {
-              consoleOutput.push(JSON.stringify(entry, null, 2));
-            });
-            consoleOutput = consoleOutput;
-            break;
-          case 'error':
-            previewDoc = '';
-            previewError = message.error.message;
-            break;
+              message.args.forEach((entry) => {
+                consoleOutput.push(JSON.stringify(entry, null, 2));
+              });
+              consoleOutput = consoleOutput;
+              break;
+            case 'error':
+              previewDoc = '';
+              previewError = message.error.message;
+              break;
+          }
         }
-      });
+      );
     }
   }
 

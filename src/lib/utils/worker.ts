@@ -1,4 +1,4 @@
-import type { GeoJSON, FeatureCollection, Feature } from 'geojson';
+import type { GeoJSON, FeatureCollection } from 'geojson';
 
 import { normalizeGeoJSONToFeatureCollection } from './geojson';
 
@@ -46,7 +46,7 @@ export function sourceWorker(
 }
 
 type TransformationWorkerMessage =
-  | { type: 'data'; data: Feature[] }
+  | { type: 'data'; data: FeatureCollection }
   | { type: 'console'; args: unknown[] }
   | { type: 'error'; error: Error };
 
@@ -60,7 +60,7 @@ type TransformationWorkerMessage =
  */
 export function transformationWorker(
   program: string,
-  featureCollection: Feature[],
+  featureCollection: FeatureCollection,
   cb: (message: TransformationWorkerMessage) => void
 ) {
   const blob = new Blob(

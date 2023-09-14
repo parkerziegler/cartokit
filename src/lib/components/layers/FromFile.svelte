@@ -54,7 +54,8 @@
           data: {
             geoJSON: normalizeGeoJSONToFeatureCollection(geojson),
             rawGeoJSON: normalizeGeoJSONToFeatureCollection(geojson),
-            fileName: file.name
+            fileName: file.name,
+            transformations: []
           },
           style: {
             fill: {

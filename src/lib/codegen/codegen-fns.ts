@@ -8,13 +8,10 @@ import type { CartoKitIR } from '$lib/stores/ir';
  *
  * @returns – A program fragment.
  */
-export function codegenFns(
-  ir: CartoKitIR,
-  transformTable: Map<string, boolean>
-): string {
+export function codegenFns(ir: CartoKitIR): string {
   const fns: string[] = [];
 
-  if (isFetchGeoJSONRequired(ir, transformTable)) {
+  if (isFetchGeoJSONRequired(ir)) {
     fns.push(`async function fetchGeoJSON(url) {
       try {
         const response = await fetch(url);
@@ -40,12 +37,9 @@ export function codegenFns(
  * @returns – A Boolean value indicting whether we need to inline a function to
  * fetch GeoJSON hosted at a remote URL.
  */
-export function isFetchGeoJSONRequired(
-  { layers }: CartoKitIR,
-  transformTable: Map<string, boolean>
-): boolean {
+export function isFetchGeoJSONRequired({ layers }: CartoKitIR): boolean {
   for (const layer of Object.values(layers)) {
-    if (layer.data.url && transformTable.has(layer.id)) {
+    if (layer.data.url && layer.data.transformations.length > 0) {
       return true;
     }
   }
