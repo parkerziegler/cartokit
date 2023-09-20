@@ -1,3 +1,5 @@
+import type { ColorScheme } from '$lib/types/color';
+
 /**
  * Generate a random color in hexademical format.
  *
@@ -27,4 +29,20 @@ export function percentToDecimal(percent: number): number {
  */
 export function decimalToPercent(decimal: number): number {
   return decimal * 100;
+}
+
+/**
+ * Reverse a D3 color scheme.
+ *
+ * @param scheme – The D3 color scheme to reverse.
+ * @returns – The reversed D3 color scheme.
+ */
+export function reverseD3ColorScheme(scheme: ColorScheme) {
+  const revScheme = scheme.map((indexedScheme) => {
+    const revIndexedScheme = [...indexedScheme].reverse();
+
+    return revIndexedScheme;
+  });
+
+  return revScheme;
 }

@@ -2,9 +2,15 @@
   import { onMount } from 'svelte';
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
+  import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
-  import { type ColorScheme, COLOR_SCHEMES } from '$lib/types/color';
+  import {
+    type ColorScheme,
+    COLOR_SCHEMES,
+    COLOR_SCHEMES_REV
+  } from '$lib/types/color';
+  import { reverseD3ColorScheme } from '$lib/utils/color';
 
   export let layer: CartoKitChoroplethLayer;
 
@@ -16,6 +22,7 @@
   let y = 0;
   let trigger: HTMLButtonElement;
   let firstScheme: HTMLButtonElement;
+  let schemeReversed = false;
 
   onMount(() => {
     const { y: triggerY } = trigger.getBoundingClientRect();
@@ -38,6 +45,18 @@
     togglePaletteDropdown();
   }
 
+  function onSchemeReverse() {
+    schemeReversed = !schemeReversed;
+
+    dispatchLayerUpdate({
+      type: 'color-scheme',
+      layer,
+      payload: {
+        scheme: reverseD3ColorScheme(layer.style.fill.scheme)
+      }
+    });
+  }
+
   $: if (showDropdown && firstScheme) {
     firstScheme.focus();
   }
@@ -57,7 +76,7 @@
       <ul class="flex">
         {#each colors as color}
           <li>
-            <span style="background-color: {color};" class="block h-4 w-6" />
+            <span style="background-color: {color};" class="block h-4 w-5" />
           </li>
         {/each}
       </ul>
@@ -67,7 +86,7 @@
         class="fixed flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 py-2 shadow-lg"
         style="top: {offsetHeight + y + 10}px;"
       >
-        {#each COLOR_SCHEMES as scheme, i}
+        {#each schemeReversed ? COLOR_SCHEMES_REV : COLOR_SCHEMES as scheme, i}
           {#if i === 0}
             <button
               on:click={() => onSchemeSelect(scheme)}
@@ -106,6 +125,7 @@
       </ul>
     {/if}
   </div>
+  <button on:click={onSchemeReverse}><ReverseIcon /></button>
 </div>
 
 <style>
