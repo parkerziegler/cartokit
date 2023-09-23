@@ -16,7 +16,7 @@ export interface CartoKitIR {
 export const ir = writable<CartoKitIR>({
   center: [-105, 37],
   basemap: {
-    url: "https://tiles.stadiamaps.com/styles/alidade_smooth.json",
+    url: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json',
     provider: 'Stadia Maps'
   },
   zoom: 4,
