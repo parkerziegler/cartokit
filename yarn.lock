@@ -394,9 +394,9 @@
   integrity sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==
 
 "@maplibre/maplibre-gl-style-spec@^19.3.0":
-  version "19.3.0"
-  resolved "https://registry.yarnpkg.com/@maplibre/maplibre-gl-style-spec/-/maplibre-gl-style-spec-19.3.0.tgz#00a1dde3d389313b0b9805b57fc0b3d023cfcf19"
-  integrity sha512-ZbhX9CTV+Z7vHwkRIasDOwTSzr76e8Q6a55RMsAibjyX6+P0ZNL1qAKNzOjjBDP3+aEfNMl7hHo5knuY6pTAUQ==
+  version "19.3.1"
+  resolved "https://registry.yarnpkg.com/@maplibre/maplibre-gl-style-spec/-/maplibre-gl-style-spec-19.3.1.tgz#f0e74e8e6db2afcc4fed53f325f850c12dcdd5c5"
+  integrity sha512-ss5+b3/a8I1wD5PYmAYPYxg0Nag0cxvw4GGOnQroTP59sobTPI3KeHP9OjUr/es7uNtYEodr54fgoEnCBF6gaQ==
   dependencies:
     "@mapbox/jsonlint-lines-primitives" "~2.0.2"
     "@mapbox/unitbezier" "^0.0.1"
@@ -775,7 +775,12 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.1.tgz#aa22750962f3bf0e79d753d3cc067f010c95f194"
   integrity sha512-LG4opVs2ANWZ1TJoKc937iMmNstM/d0ae1vNbnBvBhqCSezgVUOzcLCqbI5elV8Vy6WKwKjaqR+zO9VKirBBCA==
 
-"@types/geojson@*", "@types/geojson@^7946.0.10":
+"@types/geojson@*":
+  version "7946.0.11"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.11.tgz#012c17cb2256ad8de78560da851ab914a7b9b40e"
+  integrity sha512-L7A0AINMXQpVwxHJ4jxD6/XjZ4NDufaRlUJHjNIFKYUFBH1SvOW+neaqb0VTRSLW5suSrSu19ObFEFnfNcr+qg==
+
+"@types/geojson@^7946.0.10":
   version "7946.0.10"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.10.tgz#6dfbf5ea17142f7f9a043809f1cd4c448cb68249"
   integrity sha512-Nmh0K3iWQJzniTuPRcJn5hxXkfB1T1pgB89SBig5PlJQU5yocazeu4jATJlaA0GYFKWMqDdvYemoSnF2pXgLVA==
@@ -2359,9 +2364,9 @@ make-dir@^3.1.0:
     semver "^6.0.0"
 
 maplibre-gl@^3.0.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/maplibre-gl/-/maplibre-gl-3.3.0.tgz#a4a33f7ca632dad7a46b231c2617bc92267b1933"
-  integrity sha512-LDia3b8u2S8qtl50n8TYJM0IPLzfc01KDc71LNuydvDiEXAGBI5togty+juVtUipRZZjs4dAW6xhgrabc6lIgw==
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/maplibre-gl/-/maplibre-gl-3.3.1.tgz#150e48d80813b72b66b89156446298c72dca4ca0"
+  integrity sha512-SfRq9bT68GytDzCOG0IoTGg2rASbgdYunW/6xhnp55QuLmwG1M/YOlXxqHaphwia7kZbMvBOocvY0fp5yfTjZA==
   dependencies:
     "@mapbox/geojson-rewind" "^0.5.2"
     "@mapbox/jsonlint-lines-primitives" "^2.0.2"
