@@ -1,6 +1,7 @@
 import type { Map } from 'maplibre-gl';
-import prettier from 'prettier/standalone';
-import babylon from 'prettier/parser-babel';
+import * as prettier from 'prettier';
+import babel from 'prettier/plugins/babel';
+import estree from 'prettier/plugins/estree';
 
 import { codegenImports } from '$lib/codegen/codegen-imports';
 import type { CartoKitIR } from '$lib/stores/ir';
@@ -13,11 +14,11 @@ import type { CartoKitIR } from '$lib/stores/ir';
  *
  * @returns – A Mapbox GL JS program.
  */
-export function codegen(map: Map, ir: CartoKitIR): string {
+export async function codegen(map: Map, ir: CartoKitIR): Promise<string> {
   const program = codegenImports(map, ir);
-  const formatted = prettier.format(program, {
+  const formatted = await prettier.format(program, {
     parser: 'babel',
-    plugins: [babylon]
+    plugins: [babel, estree]
   });
 
   return formatted;
