@@ -1,7 +1,6 @@
 import type { GeoJSONSource } from 'maplibre-gl';
-import type { FeatureCollection, Feature } from 'geojson';
+import type { FeatureCollection } from 'geojson';
 import { get } from 'svelte/store';
-import { featureCollection as turfFeatureCollection } from '@turf/helpers';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import {
@@ -22,6 +21,7 @@ import type {
 } from '$lib/types/CartoKitLayer';
 import type { ColorScale, ColorScheme } from '$lib/types/color';
 import type { MapType } from '$lib/types/map-types';
+import type { Transformation } from '$lib/types/transformation';
 import {
   DEFAULT_FILL,
   DEFAULT_OPACITY,
@@ -189,10 +189,11 @@ interface DotValueUpdate extends LayerUpdate {
   layer: CartoKitDotDensityLayer;
 }
 
-interface ComputedAttributeUpdate extends LayerUpdate {
-  type: 'computed-attribute';
+interface TransformationUpdate extends LayerUpdate {
+  type: 'transformation';
   payload: {
-    features: Feature[];
+    geoJSON: FeatureCollection;
+    transformation: Transformation;
   };
   layer:
     | CartoKitChoroplethLayer
@@ -220,7 +221,7 @@ type DispatchLayerUpdateParams =
   | SizeUpdate
   | DotSizeUpdate
   | DotValueUpdate
-  | ComputedAttributeUpdate;
+  | TransformationUpdate;
 
 /**
  * Dispatch standardized updates to specific layers.
@@ -690,14 +691,25 @@ export function dispatchLayerUpdate({
       });
       break;
     }
-    case 'computed-attribute': {
+    case 'transformation': {
       ir.update((ir) => {
         const lyr = ir.layers[layer.id];
-        const featureCollection = turfFeatureCollection(payload.features);
-        lyr.data.geoJSON = featureCollection;
+        lyr.data.geoJSON = payload.geoJSON;
+
+        const transformationIndex = lyr.data.transformations.findIndex(
+          (t) => t.name === payload.transformation.name
+        );
+        lyr.data.transformations =
+          transformationIndex > -1
+            ? [
+                ...lyr.data.transformations.slice(transformationIndex),
+                payload.transformation,
+                ...lyr.data.transformations.slice(transformationIndex + 1)
+              ]
+            : [...lyr.data.transformations, payload.transformation];
 
         // Update the source with the new data.
-        (map.getSource(layer.id) as GeoJSONSource).setData(featureCollection);
+        (map.getSource(layer.id) as GeoJSONSource).setData(payload.geoJSON);
 
         return ir;
       });

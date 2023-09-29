@@ -4,8 +4,6 @@ import camelCase from 'lodash.camelcase';
 import { codegenFns } from '$lib/codegen/codegen-fns';
 import { codegenMap } from '$lib/codegen/codegen-map';
 import type { CartoKitIR } from '$lib/stores/ir';
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
-import { getFeatureCollectionType } from '$lib/utils/geojson';
 
 /**
  * Generate a program fragment for all library and data source imports.
@@ -20,15 +18,7 @@ export function codegenImports(map: MapLibreMap, ir: CartoKitIR) {
   // source data.
   const uploadTable = new Map<string, string>();
 
-  // Create a symbol table to track which layers performed cross-geometry data
-  // transformations.
-  const transformTable = new Map<string, boolean>();
-
   const fileImports = Object.values(ir.layers).reduce((acc, layer) => {
-    if (isTransformRequired(layer)) {
-      transformTable.set(layer.id, true);
-    }
-
     if (layer.data.fileName) {
       const dataIdent = camelCase(layer.displayName);
       uploadTable.set(layer.id, dataIdent);
@@ -40,30 +30,47 @@ export function codegenImports(map: MapLibreMap, ir: CartoKitIR) {
   }, '');
 
   const imports = `import mapboxgl from 'mapbox-gl';
-  ${transformTable.size > 0 ? "import * as turf from '@turf/turf';\n" : ''}
+  ${isTurfRequired(ir) ? "import * as turf from '@turf/turf';\n" : ''}
+  ${isLodashFlowRequired(ir) ? "import flow from 'lodash.flow';\n" : ''}
   ${fileImports}
   
   mapboxgl.accessToken = '<YOUR_MAPBOX_ACCESS_TOKEN>'`;
 
   return `${imports}
 
-  ${codegenFns(ir, transformTable)}
+  ${codegenFns(ir)}
   
-  ${codegenMap({ map, ir, uploadTable, transformTable })}`;
+  ${codegenMap(map, ir, uploadTable)}`;
 }
 
 /**
- * Determine whether some form of cross-geometry transformation was performed on
- * the original source data of a layer.
+ * Determine whether @turf/turf is required for cross-geometry transformations.
  *
- * @param layer – A CartoKit layer.
+ * @param ir – The CartoKit IR.
  *
- * @returns – A Boolean value indicating whether a cross-geometry transformation
- * was performed on the input layer.
+ * @returns – A Boolean value indicating whether @turf/turf is required.
  */
-function isTransformRequired(layer: CartoKitLayer): boolean {
-  const geometry = getFeatureCollectionType(layer.data.geoJSON);
-  const rawGeometry = getFeatureCollectionType(layer.data.rawGeoJSON);
+function isTurfRequired({ layers }: CartoKitIR): boolean {
+  for (const layer of Object.values(layers)) {
+    return (
+      layer.data.transformations.filter(
+        (transformation) => transformation.type === 'geometric'
+      ).length > 0
+    );
+  }
 
-  return geometry !== rawGeometry;
+  return false;
+}
+
+/**
+ * Determine whether lodash.flow is required for chaining transformations.
+ *
+ * @param ir – The CartoKit IR.
+ *
+ * @returns - A Boolean value indicating whether lodash.flow is required.
+ */
+function isLodashFlowRequired({ layers }: CartoKitIR): boolean {
+  return Object.values(layers).some(
+    (layer) => layer.data.transformations.length > 1
+  );
 }

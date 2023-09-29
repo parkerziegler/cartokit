@@ -54,7 +54,8 @@
       data: {
         url: endpoint,
         geoJSON: turfFeatureCollection([]),
-        rawGeoJSON: turfFeatureCollection([])
+        rawGeoJSON: turfFeatureCollection([]),
+        transformations: []
       },
       style: {
         fill: {
