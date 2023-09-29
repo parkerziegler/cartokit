@@ -1,5 +1,5 @@
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { codegenTransformations } from '$lib/codegen/codegen-transformations';
+import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
 /**
  * Generate the data source for a CartoKit layer.

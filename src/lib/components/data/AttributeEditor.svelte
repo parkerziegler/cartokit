@@ -19,6 +19,7 @@
     CartoKitDotDensityLayer,
     CartoKitProportionalSymbolLayer
   } from '$lib/types/CartoKitLayer';
+  import { functionNameRe } from '$lib/utils/regex';
   import { transformationWorker } from '$lib/utils/worker';
 
   export let onClose: () => void;
@@ -58,7 +59,7 @@
   }
   onMount(() => {
     view = new EditorView({
-      doc: `function transform(geoJSON) {
+      doc: `function transformGeoJSON(geoJSON) {
   return geoJSON;
 }`,
       extensions: [
@@ -86,7 +87,7 @@
     transformationWorker(program, layer.data.geoJSON, (message) => {
       switch (message.type) {
         case 'data': {
-          const name = /^function\s+([\w$]+)\s*\(/.exec(program);
+          const name = functionNameRe.exec(program);
 
           dispatchLayerUpdate({
             type: 'transformation',

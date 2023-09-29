@@ -14,7 +14,6 @@ import type { CartoKitIR } from '$lib/stores/ir';
  * @returns – A program fragment.
  */
 export function codegenImports(map: MapLibreMap, ir: CartoKitIR) {
-  console.log(JSON.stringify(Object.values(ir.layers)[0].style, null, 2));
   // Create a symbol table mapping layer ids to identifiers referencing imported
   // source data.
   const uploadTable = new Map<string, string>();
