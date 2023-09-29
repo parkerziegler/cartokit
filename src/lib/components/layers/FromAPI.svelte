@@ -1,23 +1,11 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import type { MapSourceDataEvent } from 'maplibre-gl';
-  import { featureCollection as turfFeatureCollection } from '@turf/helpers';
-  import kebabCase from 'lodash.kebabcase';
-  import uniqueId from 'lodash.uniqueid';
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import { addSource } from '$lib/interaction/source';
-  import { ir } from '$lib/stores/ir';
   import { map } from '$lib/stores/map';
-  import type { CartoKitFillLayer } from '$lib/types/CartoKitLayer';
-  import { randomColor } from '$lib/utils/color';
-  import {
-    DEFAULT_OPACITY,
-    DEFAULT_STROKE_OPACITY,
-    DEFAULT_STROKE_WIDTH
-  } from '$lib/utils/constants';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -33,51 +21,20 @@
     displayName = event.detail.value;
   }
 
-  function onDataLoaded(layer: CartoKitFillLayer) {
-    return function handleDataLoaded(event: MapSourceDataEvent) {
-      if (event.sourceId === layer.id) {
-        dataLoading = false;
-        closeModal();
-        $map.off('sourcedata', onDataLoaded);
-      }
-    };
+  function onSourceLoaded() {
+    dataLoading = false;
+    closeModal();
   }
 
   function onSubmit() {
     dataLoading = true;
 
-    const color = randomColor();
-    const layer: CartoKitFillLayer = {
-      id: uniqueId(kebabCase(displayName)),
+    addSource($map, {
+      kind: 'api',
       displayName,
-      type: 'Fill',
-      data: {
-        url: endpoint,
-        geoJSON: turfFeatureCollection([]),
-        rawGeoJSON: turfFeatureCollection([]),
-        transformations: []
-      },
-      style: {
-        fill: {
-          color,
-          opacity: DEFAULT_OPACITY
-        },
-        stroke: {
-          color,
-          width: DEFAULT_STROKE_WIDTH,
-          opacity: DEFAULT_STROKE_OPACITY
-        }
-      }
-    };
-
-    ir.update((ir) => {
-      ir.layers[layer.id] = layer;
-      addSource($map, layer);
-
-      return ir;
+      url: endpoint,
+      onSourceLoaded
     });
-
-    $map.on('sourcedata', onDataLoaded(layer));
   }
 </script>
 

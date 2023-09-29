@@ -3,20 +3,18 @@
   import maplibregl from 'maplibre-gl';
 
   import BasemapPicker from '$lib/components/basemap/BasemapPicker.svelte';
-  import ColorPalette from '$lib/components/color/ColorPalette.svelte';
-  import FillModifier from '$lib/components/color/FillModifier.svelte';
-  import FillPicker from '$lib/components/color/FillPicker.svelte';
-  import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
-  import StrokePicker from '$lib/components/color/StrokePicker.svelte';
-  import DotControls from '$lib/components/dots/DotControls.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
+  import PointPropertiesPanel from '$lib/components/properties/PointPropertiesPanel.svelte';
+  import FillPropertiesPanel from '$lib/components/properties/FillPropertiesPanel.svelte';
+  import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
+  import ProportionalSymbolPropertiesPanel from '$lib/components/properties/ProportionalSymbolPropertiesPanel.svelte';
+  import DotDensityPropertiesPanel from '$lib/components/properties/DotDensityPropertiesPanel.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
-  import SizeControls from '$lib/components/size/SizeControls.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
   import { ir } from '$lib/stores/ir';
   import { map as mapStore } from '$lib/stores/map';
@@ -87,49 +85,18 @@
         >
           <MenuTitle>Properties</MenuTitle>
           <MenuItem title="Map Type">
-            <MapTypeSelect />
+            <MapTypeSelect layer={$selectedLayer} />
           </MenuItem>
-          {#if $selectedLayer.type === 'Fill'}
-            <MenuItem title="Fill">
-              <FillPicker layer={$selectedLayer} />
-              <FillModifier layer={$selectedLayer} slot="action" />
-            </MenuItem>
-            <MenuItem title="Stroke">
-              <StrokePicker layer={$selectedLayer} />
-              <StrokeModifier layer={$selectedLayer} slot="action" />
-            </MenuItem>
+          {#if $selectedLayer.type === 'Point'}
+            <PointPropertiesPanel layer={$selectedLayer} />
+          {:else if $selectedLayer.type === 'Fill'}
+            <FillPropertiesPanel layer={$selectedLayer} />
           {:else if $selectedLayer.type === 'Choropleth'}
-            <MenuItem title="Fill">
-              <ColorPalette layer={$selectedLayer} />
-            </MenuItem>
-            <MenuItem title="Stroke">
-              <StrokePicker layer={$selectedLayer} />
-              <StrokeModifier layer={$selectedLayer} slot="action" />
-            </MenuItem>
+            <ChoroplethPropertiesPanel layer={$selectedLayer} />
           {:else if $selectedLayer.type === 'Proportional Symbol'}
-            <MenuItem title="Size">
-              <SizeControls layer={$selectedLayer} />
-            </MenuItem>
-            <MenuItem title="Fill">
-              <FillPicker layer={$selectedLayer} />
-              <FillModifier layer={$selectedLayer} slot="action" />
-            </MenuItem>
-            <MenuItem title="Stroke">
-              <StrokePicker layer={$selectedLayer} />
-              <StrokeModifier layer={$selectedLayer} slot="action" />
-            </MenuItem>
+            <ProportionalSymbolPropertiesPanel layer={$selectedLayer} />
           {:else if $selectedLayer.type === 'Dot Density'}
-            <MenuItem title="Dots">
-              <DotControls layer={$selectedLayer} />
-            </MenuItem>
-            <MenuItem title="Fill">
-              <FillPicker layer={$selectedLayer} />
-              <FillModifier layer={$selectedLayer} slot="action" />
-            </MenuItem>
-            <MenuItem title="Stroke">
-              <StrokePicker layer={$selectedLayer} />
-              <StrokeModifier layer={$selectedLayer} slot="action" />
-            </MenuItem>
+            <DotDensityPropertiesPanel layer={$selectedLayer} />
           {/if}
         </Menu>
       {/if}

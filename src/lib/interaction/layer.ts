@@ -20,6 +20,36 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
  */
 export function addLayer(map: Map, layer: CartoKitLayer): void {
   switch (layer.type) {
+    case 'Point': {
+      const fillProperties = layer.style.fill
+        ? {
+            'circle-color': layer.style.fill.color,
+            'circle-opacity': layer.style.fill.opacity
+          }
+        : {};
+      const strokeProperties = layer.style.stroke
+        ? {
+            'circle-stroke-color': layer.style.stroke.color,
+            'circle-stroke-width': layer.style.stroke.width,
+            'circle-stroke-opacity': layer.style.stroke.opacity
+          }
+        : {};
+
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'circle',
+        paint: {
+          ...fillProperties,
+          ...strokeProperties,
+          'circle-radius': layer.style.size
+        }
+      });
+
+      instrumentPointHover(map, layer.id);
+      instrumentPointSelect(map, layer.id);
+      break;
+    }
     case 'Fill': {
       if (layer.style.fill) {
         map.addLayer({

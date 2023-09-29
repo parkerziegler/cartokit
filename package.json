@@ -14,11 +14,7 @@
   "dependencies": {
     "@codemirror/lang-javascript": "^6.1.5",
     "@codemirror/lang-json": "^6.0.1",
-    "@turf/bbox": "^6.5.0",
-    "@turf/boolean-within": "^6.5.0",
-    "@turf/centroid": "^6.5.0",
-    "@turf/helpers": "^6.5.0",
-    "@turf/random": "^6.5.0",
+    "@turf/turf": "^6.5.0",
     "classnames": "^2.3.2",
     "codemirror": "^6.0.1",
     "d3": "^7.8.2",

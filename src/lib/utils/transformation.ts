@@ -1,10 +1,10 @@
 import type { Transformation } from '$lib/types/transformation';
 
-export function transformProportionalSymbol(): Transformation {
+export function transformPolygonsToCentroids(): Transformation {
   return {
-    name: 'transformProportionalSymbol',
+    name: 'transformPolygonsToCentroids',
     definition: `
-    function transformProportionalSymbol(geoJSON) {
+    function transformPolygonsToCentroids(geoJSON) {
       const centroids = geoJSON.features.map((feature) => {
         return turf.feature(turf.centroid(feature).geometry, feature.properties);
       });

@@ -1,9 +1,4 @@
-import type {
-  Map,
-  MapGeoJSONFeature,
-  MapLayerMouseEvent,
-  MapMouseEvent
-} from 'maplibre-gl';
+import type { Map, MapLayerMouseEvent, MapMouseEvent } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import type { CartoKitIR } from '$lib/stores/ir';
@@ -94,8 +89,7 @@ function addSelectListeners(map: Map, layerId: string) {
         { selected: true }
       );
 
-      // We cast for now until this PR is released: https://github.com/maplibre/maplibre-gl-js/pull/2244
-      selectedFeature.set(event.features[0] as MapGeoJSONFeature);
+      selectedFeature.set(event.features[0]);
     }
   }
 

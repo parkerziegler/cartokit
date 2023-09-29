@@ -4,7 +4,8 @@ import { deriveColorScale } from '$lib/interaction/color';
 import {
   generateDotDensityPoints,
   deriveDotDensityStartingValue,
-  deriveCentroids
+  deriveCentroids,
+  deriveSize
 } from '$lib/interaction/geometry';
 import { addLayer } from '$lib/interaction/layer';
 import { listeners, type LayerListeners } from '$lib/stores/listeners';
@@ -13,9 +14,11 @@ import type {
   CartoKitChoroplethLayer,
   CartoKitProportionalSymbolLayer,
   CartoKitDotDensityLayer,
-  CartoKitLayer
+  CartoKitLayer,
+  CartoKitPointLayer
 } from '$lib/types/CartoKitLayer';
 import type { MapType } from '$lib/types/map-types';
+import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_OPACITY,
   DEFAULT_MAX_SIZE,
@@ -23,16 +26,17 @@ import {
   DEFAULT_COUNT,
   DEFAULT_SCALE,
   DEFAULT_SCHEME,
-  DEFAULT_THRESHOLDS
+  DEFAULT_THRESHOLDS,
+  DEFAULT_RADIUS
 } from '$lib/utils/constants';
 import {
-  getFeatureCollectionType,
+  getLayerGeometryType,
   selectNumericAttribute
 } from '$lib/utils/geojson';
 import { getInstrumetedLayerIds } from '$lib/utils/layer';
 import {
   transformDotDensity,
-  transformProportionalSymbol
+  transformPolygonsToCentroids
 } from '$lib/utils/transformation';
 
 interface TransitionMapTypeParams {
@@ -65,32 +69,24 @@ export function transitionMapType({
   let targetLayer: CartoKitLayer;
 
   switch (targetMapType) {
+    case 'Point': {
+      ({ redraw, targetLayer } = transitionToPoint(map, layer));
+      break;
+    }
     case 'Fill': {
-      const { redraw: rd, targetLayer: tl } = transitionToFill(map, layer);
-      redraw = rd;
-      targetLayer = tl;
+      ({ redraw, targetLayer } = transitionToFill(map, layer));
       break;
     }
     case 'Choropleth': {
-      const { redraw: rd, targetLayer: tl } = transitionToChoropleth(
-        map,
-        layer
-      );
-      redraw = rd;
-      targetLayer = tl;
+      ({ redraw, targetLayer } = transitionToChoropleth(map, layer));
       break;
     }
     case 'Proportional Symbol': {
-      const { redraw: rd, targetLayer: tl } =
-        transitionToProportionalSymbol(layer);
-      redraw = rd;
-      targetLayer = tl;
+      ({ redraw, targetLayer } = transitionToProportionalSymbol(map, layer));
       break;
     }
     case 'Dot Density': {
-      const { redraw: rd, targetLayer: tl } = transitionToDotDensity(layer);
-      redraw = rd;
-      targetLayer = tl;
+      ({ redraw, targetLayer } = transitionToDotDensity(layer));
       break;
     }
   }
@@ -133,6 +129,125 @@ export function transitionMapType({
 }
 
 /**
+ * Transition a layer to a point layer.
+ *
+ * @param map — The top-level MapLibre GL map instance.
+ * @param layer — The CartoKit layer to transition.
+ *
+ * @returns — The transitioned CartoKitPointLayer.
+ */
+function transitionToPoint(
+  map: Map,
+  layer: CartoKitLayer
+): TransitionMapTypeReturnValue {
+  switch (layer.type) {
+    case 'Point':
+      return {
+        targetLayer: layer,
+        redraw: false
+      };
+    case 'Fill': {
+      const targetLayer: CartoKitPointLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Point',
+        data: {
+          ...layer.data,
+          geoJSON: deriveCentroids(layer.data.geoJSON.features),
+          transformations: [
+            ...layer.data.transformations,
+            transformPolygonsToCentroids()
+          ]
+        },
+        style: {
+          size: DEFAULT_RADIUS,
+          fill: layer.style.fill,
+          stroke: layer.style.stroke
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
+    case 'Choropleth': {
+      const targetLayer: CartoKitPointLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Point',
+        data: {
+          ...layer.data,
+          geoJSON: deriveCentroids(layer.data.geoJSON.features),
+          transformations: [
+            ...layer.data.transformations,
+            transformPolygonsToCentroids()
+          ]
+        },
+        style: {
+          size: DEFAULT_RADIUS,
+          fill: {
+            color:
+              layer.style.fill.scheme[layer.style.fill.count].at(-1) ??
+              randomColor(),
+            opacity: layer.style.fill.opacity
+          },
+          stroke: layer.style.stroke
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
+    case 'Proportional Symbol': {
+      const targetLayer: CartoKitPointLayer = {
+        ...layer,
+        type: 'Point',
+        style: {
+          ...layer.style,
+          size: DEFAULT_RADIUS
+        }
+      };
+
+      // Update the circle-radius of the existing layer. All other paint
+      // properties should remain unchanged.
+      map.setPaintProperty(layer.id, 'circle-radius', DEFAULT_RADIUS);
+
+      return {
+        targetLayer,
+        redraw: false
+      };
+    }
+    case 'Dot Density': {
+      const targetLayer: CartoKitPointLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Point',
+        data: {
+          ...layer.data,
+          geoJSON: deriveCentroids(layer.data.rawGeoJSON.features),
+          transformations: [
+            ...layer.data.transformations,
+            transformPolygonsToCentroids()
+          ]
+        },
+        style: {
+          ...layer.style,
+          size: layer.style.dots.size
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
+  }
+}
+
+/**
  * Transition a layer to a polygon fill layer.
  *
  * @param map — The top-level MapLibre GL map instance.
@@ -144,13 +259,20 @@ function transitionToFill(
   map: Map,
   layer: CartoKitLayer
 ): TransitionMapTypeReturnValue {
-  const sourceLayerType = layer.type;
-
-  switch (sourceLayerType) {
+  switch (layer.type) {
+    case 'Fill': {
+      return {
+        targetLayer: layer,
+        redraw: false
+      };
+    }
+    case 'Point':
+      throw new Error(
+        'Unsupported geometry transition. Transition initiated from Point to Polygon.'
+      );
     case 'Choropleth': {
       const colors = layer.style.fill.scheme[layer.style.fill.count];
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const color = colors.at(-1)!;
+      const color = colors.at(-1) ?? randomColor();
 
       const targetLayer: CartoKitFillLayer = {
         id: layer.id,
@@ -166,8 +288,8 @@ function transitionToFill(
         }
       };
 
-      // Just update the fill-color of the existing layer.
-      // All other paint properties should be unchanged.
+      // Update the fill-color of the existing layer. All other paint properties
+      // should be unchanged.
       map.setPaintProperty(layer.id, 'fill-color', color);
 
       return {
@@ -176,16 +298,11 @@ function transitionToFill(
       };
     }
     case 'Proportional Symbol': {
-      const rawFeatureCollectionType = getFeatureCollectionType(
-        layer.data.rawGeoJSON
-      );
+      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
 
-      if (
-        rawFeatureCollectionType !== 'Polygon' &&
-        rawFeatureCollectionType !== 'MultiPolygon'
-      ) {
+      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
         throw new Error(
-          `Unsupported geometry transition. Transition initiated from ${rawFeatureCollectionType} to Polygon.`
+          `Unsupported geometry transition. Transition initiated from ${rawGeometryType} to Polygon.`
         );
       }
 
@@ -228,12 +345,6 @@ function transitionToFill(
         redraw: true
       };
     }
-    case 'Fill': {
-      return {
-        targetLayer: layer,
-        redraw: false
-      };
-    }
   }
 }
 
@@ -249,9 +360,17 @@ function transitionToChoropleth(
   map: Map,
   layer: CartoKitLayer
 ): TransitionMapTypeReturnValue {
-  const sourceLayerType = layer.type;
-
-  switch (sourceLayerType) {
+  switch (layer.type) {
+    case 'Choropleth': {
+      return {
+        targetLayer: layer,
+        redraw: false
+      };
+    }
+    case 'Point':
+      throw new Error(
+        'Unsupported geometry transition. Transition initiated from Point to Polygon.'
+      );
     case 'Fill': {
       const attribute = selectNumericAttribute(layer.data.geoJSON.features);
 
@@ -297,16 +416,11 @@ function transitionToChoropleth(
       };
     }
     case 'Proportional Symbol': {
-      const rawFeatureCollectionType = getFeatureCollectionType(
-        layer.data.rawGeoJSON
-      );
+      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
 
-      if (
-        rawFeatureCollectionType !== 'Polygon' &&
-        rawFeatureCollectionType !== 'MultiPolygon'
-      ) {
+      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
         throw new Error(
-          `Unsupported geometry transition. Transition initiated from ${rawFeatureCollectionType} to Polygon.`
+          `Unsupported geometry transition. Transition initiated from ${rawGeometryType} to Polygon.`
         );
       }
 
@@ -369,12 +483,6 @@ function transitionToChoropleth(
         redraw: true
       };
     }
-    case 'Choropleth': {
-      return {
-        targetLayer: layer,
-        redraw: false
-      };
-    }
   }
 }
 
@@ -386,12 +494,43 @@ function transitionToChoropleth(
  * @returns – The transitioned CartoKitProportionalSymbolLayer.
  */
 function transitionToProportionalSymbol(
+  map: Map,
   layer: CartoKitLayer
 ): TransitionMapTypeReturnValue {
-  const sourceLayerType = layer.type;
   const features = layer.data.geoJSON.features;
 
-  switch (sourceLayerType) {
+  switch (layer.type) {
+    case 'Proportional Symbol':
+      return {
+        targetLayer: layer,
+        redraw: false
+      };
+    case 'Point': {
+      const targetLayer: CartoKitProportionalSymbolLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Proportional Symbol',
+        data: layer.data,
+        style: {
+          size: {
+            attribute: selectNumericAttribute(features),
+            min: DEFAULT_MIN_SIZE,
+            max: DEFAULT_MAX_SIZE
+          },
+          fill: layer.style.fill,
+          stroke: layer.style.stroke
+        }
+      };
+
+      // Update the circle-radius of the existing layer. All other paint
+      // properties should remain unchanged.
+      map.setPaintProperty(layer.id, 'circle-radius', deriveSize(targetLayer));
+
+      return {
+        targetLayer,
+        redraw: false
+      };
+    }
     case 'Fill': {
       const targetLayer: CartoKitProportionalSymbolLayer = {
         id: layer.id,
@@ -402,7 +541,7 @@ function transitionToProportionalSymbol(
           geoJSON: deriveCentroids(features),
           transformations: [
             ...layer.data.transformations,
-            transformProportionalSymbol()
+            transformPolygonsToCentroids()
           ]
         },
         style: {
@@ -431,7 +570,7 @@ function transitionToProportionalSymbol(
           geoJSON: deriveCentroids(features),
           transformations: [
             ...layer.data.transformations,
-            transformProportionalSymbol()
+            transformPolygonsToCentroids()
           ]
         },
         style: {
@@ -441,8 +580,9 @@ function transitionToProportionalSymbol(
             max: DEFAULT_MAX_SIZE
           },
           fill: {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            color: layer.style.fill.scheme[layer.style.fill.count].at(-1)!,
+            color:
+              layer.style.fill.scheme[layer.style.fill.count].at(-1) ??
+              randomColor(),
             opacity: layer.style.fill.opacity
           },
           stroke: layer.style.stroke
@@ -464,7 +604,7 @@ function transitionToProportionalSymbol(
           geoJSON: deriveCentroids(layer.data.rawGeoJSON.features),
           transformations: [
             ...layer.data.transformations,
-            transformProportionalSymbol()
+            transformPolygonsToCentroids()
           ]
         },
         style: {
@@ -483,11 +623,6 @@ function transitionToProportionalSymbol(
         redraw: true
       };
     }
-    case 'Proportional Symbol':
-      return {
-        targetLayer: layer,
-        redraw: false
-      };
   }
 }
 
@@ -501,9 +636,16 @@ function transitionToProportionalSymbol(
 function transitionToDotDensity(
   layer: CartoKitLayer
 ): TransitionMapTypeReturnValue {
-  const sourceLayerType = layer.type;
-
-  switch (sourceLayerType) {
+  switch (layer.type) {
+    case 'Dot Density':
+      return {
+        targetLayer: layer,
+        redraw: false
+      };
+    case 'Point':
+      throw new Error(
+        'Unsupported geometry transition. Transition initiated from Point to Polygon.'
+      );
     case 'Fill': {
       const features = layer.data.geoJSON.features;
       const attribute = selectNumericAttribute(features);
@@ -569,8 +711,9 @@ function transitionToDotDensity(
             value: dotValue
           },
           fill: {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            color: layer.style.fill.scheme[layer.style.fill.count].at(-1)!,
+            color:
+              layer.style.fill.scheme[layer.style.fill.count].at(-1) ??
+              randomColor(),
             opacity: layer.style.fill.opacity
           },
           stroke: layer.style.stroke
@@ -583,16 +726,11 @@ function transitionToDotDensity(
       };
     }
     case 'Proportional Symbol': {
-      const rawFeatureCollectionType = getFeatureCollectionType(
-        layer.data.rawGeoJSON
-      );
+      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
 
-      if (
-        rawFeatureCollectionType !== 'Polygon' &&
-        rawFeatureCollectionType !== 'MultiPolygon'
-      ) {
+      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
         throw new Error(
-          `Unsupported geometry transition. Transition initiated from ${rawFeatureCollectionType} to Polygon.`
+          `Unsupported geometry transition. Transition initiated from ${rawGeometryType} to Polygon.`
         );
       }
 
@@ -633,12 +771,6 @@ function transitionToDotDensity(
       return {
         targetLayer,
         redraw: true
-      };
-    }
-    case 'Dot Density': {
-      return {
-        targetLayer: layer,
-        redraw: false
       };
     }
   }

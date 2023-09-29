@@ -1,9 +1,24 @@
-import type { Map } from 'maplibre-gl';
+import type { Map, MapSourceDataEvent } from 'maplibre-gl';
+import type { FeatureCollection } from 'geojson';
 
 import { addLayer } from '$lib/interaction/layer';
-import { dispatchLayerUpdate } from '$lib/interaction/update';
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { sourceWorker } from '$lib/utils/worker';
+import { generateCartoKitLayer } from '$lib/utils/layer';
+import { ir } from '$lib/stores/ir';
+
+type AddSourceOptions =
+  | {
+      kind: 'api';
+      displayName: string;
+      url: string;
+      onSourceLoaded: () => void;
+    }
+  | {
+      kind: 'file';
+      displayName: string;
+      fileName: string;
+      featureCollection: FeatureCollection;
+    };
 
 /**
  * Add a source for a CartoKit layer to the map.
@@ -11,17 +26,20 @@ import { sourceWorker } from '$lib/utils/worker';
  * @param map – The top-level MapLibre GL map instance.
  * @param layer – The CartoKit layer to add a source for.
  */
-export function addSource(map: Map, layer: CartoKitLayer) {
-  if (layer.data.url) {
+export function addSource(map: Map, options: AddSourceOptions) {
+  if (options.kind === 'api') {
     // Load the data in a worker thread.
-    sourceWorker(layer.data.url, (data) => {
-      dispatchLayerUpdate({
-        type: 'initial-data',
-        layer,
-        payload: {
-          geoJSON: data
+    sourceWorker(options.url, (data) => {
+      const layer = generateCartoKitLayer(data, options);
+
+      const handleSourceLoaded = (event: MapSourceDataEvent) => {
+        if (event.sourceId === layer.id) {
+          options.onSourceLoaded();
+          map.off('sourcedata', handleSourceLoaded);
         }
-      });
+      };
+
+      map.on('sourcedata', handleSourceLoaded);
 
       map.addSource(layer.id, {
         type: 'geojson',
@@ -30,13 +48,27 @@ export function addSource(map: Map, layer: CartoKitLayer) {
         generateId: true
       });
 
+      ir.update((ir) => {
+        ir.layers[layer.id] = layer;
+
+        return ir;
+      });
+
       addLayer(map, layer);
     });
   } else {
+    const layer = generateCartoKitLayer(options.featureCollection, options);
+
     map.addSource(layer.id, {
       type: 'geojson',
       data: layer.data.geoJSON,
       generateId: true
+    });
+
+    ir.update((ir) => {
+      ir.layers[layer.id] = layer;
+
+      return ir;
     });
 
     addLayer(map, layer);

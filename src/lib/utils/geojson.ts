@@ -1,7 +1,4 @@
-import {
-  feature as turfFeature,
-  featureCollection as turfFeatureCollection
-} from '@turf/helpers';
+import * as turf from '@turf/turf';
 import type { GeoJSON, FeatureCollection, Geometry } from 'geojson';
 
 import { isPropertyNumeric } from '$lib/utils/property';
@@ -22,37 +19,38 @@ export function normalizeGeoJSONToFeatureCollection(
     case 'MultiLineString':
     case 'Polygon':
     case 'MultiPolygon': {
-      const feature = turfFeature(geoJSON);
-      const featureCollection = turfFeatureCollection([feature]);
+      const feature = turf.feature(geoJSON);
+      const featureCollection = turf.featureCollection([feature]);
 
       return featureCollection;
     }
     case 'GeometryCollection': {
       const features = geoJSON.geometries.map((geometry) =>
-        turfFeature(geometry)
+        turf.feature(geometry)
       );
-      const featureCollection = turfFeatureCollection(features);
+      const featureCollection = turf.featureCollection(features);
 
       return featureCollection;
     }
     case 'Feature':
-      return turfFeatureCollection([geoJSON]);
+      return turf.featureCollection([geoJSON]);
     case 'FeatureCollection':
       return geoJSON;
   }
 }
 
 /**
- * Get the type of the first Feature in a FeatureCollection.
- * Used to infer the type of the layer.
+ * Get the Geometry type of the layer by reading its first Feature.
  *
  * @param featureCollection - The FeatureCollection to inspect.
  * @returns – The type of the first Feature in the FeatureCollection.
  */
-export function getFeatureCollectionType(
+export function getLayerGeometryType(
   featureCollection: FeatureCollection
 ): Geometry['type'] {
-  return featureCollection.features?.[0]?.geometry?.type;
+  return (
+    featureCollection.features?.[0]?.geometry?.type ?? 'GeometryCollection'
+  );
 }
 
 /**
