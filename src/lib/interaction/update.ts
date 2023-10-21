@@ -128,6 +128,14 @@ interface RemoveStrokeUpdate extends LayerUpdate {
   layer: CartoKitLayer;
 }
 
+interface PointSizeUpdate extends LayerUpdate {
+  type: 'point-size';
+  payload: {
+    size: number;
+  };
+  layer: CartoKitPointLayer | CartoKitDotDensityLayer;
+}
+
 interface ColorScaleUpdate extends LayerUpdate {
   type: 'color-scale';
   payload: {
@@ -170,14 +178,6 @@ interface SizeUpdate extends LayerUpdate {
   layer: CartoKitProportionalSymbolLayer;
 }
 
-interface DotSizeUpdate extends LayerUpdate {
-  type: 'dot-size';
-  payload: {
-    size: number;
-  };
-  layer: CartoKitDotDensityLayer;
-}
-
 interface DotValueUpdate extends LayerUpdate {
   type: 'dot-value';
   payload: {
@@ -210,12 +210,12 @@ type DispatchLayerUpdateParams =
   | StrokeOpacityUpdate
   | AddStrokeUpdate
   | RemoveStrokeUpdate
+  | PointSizeUpdate
   | ColorScaleUpdate
   | ColorSchemeUpdate
   | ColorCountUpdate
   | ColorThresholdUpdate
   | SizeUpdate
-  | DotSizeUpdate
   | DotValueUpdate
   | TransformationUpdate;
 
@@ -575,6 +575,21 @@ export function dispatchLayerUpdate({
       });
       break;
     }
+    case 'point-size': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id] as
+          | CartoKitPointLayer
+          | CartoKitDotDensityLayer;
+        lyr.type === 'Point'
+          ? (lyr.style.size = payload.size)
+          : (lyr.style.dots.size = payload.size);
+
+        map.setPaintProperty(layer.id, 'circle-radius', payload.size);
+
+        return ir;
+      });
+      break;
+    }
     case 'color-scale': {
       ir.update((ir) => {
         // We guarantee that layer is a CartoKitChoroplethLayer when we dispatch
@@ -643,17 +658,6 @@ export function dispatchLayerUpdate({
         lyr.style.size.max = payload.max ?? lyr.style.size.max;
 
         map.setPaintProperty(layer.id, 'circle-radius', deriveSize(lyr));
-
-        return ir;
-      });
-      break;
-    }
-    case 'dot-size': {
-      ir.update((ir) => {
-        const lyr = ir.layers[layer.id] as CartoKitDotDensityLayer;
-        lyr.style.dots.size = payload.size;
-
-        map.setPaintProperty(layer.id, 'circle-radius', payload.size);
 
         return ir;
       });

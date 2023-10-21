@@ -6,8 +6,8 @@
   import { getLayerGeometryType } from '$lib/utils/geojson';
 
   export let layer: CartoKitLayer;
-  $: geometry = getLayerGeometryType(layer.data.rawGeoJSON);
-  $: options = GEOMETRY_TO_MAP_TYPES[geometry].map((mapType) => ({
+  $: geometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+  $: options = GEOMETRY_TO_MAP_TYPES[geometryType].map((mapType) => ({
     value: mapType,
     label: mapType
   }));

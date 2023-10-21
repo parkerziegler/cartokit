@@ -3,7 +3,7 @@
   import { getLayerGeometryType } from '$lib/utils/geojson';
 
   export let layer: CartoKitPointLayer;
-  $: geometryType = getLayerGeometryType(layer.data.geoJSON) ?? 'Feature';
+  $: geometryType = getLayerGeometryType(layer.data.geoJSON);
   $: dimension = layer.style.size * 2 + (layer.style.stroke?.width ?? 0) * 2;
 </script>
 

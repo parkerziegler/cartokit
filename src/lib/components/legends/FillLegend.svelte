@@ -3,7 +3,7 @@
   import { getLayerGeometryType } from '$lib/utils/geojson';
 
   export let layer: CartoKitFillLayer;
-  $: geometryType = getLayerGeometryType(layer.data.geoJSON) ?? 'Feature';
+  $: geometryType = getLayerGeometryType(layer.data.geoJSON);
 </script>
 
 <div class="stack-h stack-h-xs ml-8 items-center">
