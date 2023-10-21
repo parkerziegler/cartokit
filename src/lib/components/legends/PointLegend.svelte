@@ -3,8 +3,7 @@
   import { getLayerGeometryType } from '$lib/utils/geojson';
 
   export let layer: CartoKitPointLayer;
-  $: featureCount = layer.data.geoJSON.features.length;
-  $: featureType = getLayerGeometryType(layer.data.geoJSON) ?? 'Feature';
+  $: geometryType = getLayerGeometryType(layer.data.geoJSON) ?? 'Feature';
   $: dimension = layer.style.size * 2 + (layer.style.stroke?.width ?? 0) * 2;
 </script>
 
@@ -26,6 +25,7 @@
     />
   </svg>
   <span
-    >{featureCount} {featureType + (featureType.length !== 1 ? 's' : '')}</span
+    >{layer.data.geoJSON.features.length}
+    {geometryType + (geometryType.length !== 1 ? 's' : '')}</span
   >
 </div>
