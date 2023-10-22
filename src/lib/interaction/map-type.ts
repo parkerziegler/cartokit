@@ -1,4 +1,5 @@
 import type { Map, GeoJSONSource } from 'maplibre-gl';
+import type { Geometry } from 'geojson';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import {
@@ -60,11 +61,11 @@ interface TransitionMapTypeReturnValue {
  *
  * @returns — The transitioned CartoKitLayer.
  */
-export function transitionMapType({
+export const transitionMapType = ({
   map,
   layer,
   targetMapType
-}: TransitionMapTypeParams): CartoKitLayer {
+}: TransitionMapTypeParams): CartoKitLayer => {
   let redraw = false;
   let targetLayer: CartoKitLayer;
 
@@ -126,7 +127,25 @@ export function transitionMapType({
   }
 
   return targetLayer;
-}
+};
+
+/**
+ * Generate errors with consistent messages for unsupported map type transitions.
+ *
+ * @param rawGeometryType – The geometry type of the original layer.
+ * @param targetGeometryType – The geometry type of the target layer being
+ * transitioned to.
+ *
+ * @returns – never—program execution halts.
+ */
+const throwUnsupportedTransitionError = (
+  rawGeometryType: Geometry['type'],
+  targetGeometryType: Geometry['type']
+): never => {
+  throw new Error(
+    `Unsupported geometry transition. Transition initiated from ${rawGeometryType} to ${targetGeometryType}, but no ${targetGeometryType} features are present in the original data.`
+  );
+};
 
 /**
  * Transition a layer to a point layer.
@@ -136,10 +155,10 @@ export function transitionMapType({
  *
  * @returns — The transitioned CartoKitPointLayer.
  */
-function transitionToPoint(
+const transitionToPoint = (
   map: Map,
   layer: CartoKitLayer
-): TransitionMapTypeReturnValue {
+): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Point':
       return {
@@ -245,7 +264,7 @@ function transitionToPoint(
       };
     }
   }
-}
+};
 
 /**
  * Transition a layer to a polygon fill layer.
@@ -255,10 +274,10 @@ function transitionToPoint(
  *
  * @returns — The transitioned CartoKitFillLayer.
  */
-function transitionToFill(
+const transitionToFill = (
   map: Map,
   layer: CartoKitLayer
-): TransitionMapTypeReturnValue {
+): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Fill': {
       return {
@@ -266,10 +285,32 @@ function transitionToFill(
         redraw: false
       };
     }
-    case 'Point':
-      throw new Error(
-        'Unsupported geometry transition. Transition initiated from Point to Polygon.'
-      );
+    case 'Point': {
+      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+
+      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
+        throwUnsupportedTransitionError(rawGeometryType, 'Polygon');
+      }
+
+      const targetLayer: CartoKitFillLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Fill',
+        data: {
+          ...layer.data,
+          geoJSON: layer.data.rawGeoJSON
+        },
+        style: {
+          fill: layer.style.fill,
+          stroke: layer.style.stroke
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
     case 'Choropleth': {
       const colors = layer.style.fill.scheme[layer.style.fill.count];
       const color = colors.at(-1) ?? randomColor();
@@ -289,7 +330,7 @@ function transitionToFill(
       };
 
       // Update the fill-color of the existing layer. All other paint properties
-      // should be unchanged.
+      // should remain unchanged.
       map.setPaintProperty(layer.id, 'fill-color', color);
 
       return {
@@ -301,9 +342,7 @@ function transitionToFill(
       const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
 
       if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
-        throw new Error(
-          `Unsupported geometry transition. Transition initiated from ${rawGeometryType} to Polygon.`
-        );
+        throwUnsupportedTransitionError(rawGeometryType, 'Polygon');
       }
 
       const targetLayer: CartoKitFillLayer = {
@@ -346,7 +385,7 @@ function transitionToFill(
       };
     }
   }
-}
+};
 
 /**
  * Transition a layer to a choropleth layer.
@@ -356,10 +395,10 @@ function transitionToFill(
  *
  * @returns – The transitioned CartoKitChoroplethLayer.
  */
-function transitionToChoropleth(
+const transitionToChoropleth = (
   map: Map,
   layer: CartoKitLayer
-): TransitionMapTypeReturnValue {
+): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Choropleth': {
       return {
@@ -367,10 +406,44 @@ function transitionToChoropleth(
         redraw: false
       };
     }
-    case 'Point':
-      throw new Error(
-        'Unsupported geometry transition. Transition initiated from Point to Polygon.'
-      );
+    case 'Point': {
+      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+
+      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
+        throwUnsupportedTransitionError(rawGeometryType, 'Polygon');
+      }
+
+      const attribute = selectNumericAttribute(layer.data.geoJSON.features);
+
+      const targetLayer: CartoKitChoroplethLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Choropleth',
+        data: {
+          ...layer.data,
+          geoJSON: layer.data.rawGeoJSON
+        },
+        style: {
+          fill: {
+            attribute,
+            scale: DEFAULT_SCALE,
+            scheme: DEFAULT_SCHEME,
+            count: DEFAULT_COUNT,
+            thresholds: DEFAULT_THRESHOLDS(
+              attribute,
+              layer.data.geoJSON.features
+            ),
+            opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
+          },
+          stroke: layer.style.stroke
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
     case 'Fill': {
       const attribute = selectNumericAttribute(layer.data.geoJSON.features);
 
@@ -389,8 +462,6 @@ function transitionToChoropleth(
               attribute,
               layer.data.geoJSON.features
             ),
-            // A Choropleth layer should always have an opacity, even if the
-            // Fill layer we're transitioning from had no fill.
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
           stroke: layer.style.stroke
@@ -419,9 +490,7 @@ function transitionToChoropleth(
       const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
 
       if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
-        throw new Error(
-          `Unsupported geometry transition. Transition initiated from ${rawGeometryType} to Polygon.`
-        );
+        throwUnsupportedTransitionError(rawGeometryType, 'Polygon');
       }
 
       const targetLayer: CartoKitChoroplethLayer = {
@@ -484,7 +553,7 @@ function transitionToChoropleth(
       };
     }
   }
-}
+};
 
 /**
  * Transition a layer to a proportional symbol layer.
@@ -493,10 +562,10 @@ function transitionToChoropleth(
  *
  * @returns – The transitioned CartoKitProportionalSymbolLayer.
  */
-function transitionToProportionalSymbol(
+const transitionToProportionalSymbol = (
   map: Map,
   layer: CartoKitLayer
-): TransitionMapTypeReturnValue {
+): TransitionMapTypeReturnValue => {
   const features = layer.data.geoJSON.features;
 
   switch (layer.type) {
@@ -624,7 +693,7 @@ function transitionToProportionalSymbol(
       };
     }
   }
-}
+};
 
 /**
  * Transition a layer to a dot density layer.
@@ -633,19 +702,58 @@ function transitionToProportionalSymbol(
  *
  * @returns – The transitioned CartoKitDotDensityLayer.
  */
-function transitionToDotDensity(
+const transitionToDotDensity = (
   layer: CartoKitLayer
-): TransitionMapTypeReturnValue {
+): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Dot Density':
       return {
         targetLayer: layer,
         redraw: false
       };
-    case 'Point':
-      throw new Error(
-        'Unsupported geometry transition. Transition initiated from Point to Polygon.'
-      );
+    case 'Point': {
+      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+
+      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
+        throwUnsupportedTransitionError(rawGeometryType, 'Polygon');
+      }
+
+      const features = layer.data.rawGeoJSON.features;
+      const attribute = selectNumericAttribute(features);
+      const dotValue = deriveDotDensityStartingValue(features, attribute);
+
+      const targetLayer: CartoKitDotDensityLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Dot Density',
+        data: {
+          ...layer.data,
+          geoJSON: generateDotDensityPoints({
+            features,
+            attribute,
+            value: dotValue
+          }),
+          transformations: [
+            ...layer.data.transformations,
+            transformDotDensity(attribute, dotValue)
+          ]
+        },
+        style: {
+          dots: {
+            attribute,
+            size: 1,
+            value: dotValue
+          },
+          fill: layer.style.fill,
+          stroke: layer.style.stroke
+        }
+      };
+
+      return {
+        targetLayer,
+        redraw: true
+      };
+    }
     case 'Fill': {
       const features = layer.data.geoJSON.features;
       const attribute = selectNumericAttribute(features);
@@ -729,9 +837,7 @@ function transitionToDotDensity(
       const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
 
       if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
-        throw new Error(
-          `Unsupported geometry transition. Transition initiated from ${rawGeometryType} to Polygon.`
-        );
+        throwUnsupportedTransitionError(rawGeometryType, 'Polygon');
       }
 
       const features = layer.data.rawGeoJSON.features;
@@ -774,4 +880,4 @@ function transitionToDotDensity(
       };
     }
   }
-}
+};
