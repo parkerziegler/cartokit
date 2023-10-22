@@ -1,10 +1,9 @@
 import type { Map, MapSourceDataEvent } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
 
-import { addLayer } from '$lib/interaction/layer';
-import { sourceWorker } from '$lib/utils/worker';
-import { generateCartoKitLayer } from '$lib/utils/layer';
+import { addLayer, generateCartoKitLayer } from '$lib/interaction/layer';
 import { ir } from '$lib/stores/ir';
+import { sourceWorker } from '$lib/utils/worker';
 
 type AddSourceOptions =
   | {
