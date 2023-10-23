@@ -23,3 +23,6 @@ yarn.lock
 
 # VSCode
 /.vscode
+
+# Svelte
+svelte.config.js
