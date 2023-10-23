@@ -5,6 +5,8 @@
   import DotDensityLegend from '$lib/components/legends/DotDensityLegend.svelte';
   import FillIcon from '$lib/components/icons/FillIcon.svelte';
   import FillLegend from '$lib/components/legends/FillLegend.svelte';
+  import PointIcon from '$lib/components/icons/PointIcon.svelte';
+  import PointLegend from '$lib/components/legends/PointLegend.svelte';
   import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
   import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
@@ -38,7 +40,9 @@
 <li class="stack stack-xs">
   <p class="flex items-center">
     <span class="shrink-0">
-      {#if layer.type === 'Fill'}
+      {#if layer.type === 'Point'}
+        <PointIcon />
+      {:else if layer.type === 'Fill'}
         <FillIcon />
       {:else if layer.type === 'Choropleth'}
         <ChoroplethIcon />
@@ -59,7 +63,9 @@
       </button>
     {/if}
   </p>
-  {#if layer.type === 'Fill'}
+  {#if layer.type === 'Point'}
+    <PointLegend {layer} />
+  {:else if layer.type === 'Fill'}
     <FillLegend {layer} />
   {:else if layer.type === 'Choropleth'}
     <ChoroplethLegend {layer} />

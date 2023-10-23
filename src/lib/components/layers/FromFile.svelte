@@ -1,6 +1,4 @@
 <script lang="ts">
-  import kebabCase from 'lodash.kebabcase';
-  import uniqueId from 'lodash.uniqueid';
   import { getContext } from 'svelte';
 
   import Button from '$lib/components/shared/Button.svelte';
@@ -8,15 +6,7 @@
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { addSource } from '$lib/interaction/source';
-  import { ir } from '$lib/stores/ir';
   import { map } from '$lib/stores/map';
-  import type { CartoKitFillLayer } from '$lib/types/CartoKitLayer';
-  import { randomColor } from '$lib/utils/color';
-  import {
-    DEFAULT_OPACITY,
-    DEFAULT_STROKE_OPACITY,
-    DEFAULT_STROKE_WIDTH
-  } from '$lib/utils/constants';
   import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
 
   const closeModal = getContext<() => void>('close-modal');
@@ -44,37 +34,15 @@
 
     reader.onload = function readGeoJSON(theFile) {
       if (typeof theFile.target?.result === 'string') {
-        const geojson = JSON.parse(theFile.target.result);
+        const featureCollection = normalizeGeoJSONToFeatureCollection(
+          JSON.parse(theFile.target.result)
+        );
 
-        const color = randomColor();
-        const layer: CartoKitFillLayer = {
-          id: uniqueId(kebabCase(displayName)),
+        addSource($map, {
+          kind: 'file',
           displayName,
-          type: 'Fill',
-          data: {
-            geoJSON: normalizeGeoJSONToFeatureCollection(geojson),
-            rawGeoJSON: normalizeGeoJSONToFeatureCollection(geojson),
-            fileName: file.name,
-            transformations: []
-          },
-          style: {
-            fill: {
-              color,
-              opacity: DEFAULT_OPACITY
-            },
-            stroke: {
-              color,
-              width: DEFAULT_STROKE_WIDTH,
-              opacity: DEFAULT_STROKE_OPACITY
-            }
-          }
-        };
-
-        ir.update((ir) => {
-          ir.layers[layer.id] = layer;
-          addSource($map, layer);
-
-          return ir;
+          fileName: file.name,
+          featureCollection
         });
 
         closeModal();

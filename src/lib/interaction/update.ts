@@ -17,7 +17,8 @@ import type {
   CartoKitFillLayer,
   CartoKitChoroplethLayer,
   CartoKitProportionalSymbolLayer,
-  CartoKitDotDensityLayer
+  CartoKitDotDensityLayer,
+  CartoKitPointLayer
 } from '$lib/types/CartoKitLayer';
 import type { ColorScale, ColorScheme } from '$lib/types/color';
 import type { MapType } from '$lib/types/map-types';
@@ -32,13 +33,6 @@ import {
 
 interface LayerUpdate {
   layer: CartoKitLayer;
-}
-
-interface InitialDataUpdate extends LayerUpdate {
-  type: 'initial-data';
-  payload: {
-    geoJSON: FeatureCollection;
-  };
 }
 
 interface MapTypeUpdate extends LayerUpdate {
@@ -65,6 +59,7 @@ interface FillUpdate extends LayerUpdate {
     color: string;
   };
   layer:
+    | CartoKitPointLayer
     | CartoKitFillLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer;
@@ -81,6 +76,7 @@ interface AddFillUpdate extends LayerUpdate {
   type: 'add-fill';
   payload: Record<string, never>;
   layer:
+    | CartoKitPointLayer
     | CartoKitFillLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer;
@@ -90,6 +86,7 @@ interface RemoveFillUpdate extends LayerUpdate {
   type: 'remove-fill';
   payload: Record<string, never>;
   layer:
+    | CartoKitPointLayer
     | CartoKitFillLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer;
@@ -129,6 +126,14 @@ interface RemoveStrokeUpdate extends LayerUpdate {
   type: 'remove-stroke';
   payload: Record<string, never>;
   layer: CartoKitLayer;
+}
+
+interface PointSizeUpdate extends LayerUpdate {
+  type: 'point-size';
+  payload: {
+    size: number;
+  };
+  layer: CartoKitPointLayer | CartoKitDotDensityLayer;
 }
 
 interface ColorScaleUpdate extends LayerUpdate {
@@ -173,14 +178,6 @@ interface SizeUpdate extends LayerUpdate {
   layer: CartoKitProportionalSymbolLayer;
 }
 
-interface DotSizeUpdate extends LayerUpdate {
-  type: 'dot-size';
-  payload: {
-    size: number;
-  };
-  layer: CartoKitDotDensityLayer;
-}
-
 interface DotValueUpdate extends LayerUpdate {
   type: 'dot-value';
   payload: {
@@ -202,7 +199,6 @@ interface TransformationUpdate extends LayerUpdate {
 }
 
 type DispatchLayerUpdateParams =
-  | InitialDataUpdate
   | MapTypeUpdate
   | AttributeUpdate
   | FillUpdate
@@ -214,12 +210,12 @@ type DispatchLayerUpdateParams =
   | StrokeOpacityUpdate
   | AddStrokeUpdate
   | RemoveStrokeUpdate
+  | PointSizeUpdate
   | ColorScaleUpdate
   | ColorSchemeUpdate
   | ColorCountUpdate
   | ColorThresholdUpdate
   | SizeUpdate
-  | DotSizeUpdate
   | DotValueUpdate
   | TransformationUpdate;
 
@@ -239,19 +235,6 @@ export function dispatchLayerUpdate({
   const map = get(mapStore);
 
   switch (type) {
-    case 'initial-data': {
-      ir.update((ir) => {
-        const lyr = ir.layers[layer.id];
-        lyr.data.geoJSON = payload.geoJSON;
-        // The initial data loaded for a layer gets preserved in the rawGeoJSON property.
-        // This allows us to recover polygons when we do things like transition to points
-        // and subsequently back to polygons.
-        lyr.data.rawGeoJSON = payload.geoJSON;
-
-        return ir;
-      });
-      break;
-    }
     case 'map-type': {
       ir.update((ir) => {
         ir.layers[layer.id] = transitionMapType({
@@ -312,6 +295,7 @@ export function dispatchLayerUpdate({
     case 'fill': {
       ir.update((ir) => {
         const lyr = ir.layers[layer.id] as
+          | CartoKitPointLayer
           | CartoKitFillLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer;
@@ -323,6 +307,7 @@ export function dispatchLayerUpdate({
             case 'Fill':
               map.setPaintProperty(layer.id, 'fill-color', payload.color);
               break;
+            case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(layer.id, 'circle-color', payload.color);
@@ -346,6 +331,7 @@ export function dispatchLayerUpdate({
             case 'Choropleth':
               map.setPaintProperty(layer.id, 'fill-opacity', payload.opacity);
               break;
+            case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(layer.id, 'circle-opacity', payload.opacity);
@@ -371,6 +357,7 @@ export function dispatchLayerUpdate({
             map.setPaintProperty(layer.id, 'fill-color', DEFAULT_FILL);
             map.setPaintProperty(layer.id, 'fill-opacity', DEFAULT_OPACITY);
             break;
+          case 'Point':
           case 'Proportional Symbol':
           case 'Dot Density':
             map.setPaintProperty(layer.id, 'circle-color', DEFAULT_FILL);
@@ -392,12 +379,11 @@ export function dispatchLayerUpdate({
             map.setPaintProperty(layer.id, 'fill-color', 'transparent');
             map.setPaintProperty(layer.id, 'fill-opacity', 0);
             break;
+          case 'Point':
           case 'Proportional Symbol':
           case 'Dot Density':
             map.setPaintProperty(layer.id, 'circle-color', 'transparent');
             map.setPaintProperty(layer.id, 'circle-opacity', 0);
-            break;
-          default:
             break;
         }
 
@@ -420,6 +406,7 @@ export function dispatchLayerUpdate({
                 payload.color
               );
               break;
+            case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(
@@ -451,6 +438,7 @@ export function dispatchLayerUpdate({
                 payload.strokeWidth
               );
               break;
+            case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(
@@ -482,6 +470,7 @@ export function dispatchLayerUpdate({
                 payload.opacity
               );
               break;
+            case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(
@@ -526,6 +515,7 @@ export function dispatchLayerUpdate({
               DEFAULT_STROKE_OPACITY
             );
             break;
+          case 'Point':
           case 'Proportional Symbol':
           case 'Dot Density':
             map.setPaintProperty(
@@ -566,6 +556,7 @@ export function dispatchLayerUpdate({
             map.setPaintProperty(`${layer.id}-stroke`, 'line-width', 0);
             map.setPaintProperty(`${layer.id}-stroke`, 'line-opacity', 0);
             break;
+          case 'Point':
           case 'Proportional Symbol':
           case 'Dot Density':
             map.setPaintProperty(
@@ -579,6 +570,21 @@ export function dispatchLayerUpdate({
           default:
             break;
         }
+
+        return ir;
+      });
+      break;
+    }
+    case 'point-size': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layer.id] as
+          | CartoKitPointLayer
+          | CartoKitDotDensityLayer;
+        lyr.type === 'Point'
+          ? (lyr.style.size = payload.size)
+          : (lyr.style.dots.size = payload.size);
+
+        map.setPaintProperty(layer.id, 'circle-radius', payload.size);
 
         return ir;
       });
@@ -652,17 +658,6 @@ export function dispatchLayerUpdate({
         lyr.style.size.max = payload.max ?? lyr.style.size.max;
 
         map.setPaintProperty(layer.id, 'circle-radius', deriveSize(lyr));
-
-        return ir;
-      });
-      break;
-    }
-    case 'dot-size': {
-      ir.update((ir) => {
-        const lyr = ir.layers[layer.id] as CartoKitDotDensityLayer;
-        lyr.style.dots.size = payload.size;
-
-        map.setPaintProperty(layer.id, 'circle-radius', payload.size);
 
         return ir;
       });

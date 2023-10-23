@@ -1,18 +1,22 @@
 <script lang="ts">
-  import type { CartoKitFillLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitPointLayer } from '$lib/types/CartoKitLayer';
   import { getLayerGeometryType } from '$lib/utils/geojson';
 
-  export let layer: CartoKitFillLayer;
+  export let layer: CartoKitPointLayer;
   $: geometryType = getLayerGeometryType(layer.data.geoJSON);
+  $: dimension = layer.style.size * 2 + (layer.style.stroke?.width ?? 0) * 2;
 </script>
 
 <div class="stack-h stack-h-xs ml-8 items-center">
-  <svg viewBox="0 0 16 16" width="16" height="16">
-    <rect
-      x="0"
-      y="0"
-      width="16"
-      height="16"
+  <svg
+    viewBox={`0 0 ${dimension} ${dimension}`}
+    width={dimension}
+    height={dimension}
+  >
+    <circle
+      cx={dimension / 2}
+      cy={dimension / 2}
+      r={layer.style.size}
       fill={layer.style.fill?.color ?? 'none'}
       fill-opacity={layer.style.fill?.opacity ?? 0}
       stroke={layer.style.stroke?.color ?? 'none'}

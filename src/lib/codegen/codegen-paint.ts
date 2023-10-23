@@ -12,6 +12,31 @@ import { MAPBOX_DEFAULTS } from '$lib/utils/constants';
  */
 export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
+    case 'Point': {
+      if (!layer.style.fill) {
+        return '';
+      }
+
+      return [
+        withDefault(
+          'circle-color',
+          layer.style.fill.color,
+          MAPBOX_DEFAULTS['circle-color']
+        ),
+        withDefault(
+          'circle-radius',
+          layer.style.size,
+          MAPBOX_DEFAULTS['circle-radius']
+        ),
+        withDefault(
+          'circle-opacity',
+          layer.style.fill.opacity,
+          MAPBOX_DEFAULTS['circle-opacity']
+        )
+      ]
+        .filter(Boolean)
+        .join(',\n');
+    }
     case 'Fill': {
       if (!layer.style.fill) {
         return '';
@@ -127,6 +152,7 @@ export function codegenStroke(layer: CartoKitLayer): string {
         .filter(Boolean)
         .join(',\n');
     }
+    case 'Point':
     case 'Proportional Symbol':
     case 'Dot Density': {
       if (!layer.style.stroke) {

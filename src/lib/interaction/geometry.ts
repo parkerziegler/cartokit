@@ -1,11 +1,5 @@
 import * as d3 from 'd3';
-import turfBbox from '@turf/bbox';
-import turfBooleanWithin from '@turf/boolean-within';
-import turfCentroid from '@turf/centroid';
-import {
-  feature as turfFeature,
-  featureCollection as turfFeatureCollection
-} from '@turf/helpers';
+import * as turf from '@turf/turf';
 import { randomPoint as turfRandomPoint } from '@turf/random';
 import type { ExpressionSpecification } from 'maplibre-gl';
 import type { Feature, FeatureCollection } from 'geojson';
@@ -55,12 +49,12 @@ export function deriveSize(
  */
 export function deriveCentroids(features: Feature[]): FeatureCollection {
   const feats = features.map((feature) => {
-    const centroid = turfCentroid(feature);
+    const centroid = turf.centroid(feature);
 
-    return turfFeature(centroid.geometry, feature.properties);
+    return turf.feature(centroid.geometry, feature.properties);
   });
 
-  return turfFeatureCollection(feats);
+  return turf.featureCollection(feats);
 }
 
 interface GenerateDotDensityPointsParams {
@@ -87,7 +81,7 @@ export function generateDotDensityPoints({
     const numPoints = Math.floor(feature.properties?.[attribute] / value) ?? 0;
 
     // Obtain the bounding box of the polygon.
-    const bbox = turfBbox(feature);
+    const bbox = turf.bbox(feature);
 
     // Begin "throwing" random points within the bounding box,
     // keeping them only if they fall within the polygon.
@@ -95,17 +89,17 @@ export function generateDotDensityPoints({
     while (selectedFeatures.length < numPoints) {
       const candidate = turfRandomPoint(1, { bbox }).features[0];
 
-      if (turfBooleanWithin(candidate, feature)) {
+      if (turf.booleanWithin(candidate, feature)) {
         selectedFeatures.push(candidate);
       }
     }
 
     return selectedFeatures.flatMap((point) => {
-      return turfFeature(point.geometry, feature.properties);
+      return turf.feature(point.geometry, feature.properties);
     });
   });
 
-  return turfFeatureCollection(dots);
+  return turf.featureCollection(dots);
 }
 
 /**

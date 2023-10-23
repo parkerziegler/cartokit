@@ -8,12 +8,14 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type {
     CartoKitFillLayer,
+    CartoKitPointLayer,
     CartoKitProportionalSymbolLayer,
     CartoKitDotDensityLayer
   } from '$lib/types/CartoKitLayer';
   import { DEFAULT_FILL } from '$lib/utils/constants';
 
   export let layer:
+    | CartoKitPointLayer
     | CartoKitFillLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer;

@@ -59,6 +59,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
 
       return [fillLayer, strokeLayer].filter(Boolean).join('\n\n');
     }
+    case 'Point':
     case 'Proportional Symbol':
     case 'Dot Density': {
       const fill = codegenFill(layer);

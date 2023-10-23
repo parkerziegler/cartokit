@@ -12,6 +12,7 @@ export function getInstrumetedLayerIds(layer: CartoKitLayer): string[] {
     case 'Fill':
     case 'Choropleth':
       return [`${layer.id}-stroke`, `${layer.id}-hover`, `${layer.id}-select`];
+    case 'Point':
     case 'Proportional Symbol':
       return [`${layer.id}-hover`, `${layer.id}-select`];
     case 'Dot Density':
