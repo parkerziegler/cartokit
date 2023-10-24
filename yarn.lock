@@ -1874,9 +1874,9 @@
     "@types/lodash" "*"
 
 "@types/lodash.isfinite@^3.3.7":
-  version "3.3.7"
-  resolved "https://registry.yarnpkg.com/@types/lodash.isfinite/-/lodash.isfinite-3.3.7.tgz#e7d5bb5a61cd6499469e3a682945aa37c25242a1"
-  integrity sha512-E7t/RMqtW2AGhT21CKV5Sw0Ytn9n6HAaRgWTr8p0zlHWaRM9+K5nbHrA8CrbAl4d7iaWz7CYmFxnyrsklgBBcg==
+  version "3.3.8"
+  resolved "https://registry.yarnpkg.com/@types/lodash.isfinite/-/lodash.isfinite-3.3.8.tgz#f1b793eda9a28677c579533765de17e3925f6956"
+  integrity sha512-ZrlUBiyei7YxBngub1Xvsgh1Irlp3G5V8G6FjKpR1FagIBJu9Q+P1nXA71rdsGeiAky+5s6l4WZXyGJW7EKRxg==
   dependencies:
     "@types/lodash" "*"
 
@@ -1902,9 +1902,9 @@
     "@types/lodash" "*"
 
 "@types/lodash@*":
-  version "4.14.197"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.197.tgz#e95c5ddcc814ec3e84c891910a01e0c8a378c54b"
-  integrity sha512-BMVOiWs0uNxHVlHBgzTIqJYmj+PgCo4euloGF+5m4okL3rEYzM2EEv78mw8zWSMM57dM7kVIgJ2QDvwHSoCI5g==
+  version "4.14.200"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.200.tgz#435b6035c7eba9cdf1e039af8212c9e9281e7149"
+  integrity sha512-YI/M/4HRImtNf3pJgbF+W6FrXovqj+T+/HpENLTooK9PnkacBsDpeP3IpHab40CClUfhNmdM2WTNP2sa2dni5Q==
 
 "@types/mapbox__point-geometry@*", "@types/mapbox__point-geometry@^0.1.2":
   version "0.1.2"
