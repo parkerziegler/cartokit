@@ -1888,9 +1888,9 @@
     "@types/lodash" "*"
 
 "@types/lodash.orderby@^4.6.7":
-  version "4.6.7"
-  resolved "https://registry.yarnpkg.com/@types/lodash.orderby/-/lodash.orderby-4.6.7.tgz#3484098c0633f45aa0d3a57c5a8fc8a031cebb43"
-  integrity sha512-GaaUBTS4RTjL8gz1ZXkwAB/defpGMOWwCG9C4HL9g81i4wghIoVVESQCUa1xRsyUBqAb5JwLbSwvL0q36rK0sA==
+  version "4.6.8"
+  resolved "https://registry.yarnpkg.com/@types/lodash.orderby/-/lodash.orderby-4.6.8.tgz#a81a8bf8903ebcda687913eaf9ffd2de0376b297"
+  integrity sha512-gvkdV88VOIC381U0kwofM+s5N5ZYzHwqMjaJkBDGFo8SA7UcCsGwtsU34Rat6opejf7uV6sQEniGwCjZnPW2Qw==
   dependencies:
     "@types/lodash" "*"
 
