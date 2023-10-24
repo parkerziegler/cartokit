@@ -1874,9 +1874,9 @@
     "@types/lodash" "*"
 
 "@types/lodash.isfinite@^3.3.7":
-  version "3.3.7"
-  resolved "https://registry.yarnpkg.com/@types/lodash.isfinite/-/lodash.isfinite-3.3.7.tgz#e7d5bb5a61cd6499469e3a682945aa37c25242a1"
-  integrity sha512-E7t/RMqtW2AGhT21CKV5Sw0Ytn9n6HAaRgWTr8p0zlHWaRM9+K5nbHrA8CrbAl4d7iaWz7CYmFxnyrsklgBBcg==
+  version "3.3.8"
+  resolved "https://registry.yarnpkg.com/@types/lodash.isfinite/-/lodash.isfinite-3.3.8.tgz#f1b793eda9a28677c579533765de17e3925f6956"
+  integrity sha512-ZrlUBiyei7YxBngub1Xvsgh1Irlp3G5V8G6FjKpR1FagIBJu9Q+P1nXA71rdsGeiAky+5s6l4WZXyGJW7EKRxg==
   dependencies:
     "@types/lodash" "*"
 
