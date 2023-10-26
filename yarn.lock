@@ -401,7 +401,7 @@
   resolved "https://registry.yarnpkg.com/@mapbox/whoots-js/-/whoots-js-3.1.0.tgz#497c67a1cef50d1a2459ba60f315e448d2ad87fe"
   integrity sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==
 
-"@maplibre/maplibre-gl-style-spec@^19.3.2":
+"@maplibre/maplibre-gl-style-spec@^19.3.3":
   version "19.3.3"
   resolved "https://registry.yarnpkg.com/@maplibre/maplibre-gl-style-spec/-/maplibre-gl-style-spec-19.3.3.tgz#a106248bd2e25e77c963a362aeaf630e00f924e9"
   integrity sha512-cOZZOVhDSulgK0meTsTkmNXb1ahVvmTmWmfx9gRBwc6hq98wS9JP35ESIoNq3xqEan+UN+gn8187Z6E4NKhLsw==
@@ -1851,7 +1851,7 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.3.tgz#2be19e759a3dd18c79f9f436bd7363556c1a73dd"
   integrity sha512-CS2rOaoQ/eAgAfcTfq6amKG7bsN+EMcgGY4FAFQdvSj2y1ixvOZTUA9mOtCai7E1SYu283XNw7urKK30nP3wkQ==
 
-"@types/geojson@*", "@types/geojson@^7946.0.10", "@types/geojson@^7946.0.11":
+"@types/geojson@*", "@types/geojson@^7946.0.10", "@types/geojson@^7946.0.12":
   version "7946.0.12"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.12.tgz#0307536218d32e6b970bccd1d148b9c4e5b6f10d"
   integrity sha512-uK2z1ZHJyC0nQRbuovXFt4mzXDwf27vQeUWNhfKGwRcWW429GOhP8HxUHlM6TLH4bzmlv/HlEjpvJh3JfmGsAA==
@@ -1906,12 +1906,12 @@
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.200.tgz#435b6035c7eba9cdf1e039af8212c9e9281e7149"
   integrity sha512-YI/M/4HRImtNf3pJgbF+W6FrXovqj+T+/HpENLTooK9PnkacBsDpeP3IpHab40CClUfhNmdM2WTNP2sa2dni5Q==
 
-"@types/mapbox__point-geometry@*", "@types/mapbox__point-geometry@^0.1.2":
+"@types/mapbox__point-geometry@*", "@types/mapbox__point-geometry@^0.1.3":
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/@types/mapbox__point-geometry/-/mapbox__point-geometry-0.1.3.tgz#3050f58fcdcc9da96998655268d477ea266dbe76"
   integrity sha512-2W46IOXlu7vC8m3+M5rDqSnuY22GFxxx3xhkoyqyPWrD+eP2iAwNst0A1+umLYjCTJMJTSpiofphn9h9k+Kw+w==
 
-"@types/mapbox__vector-tile@^1.3.1":
+"@types/mapbox__vector-tile@^1.3.3":
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/@types/mapbox__vector-tile/-/mapbox__vector-tile-1.3.3.tgz#f8bf33d91f9951c6090dbd454d4e33626f5107cc"
   integrity sha512-d263B3KCQtXKVZMHpMJrEW5EeLBsQ8jvAS9nhpUKC5hHIlQaACG9PWkW8qxEeNuceo9120AwPjeS91uNa4ltqA==
@@ -1920,7 +1920,7 @@
     "@types/mapbox__point-geometry" "*"
     "@types/pbf" "*"
 
-"@types/pbf@*", "@types/pbf@^3.0.3":
+"@types/pbf@*", "@types/pbf@^3.0.4":
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/@types/pbf/-/pbf-3.0.4.tgz#32f8cd8bb2fb53e5870a5d751210d1dcdce23f85"
   integrity sha512-SOFlLGZkLbEXJRwcWCqeP/Koyaf/uAqLXHUsdo/nMfjLsNd8kqauwHe9GBOljSmpcHp/LC6kOjo3SidGjNirVA==
@@ -1940,7 +1940,7 @@
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.5.4.tgz#0a41252ad431c473158b22f9bfb9a63df7541cff"
   integrity sha512-MMzuxN3GdFwskAnb6fz0orFvhfqi752yjaXylr0Rp4oDg5H0Zn1IuyRhDVvYOwAXoJirx2xuS16I3WjxnAIHiQ==
 
-"@types/supercluster@^7.1.1":
+"@types/supercluster@^7.1.2":
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/@types/supercluster/-/supercluster-7.1.2.tgz#2391a1b22ef108e37d51d4c8bdea7dc04ebf4bcf"
   integrity sha512-qMhofL945Z4njQUuntadexAgPtpiBC014WvVqU70Prj42LC77Xgmz04us7hSMmwjs7KbgAwGBmje+FSOvDbP0Q==
@@ -3594,9 +3594,9 @@ make-dir@^3.1.0:
     semver "^6.0.0"
 
 maplibre-gl@^3.0.0:
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/maplibre-gl/-/maplibre-gl-3.5.1.tgz#83d6be57612bd056b096f8faf4b2cfc31ce655b8"
-  integrity sha512-XFpqAKjpm7Y6cV3B1MDZ3FGUCXyrfeM2QkXloKc4x2QK9/e6/BEHdVebtxXcTrwdzpQexKrMqzdYCbaobJRNrw==
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/maplibre-gl/-/maplibre-gl-3.5.2.tgz#84a352f1845c6ccf6fe5d86aaa0d0e8b0f18923c"
+  integrity sha512-deqYA/RiEyXMGroZMDbOWNQTLnFsxREC+mDkQnuyCUNdBWm1KHafsXJYZP7rlLa5RLQNq05IAUAizY9aHTpIUw==
   dependencies:
     "@mapbox/geojson-rewind" "^0.5.2"
     "@mapbox/jsonlint-lines-primitives" "^2.0.2"
@@ -3605,12 +3605,12 @@ maplibre-gl@^3.0.0:
     "@mapbox/unitbezier" "^0.0.1"
     "@mapbox/vector-tile" "^1.3.1"
     "@mapbox/whoots-js" "^3.1.0"
-    "@maplibre/maplibre-gl-style-spec" "^19.3.2"
-    "@types/geojson" "^7946.0.11"
-    "@types/mapbox__point-geometry" "^0.1.2"
-    "@types/mapbox__vector-tile" "^1.3.1"
-    "@types/pbf" "^3.0.3"
-    "@types/supercluster" "^7.1.1"
+    "@maplibre/maplibre-gl-style-spec" "^19.3.3"
+    "@types/geojson" "^7946.0.12"
+    "@types/mapbox__point-geometry" "^0.1.3"
+    "@types/mapbox__vector-tile" "^1.3.3"
+    "@types/pbf" "^3.0.4"
+    "@types/supercluster" "^7.1.2"
     earcut "^2.2.4"
     geojson-vt "^3.2.1"
     gl-matrix "^3.4.3"
