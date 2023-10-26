@@ -38,21 +38,23 @@
 </script>
 
 <li class="stack stack-xs">
-  <p class="flex items-center">
-    <span class="shrink-0">
-      {#if layer.type === 'Point'}
-        <PointIcon />
-      {:else if layer.type === 'Fill'}
-        <FillIcon />
-      {:else if layer.type === 'Choropleth'}
-        <ChoroplethIcon />
-      {:else if layer.type === 'Proportional Symbol'}
-        <ProportionalSymbolIcon />
-      {:else if layer.type === 'Dot Density'}
-        <DotDensityIcon />
-      {/if}
-    </span>
-    <span class="ml-2 mr-8 truncate text-sm">{layer.displayName}</span>
+  <div class="flex items-center justify-between">
+    <div class="flex items-center">
+      <span class="shrink-0">
+        {#if layer.type === 'Point'}
+          <PointIcon />
+        {:else if layer.type === 'Fill'}
+          <FillIcon />
+        {:else if layer.type === 'Choropleth'}
+          <ChoroplethIcon />
+        {:else if layer.type === 'Proportional Symbol'}
+          <ProportionalSymbolIcon />
+        {:else if layer.type === 'Dot Density'}
+          <DotDensityIcon />
+        {/if}
+      </span>
+      <span class="ml-2 mr-8 truncate text-sm">{layer.displayName}</span>
+    </div>
     {#if layerVisible}
       <button on:click={toggleLayerVisibility}>
         <LayerVisibleIcon />
@@ -62,7 +64,7 @@
         <LayerHiddenIcon />
       </button>
     {/if}
-  </p>
+  </div>
   {#if layer.type === 'Point'}
     <PointLegend {layer} />
   {:else if layer.type === 'Fill'}
