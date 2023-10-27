@@ -74,6 +74,10 @@ export const transitionMapType = ({
       ({ redraw, targetLayer } = transitionToPoint(map, layer));
       break;
     }
+    case 'Line': {
+      ({ redraw, targetLayer } = transitionToLine(map, layer));
+      break;
+    }
     case 'Fill': {
       ({ redraw, targetLayer } = transitionToFill(map, layer));
       break;
@@ -165,6 +169,13 @@ const transitionToPoint = (
         targetLayer: layer,
         redraw: false
       };
+    case 'Line': {
+      // TODO:
+      return {
+        targetLayer: layer,
+        redraw: false
+      };
+    }
     case 'Fill': {
       const targetLayer: CartoKitPointLayer = {
         id: layer.id,
@@ -266,6 +277,28 @@ const transitionToPoint = (
   }
 };
 
+const transitionToLine = (
+  map: Map,
+  layer: CartoKitLayer
+): TransitionMapTypeReturnValue => {
+  switch (layer.type) {
+    case 'Line':
+      return {
+        targetLayer: layer,
+        redraw: false
+      };
+    case 'Point':
+    case 'Proportional Symbol':
+    case 'Dot Density':
+      throwUnsupportedTransitionError('Point', 'LineString');
+      break;
+    case 'Fill':
+    case 'Choropleth':
+      throwUnsupportedTransitionError('Polygon', 'LineString');
+      break;
+  }
+};
+
 /**
  * Transition a layer to a polygon fill layer.
  *
@@ -279,12 +312,11 @@ const transitionToFill = (
   layer: CartoKitLayer
 ): TransitionMapTypeReturnValue => {
   switch (layer.type) {
-    case 'Fill': {
+    case 'Fill':
       return {
         targetLayer: layer,
         redraw: false
       };
-    }
     case 'Point': {
       const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
 

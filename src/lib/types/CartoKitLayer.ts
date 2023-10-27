@@ -33,6 +33,17 @@ export interface CartoKitPointLayer extends Layer {
   };
 }
 
+export interface CartoKitLineLayer extends Layer {
+  type: 'Line';
+  style: {
+    stroke: {
+      color: string;
+      width: number;
+      opacity: number;
+    };
+  };
+}
+
 export interface CartoKitFillLayer extends Layer {
   type: 'Fill';
   style: {
@@ -109,6 +120,7 @@ export interface CartoKitDotDensityLayer extends Layer {
 
 export type CartoKitLayer =
   | CartoKitPointLayer
+  | CartoKitLineLayer
   | CartoKitFillLayer
   | CartoKitChoroplethLayer
   | CartoKitProportionalSymbolLayer

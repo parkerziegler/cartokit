@@ -12,13 +12,13 @@
     label: mapType
   }));
 
-  function onChange(event: CustomEvent<{ value: MapType }>) {
+  const onChange = (event: CustomEvent<{ value: MapType }>) => {
     dispatchLayerUpdate({
       type: 'map-type',
       layer,
       payload: { mapType: event.detail.value }
     });
-  }
+  };
 </script>
 
 <Select {options} selected={layer.type} on:change={onChange} />

@@ -18,7 +18,8 @@ import type {
   CartoKitChoroplethLayer,
   CartoKitProportionalSymbolLayer,
   CartoKitDotDensityLayer,
-  CartoKitPointLayer
+  CartoKitPointLayer,
+  CartoKitLineLayer
 } from '$lib/types/CartoKitLayer';
 import type { ColorScale, ColorScheme } from '$lib/types/color';
 import type { MapType } from '$lib/types/map-types';
@@ -70,6 +71,12 @@ interface FillOpacityUpdate extends LayerUpdate {
   payload: {
     opacity: number;
   };
+  layer:
+    | CartoKitPointLayer
+    | CartoKitFillLayer
+    | CartoKitChoroplethLayer
+    | CartoKitProportionalSymbolLayer
+    | CartoKitDotDensityLayer;
 }
 
 interface AddFillUpdate extends LayerUpdate {
@@ -321,7 +328,10 @@ export function dispatchLayerUpdate({
     }
     case 'fill-opacity': {
       ir.update((ir) => {
-        const lyr = ir.layers[layer.id];
+        const lyr = ir.layers[layer.id] as Exclude<
+          CartoKitLayer,
+          CartoKitLineLayer
+        >;
 
         if (lyr.style.fill) {
           lyr.style.fill.opacity = payload.opacity;
@@ -345,7 +355,11 @@ export function dispatchLayerUpdate({
     }
     case 'add-fill': {
       ir.update((ir) => {
-        const lyr = ir.layers[layer.id];
+        const lyr = ir.layers[layer.id] as
+          | CartoKitPointLayer
+          | CartoKitFillLayer
+          | CartoKitProportionalSymbolLayer
+          | CartoKitDotDensityLayer;
         lyr.style.fill = {
           color: DEFAULT_FILL,
           opacity: DEFAULT_OPACITY
@@ -353,7 +367,6 @@ export function dispatchLayerUpdate({
 
         switch (lyr.type) {
           case 'Fill':
-          case 'Choropleth':
             map.setPaintProperty(layer.id, 'fill-color', DEFAULT_FILL);
             map.setPaintProperty(layer.id, 'fill-opacity', DEFAULT_OPACITY);
             break;
@@ -371,7 +384,11 @@ export function dispatchLayerUpdate({
     }
     case 'remove-fill': {
       ir.update((ir) => {
-        const lyr = ir.layers[layer.id];
+        const lyr = ir.layers[layer.id] as
+          | CartoKitPointLayer
+          | CartoKitFillLayer
+          | CartoKitProportionalSymbolLayer
+          | CartoKitDotDensityLayer;
         lyr.style.fill = undefined;
 
         switch (lyr.type) {
