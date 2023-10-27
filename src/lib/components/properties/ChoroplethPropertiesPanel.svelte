@@ -8,7 +8,7 @@
   export let layer: CartoKitChoroplethLayer;
 </script>
 
-<MenuItem title="Choropleth">
+<MenuItem title="Fill">
   <ColorPalette {layer} />
 </MenuItem>
 <MenuItem title="Stroke">
