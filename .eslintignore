@@ -26,3 +26,6 @@ yarn.lock
 
 # Svelte
 svelte.config.js
+
+# ESLint
+.eslintrc.cjs

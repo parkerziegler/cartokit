@@ -7,11 +7,13 @@ import { deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
 import {
   instrumentPolygonHover,
-  instrumentPointHover
+  instrumentPointHover,
+  instrumentLineHover
 } from '$lib/interaction/hover';
 import {
-  instrumentPolygonSelect,
-  instrumentPointSelect
+  instrumentPointSelect,
+  instrumentLineSelect,
+  instrumentPolygonSelect
 } from '$lib/interaction/select';
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import { randomColor } from '$lib/utils/color';
@@ -59,6 +61,22 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 
       instrumentPointHover(map, layer.id);
       instrumentPointSelect(map, layer.id);
+      break;
+    }
+    case 'Line': {
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'line',
+        paint: {
+          'line-color': layer.style.stroke.color,
+          'line-width': layer.style.stroke.width,
+          'line-opacity': layer.style.stroke.opacity
+        }
+      });
+
+      instrumentLineHover(map, layer.id);
+      instrumentLineSelect(map, layer.id);
       break;
     }
     case 'Fill': {
@@ -248,6 +266,27 @@ export const generateCartoKitLayer = (
           }
         }
       };
+    case 'LineString':
+    case 'MultiLineString':
+      return {
+        id: uniqueId(`${kebabCase(options.displayName)}__`),
+        displayName: options.displayName,
+        type: 'Line',
+        data: {
+          geoJSON: featureCollection,
+          rawGeoJSON: featureCollection,
+          fileName: options.fileName,
+          url: options.url,
+          transformations: []
+        },
+        style: {
+          stroke: {
+            color,
+            width: DEFAULT_STROKE_WIDTH,
+            opacity: DEFAULT_STROKE_OPACITY
+          }
+        }
+      };
     case 'Polygon':
     case 'MultiPolygon':
       return {
@@ -273,7 +312,7 @@ export const generateCartoKitLayer = (
           }
         }
       };
-    default:
-      throw new Error(`Unsupported geometry type: ${geometryType}.`);
+    case 'GeometryCollection':
+      throw new Error('GeometryCollection not supported.');
   }
 };

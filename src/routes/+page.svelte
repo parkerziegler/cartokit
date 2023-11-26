@@ -7,11 +7,12 @@
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
-  import PointPropertiesPanel from '$lib/components/properties/PointPropertiesPanel.svelte';
-  import FillPropertiesPanel from '$lib/components/properties/FillPropertiesPanel.svelte';
   import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
-  import ProportionalSymbolPropertiesPanel from '$lib/components/properties/ProportionalSymbolPropertiesPanel.svelte';
   import DotDensityPropertiesPanel from '$lib/components/properties/DotDensityPropertiesPanel.svelte';
+  import FillPropertiesPanel from '$lib/components/properties/FillPropertiesPanel.svelte';
+  import LinePropertiesPanel from '$lib/components/properties/LinePropertiesPanel.svelte';
+  import PointPropertiesPanel from '$lib/components/properties/PointPropertiesPanel.svelte';
+  import ProportionalSymbolPropertiesPanel from '$lib/components/properties/ProportionalSymbolPropertiesPanel.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
@@ -89,6 +90,8 @@
           </MenuItem>
           {#if $selectedLayer.type === 'Point'}
             <PointPropertiesPanel layer={$selectedLayer} />
+          {:else if $selectedLayer.type === 'Line'}
+            <LinePropertiesPanel layer={$selectedLayer} />
           {:else if $selectedLayer.type === 'Fill'}
             <FillPropertiesPanel layer={$selectedLayer} />
           {:else if $selectedLayer.type === 'Choropleth'}

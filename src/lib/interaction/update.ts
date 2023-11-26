@@ -423,6 +423,9 @@ export function dispatchLayerUpdate({
                 payload.color
               );
               break;
+            case 'Line':
+              map.setPaintProperty(layer.id, 'line-color', payload.color);
+              break;
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
@@ -455,6 +458,9 @@ export function dispatchLayerUpdate({
                 payload.strokeWidth
               );
               break;
+            case 'Line':
+              map.setPaintProperty(layer.id, 'line-width', payload.strokeWidth);
+              break;
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
@@ -486,6 +492,9 @@ export function dispatchLayerUpdate({
                 'line-opacity',
                 payload.opacity
               );
+              break;
+            case 'Line':
+              map.setPaintProperty(layer.id, 'line-opacity', payload.opacity);
               break;
             case 'Point':
             case 'Proportional Symbol':
@@ -531,6 +540,8 @@ export function dispatchLayerUpdate({
               'line-opacity',
               DEFAULT_STROKE_OPACITY
             );
+            break;
+          case 'Line':
             break;
           case 'Point':
           case 'Proportional Symbol':

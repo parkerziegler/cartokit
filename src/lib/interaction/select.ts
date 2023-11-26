@@ -6,31 +6,6 @@ import { listeners } from '$lib/stores/listeners';
 import { selectedFeature } from '$lib/stores/selected-feature';
 
 /**
- * Add a selection indicator to a feature in a polygon layer.
- *
- * @param map – The top-level MapLibre GL map instance.
- * @param layerId — The id of the layer to instrument.
- */
-export function instrumentPolygonSelect(map: Map, layerId: string): void {
-  map.addLayer({
-    id: `${layerId}-select`,
-    type: 'line',
-    source: layerId,
-    paint: {
-      'line-color': '#A534FF',
-      'line-width': [
-        'case',
-        ['boolean', ['feature-state', 'selected'], false],
-        1,
-        0
-      ]
-    }
-  });
-
-  addSelectListeners(map, layerId);
-}
-
-/**
  * Add a selection indicator to a feature in a point layer.
  *
  * @param map – The top-level MapLibre GL map instance.
@@ -58,6 +33,57 @@ export function instrumentPointSelect(map: Map, layerId: string): void {
     '#A534FF',
     currentStrokeColor ?? 'transparent'
   ]);
+
+  addSelectListeners(map, layerId);
+}
+
+/**
+ * Add a selection indicator to a feature in a line layer.
+ *
+ * @param map – The top-level MapLibre GL map instance.
+ * @param layerId — The id of the layer to instrument.
+ */
+export function instrumentLineSelect(map: Map, layerId: string): void {
+  const currentStrokeWidth = map.getPaintProperty(layerId, 'line-width');
+  const currentStrokeColor = map.getPaintProperty(layerId, 'line-color');
+
+  map.setPaintProperty(layerId, 'line-width', [
+    'case',
+    ['boolean', ['feature-state', 'selected'], false],
+    1,
+    currentStrokeWidth ?? 0
+  ]);
+  map.setPaintProperty(layerId, 'line-color', [
+    'case',
+    ['boolean', ['feature-state', 'selected'], false],
+    '#A534FF',
+    currentStrokeColor ?? 'transparent'
+  ]);
+
+  addSelectListeners(map, layerId);
+}
+
+/**
+ * Add a selection indicator to a feature in a polygon layer.
+ *
+ * @param map – The top-level MapLibre GL map instance.
+ * @param layerId — The id of the layer to instrument.
+ */
+export function instrumentPolygonSelect(map: Map, layerId: string): void {
+  map.addLayer({
+    id: `${layerId}-select`,
+    type: 'line',
+    source: layerId,
+    paint: {
+      'line-color': '#A534FF',
+      'line-width': [
+        'case',
+        ['boolean', ['feature-state', 'selected'], false],
+        1,
+        0
+      ]
+    }
+  });
 
   addSelectListeners(map, layerId);
 }

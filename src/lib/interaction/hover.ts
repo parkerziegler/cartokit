@@ -3,31 +3,6 @@ import type { Map, MapLayerMouseEvent } from 'maplibre-gl';
 import { listeners } from '$lib/stores/listeners';
 
 /**
- * Add a hover effect to all features in a polygon layer.
- *
- * @param map – The top-level MapLibre GL map instance.
- * @param layerId – The id of the layer to instrument.
- */
-export function instrumentPolygonHover(map: Map, layerId: string): void {
-  map.addLayer({
-    id: `${layerId}-hover`,
-    type: 'line',
-    source: layerId,
-    paint: {
-      'line-color': '#FFFFFF',
-      'line-width': [
-        'case',
-        ['boolean', ['feature-state', 'hover'], false],
-        1,
-        0
-      ]
-    }
-  });
-
-  addHoverListeners(map, layerId);
-}
-
-/**
  * Add a hover effect to all features in a point layer.
  *
  * @param map – The top-level MapLibre GL map instance.
@@ -55,6 +30,51 @@ export function instrumentPointHover(map: Map, layerId: string): void {
     '#FFFFFF',
     currentStrokeColor ?? 'transparent'
   ]);
+
+  addHoverListeners(map, layerId);
+}
+
+export function instrumentLineHover(map: Map, layerId: string): void {
+  const currentStrokeWidth = map.getPaintProperty(layerId, 'line-width');
+  const currentStrokeColor = map.getPaintProperty(layerId, 'line-color');
+
+  map.setPaintProperty(layerId, 'line-width', [
+    'case',
+    ['boolean', ['feature-state', 'hover'], false],
+    1,
+    currentStrokeWidth ?? 0
+  ]);
+  map.setPaintProperty(layerId, 'line-color', [
+    'case',
+    ['boolean', ['feature-state', 'hover'], false],
+    '#FFFFFF',
+    currentStrokeColor ?? 'transparent'
+  ]);
+
+  addHoverListeners(map, layerId);
+}
+
+/**
+ * Add a hover effect to all features in a polygon layer.
+ *
+ * @param map – The top-level MapLibre GL map instance.
+ * @param layerId – The id of the layer to instrument.
+ */
+export function instrumentPolygonHover(map: Map, layerId: string): void {
+  map.addLayer({
+    id: `${layerId}-hover`,
+    type: 'line',
+    source: layerId,
+    paint: {
+      'line-color': '#FFFFFF',
+      'line-width': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        1,
+        0
+      ]
+    }
+  });
 
   addHoverListeners(map, layerId);
 }
