@@ -8,8 +8,39 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
  *
  * @returns – A Mapbox GL JS program fragment.
  */
-export function codegenLayer(layer: CartoKitLayer): string {
+export const codegenLayer = (layer: CartoKitLayer): string => {
   switch (layer.type) {
+    case 'Point':
+    case 'Proportional Symbol':
+    case 'Dot Density': {
+      const fill = codegenFill(layer);
+      const stroke = codegenStroke(layer);
+
+      return `
+        map.addLayer({
+          id: '${layer.id}',
+          source: '${layer.id}',
+          type: 'circle',
+          ${
+            fill || stroke
+              ? `paint: { ${[fill, stroke].filter(Boolean).join(',\n')} }`
+              : ''
+          }
+        });
+      `;
+    }
+    case 'Line': {
+      const stroke = codegenStroke(layer);
+
+      return `
+        map.addLayer({
+          id: '${layer.id}',
+          source: '${layer.id}',
+          type: 'line',
+          ${stroke ? `paint: { ${stroke} }` : ''}
+        });
+      `;
+    }
     case 'Fill': {
       let fillLayer = '';
       let strokeLayer = '';
@@ -59,24 +90,5 @@ export function codegenLayer(layer: CartoKitLayer): string {
 
       return [fillLayer, strokeLayer].filter(Boolean).join('\n\n');
     }
-    case 'Point':
-    case 'Proportional Symbol':
-    case 'Dot Density': {
-      const fill = codegenFill(layer);
-      const stroke = codegenStroke(layer);
-
-      return `
-        map.addLayer({
-          id: '${layer.id}',
-          source: '${layer.id}',
-          type: 'circle',
-          ${
-            fill || stroke
-              ? `paint: { ${[fill, stroke].filter(Boolean).join(',\n')} }`
-              : ''
-          }
-        });
-      `;
-    }
   }
-}
+};
