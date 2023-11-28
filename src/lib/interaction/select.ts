@@ -11,7 +11,7 @@ import { selectedFeature } from '$lib/stores/selected-feature';
  * @param map – The top-level MapLibre GL map instance.
  * @param layerId – The id of the layer to instrument.
  */
-export function instrumentPointSelect(map: Map, layerId: string): void {
+export const instrumentPointSelect = (map: Map, layerId: string): void => {
   const currentStrokeWidth = map.getPaintProperty(
     layerId,
     'circle-stroke-width'
@@ -35,7 +35,7 @@ export function instrumentPointSelect(map: Map, layerId: string): void {
   ]);
 
   addSelectListeners(map, layerId);
-}
+};
 
 /**
  * Add a selection indicator to a feature in a line layer.
@@ -43,7 +43,7 @@ export function instrumentPointSelect(map: Map, layerId: string): void {
  * @param map – The top-level MapLibre GL map instance.
  * @param layerId — The id of the layer to instrument.
  */
-export function instrumentLineSelect(map: Map, layerId: string): void {
+export const instrumentLineSelect = (map: Map, layerId: string): void => {
   const currentStrokeWidth = map.getPaintProperty(layerId, 'line-width');
   const currentStrokeColor = map.getPaintProperty(layerId, 'line-color');
 
@@ -61,7 +61,7 @@ export function instrumentLineSelect(map: Map, layerId: string): void {
   ]);
 
   addSelectListeners(map, layerId);
-}
+};
 
 /**
  * Add a selection indicator to a feature in a polygon layer.
@@ -69,7 +69,7 @@ export function instrumentLineSelect(map: Map, layerId: string): void {
  * @param map – The top-level MapLibre GL map instance.
  * @param layerId — The id of the layer to instrument.
  */
-export function instrumentPolygonSelect(map: Map, layerId: string): void {
+export const instrumentPolygonSelect = (map: Map, layerId: string): void => {
   map.addLayer({
     id: `${layerId}-select`,
     type: 'line',
@@ -86,7 +86,7 @@ export function instrumentPolygonSelect(map: Map, layerId: string): void {
   });
 
   addSelectListeners(map, layerId);
-}
+};
 
 /**
  * Wire up event listeners for select effects.
@@ -94,7 +94,7 @@ export function instrumentPolygonSelect(map: Map, layerId: string): void {
  * @param map – The top-level MapLibre GL map instance.
  * @param layerId – The id of the layer to instrument.
  */
-function addSelectListeners(map: Map, layerId: string) {
+const addSelectListeners = (map: Map, layerId: string) => {
   let selectedFeatureId: string | null = null;
 
   function onClick(event: MapLayerMouseEvent): void {
@@ -135,7 +135,7 @@ function addSelectListeners(map: Map, layerId: string) {
       click: onClick
     });
   });
-}
+};
 
 /**
  * A global event listener for deselecting features.
@@ -144,11 +144,11 @@ function addSelectListeners(map: Map, layerId: string) {
  * @param ir – The CartoKit IR.
  * @returns – deselectFeature, a callback to run when a map mouse event intersects no features.
  */
-export function onFeatureLeave(
+export const onFeatureLeave = (
   map: Map,
   { layers }: CartoKitIR
-): (event: MapMouseEvent) => void {
-  return function deselectFeature(event: MapMouseEvent) {
+): ((event: MapMouseEvent) => void) => {
+  return (event: MapMouseEvent): void => {
     const layerIds = Object.values(layers).map((layer) => {
       // For dot density layers, we need to deselect the outline layer.
       if (layer.type === 'Dot Density') {
@@ -183,4 +183,4 @@ export function onFeatureLeave(
       );
     }
   };
-}
+};

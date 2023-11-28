@@ -13,8 +13,8 @@ export type MapType = (typeof MAP_TYPES)[number];
 export const GEOMETRY_TO_MAP_TYPES: Record<Geometry['type'], MapType[]> = {
   Point: ['Point', 'Proportional Symbol'],
   MultiPoint: ['Point', 'Proportional Symbol'],
-  LineString: ['Line'],
-  MultiLineString: ['Line'],
+  LineString: ['Line', 'Point', 'Proportional Symbol'],
+  MultiLineString: ['Line', 'Point', 'Proportional Symbol'],
   Polygon: [
     'Fill',
     'Choropleth',

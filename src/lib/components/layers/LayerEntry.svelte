@@ -45,16 +45,16 @@
       <span class="shrink-0">
         {#if layer.type === 'Point'}
           <PointIcon />
+        {:else if layer.type === 'Proportional Symbol'}
+          <ProportionalSymbolIcon />
+        {:else if layer.type === 'Dot Density'}
+          <DotDensityIcon />
         {:else if layer.type === 'Line'}
           <LineIcon />
         {:else if layer.type === 'Fill'}
           <FillIcon />
         {:else if layer.type === 'Choropleth'}
           <ChoroplethIcon />
-        {:else if layer.type === 'Proportional Symbol'}
-          <ProportionalSymbolIcon />
-        {:else if layer.type === 'Dot Density'}
-          <DotDensityIcon />
         {/if}
       </span>
       <span class="ml-2 mr-8 truncate text-sm">{layer.displayName}</span>
@@ -71,15 +71,15 @@
   </div>
   {#if layer.type === 'Point'}
     <PointLegend {layer} />
+  {:else if layer.type === 'Proportional Symbol'}
+    <ProportionalSymbolLegend {layer} />
+  {:else if layer.type === 'Dot Density'}
+    <DotDensityLegend {layer} />
   {:else if layer.type === 'Line'}
     <LineLegend {layer} />
   {:else if layer.type === 'Fill'}
     <FillLegend {layer} />
   {:else if layer.type === 'Choropleth'}
     <ChoroplethLegend {layer} />
-  {:else if layer.type === 'Proportional Symbol'}
-    <ProportionalSymbolLegend {layer} />
-  {:else if layer.type === 'Dot Density'}
-    <DotDensityLegend {layer} />
   {/if}
 </li>

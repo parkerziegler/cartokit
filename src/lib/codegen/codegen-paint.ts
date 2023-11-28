@@ -156,25 +156,6 @@ export const codegenStroke = (layer: CartoKitLayer): string => {
         .join(',\n');
     }
     case 'Line':
-      return [
-        withDefault(
-          'line-color',
-          layer.style.stroke.color,
-          MAPBOX_DEFAULTS['line-color']
-        ),
-        withDefault(
-          'line-width',
-          layer.style.stroke.width,
-          MAPBOX_DEFAULTS['line-width']
-        ),
-        withDefault(
-          'line-opacity',
-          layer.style.stroke.opacity,
-          MAPBOX_DEFAULTS['line-opacity']
-        )
-      ]
-        .filter(Boolean)
-        .join(',\n');
     case 'Fill':
     case 'Choropleth': {
       if (!layer.style.stroke) {

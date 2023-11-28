@@ -33,6 +33,46 @@ export interface CartoKitPointLayer extends Layer {
   };
 }
 
+export interface CartoKitProportionalSymbolLayer extends Layer {
+  type: 'Proportional Symbol';
+  style: {
+    size: {
+      attribute: string;
+      min: number;
+      max: number;
+    };
+    fill?: {
+      color: string;
+      opacity: number;
+    };
+    stroke?: {
+      color: string;
+      width: number;
+      opacity: number;
+    };
+  };
+}
+
+export interface CartoKitDotDensityLayer extends Layer {
+  type: 'Dot Density';
+  style: {
+    dots: {
+      attribute: string;
+      size: number;
+      value: number;
+    };
+    fill?: {
+      color: string;
+      opacity: number;
+    };
+    stroke?: {
+      color: string;
+      width: number;
+      opacity: number;
+    };
+  };
+}
+
 export interface CartoKitLineLayer extends Layer {
   type: 'Line';
   style: {
@@ -78,50 +118,10 @@ export interface CartoKitChoroplethLayer extends Layer {
   };
 }
 
-export interface CartoKitProportionalSymbolLayer extends Layer {
-  type: 'Proportional Symbol';
-  style: {
-    size: {
-      attribute: string;
-      min: number;
-      max: number;
-    };
-    fill?: {
-      color: string;
-      opacity: number;
-    };
-    stroke?: {
-      color: string;
-      width: number;
-      opacity: number;
-    };
-  };
-}
-
-export interface CartoKitDotDensityLayer extends Layer {
-  type: 'Dot Density';
-  style: {
-    dots: {
-      attribute: string;
-      size: number;
-      value: number;
-    };
-    fill?: {
-      color: string;
-      opacity: number;
-    };
-    stroke?: {
-      color: string;
-      width: number;
-      opacity: number;
-    };
-  };
-}
-
 export type CartoKitLayer =
   | CartoKitPointLayer
+  | CartoKitProportionalSymbolLayer
+  | CartoKitDotDensityLayer
   | CartoKitLineLayer
   | CartoKitFillLayer
-  | CartoKitChoroplethLayer
-  | CartoKitProportionalSymbolLayer
-  | CartoKitDotDensityLayer;
+  | CartoKitChoroplethLayer;

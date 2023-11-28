@@ -14,12 +14,11 @@ import { ir } from '$lib/stores/ir';
 import { map as mapStore } from '$lib/stores/map';
 import type {
   CartoKitLayer,
-  CartoKitFillLayer,
-  CartoKitChoroplethLayer,
+  CartoKitPointLayer,
   CartoKitProportionalSymbolLayer,
   CartoKitDotDensityLayer,
-  CartoKitPointLayer,
-  CartoKitLineLayer
+  CartoKitFillLayer,
+  CartoKitChoroplethLayer
 } from '$lib/types/CartoKitLayer';
 import type { ColorScale, ColorScheme } from '$lib/types/color';
 import type { MapType } from '$lib/types/map-types';
@@ -49,9 +48,9 @@ interface AttributeUpdate extends LayerUpdate {
     attribute: string;
   };
   layer:
-    | CartoKitChoroplethLayer
     | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer;
+    | CartoKitDotDensityLayer
+    | CartoKitChoroplethLayer;
 }
 
 interface FillUpdate extends LayerUpdate {
@@ -61,9 +60,9 @@ interface FillUpdate extends LayerUpdate {
   };
   layer:
     | CartoKitPointLayer
-    | CartoKitFillLayer
     | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer;
+    | CartoKitDotDensityLayer
+    | CartoKitFillLayer;
 }
 
 interface FillOpacityUpdate extends LayerUpdate {
@@ -73,10 +72,10 @@ interface FillOpacityUpdate extends LayerUpdate {
   };
   layer:
     | CartoKitPointLayer
-    | CartoKitFillLayer
-    | CartoKitChoroplethLayer
     | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer;
+    | CartoKitDotDensityLayer
+    | CartoKitFillLayer
+    | CartoKitChoroplethLayer;
 }
 
 interface AddFillUpdate extends LayerUpdate {
@@ -84,9 +83,9 @@ interface AddFillUpdate extends LayerUpdate {
   payload: Record<string, never>;
   layer:
     | CartoKitPointLayer
-    | CartoKitFillLayer
     | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer;
+    | CartoKitDotDensityLayer
+    | CartoKitFillLayer;
 }
 
 interface RemoveFillUpdate extends LayerUpdate {
@@ -94,9 +93,9 @@ interface RemoveFillUpdate extends LayerUpdate {
   payload: Record<string, never>;
   layer:
     | CartoKitPointLayer
-    | CartoKitFillLayer
     | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer;
+    | CartoKitDotDensityLayer
+    | CartoKitFillLayer;
 }
 
 interface StrokeUpdate extends LayerUpdate {
@@ -126,13 +125,23 @@ interface StrokeOpacityUpdate extends LayerUpdate {
 interface AddStrokeUpdate extends LayerUpdate {
   type: 'add-stroke';
   payload: Record<string, never>;
-  layer: CartoKitLayer;
+  layer:
+    | CartoKitPointLayer
+    | CartoKitProportionalSymbolLayer
+    | CartoKitDotDensityLayer
+    | CartoKitFillLayer
+    | CartoKitChoroplethLayer;
 }
 
 interface RemoveStrokeUpdate extends LayerUpdate {
   type: 'remove-stroke';
   payload: Record<string, never>;
-  layer: CartoKitLayer;
+  layer:
+    | CartoKitPointLayer
+    | CartoKitProportionalSymbolLayer
+    | CartoKitDotDensityLayer
+    | CartoKitFillLayer
+    | CartoKitChoroplethLayer;
 }
 
 interface PointSizeUpdate extends LayerUpdate {
@@ -200,9 +209,9 @@ interface TransformationUpdate extends LayerUpdate {
     transformation: Transformation;
   };
   layer:
-    | CartoKitChoroplethLayer
     | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer;
+    | CartoKitDotDensityLayer
+    | CartoKitChoroplethLayer;
 }
 
 type DispatchLayerUpdateParams =
@@ -234,11 +243,11 @@ type DispatchLayerUpdateParams =
  * @param layer – The CartoKit layer to update.
  * @param payload – The payload for the update.
  */
-export function dispatchLayerUpdate({
+export const dispatchLayerUpdate = ({
   type,
   layer,
   payload
-}: DispatchLayerUpdateParams): void {
+}: DispatchLayerUpdateParams): void => {
   const map = get(mapStore);
 
   switch (type) {
@@ -260,15 +269,11 @@ export function dispatchLayerUpdate({
         // this update. Therefore, accessing that same layer in the store by id
         // guarantees that lyr has an attribute property.
         const lyr = ir.layers[layer.id] as
-          | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer
-          | CartoKitDotDensityLayer;
+          | CartoKitDotDensityLayer
+          | CartoKitChoroplethLayer;
 
         switch (lyr.type) {
-          case 'Choropleth':
-            lyr.style.fill.attribute = payload.attribute;
-            map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
-            break;
           case 'Proportional Symbol':
             lyr.style.size.attribute = payload.attribute;
             map.setPaintProperty(lyr.id, 'circle-radius', deriveSize(lyr));
@@ -293,6 +298,10 @@ export function dispatchLayerUpdate({
             (map.getSource(layer.id) as GeoJSONSource).setData(features);
             break;
           }
+          case 'Choropleth':
+            lyr.style.fill.attribute = payload.attribute;
+            map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+            break;
         }
 
         return ir;
@@ -303,21 +312,21 @@ export function dispatchLayerUpdate({
       ir.update((ir) => {
         const lyr = ir.layers[layer.id] as
           | CartoKitPointLayer
-          | CartoKitFillLayer
           | CartoKitProportionalSymbolLayer
-          | CartoKitDotDensityLayer;
+          | CartoKitDotDensityLayer
+          | CartoKitFillLayer;
 
         if (lyr.style.fill) {
           lyr.style.fill.color = payload.color;
 
           switch (lyr.type) {
-            case 'Fill':
-              map.setPaintProperty(layer.id, 'fill-color', payload.color);
-              break;
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(layer.id, 'circle-color', payload.color);
+              break;
+            case 'Fill':
+              map.setPaintProperty(layer.id, 'fill-color', payload.color);
               break;
           }
         }
@@ -328,23 +337,25 @@ export function dispatchLayerUpdate({
     }
     case 'fill-opacity': {
       ir.update((ir) => {
-        const lyr = ir.layers[layer.id] as Exclude<
-          CartoKitLayer,
-          CartoKitLineLayer
-        >;
+        const lyr = ir.layers[layer.id] as
+          | CartoKitPointLayer
+          | CartoKitProportionalSymbolLayer
+          | CartoKitDotDensityLayer
+          | CartoKitFillLayer
+          | CartoKitChoroplethLayer;
 
         if (lyr.style.fill) {
           lyr.style.fill.opacity = payload.opacity;
 
           switch (lyr.type) {
-            case 'Fill':
-            case 'Choropleth':
-              map.setPaintProperty(layer.id, 'fill-opacity', payload.opacity);
-              break;
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(layer.id, 'circle-opacity', payload.opacity);
+              break;
+            case 'Fill':
+            case 'Choropleth':
+              map.setPaintProperty(layer.id, 'fill-opacity', payload.opacity);
               break;
           }
         }
@@ -357,24 +368,24 @@ export function dispatchLayerUpdate({
       ir.update((ir) => {
         const lyr = ir.layers[layer.id] as
           | CartoKitPointLayer
-          | CartoKitFillLayer
           | CartoKitProportionalSymbolLayer
-          | CartoKitDotDensityLayer;
+          | CartoKitDotDensityLayer
+          | CartoKitFillLayer;
         lyr.style.fill = {
           color: DEFAULT_FILL,
           opacity: DEFAULT_OPACITY
         };
 
         switch (lyr.type) {
-          case 'Fill':
-            map.setPaintProperty(layer.id, 'fill-color', DEFAULT_FILL);
-            map.setPaintProperty(layer.id, 'fill-opacity', DEFAULT_OPACITY);
-            break;
           case 'Point':
           case 'Proportional Symbol':
           case 'Dot Density':
             map.setPaintProperty(layer.id, 'circle-color', DEFAULT_FILL);
             map.setPaintProperty(layer.id, 'circle-opacity', DEFAULT_OPACITY);
+            break;
+          case 'Fill':
+            map.setPaintProperty(layer.id, 'fill-color', DEFAULT_FILL);
+            map.setPaintProperty(layer.id, 'fill-opacity', DEFAULT_OPACITY);
             break;
         }
 
@@ -386,21 +397,21 @@ export function dispatchLayerUpdate({
       ir.update((ir) => {
         const lyr = ir.layers[layer.id] as
           | CartoKitPointLayer
-          | CartoKitFillLayer
           | CartoKitProportionalSymbolLayer
-          | CartoKitDotDensityLayer;
+          | CartoKitDotDensityLayer
+          | CartoKitFillLayer;
         lyr.style.fill = undefined;
 
         switch (lyr.type) {
-          case 'Fill':
-            map.setPaintProperty(layer.id, 'fill-color', 'transparent');
-            map.setPaintProperty(layer.id, 'fill-opacity', 0);
-            break;
           case 'Point':
           case 'Proportional Symbol':
           case 'Dot Density':
             map.setPaintProperty(layer.id, 'circle-color', 'transparent');
             map.setPaintProperty(layer.id, 'circle-opacity', 0);
+            break;
+          case 'Fill':
+            map.setPaintProperty(layer.id, 'fill-color', 'transparent');
+            map.setPaintProperty(layer.id, 'fill-opacity', 0);
             break;
         }
 
@@ -415,23 +426,23 @@ export function dispatchLayerUpdate({
           lyr.style.stroke.color = payload.color;
 
           switch (lyr.type) {
-            case 'Fill':
-            case 'Choropleth':
-              map.setPaintProperty(
-                `${layer.id}-stroke`,
-                'line-color',
-                payload.color
-              );
-              break;
-            case 'Line':
-              map.setPaintProperty(layer.id, 'line-color', payload.color);
-              break;
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(
                 layer.id,
                 'circle-stroke-color',
+                payload.color
+              );
+              break;
+            case 'Line':
+              map.setPaintProperty(layer.id, 'line-color', payload.color);
+              break;
+            case 'Fill':
+            case 'Choropleth':
+              map.setPaintProperty(
+                `${layer.id}-stroke`,
+                'line-color',
                 payload.color
               );
               break;
@@ -450,23 +461,23 @@ export function dispatchLayerUpdate({
           lyr.style.stroke.width = payload.strokeWidth;
 
           switch (lyr.type) {
-            case 'Fill':
-            case 'Choropleth':
-              map.setPaintProperty(
-                `${layer.id}-stroke`,
-                'line-width',
-                payload.strokeWidth
-              );
-              break;
-            case 'Line':
-              map.setPaintProperty(layer.id, 'line-width', payload.strokeWidth);
-              break;
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(
                 layer.id,
                 'circle-stroke-width',
+                payload.strokeWidth
+              );
+              break;
+            case 'Line':
+              map.setPaintProperty(layer.id, 'line-width', payload.strokeWidth);
+              break;
+            case 'Fill':
+            case 'Choropleth':
+              map.setPaintProperty(
+                `${layer.id}-stroke`,
+                'line-width',
                 payload.strokeWidth
               );
               break;
@@ -485,23 +496,23 @@ export function dispatchLayerUpdate({
           lyr.style.stroke.opacity = payload.opacity;
 
           switch (lyr.type) {
-            case 'Fill':
-            case 'Choropleth':
-              map.setPaintProperty(
-                `${layer.id}-stroke`,
-                'line-opacity',
-                payload.opacity
-              );
-              break;
-            case 'Line':
-              map.setPaintProperty(layer.id, 'line-opacity', payload.opacity);
-              break;
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(
                 layer.id,
                 'circle-stroke-opacity',
+                payload.opacity
+              );
+              break;
+            case 'Line':
+              map.setPaintProperty(layer.id, 'line-opacity', payload.opacity);
+              break;
+            case 'Fill':
+            case 'Choropleth':
+              map.setPaintProperty(
+                `${layer.id}-stroke`,
+                'line-opacity',
                 payload.opacity
               );
               break;
@@ -514,7 +525,12 @@ export function dispatchLayerUpdate({
     }
     case 'add-stroke': {
       ir.update((ir) => {
-        const lyr = ir.layers[layer.id];
+        const lyr = ir.layers[layer.id] as
+          | CartoKitPointLayer
+          | CartoKitProportionalSymbolLayer
+          | CartoKitDotDensityLayer
+          | CartoKitFillLayer
+          | CartoKitChoroplethLayer;
         // Create a default stroke.
         lyr.style.stroke = {
           color: DEFAULT_STROKE,
@@ -523,26 +539,6 @@ export function dispatchLayerUpdate({
         };
 
         switch (lyr.type) {
-          case 'Fill':
-          case 'Choropleth':
-            map.setPaintProperty(
-              `${layer.id}-stroke`,
-              'line-color',
-              DEFAULT_STROKE
-            );
-            map.setPaintProperty(
-              `${layer.id}-stroke`,
-              'line-width',
-              DEFAULT_STROKE_WIDTH
-            );
-            map.setPaintProperty(
-              `${layer.id}-stroke`,
-              'line-opacity',
-              DEFAULT_STROKE_OPACITY
-            );
-            break;
-          case 'Line':
-            break;
           case 'Point':
           case 'Proportional Symbol':
           case 'Dot Density':
@@ -562,6 +558,24 @@ export function dispatchLayerUpdate({
               DEFAULT_STROKE_OPACITY
             );
             break;
+          case 'Fill':
+          case 'Choropleth':
+            map.setPaintProperty(
+              `${layer.id}-stroke`,
+              'line-color',
+              DEFAULT_STROKE
+            );
+            map.setPaintProperty(
+              `${layer.id}-stroke`,
+              'line-width',
+              DEFAULT_STROKE_WIDTH
+            );
+            map.setPaintProperty(
+              `${layer.id}-stroke`,
+              'line-opacity',
+              DEFAULT_STROKE_OPACITY
+            );
+            break;
         }
 
         return ir;
@@ -570,20 +584,15 @@ export function dispatchLayerUpdate({
     }
     case 'remove-stroke': {
       ir.update((ir) => {
-        const lyr = ir.layers[layer.id];
+        const lyr = ir.layers[layer.id] as
+          | CartoKitPointLayer
+          | CartoKitProportionalSymbolLayer
+          | CartoKitDotDensityLayer
+          | CartoKitFillLayer
+          | CartoKitChoroplethLayer;
         lyr.style.stroke = undefined;
 
         switch (lyr.type) {
-          case 'Fill':
-          case 'Choropleth':
-            map.setPaintProperty(
-              `${layer.id}-stroke`,
-              'line-color',
-              'transparent'
-            );
-            map.setPaintProperty(`${layer.id}-stroke`, 'line-width', 0);
-            map.setPaintProperty(`${layer.id}-stroke`, 'line-opacity', 0);
-            break;
           case 'Point':
           case 'Proportional Symbol':
           case 'Dot Density':
@@ -595,7 +604,15 @@ export function dispatchLayerUpdate({
             map.setPaintProperty(layer.id, 'circle-stroke-width', 0);
             map.setPaintProperty(layer.id, 'circle-stroke-opacity', 0);
             break;
-          default:
+          case 'Fill':
+          case 'Choropleth':
+            map.setPaintProperty(
+              `${layer.id}-stroke`,
+              'line-color',
+              'transparent'
+            );
+            map.setPaintProperty(`${layer.id}-stroke`, 'line-width', 0);
+            map.setPaintProperty(`${layer.id}-stroke`, 'line-opacity', 0);
             break;
         }
 
@@ -738,4 +755,4 @@ export function dispatchLayerUpdate({
       });
     }
   }
-}
+};
