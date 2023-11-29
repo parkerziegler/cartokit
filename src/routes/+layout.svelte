@@ -1,4 +1,5 @@
 <script>
+  import 'maplibre-gl/dist/maplibre-gl.css';
   import '../app.css';
 </script>
 
@@ -7,10 +8,6 @@
   <meta
     name="description"
     content="cartokit is a new direct manipulation programming environment for interactive cartography on the web."
-  />
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/maplibre-gl@3.5.2/dist/maplibre-gl.css"
   />
 </svelte:head>
 
