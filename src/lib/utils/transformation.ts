@@ -1,10 +1,10 @@
 import type { Transformation } from '$lib/types/transformation';
 
-export function transformPolygonsToCentroids(): Transformation {
+export function transformGeometryToCentroids(): Transformation {
   return {
-    name: 'transformPolygonsToCentroids',
+    name: 'transformGeometryToCentroids',
     definition: `
-    function transformPolygonsToCentroids(geoJSON) {
+    function transformGeometryToCentroids(geoJSON) {
       const centroids = geoJSON.features.map((feature) => {
         return turf.feature(turf.centroid(feature).geometry, feature.properties);
       });

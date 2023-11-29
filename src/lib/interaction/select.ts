@@ -6,37 +6,12 @@ import { listeners } from '$lib/stores/listeners';
 import { selectedFeature } from '$lib/stores/selected-feature';
 
 /**
- * Add a selection indicator to a feature in a polygon layer.
- *
- * @param map – The top-level MapLibre GL map instance.
- * @param layerId — The id of the layer to instrument.
- */
-export function instrumentPolygonSelect(map: Map, layerId: string): void {
-  map.addLayer({
-    id: `${layerId}-select`,
-    type: 'line',
-    source: layerId,
-    paint: {
-      'line-color': '#A534FF',
-      'line-width': [
-        'case',
-        ['boolean', ['feature-state', 'selected'], false],
-        1,
-        0
-      ]
-    }
-  });
-
-  addSelectListeners(map, layerId);
-}
-
-/**
  * Add a selection indicator to a feature in a point layer.
  *
  * @param map – The top-level MapLibre GL map instance.
  * @param layerId – The id of the layer to instrument.
  */
-export function instrumentPointSelect(map: Map, layerId: string): void {
+export const instrumentPointSelect = (map: Map, layerId: string): void => {
   const currentStrokeWidth = map.getPaintProperty(
     layerId,
     'circle-stroke-width'
@@ -60,7 +35,58 @@ export function instrumentPointSelect(map: Map, layerId: string): void {
   ]);
 
   addSelectListeners(map, layerId);
-}
+};
+
+/**
+ * Add a selection indicator to a feature in a line layer.
+ *
+ * @param map – The top-level MapLibre GL map instance.
+ * @param layerId — The id of the layer to instrument.
+ */
+export const instrumentLineSelect = (map: Map, layerId: string): void => {
+  const currentStrokeWidth = map.getPaintProperty(layerId, 'line-width');
+  const currentStrokeColor = map.getPaintProperty(layerId, 'line-color');
+
+  map.setPaintProperty(layerId, 'line-width', [
+    'case',
+    ['boolean', ['feature-state', 'selected'], false],
+    1,
+    currentStrokeWidth ?? 0
+  ]);
+  map.setPaintProperty(layerId, 'line-color', [
+    'case',
+    ['boolean', ['feature-state', 'selected'], false],
+    '#A534FF',
+    currentStrokeColor ?? 'transparent'
+  ]);
+
+  addSelectListeners(map, layerId);
+};
+
+/**
+ * Add a selection indicator to a feature in a polygon layer.
+ *
+ * @param map – The top-level MapLibre GL map instance.
+ * @param layerId — The id of the layer to instrument.
+ */
+export const instrumentPolygonSelect = (map: Map, layerId: string): void => {
+  map.addLayer({
+    id: `${layerId}-select`,
+    type: 'line',
+    source: layerId,
+    paint: {
+      'line-color': '#A534FF',
+      'line-width': [
+        'case',
+        ['boolean', ['feature-state', 'selected'], false],
+        1,
+        0
+      ]
+    }
+  });
+
+  addSelectListeners(map, layerId);
+};
 
 /**
  * Wire up event listeners for select effects.
@@ -68,7 +94,7 @@ export function instrumentPointSelect(map: Map, layerId: string): void {
  * @param map – The top-level MapLibre GL map instance.
  * @param layerId – The id of the layer to instrument.
  */
-function addSelectListeners(map: Map, layerId: string) {
+const addSelectListeners = (map: Map, layerId: string) => {
   let selectedFeatureId: string | null = null;
 
   function onClick(event: MapLayerMouseEvent): void {
@@ -109,7 +135,7 @@ function addSelectListeners(map: Map, layerId: string) {
       click: onClick
     });
   });
-}
+};
 
 /**
  * A global event listener for deselecting features.
@@ -118,11 +144,11 @@ function addSelectListeners(map: Map, layerId: string) {
  * @param ir – The CartoKit IR.
  * @returns – deselectFeature, a callback to run when a map mouse event intersects no features.
  */
-export function onFeatureLeave(
+export const onFeatureLeave = (
   map: Map,
   { layers }: CartoKitIR
-): (event: MapMouseEvent) => void {
-  return function deselectFeature(event: MapMouseEvent) {
+): ((event: MapMouseEvent) => void) => {
+  return (event: MapMouseEvent): void => {
     const layerIds = Object.values(layers).map((layer) => {
       // For dot density layers, we need to deselect the outline layer.
       if (layer.type === 'Dot Density') {
@@ -157,4 +183,4 @@ export function onFeatureLeave(
       );
     }
   };
-}
+};

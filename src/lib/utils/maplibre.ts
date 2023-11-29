@@ -1,7 +1,7 @@
 import type { LayerSpecification, Map, SourceSpecification } from 'maplibre-gl';
 
 import type { CartoKitIR } from '$lib/stores/ir';
-import { getInstrumetedLayerIds } from '$lib/utils/layer';
+import { getInstrumentedLayerIds } from '$lib/utils/layer';
 
 /**
  * Switch the basemap of the map while preserving all currently renderedlayers
@@ -23,7 +23,7 @@ export async function switchBasemapWithPreservedLayers(
   const lyrs = Object.values(ir.layers).reduce<LayerSpecification[]>(
     (acc, layer) => {
       // Get the ids of all layers in the IR in addition to their instrumented layers.
-      const ids = [layer.id, ...getInstrumetedLayerIds(layer)];
+      const ids = [layer.id, ...getInstrumentedLayerIds(layer)];
 
       // Return the LayerSpecifications of the layers possessing one of the above ids.
       return [
