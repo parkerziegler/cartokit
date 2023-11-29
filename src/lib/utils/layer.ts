@@ -7,13 +7,11 @@ import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
  *
  * @returns – an array of instrumented layer ids.
  */
-export function getInstrumetedLayerIds(layer: CartoKitLayer): string[] {
+export const getInstrumentedLayerIds = (layer: CartoKitLayer): string[] => {
   switch (layer.type) {
-    case 'Fill':
-    case 'Choropleth':
-      return [`${layer.id}-stroke`, `${layer.id}-hover`, `${layer.id}-select`];
     case 'Point':
     case 'Proportional Symbol':
+    case 'Line':
       return [`${layer.id}-hover`, `${layer.id}-select`];
     case 'Dot Density':
       return [
@@ -21,5 +19,8 @@ export function getInstrumetedLayerIds(layer: CartoKitLayer): string[] {
         `${layer.id}-outlines-hover`,
         `${layer.id}-outlines-select`
       ];
+    case 'Fill':
+    case 'Choropleth':
+      return [`${layer.id}-stroke`, `${layer.id}-hover`, `${layer.id}-select`];
   }
-}
+};

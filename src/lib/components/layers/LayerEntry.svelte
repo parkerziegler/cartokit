@@ -5,6 +5,8 @@
   import DotDensityLegend from '$lib/components/legends/DotDensityLegend.svelte';
   import FillIcon from '$lib/components/icons/FillIcon.svelte';
   import FillLegend from '$lib/components/legends/FillLegend.svelte';
+  import LineIcon from '$lib/components/icons/LineIcon.svelte';
+  import LineLegend from '$lib/components/legends/LineLegend.svelte';
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import PointLegend from '$lib/components/legends/PointLegend.svelte';
   import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
@@ -43,14 +45,16 @@
       <span class="shrink-0">
         {#if layer.type === 'Point'}
           <PointIcon />
-        {:else if layer.type === 'Fill'}
-          <FillIcon />
-        {:else if layer.type === 'Choropleth'}
-          <ChoroplethIcon />
         {:else if layer.type === 'Proportional Symbol'}
           <ProportionalSymbolIcon />
         {:else if layer.type === 'Dot Density'}
           <DotDensityIcon />
+        {:else if layer.type === 'Line'}
+          <LineIcon />
+        {:else if layer.type === 'Fill'}
+          <FillIcon />
+        {:else if layer.type === 'Choropleth'}
+          <ChoroplethIcon />
         {/if}
       </span>
       <span class="ml-2 mr-8 truncate text-sm">{layer.displayName}</span>
@@ -67,13 +71,15 @@
   </div>
   {#if layer.type === 'Point'}
     <PointLegend {layer} />
-  {:else if layer.type === 'Fill'}
-    <FillLegend {layer} />
-  {:else if layer.type === 'Choropleth'}
-    <ChoroplethLegend {layer} />
   {:else if layer.type === 'Proportional Symbol'}
     <ProportionalSymbolLegend {layer} />
   {:else if layer.type === 'Dot Density'}
     <DotDensityLegend {layer} />
+  {:else if layer.type === 'Line'}
+    <LineLegend {layer} />
+  {:else if layer.type === 'Fill'}
+    <FillLegend {layer} />
+  {:else if layer.type === 'Choropleth'}
+    <ChoroplethLegend {layer} />
   {/if}
 </li>

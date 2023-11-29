@@ -33,40 +33,6 @@ export interface CartoKitPointLayer extends Layer {
   };
 }
 
-export interface CartoKitFillLayer extends Layer {
-  type: 'Fill';
-  style: {
-    fill?: {
-      color: string;
-      opacity: number;
-    };
-    stroke?: {
-      color: string;
-      width: number;
-      opacity: number;
-    };
-  };
-}
-
-export interface CartoKitChoroplethLayer extends Layer {
-  type: 'Choropleth';
-  style: {
-    fill: {
-      attribute: string;
-      scale: ColorScale;
-      scheme: ColorScheme;
-      count: number;
-      thresholds: number[];
-      opacity: number;
-    };
-    stroke?: {
-      color: string;
-      width: number;
-      opacity: number;
-    };
-  };
-}
-
 export interface CartoKitProportionalSymbolLayer extends Layer {
   type: 'Proportional Symbol';
   style: {
@@ -107,9 +73,55 @@ export interface CartoKitDotDensityLayer extends Layer {
   };
 }
 
+export interface CartoKitLineLayer extends Layer {
+  type: 'Line';
+  style: {
+    stroke: {
+      color: string;
+      width: number;
+      opacity: number;
+    };
+  };
+}
+
+export interface CartoKitFillLayer extends Layer {
+  type: 'Fill';
+  style: {
+    fill?: {
+      color: string;
+      opacity: number;
+    };
+    stroke?: {
+      color: string;
+      width: number;
+      opacity: number;
+    };
+  };
+}
+
+export interface CartoKitChoroplethLayer extends Layer {
+  type: 'Choropleth';
+  style: {
+    fill: {
+      attribute: string;
+      scale: ColorScale;
+      scheme: ColorScheme;
+      count: number;
+      thresholds: number[];
+      opacity: number;
+    };
+    stroke?: {
+      color: string;
+      width: number;
+      opacity: number;
+    };
+  };
+}
+
 export type CartoKitLayer =
   | CartoKitPointLayer
-  | CartoKitFillLayer
-  | CartoKitChoroplethLayer
   | CartoKitProportionalSymbolLayer
-  | CartoKitDotDensityLayer;
+  | CartoKitDotDensityLayer
+  | CartoKitLineLayer
+  | CartoKitFillLayer
+  | CartoKitChoroplethLayer;

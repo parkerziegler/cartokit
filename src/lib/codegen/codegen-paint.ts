@@ -10,7 +10,7 @@ import { MAPBOX_DEFAULTS } from '$lib/utils/constants';
  *
  * @returns – A Mapbox GL JS program fragment representing the layer's fill.
  */
-export function codegenFill(layer: CartoKitLayer): string {
+export const codegenFill = (layer: CartoKitLayer): string => {
   switch (layer.type) {
     case 'Point': {
       if (!layer.style.fill) {
@@ -32,38 +32,6 @@ export function codegenFill(layer: CartoKitLayer): string {
           'circle-opacity',
           layer.style.fill.opacity,
           MAPBOX_DEFAULTS['circle-opacity']
-        )
-      ]
-        .filter(Boolean)
-        .join(',\n');
-    }
-    case 'Fill': {
-      if (!layer.style.fill) {
-        return '';
-      }
-
-      return [
-        withDefault(
-          'fill-color',
-          layer.style.fill.color,
-          MAPBOX_DEFAULTS['fill-color']
-        ),
-        withDefault(
-          'fill-opacity',
-          layer.style.fill.opacity,
-          MAPBOX_DEFAULTS['fill-opacity']
-        )
-      ]
-        .filter(Boolean)
-        .join(',\n');
-    }
-    case 'Choropleth': {
-      return [
-        `'fill-color': ${JSON.stringify(deriveColorScale(layer))}`,
-        withDefault(
-          'fill-opacity',
-          layer.style.fill.opacity,
-          MAPBOX_DEFAULTS['fill-opacity']
         )
       ]
         .filter(Boolean)
@@ -115,8 +83,42 @@ export function codegenFill(layer: CartoKitLayer): string {
         .filter(Boolean)
         .join(',\n');
     }
+    case 'Line':
+      return '';
+    case 'Fill': {
+      if (!layer.style.fill) {
+        return '';
+      }
+
+      return [
+        withDefault(
+          'fill-color',
+          layer.style.fill.color,
+          MAPBOX_DEFAULTS['fill-color']
+        ),
+        withDefault(
+          'fill-opacity',
+          layer.style.fill.opacity,
+          MAPBOX_DEFAULTS['fill-opacity']
+        )
+      ]
+        .filter(Boolean)
+        .join(',\n');
+    }
+    case 'Choropleth': {
+      return [
+        `'fill-color': ${JSON.stringify(deriveColorScale(layer))}`,
+        withDefault(
+          'fill-opacity',
+          layer.style.fill.opacity,
+          MAPBOX_DEFAULTS['fill-opacity']
+        )
+      ]
+        .filter(Boolean)
+        .join(',\n');
+    }
   }
-}
+};
 
 /**
  * Generate a Mapbox GL JS program fragment representing the layer's stroke.
@@ -124,34 +126,8 @@ export function codegenFill(layer: CartoKitLayer): string {
  * @param layer – A CartoKit layer.
  * @returns – A Mapbox GL JS program fragment representing the layer's stroke.
  */
-export function codegenStroke(layer: CartoKitLayer): string {
+export const codegenStroke = (layer: CartoKitLayer): string => {
   switch (layer.type) {
-    case 'Fill':
-    case 'Choropleth': {
-      if (!layer.style.stroke) {
-        return '';
-      }
-
-      return [
-        withDefault(
-          'line-color',
-          layer.style.stroke.color,
-          MAPBOX_DEFAULTS['line-color']
-        ),
-        withDefault(
-          'line-width',
-          layer.style.stroke.width,
-          MAPBOX_DEFAULTS['line-width']
-        ),
-        withDefault(
-          'line-opacity',
-          layer.style.stroke.opacity,
-          MAPBOX_DEFAULTS['line-opacity']
-        )
-      ]
-        .filter(Boolean)
-        .join(',\n');
-    }
     case 'Point':
     case 'Proportional Symbol':
     case 'Dot Density': {
@@ -179,8 +155,35 @@ export function codegenStroke(layer: CartoKitLayer): string {
         .filter(Boolean)
         .join(',\n');
     }
+    case 'Line':
+    case 'Fill':
+    case 'Choropleth': {
+      if (!layer.style.stroke) {
+        return '';
+      }
+
+      return [
+        withDefault(
+          'line-color',
+          layer.style.stroke.color,
+          MAPBOX_DEFAULTS['line-color']
+        ),
+        withDefault(
+          'line-width',
+          layer.style.stroke.width,
+          MAPBOX_DEFAULTS['line-width']
+        ),
+        withDefault(
+          'line-opacity',
+          layer.style.stroke.opacity,
+          MAPBOX_DEFAULTS['line-opacity']
+        )
+      ]
+        .filter(Boolean)
+        .join(',\n');
+    }
   }
-}
+};
 
 /**
  * Return a Mapbox GL JS program fragment representing a property-value pair,
@@ -192,14 +195,14 @@ export function codegenStroke(layer: CartoKitLayer): string {
  *
  * @returns – A (potentially empty) Mapbox GL JS program fragment.
  */
-function withDefault<T extends string | number>(
+const withDefault = <T extends string | number>(
   mapboxProperty: string,
   cartokitValue: T,
   defaultValue: T
-): string {
+): string => {
   return cartokitValue !== defaultValue
     ? `'${mapboxProperty}': ${
         typeof cartokitValue === 'string' ? `'${cartokitValue}'` : cartokitValue
       }`
     : '';
-}
+};
