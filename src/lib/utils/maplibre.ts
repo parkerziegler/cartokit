@@ -32,7 +32,7 @@ export type BasemapSwitchConfig = URLTileConfig | JSONTileConfig;
 export const switchBasemapWithPreservedLayers = async (
   map: Map,
   ir: CartoKitIR,
-  config: URLTileConfig | JSONTileConfig
+  config: BasemapSwitchConfig
 ) => {
   const { layers, sources } = map.getStyle();
 

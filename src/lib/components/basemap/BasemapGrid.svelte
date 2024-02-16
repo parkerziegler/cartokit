@@ -2,6 +2,7 @@
   import { getContext } from 'svelte';
   import cs from 'classnames';
 
+  import CustomTiles from '$lib/components/basemap/CustomTiles.svelte';
   import { ir } from '$lib/stores/ir';
   import { map } from '$lib/stores/map';
   import {
@@ -11,7 +12,6 @@
     type BasemapProvider
   } from '$lib/utils/basemap';
   import { switchBasemapWithPreservedLayers } from '$lib/utils/maplibre';
-  import CustomTiles from '$lib/components/basemap/CustomTiles.svelte';
 
   export let provider: BasemapProvider;
   const closeModal = getContext<() => void>('close-modal');

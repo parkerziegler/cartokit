@@ -20,11 +20,13 @@
   let sourceSelection: 'url' | 'json' = 'url';
 
   $: applyDisabled =
-    sourceSelection === 'url' ? !tileUrl : tileJSONSpec === '{}';
+    sourceSelection === 'url'
+      ? !tileUrl
+      : !tileJSONSpec || tileJSONSpec === '{}';
 
   const closeModal = getContext<() => void>('close-modal');
 
-  const onTileUrlChange = (event: CustomEvent<{ value: string }>) => {
+  const onTileUrlInput = (event: CustomEvent<{ value: string }>) => {
     tileUrl = event.detail.value;
   };
 
@@ -89,7 +91,7 @@
     </p>
     <FieldLabel fieldId="tile-url">Tile URL</FieldLabel>
     <TextInput
-      on:change={onTileUrlChange}
+      on:input={onTileUrlInput}
       on:focus={onTileUrlFocus}
       value={tileUrl}
       placeholder=""

@@ -19,6 +19,11 @@
   const onFocus = () => {
     dispatch('focus', { focusing: true });
   };
+
+  const onInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    dispatch('input', { value: target.value });
+  };
 </script>
 
 <input
@@ -27,6 +32,7 @@
   {id}
   on:change={onChange}
   on:focus={onFocus}
+  on:input={onInput}
   class={cs(
     'border border-slate-600 bg-inherit bg-slate-900 p-2 hover:border-slate-400 focus:border-slate-400',
     className
