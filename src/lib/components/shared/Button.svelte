@@ -4,17 +4,19 @@
 
   let className = '';
   export { className as class };
+  export let disabled = false;
 
   const dispatch = createEventDispatcher();
-  function click() {
+  const onClick = () => {
     dispatch('click');
-  }
+  };
 </script>
 
 <button
-  on:click={click}
+  on:click={onClick}
+  {disabled}
   class={cs(
-    'rounded bg-slate-700 px-3 py-2 text-sm text-white transition-opacity hover:opacity-75',
+    'rounded bg-slate-700 px-3 py-2 text-sm text-white transition-opacity enabled:hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:cursor-not-allowed',
     className
   )}><slot /></button
 >

@@ -57,6 +57,7 @@
   export function focus() {
     view.focus();
   }
+
   onMount(() => {
     view = new EditorView({
       doc: `function transformGeoJSON(geoJSON) {
@@ -226,7 +227,7 @@
     <ul class="-mx-4 max-h-[148px] overflow-auto">
       {#each consoleOutput as entry}
         <li
-          class="border-b border-slate-700 px-4 py-2 text-white first:border-t"
+          class="border-b border-slate-600 px-4 py-2 text-white first:border-t"
         >
           {entry}
         </li>

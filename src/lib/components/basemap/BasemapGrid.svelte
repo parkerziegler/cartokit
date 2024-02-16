@@ -2,6 +2,7 @@
   import { getContext } from 'svelte';
   import cs from 'classnames';
 
+  import CustomTiles from '$lib/components/basemap/CustomTiles.svelte';
   import { ir } from '$lib/stores/ir';
   import { map } from '$lib/stores/map';
   import {
@@ -13,12 +14,12 @@
   import { switchBasemapWithPreservedLayers } from '$lib/utils/maplibre';
 
   export let provider: BasemapProvider;
-  $: basemaps = BASEMAPS[provider];
-
   const closeModal = getContext<() => void>('close-modal');
 
-  function onSelectBasemap(tileId: Basemap['tileId']) {
-    return async function handleBasemapSelect() {
+  $: basemaps = BASEMAPS[provider];
+
+  const onSelectBasemap = (tileId: Basemap['tileId']) => {
+    return async () => {
       const url = TILE_URLS[provider](tileId);
 
       ir.update((ir) => {
@@ -28,29 +29,33 @@
         return ir;
       });
 
-      await switchBasemapWithPreservedLayers($map, $ir, url);
+      await switchBasemapWithPreservedLayers($map, $ir, { kind: 'url', url });
       closeModal();
     };
-  }
+  };
 </script>
 
-<div class="grid grid-cols-3 gap-4">
-  {#each basemaps as basemap}
-    <button
-      class={cs(
-        'flex flex-col rounded border p-2 transition-colors hover:border-slate-400',
-        TILE_URLS[provider](basemap.tileId) === $ir.basemap.url
-          ? 'border-slate-400'
-          : 'border-transparent'
-      )}
-      on:click={onSelectBasemap(basemap.tileId)}
-    >
-      <img
-        src={basemap.src}
-        alt={`tiles-${basemap.tileId}`}
-        class="rounded-sm"
-      />
-      <p class="mt-2 text-sm font-semibold">{basemap.title}</p>
-    </button>
-  {/each}
-</div>
+{#if provider === 'Custom'}
+  <CustomTiles />
+{:else}
+  <div class="grid grid-cols-3 gap-4">
+    {#each basemaps as basemap}
+      <button
+        class={cs(
+          'flex flex-col rounded border p-2 transition-colors hover:border-slate-400',
+          TILE_URLS[provider](basemap.tileId) === $ir.basemap.url
+            ? 'border-slate-400'
+            : 'border-transparent'
+        )}
+        on:click={onSelectBasemap(basemap.tileId)}
+      >
+        <img
+          src={basemap.src}
+          alt="tiles-{basemap.tileId}"
+          class="rounded-sm"
+        />
+        <p class="mt-2 text-sm font-semibold">{basemap.title}</p>
+      </button>
+    {/each}
+  </div>
+{/if}

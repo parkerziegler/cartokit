@@ -11,10 +11,19 @@
 
   const dispatch = createEventDispatcher();
 
-  function onChange(event: Event) {
+  const onChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     dispatch('change', { value: target.value });
-  }
+  };
+
+  const onFocus = () => {
+    dispatch('focus', { focusing: true });
+  };
+
+  const onInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    dispatch('input', { value: target.value });
+  };
 </script>
 
 <input
@@ -22,8 +31,10 @@
   {placeholder}
   {id}
   on:change={onChange}
+  on:focus={onFocus}
+  on:input={onInput}
   class={cs(
-    'border border-slate-700 bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
+    'border border-slate-600 bg-inherit bg-slate-900 p-2 hover:border-slate-400 focus:border-slate-400',
     className
   )}
 />

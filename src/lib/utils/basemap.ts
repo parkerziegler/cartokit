@@ -83,7 +83,8 @@ const STAMEN_BASEMAPS: Basemap[] = [
 export const BASEMAPS = {
   MapTiler: MAPTILER_BASEMAPS,
   'Stadia Maps': STADIA_MAPS_BASEMAPS,
-  Stamen: STAMEN_BASEMAPS
+  Stamen: STAMEN_BASEMAPS,
+  Custom: []
 };
 
 export type BasemapProvider = keyof typeof BASEMAPS;
@@ -94,5 +95,6 @@ export const TILE_URLS = {
   'Stadia Maps': (tileId: string) =>
     `https://tiles.stadiamaps.com/styles/${tileId}.json`,
   Stamen: (tileId: string) =>
-    `https://tiles-beta.stadiamaps.com/styles/${tileId}.json`
+    `https://tiles-beta.stadiamaps.com/styles/${tileId}.json`,
+  Custom: () => ''
 };

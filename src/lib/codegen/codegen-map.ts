@@ -1,8 +1,8 @@
 import type { Map as MapLibreMap } from 'maplibre-gl';
 
-import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
 import { isFetchGeoJSONRequired } from '$lib/codegen/codegen-fns';
 import { codegenLayer } from '$lib/codegen/codegen-layer';
+import { codegenMapStyle } from '$lib/codegen/codegen-map-style';
 import { codegenSource } from '$lib/codegen/codegen-source';
 import type { CartoKitIR } from '$lib/stores/ir';
 
@@ -35,10 +35,7 @@ export function codegenMap(
   const program = `
   const map = new mapboxgl.Map({
     container: 'map',
-    style: '${ir.basemap.url.replace(
-      PUBLIC_MAPTILER_API_KEY,
-      '<YOUR_MAPTILER_API_KEY>'
-    )}',
+    style: ${codegenMapStyle(ir)},
     center: [${lng}, ${lat}],
     zoom: ${map.getZoom()}
   });
