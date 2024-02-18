@@ -1,7 +1,8 @@
 <script lang="ts">
   import DataTable from '$lib/components/editor/DataTable.svelte';
-  import Program from '$lib/components/editor/Program.svelte';
+  import CodeEditor from '$lib/components/shared/CodeEditor.svelte';
   import { ir } from '$lib/stores/ir';
+  import { program } from '$lib/stores/program';
   import { selectedLayer } from '$lib/stores/selected-layer';
 
   $: layer = $selectedLayer ?? Object.values($ir.layers)[0];
@@ -9,7 +10,10 @@
 </script>
 
 <div class="z-10 col-span-4 flex flex-col overflow-hidden shadow-lg">
-  <Program />
+  <CodeEditor
+    doc={$program}
+    config={{ kind: 'readonly', language: 'javascript' }}
+  />
   {#if layer}
     <DataTable {data} tableName={layer.data.fileName ?? layer.displayName} />
   {/if}

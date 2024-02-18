@@ -3,6 +3,7 @@
   import { syntaxHighlighting } from '@codemirror/language';
   import { javascript } from '@codemirror/lang-javascript';
   import { json } from '@codemirror/lang-json';
+  import cs from 'classnames';
   import { onMount, onDestroy } from 'svelte';
 
   import { syntaxTheme, editorTheme } from '$lib/utils/codemirror';
@@ -23,6 +24,8 @@
 
   export let doc: string;
   export let config: CodeEditorConfig;
+  let className = '';
+  export { className as class };
 
   let editor: HTMLDivElement;
   let view: EditorView;
@@ -67,9 +70,20 @@
   onDestroy(() => {
     view.destroy();
   });
+
+  $: if (view && config.kind === 'readonly') {
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: doc }
+    });
+  }
 </script>
 
 <div
   bind:this={editor}
-  class="grow overflow-auto border border-slate-600 transition-colors focus-within:border-slate-400 hover:border-slate-400 focus:border-slate-400"
+  class={cs(
+    'grow overflow-auto border border-slate-600 text-white',
+    config.kind === 'editable' &&
+      'transition-colors focus-within:border-slate-400 hover:border-slate-400 focus:border-slate-400',
+    className
+  )}
 />

@@ -54,7 +54,8 @@ export const editorTheme = EditorView.theme(
     '.cm-gutters': {
       backgroundColor: '#0f172a',
       color: '#506377',
-      paddingRight: '6px'
+      padding: '0 6px',
+      borderRight: '1px solid #506377'
     },
     '.cm-activeLineGutter': {
       backgroundColor: 'transparent',
