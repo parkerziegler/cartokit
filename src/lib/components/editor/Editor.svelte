@@ -11,8 +11,7 @@
 
 <div class="z-10 col-span-4 flex flex-col overflow-hidden shadow-lg">
   <CodeEditor
-    doc={$program}
-    config={{ kind: 'readonly', language: 'javascript' }}
+    config={{ kind: 'readonly', doc: $program, language: 'javascript' }}
   />
   {#if layer}
     <DataTable {data} tableName={layer.data.fileName ?? layer.displayName} />

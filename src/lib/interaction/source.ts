@@ -25,7 +25,7 @@ type AddSourceOptions =
  * @param map – The top-level MapLibre GL map instance.
  * @param layer – The CartoKit layer to add a source for.
  */
-export function addSource(map: Map, options: AddSourceOptions) {
+export const addSource = (map: Map, options: AddSourceOptions) => {
   if (options.kind === 'api') {
     // Load the data in a worker thread.
     sourceWorker(options.url, (data) => {
@@ -43,7 +43,7 @@ export function addSource(map: Map, options: AddSourceOptions) {
       map.addSource(layer.id, {
         type: 'geojson',
         // Still use the API endpoint when available to speed up vector tile generation.
-        data: layer.data.url,
+        data: options.url,
         generateId: true
       });
 
@@ -60,7 +60,7 @@ export function addSource(map: Map, options: AddSourceOptions) {
 
     map.addSource(layer.id, {
       type: 'geojson',
-      data: layer.data.geoJSON,
+      data: options.featureCollection,
       generateId: true
     });
 
@@ -72,4 +72,4 @@ export function addSource(map: Map, options: AddSourceOptions) {
 
     addLayer(map, layer);
   }
-}
+};

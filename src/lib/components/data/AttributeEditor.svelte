@@ -163,8 +163,12 @@
         Use the editor below to transform your dataset using JavaScript.
       </p>
       <CodeEditor
-        {doc}
-        config={{ kind: 'editable', language: 'javascript', onChange }}
+        config={{
+          kind: 'editable',
+          initialDoc: doc,
+          language: 'javascript',
+          onChange
+        }}
         class="-mx-4 max-h-[9.5rem] overflow-auto"
         bind:view
       />
@@ -181,8 +185,7 @@
   </MenuItem>
   <MenuItem title="Preview (1 selected feature)" titleClass="items-baseline">
     <CodeEditor
-      doc={previewDoc}
-      config={{ kind: 'readonly', language: 'json' }}
+      config={{ kind: 'readonly', doc: previewDoc, language: 'json' }}
       class="-mx-4 max-h-[9.5rem] overflow-auto"
     />
     <p slot="action" class="text-slate-400">OUTPUT</p>

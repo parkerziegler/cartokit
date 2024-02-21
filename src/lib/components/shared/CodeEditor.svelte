@@ -10,11 +10,13 @@
 
   interface ReadonlyCodeEditorConfig {
     kind: 'readonly';
+    doc: string;
     language: 'javascript' | 'json';
   }
 
   interface EditableCodeEditorConfig {
     kind: 'editable';
+    initialDoc: string;
     onChange: (value: string) => void;
     onFocusChange?: (focusing: boolean) => void;
     language: 'javascript' | 'json';
@@ -22,7 +24,6 @@
 
   type CodeEditorConfig = ReadonlyCodeEditorConfig | EditableCodeEditorConfig;
 
-  export let doc: string;
   export let config: CodeEditorConfig;
   export let view: EditorView | null = null;
   let className = '';
@@ -61,7 +62,7 @@
     }
 
     view = new EditorView({
-      doc,
+      doc: config.kind === 'editable' ? config.initialDoc : config.doc,
       extensions,
       parent: editor
     });
@@ -73,7 +74,7 @@
 
   $: if (view && config.kind === 'readonly') {
     view.dispatch({
-      changes: { from: 0, to: view.state.doc.length, insert: doc }
+      changes: { from: 0, to: view.state.doc.length, insert: config.doc }
     });
   }
 </script>
