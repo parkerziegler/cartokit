@@ -28,7 +28,6 @@
     | CartoKitDotDensityLayer;
 
   // Main editor state.
-  let editor: HTMLDivElement;
   let view: EditorView;
   let error = '';
   let success = false;
@@ -163,13 +162,11 @@
       <p class="font-sans">
         Use the editor below to transform your dataset using JavaScript.
       </p>
-      <!-- <div
-        bind:this={editor}
-        class="transformation-editor -mx-4 overflow-auto bg-white text-black"
-      /> -->
       <CodeEditor
         {doc}
         config={{ kind: 'editable', language: 'javascript', onChange }}
+        class="-mx-4 max-h-[9.5rem] overflow-auto"
+        bind:view
       />
       {#if error}
         <TransformationAlert alert={{ kind: 'error', message: error }} />

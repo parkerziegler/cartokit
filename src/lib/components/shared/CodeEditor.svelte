@@ -24,11 +24,11 @@
 
   export let doc: string;
   export let config: CodeEditorConfig;
+  export let view: EditorView | null = null;
   let className = '';
   export { className as class };
 
   let editor: HTMLDivElement;
-  let view: EditorView;
 
   onMount(() => {
     const extensions = [
@@ -52,7 +52,7 @@
       extensions.push(
         EditorView.updateListener.of((v) => {
           if (v.focusChanged) {
-            onFocusChange?.(view.hasFocus);
+            onFocusChange?.(view?.hasFocus ?? false);
           }
         })
       );
@@ -68,7 +68,7 @@
   });
 
   onDestroy(() => {
-    view.destroy();
+    view?.destroy();
   });
 
   $: if (view && config.kind === 'readonly') {
