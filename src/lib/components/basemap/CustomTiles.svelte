@@ -134,9 +134,9 @@
       Add Vector Tile JSON Specification
     </p>
     <CodeEditor
-      doc={tileJSONSpec}
       config={{
         kind: 'editable',
+        initialDoc: tileJSONSpec,
         onChange: onTileJSONSpecChange,
         onFocusChange: onTileJSONFocusChange,
         language: 'json'

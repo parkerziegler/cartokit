@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { basicSetup, EditorView } from 'codemirror';
-  import { javascript } from '@codemirror/lang-javascript';
-  import { json } from '@codemirror/lang-json';
+  import { onDestroy } from 'svelte';
+  import { EditorView } from 'codemirror';
   import { featureCollection as turfFeatureCollection } from '@turf/helpers';
 
   import TransformationAlert from '$lib/components/data/TransformationAlert.svelte';
@@ -10,6 +8,7 @@
   import PlayCircle from '$lib/components/icons/PlayCircle.svelte';
   import TerminalIcon from '$lib/components/icons/TerminalIcon.svelte';
   import Button from '$lib/components/shared/Button.svelte';
+  import CodeEditor from '$lib/components/shared/CodeEditor.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
@@ -29,15 +28,15 @@
     | CartoKitDotDensityLayer;
 
   // Main editor state.
-  let editor: HTMLDivElement;
   let view: EditorView;
   let error = '';
   let success = false;
   let timeoutId: number | undefined;
+  const doc = `function transformGeoJSON(geoJSON) {
+  return geoJSON;
+}`;
 
   // Preview editor state.
-  let previewEditor: HTMLDivElement;
-  let preview: EditorView;
   let previewError = '';
   let previewDoc: string = $selectedFeature
     ? JSON.stringify(
@@ -57,30 +56,6 @@
   export function focus() {
     view.focus();
   }
-
-  onMount(() => {
-    view = new EditorView({
-      doc: `function transformGeoJSON(geoJSON) {
-  return geoJSON;
-}`,
-      extensions: [
-        basicSetup,
-        javascript(),
-        EditorView.updateListener.of((v) => {
-          if (v.docChanged) {
-            onChange();
-          }
-        })
-      ],
-      parent: editor
-    });
-
-    preview = new EditorView({
-      doc: previewDoc,
-      extensions: [basicSetup, json(), EditorView.editable.of(false)],
-      parent: previewEditor
-    });
-  });
 
   function onClick() {
     const program = view.state.doc.toString();
@@ -123,9 +98,7 @@
     });
   }
 
-  function onChange() {
-    const program = view.state.doc.toString();
-
+  const onChange = (program: string) => {
     if ($selectedFeature) {
       transformationWorker(
         program,
@@ -173,22 +146,13 @@
         }
       );
     }
-  }
+  };
 
   onDestroy(() => {
-    view.destroy();
-    preview.destroy();
-
     if (timeoutId) {
       window.clearTimeout(timeoutId);
     }
   });
-
-  $: if (preview) {
-    preview.dispatch({
-      changes: { from: 0, to: preview.state.doc.length, insert: previewDoc }
-    });
-  }
 </script>
 
 <Menu class="w-96">
@@ -198,9 +162,15 @@
       <p class="font-sans">
         Use the editor below to transform your dataset using JavaScript.
       </p>
-      <div
-        bind:this={editor}
-        class="transformation-editor -mx-4 overflow-auto bg-white text-black"
+      <CodeEditor
+        config={{
+          kind: 'editable',
+          initialDoc: doc,
+          language: 'javascript',
+          onChange
+        }}
+        class="-mx-4 max-h-[9.5rem] overflow-auto"
+        bind:view
       />
       {#if error}
         <TransformationAlert alert={{ kind: 'error', message: error }} />
@@ -214,9 +184,9 @@
     </div>
   </MenuItem>
   <MenuItem title="Preview (1 selected feature)" titleClass="items-baseline">
-    <div
-      class="transformation-editor relative -mx-4 overflow-auto bg-white text-black"
-      bind:this={previewEditor}
+    <CodeEditor
+      config={{ kind: 'readonly', doc: previewDoc, language: 'json' }}
+      class="-mx-4 max-h-[9.5rem] overflow-auto"
     />
     <p slot="action" class="text-slate-400">OUTPUT</p>
     {#if previewError}
@@ -224,7 +194,7 @@
     {/if}
   </MenuItem>
   <MenuItem title="Console">
-    <ul class="-mx-4 max-h-[148px] overflow-auto">
+    <ul class="-mx-4 max-h-[9.5rem] overflow-auto">
       {#each consoleOutput as entry}
         <li
           class="border-b border-slate-600 px-4 py-2 text-white first:border-t"
