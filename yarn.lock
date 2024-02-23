@@ -532,9 +532,9 @@
     esbuild "^0.19.11"
 
 "@sveltejs/kit@^2.0.0":
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.5.0.tgz#5785b40ab00b6aa0758812c69a6a0d1c646d823b"
-  integrity sha512-1uyXvzC2Lu1FZa30T4y5jUAC21R309ZMRG0TPt+PPPbNUoDpy8zSmSNVWYaBWxYDqLGQ5oPNWvjvvF2IjJ1jmA==
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.5.1.tgz#be04a8ae842bb8d469b5af72e0f7a13ce323be47"
+  integrity sha512-TKj08o3mJCoQNLTdRdGkHPePTCPUGTgkew65RDqjVU3MtPVxljsofXQYfXndHfq0P7KoPRO/0/reF6HesU0Djw==
   dependencies:
     "@types/cookie" "^0.6.0"
     cookie "^0.6.0"
