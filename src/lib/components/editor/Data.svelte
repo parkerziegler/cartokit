@@ -24,7 +24,7 @@
       {options}
       selected={layer.id}
       on:change={onChange}
-      title="Select a layer"
+      title="Select Layer"
       containerClass="px-4 py-2"
     />
     <DataTable {data} />
