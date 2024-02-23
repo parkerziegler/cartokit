@@ -1,19 +1,21 @@
 <script lang="ts">
-  import DataTable from '$lib/components/editor/DataTable.svelte';
-  import CodeEditor from '$lib/components/shared/CodeEditor.svelte';
-  import { ir } from '$lib/stores/ir';
-  import { program } from '$lib/stores/program';
-  import { selectedLayer } from '$lib/stores/selected-layer';
+  import Tabs, { type Tab } from '$lib/components/shared/Tabs.svelte';
+  import Program from '$lib/components/editor/Program.svelte';
+  import Data from '$lib/components/editor/Data.svelte';
 
-  $: layer = $selectedLayer ?? Object.values($ir.layers)[0];
-  $: data = layer?.data.geoJSON.features ?? [];
+  let activeIndex: number;
+
+  const tabs: Tab[] = [
+    { name: 'Program', content: Program },
+    { name: 'Data', content: Data }
+  ];
 </script>
 
-<div class="z-10 col-span-4 flex flex-col overflow-hidden shadow-lg">
-  <CodeEditor
-    config={{ kind: 'readonly', doc: $program, language: 'javascript' }}
+<div class="relative z-10 col-span-4 flex flex-col bg-slate-900 shadow-lg">
+  <Tabs
+    {tabs}
+    containerClass="flex-1 pt-2 absolute inset-0"
+    bodyClass="flex flex-1 overflow-hidden p-0"
+    bind:activeIndex
   />
-  {#if layer}
-    <DataTable {data} tableName={layer.data.fileName ?? layer.displayName} />
-  {/if}
 </div>

@@ -93,5 +93,5 @@
 </button>
 <Modal bind:showModal class="max-w-2xl">
   <h2 slot="header" class="text-xl font-semibold">Select Basemap</h2>
-  <Tabs {tabs} slot="body" class="h-[32rem]" />
+  <Tabs {tabs} slot="body" bodyClass="h-[32rem]" />
 </Modal>

@@ -18,21 +18,24 @@
 
   let className = '';
   export { className as class };
+  export let containerClass = '';
 
   const dispatch = createEventDispatcher();
 
-  function onChange(event: Event) {
+  const onChange = (event: Event) => {
     const target = event.target as HTMLSelectElement;
     dispatch('change', { value: target.value });
-  }
+  };
 
-  export function getBoundingClientRect(): DOMRect {
-    return ref.getBoundingClientRect();
-  }
+  export const getBoundingClientRect = (): DOMRect =>
+    ref.getBoundingClientRect();
 </script>
 
 {#if title}
-  <div class="stack-h stack-h-xs items-baseline" bind:this={ref}>
+  <div
+    class={cs('stack-h stack-h-xs items-baseline', containerClass)}
+    bind:this={ref}
+  >
     <FieldLabel fieldId={title}>
       {title}
     </FieldLabel>

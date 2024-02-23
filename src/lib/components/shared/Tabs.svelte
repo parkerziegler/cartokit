@@ -11,20 +11,19 @@
   import cs from 'classnames';
 
   export let tabs: Tab[] = [];
+  export let activeIndex = 0;
 
-  let activeIndex = 0;
+  export let containerClass = '';
+  export let bodyClass = '';
 
-  let className = '';
-  export { className as class };
-
-  function setActiveTab(i: number) {
-    return function onTabClick() {
+  const setActiveTab = (i: number) => {
+    return () => {
       activeIndex = i;
     };
-  }
+  };
 </script>
 
-<div class="stack">
+<div class={cs('stack', containerClass)}>
   <ul class="stack-h stack-h-md border-b border-b-slate-400 px-4">
     {#each tabs as tab, i}
       <li
@@ -36,7 +35,7 @@
       </li>
     {/each}
   </ul>
-  <div class={cs('p-4', className)}>
+  <div class={cs('p-4', bodyClass)}>
     {#each tabs as tab, i}
       {#if activeIndex === i}
         <svelte:component this={tab.content} {...tab.props} />
