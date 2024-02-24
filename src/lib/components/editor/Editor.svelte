@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Tabs, { type Tab } from '$lib/components/shared/Tabs.svelte';
-  import Program from '$lib/components/editor/Program.svelte';
   import Data from '$lib/components/editor/Data.svelte';
+  import Program from '$lib/components/editor/Program.svelte';
+  import Tabs, { type Tab } from '$lib/components/shared/Tabs.svelte';
 
   let activeIndex: number;
 

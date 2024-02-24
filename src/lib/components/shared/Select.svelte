@@ -22,7 +22,7 @@
 
   const dispatch = createEventDispatcher();
 
-  const onChange = (event: Event) => {
+  const onChange = (event: Event): void => {
     const target = event.target as HTMLSelectElement;
     dispatch('change', { value: target.value });
   };

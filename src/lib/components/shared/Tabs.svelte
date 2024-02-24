@@ -16,8 +16,8 @@
   export let containerClass = '';
   export let bodyClass = '';
 
-  const setActiveTab = (i: number) => {
-    return () => {
+  const setActiveTab = (i: number): (() => void) => {
+    return (): void => {
       activeIndex = i;
     };
   };
