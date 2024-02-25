@@ -1,9 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import maplibregl from 'maplibre-gl';
+  import cs from 'classnames';
 
   import BasemapPicker from '$lib/components/basemap/BasemapPicker.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
+  import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
+  import DataTable from '$lib/components/shared/DataTable.svelte';
+  import TableIcon from '$lib/components/icons/TableIcon.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
@@ -19,6 +23,7 @@
   import { onFeatureLeave } from '$lib/interaction/select';
   import { ir } from '$lib/stores/ir';
   import { map as mapStore } from '$lib/stores/map';
+  import { selectedFeature } from '$lib/stores/selected-feature';
   import { selectedLayer } from '$lib/stores/selected-layer';
 
   let map: maplibregl.Map;
@@ -63,15 +68,40 @@
   });
 
   let editorOpen = false;
+  let dataOpen = false;
 
-  function toggleEditorVisibility() {
+  const toggleEditorVisibility = () => {
     editorOpen = !editorOpen;
-  }
+  };
+
+  const onViewDataClick = () => {
+    dataOpen = true;
+  };
+
+  const onViewDataClose = () => {
+    dataOpen = false;
+  };
+
+  const onClosePropertiesMenu = () => {
+    if ($selectedFeature) {
+      map.removeFeatureState(
+        { source: $selectedFeature.layer.id, id: $selectedFeature.id },
+        'selected'
+      );
+
+      selectedFeature.set(null);
+    }
+  };
 </script>
 
 <main class="absolute inset-0">
   <div class="grid h-full w-full grid-cols-12">
-    <div class="relative col-span-12" id="map" class:col-span-8={editorOpen}>
+    <div
+      class="relative col-span-12"
+      id="map"
+      class:col-span-8={editorOpen}
+      class:data-open={dataOpen}
+    >
       <Menu class="min-w-xs absolute left-4 top-4 z-10 max-w-lg overflow-auto">
         <MenuTitle class="mr-4">
           Layers
@@ -82,9 +112,24 @@
       {#if $selectedLayer}
         <Menu
           id="properties"
-          class="style-editor absolute right-4 top-4 z-10 max-w-sm overflow-auto"
+          class={cs(
+            'style-editor absolute right-4 top-4 z-10 max-w-sm overflow-auto',
+            {
+              'style-editor--compact': dataOpen
+            }
+          )}
         >
-          <MenuTitle>Properties</MenuTitle>
+          <MenuTitle class="pr-4"
+            >{$selectedLayer.displayName}
+            <button on:click={onClosePropertiesMenu} slot="action">
+              <CloseIcon />
+            </button>
+            <div class="stack-h stack-h-xs" slot="subtitle">
+              <button on:click={onViewDataClick}>
+                <TableIcon />
+              </button>
+            </div>
+          </MenuTitle>
           <MenuItem title="Map Type">
             <MapTypeSelect layer={$selectedLayer} />
           </MenuItem>
@@ -103,9 +148,18 @@
           {/if}
         </Menu>
       {/if}
-      <BasemapPicker />
+      <BasemapPicker
+        class={cs('transition-transform duration-[400ms] ease-out', {
+          '-translate-y-72': dataOpen
+        })}
+      />
       <button
-        class="absolute bottom-8 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg"
+        class={cs(
+          'absolute bottom-12 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-[400ms] ease-out',
+          {
+            '-translate-y-72': dataOpen
+          }
+        )}
         on:click={toggleEditorVisibility}
       >
         {editorOpen ? 'Close Editor' : 'Open Editor'}
@@ -114,5 +168,32 @@
     {#if editorOpen}
       <Editor />
     {/if}
+    {#if dataOpen && $selectedLayer}
+      <DataTable
+        data={$selectedLayer.data.geoJSON.features}
+        tableName={$selectedLayer.displayName}
+        onClose={onViewDataClose}
+        class="absolute bottom-0 h-72"
+      />
+    {/if}
   </div>
 </main>
+
+<style>
+  :global(#map .maplibregl-ctrl-attrib.maplibregl-compact) {
+    @apply transition-transform duration-[400ms] ease-out;
+  }
+
+  :global(#map.data-open .maplibregl-ctrl-attrib.maplibregl-compact) {
+    @apply -translate-y-72;
+  }
+
+  :global(.style-editor) {
+    max-height: calc(100% - 2rem);
+    transition: max-height 200ms ease-out;
+  }
+
+  :global(.style-editor--compact) {
+    max-height: calc(100% - 25.25rem);
+  }
+</style>

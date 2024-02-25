@@ -2,14 +2,19 @@
      https://github.com/observablehq/inputs/blob/main/src/table.js -->
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
   import type { Feature } from 'geojson';
   import orderBy from 'lodash.orderby';
   import cs from 'classnames';
 
+  import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
+
   const ROW_HEIGHT = 33;
+  const rows = 7;
 
   export let data: Feature[];
-  export let rows = 28.5;
+  export let tableName: string;
+  export let onClose: () => void;
 
   let className = '';
   export { className as class };
@@ -89,8 +94,23 @@
 </script>
 
 <div
-  class={cs('flex flex-col overflow-hidden bg-slate-700 font-mono', className)}
+  class={cs(
+    'flex w-full flex-col overflow-hidden bg-slate-700 font-mono',
+    className
+  )}
+  transition:slide
 >
+  <div class="flex justify-between px-3 py-2 text-xs text-white">
+    <span>
+      {tableName}
+    </span>
+    <div class="stack-h stack-h-sm">
+      <span>{N} Features</span>
+      <button on:click={onClose}>
+        <CloseIcon />
+      </button>
+    </div>
+  </div>
   <div
     class="w-full overflow-auto border-t border-slate-400 bg-slate-900 text-2xs text-white"
     bind:this={root}

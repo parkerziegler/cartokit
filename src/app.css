@@ -110,11 +110,6 @@
     -moz-appearance: textfield;
   }
 
-  /* Style Editor */
-  .style-editor {
-    max-height: calc(100% - 2rem);
-  }
-
   /* Hex Input */
   .hex-input > input:first-child {
     @apply border-r border-transparent;

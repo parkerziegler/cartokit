@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount, setContext } from 'svelte';
   import maplibregl from 'maplibre-gl';
+  import cs from 'classnames';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
   import BasemapGrid from '$lib/components/basemap/BasemapGrid.svelte';
@@ -9,6 +10,9 @@
   import { ir } from '$lib/stores/ir';
   import { map as mapStore } from '$lib/stores/map';
   import { BASEMAPS, type BasemapProvider } from '$lib/utils/basemap';
+
+  let className = '';
+  export { className as class };
 
   let picker: HTMLButtonElement;
   let maps: maplibregl.Map[] = [];
@@ -70,7 +74,7 @@
 </script>
 
 <button
-  class="group absolute bottom-4 left-4 z-10 shadow-lg"
+  class={cs('group absolute bottom-4 left-4 z-10 shadow-lg', className)}
   bind:this={picker}
   on:mouseenter={() => (hovered = true)}
   on:mouseleave={() => (hovered = false)}
