@@ -21,14 +21,12 @@
 
   const dispatch = createEventDispatcher();
 
-  function onChange(event: Event) {
+  const onChange = (event: Event) => {
     const target = event.target as HTMLSelectElement;
     dispatch('change', { value: target.value });
-  }
+  };
 
-  export function getBoundingClientRect(): DOMRect {
-    return ref.getBoundingClientRect();
-  }
+  export const getBoundingClientRect = () => ref.getBoundingClientRect();
 </script>
 
 {#if title}

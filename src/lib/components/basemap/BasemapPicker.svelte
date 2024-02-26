@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount, setContext } from 'svelte';
   import maplibregl from 'maplibre-gl';
+  import cs from 'classnames';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
   import BasemapGrid from '$lib/components/basemap/BasemapGrid.svelte';
@@ -9,6 +10,8 @@
   import { ir } from '$lib/stores/ir';
   import { map as mapStore } from '$lib/stores/map';
   import { BASEMAPS, type BasemapProvider } from '$lib/utils/basemap';
+
+  export let layout: 'compact' | 'full' = 'full';
 
   let picker: HTMLButtonElement;
   let maps: maplibregl.Map[] = [];
@@ -51,11 +54,11 @@
     showModal = false;
   });
 
-  function updateMapThumbnail(map: maplibregl.Map, node: HTMLButtonElement) {
+  const updateMapThumbnail = (map: maplibregl.Map, node: HTMLButtonElement) => {
     const { top, left } = node.getBoundingClientRect();
     map.setCenter($mapStore.unproject([left + 32, top + 32]));
     map.setZoom($ir.zoom);
-  }
+  };
 
   $: if (maps.length > 0 && $mapStore && $ir) {
     updateMapThumbnail(maps[0], picker);
@@ -70,7 +73,10 @@
 </script>
 
 <button
-  class="group absolute bottom-4 left-4 z-10 shadow-lg"
+  class={cs(
+    'group absolute bottom-4 left-4 z-10 shadow-lg transition-transform duration-[400ms] ease-out',
+    { '-translate-y-72': layout === 'compact' }
+  )}
   bind:this={picker}
   on:mouseenter={() => (hovered = true)}
   on:mouseleave={() => (hovered = false)}
@@ -93,5 +99,5 @@
 </button>
 <Modal bind:showModal class="max-w-2xl">
   <h2 slot="header" class="text-xl font-semibold">Select Basemap</h2>
-  <Tabs {tabs} slot="body" class="h-[32rem]" />
+  <Tabs {tabs} slot="body" bodyClass="h-[32rem]" />
 </Modal>
