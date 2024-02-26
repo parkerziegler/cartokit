@@ -27,6 +27,8 @@
   import { selectedLayer } from '$lib/stores/selected-layer';
 
   let map: maplibregl.Map;
+  let editorOpen = false;
+  let dataOpen = false;
 
   onMount(() => {
     map = new maplibregl.Map({
@@ -67,9 +69,6 @@
     };
   });
 
-  let editorOpen = false;
-  let dataOpen = false;
-
   const toggleEditorVisibility = () => {
     editorOpen = !editorOpen;
   };
@@ -100,7 +99,7 @@
       class="relative col-span-12"
       id="map"
       class:col-span-8={editorOpen}
-      class:data-open={dataOpen}
+      class:map--compact={dataOpen}
     >
       <Menu class="min-w-xs absolute left-4 top-4 z-10 max-w-lg overflow-auto">
         <MenuTitle class="mr-4">
@@ -113,9 +112,9 @@
         <Menu
           id="properties"
           class={cs(
-            'style-editor absolute right-4 top-4 z-10 max-w-sm overflow-auto',
+            'properties absolute right-4 top-4 z-10 max-w-sm overflow-auto',
             {
-              'style-editor--compact': dataOpen
+              'properties--compact': dataOpen
             }
           )}
         >
@@ -148,11 +147,7 @@
           {/if}
         </Menu>
       {/if}
-      <BasemapPicker
-        class={cs('transition-transform duration-[400ms] ease-out', {
-          '-translate-y-72': dataOpen
-        })}
-      />
+      <BasemapPicker layout={dataOpen ? 'compact' : 'full'} />
       <button
         class={cs(
           'absolute bottom-12 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-[400ms] ease-out',
@@ -164,17 +159,17 @@
       >
         {editorOpen ? 'Close Editor' : 'Open Editor'}
       </button>
+      {#if dataOpen && $selectedLayer}
+        <DataTable
+          data={$selectedLayer.data.geoJSON.features}
+          tableName={$selectedLayer.displayName}
+          onClose={onViewDataClose}
+          class="absolute bottom-0 h-72"
+        />
+      {/if}
     </div>
     {#if editorOpen}
       <Editor />
-    {/if}
-    {#if dataOpen && $selectedLayer}
-      <DataTable
-        data={$selectedLayer.data.geoJSON.features}
-        tableName={$selectedLayer.displayName}
-        onClose={onViewDataClose}
-        class="absolute bottom-0 h-72"
-      />
     {/if}
   </div>
 </main>
@@ -184,16 +179,16 @@
     @apply transition-transform duration-[400ms] ease-out;
   }
 
-  :global(#map.data-open .maplibregl-ctrl-attrib.maplibregl-compact) {
+  :global(#map.map--compact .maplibregl-ctrl-attrib.maplibregl-compact) {
     @apply -translate-y-72;
   }
 
-  :global(.style-editor) {
+  :global(.properties) {
     max-height: calc(100% - 2rem);
     transition: max-height 200ms ease-out;
   }
 
-  :global(.style-editor--compact) {
+  :global(.properties--compact) {
     max-height: calc(100% - 25.25rem);
   }
 </style>

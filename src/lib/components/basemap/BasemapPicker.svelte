@@ -11,8 +11,7 @@
   import { map as mapStore } from '$lib/stores/map';
   import { BASEMAPS, type BasemapProvider } from '$lib/utils/basemap';
 
-  let className = '';
-  export { className as class };
+  export let layout: 'compact' | 'full' = 'full';
 
   let picker: HTMLButtonElement;
   let maps: maplibregl.Map[] = [];
@@ -74,7 +73,10 @@
 </script>
 
 <button
-  class={cs('group absolute bottom-4 left-4 z-10 shadow-lg', className)}
+  class={cs(
+    'group absolute bottom-4 left-4 z-10 shadow-lg transition-transform duration-[400ms] ease-out',
+    { '-translate-y-72': layout === 'compact' }
+  )}
   bind:this={picker}
   on:mouseenter={() => (hovered = true)}
   on:mouseleave={() => (hovered = false)}

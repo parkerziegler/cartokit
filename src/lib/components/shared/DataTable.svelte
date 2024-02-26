@@ -28,13 +28,13 @@
   let n = Math.min(N, Math.floor(rows * 2)); // The number of rows displayed.
   let sort = { col: '', desc: true };
 
-  const minlengthof = (length: number): number => {
+  const minlengthof = (length: number) => {
     length = Math.floor(length);
 
     return Math.min(N, length);
   };
 
-  const materialize = (data: Feature[]): void => {
+  const materialize = (data: Feature[]) => {
     // Empty array and reinstantiate the iterator and n.
     array = [];
     iterator = data[Symbol.iterator]();
@@ -60,7 +60,7 @@
     array = array;
   };
 
-  const resort = (col: string): (() => void) => {
+  const resort = (col: string) => {
     return () => {
       sort = {
         col,
@@ -75,7 +75,7 @@
     };
   };
 
-  const onScroll = (): void => {
+  const onScroll = () => {
     if (
       root.scrollHeight - root.scrollTop < rows * ROW_HEIGHT * 1.5 &&
       n < minlengthof(n + 1)
