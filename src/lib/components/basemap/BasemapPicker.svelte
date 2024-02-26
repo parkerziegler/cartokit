@@ -54,11 +54,11 @@
     showModal = false;
   });
 
-  function updateMapThumbnail(map: maplibregl.Map, node: HTMLButtonElement) {
+  const updateMapThumbnail = (map: maplibregl.Map, node: HTMLButtonElement) => {
     const { top, left } = node.getBoundingClientRect();
     map.setCenter($mapStore.unproject([left + 32, top + 32]));
     map.setZoom($ir.zoom);
-  }
+  };
 
   $: if (maps.length > 0 && $mapStore && $ir) {
     updateMapThumbnail(maps[0], picker);

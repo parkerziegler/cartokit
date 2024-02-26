@@ -6,7 +6,6 @@
   import BasemapPicker from '$lib/components/basemap/BasemapPicker.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
-  import DataTable from '$lib/components/shared/DataTable.svelte';
   import TableIcon from '$lib/components/icons/TableIcon.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
@@ -17,6 +16,7 @@
   import LinePropertiesPanel from '$lib/components/properties/LinePropertiesPanel.svelte';
   import FillPropertiesPanel from '$lib/components/properties/FillPropertiesPanel.svelte';
   import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
+  import DataTable from '$lib/components/shared/DataTable.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';

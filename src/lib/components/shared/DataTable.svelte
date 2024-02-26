@@ -47,7 +47,7 @@
     root.scrollTo(root.scrollLeft, 0);
   };
 
-  const appendRows = (start: number, end: number): void => {
+  const appendRows = (start: number, end: number) => {
     for (; start < end; start++) {
       const { done, value } = iterator.next();
 
