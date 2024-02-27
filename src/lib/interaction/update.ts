@@ -208,10 +208,6 @@ interface TransformationUpdate extends LayerUpdate {
     geoJSON: FeatureCollection;
     transformation: Transformation;
   };
-  layer:
-    | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer
-    | CartoKitChoroplethLayer;
 }
 
 type DispatchLayerUpdateParams =
