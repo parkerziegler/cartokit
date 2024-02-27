@@ -2,9 +2,9 @@ import * as d3 from 'd3';
 import type { Feature } from 'geojson';
 import { ckmeans } from 'simple-statistics';
 
-import { isPropertyNumeric } from '$lib/utils/property';
 import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
 import type { ColorScale } from '$lib/types/color';
+import { isPropertyNumeric } from '$lib/utils/property';
 
 /**
  * Derive the extent for a given attribute of a GeoJSON FeatureCollection.

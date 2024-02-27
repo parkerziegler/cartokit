@@ -1,5 +1,5 @@
-import { writable } from 'svelte/store';
 import type { StyleSpecification } from 'maplibre-gl';
+import { writable } from 'svelte/store';
 
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 import type { BasemapProvider } from '$lib/utils/basemap';

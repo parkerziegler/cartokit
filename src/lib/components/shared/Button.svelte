@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import cs from 'classnames';
+  import { createEventDispatcher } from 'svelte';
 
   let className = '';
   export { className as class };

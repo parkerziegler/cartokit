@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
   import cs from 'classnames';
-  import colors from 'tailwindcss/colors';
   import type { StyleSpecification } from 'maplibre-gl';
+  import { getContext } from 'svelte';
+  import colors from 'tailwindcss/colors';
 
   import Button from '$lib/components/shared/Button.svelte';
   import CodeEditor from '$lib/components/shared/CodeEditor.svelte';

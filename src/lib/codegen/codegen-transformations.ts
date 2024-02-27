@@ -1,4 +1,5 @@
 import camelCase from 'lodash.camelcase';
+
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 
 interface TransformationProgramFragment {

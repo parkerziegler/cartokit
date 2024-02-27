@@ -1,5 +1,5 @@
+// eslint-disable-next-line import/no-unresolved
 import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
-
 import MapTilerBasic from '$lib/assets/basemaps/maptiler/basic.png';
 import MapTilerDark from '$lib/assets/basemaps/maptiler/dark.png';
 import MapTilerDataviz from '$lib/assets/basemaps/maptiler/dataviz.png';
@@ -8,12 +8,12 @@ import MapTilerOutdoor from '$lib/assets/basemaps/maptiler/outdoor.png';
 import MapTilerSatellite from '$lib/assets/basemaps/maptiler/satellite.png';
 import MapTilerStreets from '$lib/assets/basemaps/maptiler/streets.png';
 import MapTilerWinter from '$lib/assets/basemaps/maptiler/winter.png';
-import StadiaMapsAlidadeSmooth from '$lib/assets/basemaps/stadia-maps/alidade-smooth.png';
 import StadiaMapsAlidadeSmoothDark from '$lib/assets/basemaps/stadia-maps/alidade-dark-smooth.png';
+import StadiaMapsAlidadeSmooth from '$lib/assets/basemaps/stadia-maps/alidade-smooth.png';
 import StadiaMapsOutdoors from '$lib/assets/basemaps/stadia-maps/outdoors.png';
-import StamenToner from '$lib/assets/basemaps/stamen/toner.png';
-import StamenTonerLite from '$lib/assets/basemaps/stamen/toner-lite.png';
 import StamenTerrain from '$lib/assets/basemaps/stamen/terrain.png';
+import StamenTonerLite from '$lib/assets/basemaps/stamen/toner-lite.png';
+import StamenToner from '$lib/assets/basemaps/stamen/toner.png';
 
 export interface Basemap {
   title: string;

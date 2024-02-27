@@ -1,8 +1,8 @@
-import * as d3 from 'd3';
-import * as turf from '@turf/turf';
 import { randomPoint as turfRandomPoint } from '@turf/random';
-import type { ExpressionSpecification } from 'maplibre-gl';
+import * as turf from '@turf/turf';
+import * as d3 from 'd3';
 import type { Feature, FeatureCollection } from 'geojson';
+import type { ExpressionSpecification } from 'maplibre-gl';
 
 import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
 

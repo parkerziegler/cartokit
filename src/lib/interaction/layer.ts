@@ -1,7 +1,7 @@
-import type { Map } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
-import uniqueId from 'lodash.uniqueid';
 import kebabCase from 'lodash.kebabcase';
+import uniqueId from 'lodash.uniqueid';
+import type { Map } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';

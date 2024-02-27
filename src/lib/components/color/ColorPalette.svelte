@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ColorSchemeDropdown from '$lib/components/color/ColorSchemeDropdown.svelte';
   import ColorScaleSelect from '$lib/components/color/ColorScaleSelect.svelte';
+  import ColorSchemeDropdown from '$lib/components/color/ColorSchemeDropdown.svelte';
   import ColorStopsSelect from '$lib/components/color/ColorStopsSelect.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';

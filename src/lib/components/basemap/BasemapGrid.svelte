@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
   import cs from 'classnames';
+  import { getContext } from 'svelte';
 
   import CustomTiles from '$lib/components/basemap/CustomTiles.svelte';
   import { ir } from '$lib/stores/ir';

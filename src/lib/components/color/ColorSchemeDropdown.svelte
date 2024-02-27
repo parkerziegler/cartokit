@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
+  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
   import {

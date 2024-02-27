@@ -3,8 +3,8 @@
   import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { COLOR_SCALES, type ColorScale } from '$lib/types/color';
   import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
+  import { COLOR_SCALES, type ColorScale } from '$lib/types/color';
 
   export let layer: CartoKitChoroplethLayer;
 

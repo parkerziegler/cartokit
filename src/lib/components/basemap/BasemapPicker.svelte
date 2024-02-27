@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { onDestroy, onMount, setContext } from 'svelte';
-  import maplibregl from 'maplibre-gl';
   import cs from 'classnames';
+  import maplibregl from 'maplibre-gl';
+  import { onDestroy, onMount, setContext } from 'svelte';
 
+  // eslint-disable-next-line import/no-unresolved
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
   import BasemapGrid from '$lib/components/basemap/BasemapGrid.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
@@ -31,6 +32,9 @@
 
   onMount(() => {
     maps = mapStyles.map((style) => {
+      // maplibre-gl is actually a CJS module, and not all module.exports may be
+      // supported as named exports.
+      // eslint-disable-next-line import/no-named-as-default-member
       const map = new maplibregl.Map({
         container: `inset-${style}`,
         style: `https://api.maptiler.com/maps/${style}/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,

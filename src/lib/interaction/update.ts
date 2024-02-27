@@ -1,5 +1,5 @@
-import type { GeoJSONSource } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
+import type { GeoJSONSource } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { deriveColorScale } from '$lib/interaction/color';

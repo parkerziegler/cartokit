@@ -1,5 +1,5 @@
-import type { Map, MapSourceDataEvent } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
+import type { Map, MapSourceDataEvent } from 'maplibre-gl';
 
 import { addLayer, generateCartoKitLayer } from '$lib/interaction/layer';
 import { ir } from '$lib/stores/ir';

@@ -1,6 +1,7 @@
 import type { Map } from 'maplibre-gl';
 import * as prettier from 'prettier';
 import babel from 'prettier/plugins/babel';
+// eslint-disable-next-line import/default
 import estree from 'prettier/plugins/estree';
 
 import { codegenImports } from '$lib/codegen/codegen-imports';
