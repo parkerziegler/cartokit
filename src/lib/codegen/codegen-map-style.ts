@@ -1,5 +1,6 @@
 import memoize from 'lodash.memoize';
 
+// eslint-disable-next-line import/no-unresolved
 import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
 import type { CartoKitIR } from '$lib/stores/ir';
 

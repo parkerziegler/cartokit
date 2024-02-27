@@ -1,5 +1,5 @@
-import type { Map as MapLibreMap } from 'maplibre-gl';
 import camelCase from 'lodash.camelcase';
+import type { Map as MapLibreMap } from 'maplibre-gl';
 
 import { codegenFns } from '$lib/codegen/codegen-fns';
 import { codegenMap } from '$lib/codegen/codegen-map';

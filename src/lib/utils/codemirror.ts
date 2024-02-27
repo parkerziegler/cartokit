@@ -1,6 +1,6 @@
-import { tags } from '@lezer/highlight';
 import { HighlightStyle } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
+import { tags } from '@lezer/highlight';
 
 export const syntaxTheme = HighlightStyle.define([
   {

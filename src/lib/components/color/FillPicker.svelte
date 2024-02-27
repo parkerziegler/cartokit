@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { slide } from 'svelte/transition';
   import * as d3 from 'd3';
+  import { slide } from 'svelte/transition';
 
   import HexInput from '$lib/components/color/HexInput.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';

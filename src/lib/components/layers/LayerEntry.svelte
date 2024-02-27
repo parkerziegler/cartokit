@@ -1,18 +1,18 @@
 <script lang="ts">
   import ChoroplethIcon from '$lib/components/icons/ChoroplethIcon.svelte';
-  import ChoroplethLegend from '$lib/components/legends/ChoroplethLegend.svelte';
   import DotDensityIcon from '$lib/components/icons/DotDensityIcon.svelte';
-  import DotDensityLegend from '$lib/components/legends/DotDensityLegend.svelte';
   import FillIcon from '$lib/components/icons/FillIcon.svelte';
-  import FillLegend from '$lib/components/legends/FillLegend.svelte';
-  import LineIcon from '$lib/components/icons/LineIcon.svelte';
-  import LineLegend from '$lib/components/legends/LineLegend.svelte';
-  import PointIcon from '$lib/components/icons/PointIcon.svelte';
-  import PointLegend from '$lib/components/legends/PointLegend.svelte';
-  import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
-  import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
   import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
   import LayerVisibleIcon from '$lib/components/icons/LayerVisibleIcon.svelte';
+  import LineIcon from '$lib/components/icons/LineIcon.svelte';
+  import PointIcon from '$lib/components/icons/PointIcon.svelte';
+  import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
+  import ChoroplethLegend from '$lib/components/legends/ChoroplethLegend.svelte';
+  import DotDensityLegend from '$lib/components/legends/DotDensityLegend.svelte';
+  import FillLegend from '$lib/components/legends/FillLegend.svelte';
+  import LineLegend from '$lib/components/legends/LineLegend.svelte';
+  import PointLegend from '$lib/components/legends/PointLegend.svelte';
+  import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
   import { map } from '$lib/stores/map';
   import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
 

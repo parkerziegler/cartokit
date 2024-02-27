@@ -6,6 +6,8 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/stylistic',
     'plugin:svelte/recommended',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
     'prettier'
   ],
   plugins: ['@typescript-eslint'],
@@ -30,8 +32,22 @@ module.exports = {
       }
     }
   ],
+  settings: {
+    'import/resolver': {
+      typescript: true,
+      node: true
+    }
+  },
   rules: {
     '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '_' }],
-    '@typescript-eslint/switch-exhaustiveness-check': 'error'
+    '@typescript-eslint/switch-exhaustiveness-check': 'error',
+    'import/newline-after-import': 2,
+    'import/order': [
+      'error',
+      {
+        'newlines-between': 'always',
+        alphabetize: { order: 'asc', caseInsensitive: true }
+      }
+    ]
   }
 };

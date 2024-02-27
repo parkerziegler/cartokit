@@ -2,10 +2,11 @@
   // ESLint sees the generic T as an undefined variable; flag it as a "global"
   // to suppress the warning.
   /* global T */
-  import { createEventDispatcher } from 'svelte';
   import cs from 'classnames';
+  import { createEventDispatcher } from 'svelte';
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
+
   interface SelectOption<T> {
     value: T;
     label: string;

@@ -1,9 +1,9 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
+  import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
-  import Button from '$lib/components/shared/Button.svelte';
   import { addSource } from '$lib/interaction/source';
   import { map } from '$lib/stores/map';
 

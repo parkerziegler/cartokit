@@ -7,8 +7,8 @@
 </script>
 
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
   import cs from 'classnames';
+  import type { ComponentType } from 'svelte';
 
   export let tabs: Tab[] = [];
   export let activeIndex = 0;

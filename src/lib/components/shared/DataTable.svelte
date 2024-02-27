@@ -1,11 +1,13 @@
 <!-- Inspiration for this implementation courtesy of Observable:
      https://github.com/observablehq/inputs/blob/main/src/table.js -->
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
+  import cs from 'classnames';
   import type { Feature } from 'geojson';
   import orderBy from 'lodash.orderby';
-  import cs from 'classnames';
+  /* eslint-disable import/no-duplicates */
+  import { onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
+  /* eslint-enable import/no-duplicates */
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
 

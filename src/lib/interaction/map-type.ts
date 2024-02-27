@@ -1,5 +1,5 @@
-import type { Map, GeoJSONSource } from 'maplibre-gl';
 import type { Geometry } from 'geojson';
+import type { Map, GeoJSONSource } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import {

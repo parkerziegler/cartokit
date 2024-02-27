@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { basicSetup, EditorView } from 'codemirror';
-  import { syntaxHighlighting } from '@codemirror/language';
   import { javascript } from '@codemirror/lang-javascript';
   import { json } from '@codemirror/lang-json';
+  import { syntaxHighlighting } from '@codemirror/language';
   import cs from 'classnames';
+  import { basicSetup, EditorView } from 'codemirror';
   import { onMount, onDestroy } from 'svelte';
 
   import { syntaxTheme, editorTheme } from '$lib/utils/codemirror';

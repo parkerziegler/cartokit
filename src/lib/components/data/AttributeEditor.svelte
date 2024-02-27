@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
-  import { EditorView } from 'codemirror';
   import { featureCollection as turfFeatureCollection } from '@turf/helpers';
+  import { EditorView } from 'codemirror';
+  import { onDestroy } from 'svelte';
 
   import TransformationAlert from '$lib/components/data/TransformationAlert.svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
