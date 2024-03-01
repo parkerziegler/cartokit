@@ -94,87 +94,94 @@
       selectedFeature.set(null);
     }
   };
+
+  $: if (!$selectedFeature) {
+    dataOpen = false;
+  }
 </script>
 
 <main class="absolute inset-0">
-  <div class="grid h-full w-full grid-cols-12">
-    <div
-      class="relative col-span-12"
-      id="map"
-      class:col-span-8={editorOpen}
-      class:map--compact={dataOpen}
-    >
-      <Menu class="min-w-xs absolute left-4 top-4 z-10 max-w-lg overflow-auto">
-        <MenuTitle class="mr-4">
-          Layers
-          <AddLayer slot="action" />
-        </MenuTitle>
-        <LayerPanel />
-      </Menu>
-      {#if $selectedLayer}
-        <Menu
-          id="properties"
-          class={cs(
-            'properties absolute right-4 top-4 z-10 max-w-sm overflow-auto',
-            {
-              'properties--compact': dataOpen
-            }
-          )}
-        >
-          <MenuTitle class="pr-4"
-            >{$selectedLayer.displayName}
-            <button on:click={onClosePropertiesMenu} slot="action">
-              <CloseIcon />
-            </button>
-            <div class="stack-h stack-h-xs" slot="subtitle">
-              <button on:click={onViewDataClick}>
-                <TableIcon />
-              </button>
-            </div>
-          </MenuTitle>
-          <MenuItem title="Map Type">
-            <MapTypeSelect layer={$selectedLayer} />
-          </MenuItem>
-          {#if $selectedLayer.type === 'Point'}
-            <PointPropertiesPanel layer={$selectedLayer} />
-          {:else if $selectedLayer.type === 'Proportional Symbol'}
-            <ProportionalSymbolPropertiesPanel layer={$selectedLayer} />
-          {:else if $selectedLayer.type === 'Dot Density'}
-            <DotDensityPropertiesPanel layer={$selectedLayer} />
-          {:else if $selectedLayer.type === 'Line'}
-            <LinePropertiesPanel layer={$selectedLayer} />
-          {:else if $selectedLayer.type === 'Fill'}
-            <FillPropertiesPanel layer={$selectedLayer} />
-          {:else if $selectedLayer.type === 'Choropleth'}
-            <ChoroplethPropertiesPanel layer={$selectedLayer} />
-          {/if}
-        </Menu>
-      {/if}
-      <BasemapPicker layout={dataOpen ? 'compact' : 'full'} />
-      <button
+  <div
+    class="relative h-full w-full"
+    class:map--y-compact={dataOpen}
+    class:map--x-compact={editorOpen}
+    id="map"
+  >
+    <Menu class="min-w-xs absolute left-4 top-4 z-10 max-w-lg overflow-auto">
+      <MenuTitle class="mr-4">
+        Layers
+        <AddLayer slot="action" />
+      </MenuTitle>
+      <LayerPanel />
+    </Menu>
+    {#if $selectedLayer}
+      <Menu
+        id="properties"
         class={cs(
-          'absolute bottom-12 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-[400ms] ease-out',
+          'properties absolute right-4 top-4 z-10 max-w-sm overflow-auto',
           {
-            '-translate-y-72': dataOpen
+            'properties--y-compact': dataOpen,
+            'properties--x-compact': editorOpen
           }
         )}
-        on:click={toggleEditorVisibility}
       >
-        {editorOpen ? 'Close Editor' : 'Open Editor'}
-      </button>
-      {#if dataOpen && $selectedLayer}
-        <DataTable
-          data={$selectedLayer.data.geoJSON.features}
-          tableName={$selectedLayer.displayName}
-          onClose={onViewDataClose}
-          class="absolute bottom-0 h-72"
-        />
-      {/if}
-    </div>
-    {#if editorOpen}
-      <Editor />
+        <MenuTitle class="pr-4"
+          >{$selectedLayer.displayName}
+          <button on:click={onClosePropertiesMenu} slot="action">
+            <CloseIcon />
+          </button>
+          <div class="stack-h stack-h-xs" slot="subtitle">
+            <button on:click={onViewDataClick}>
+              <TableIcon />
+            </button>
+          </div>
+        </MenuTitle>
+        <MenuItem title="Map Type">
+          <MapTypeSelect layer={$selectedLayer} />
+        </MenuItem>
+        {#if $selectedLayer.type === 'Point'}
+          <PointPropertiesPanel layer={$selectedLayer} />
+        {:else if $selectedLayer.type === 'Proportional Symbol'}
+          <ProportionalSymbolPropertiesPanel layer={$selectedLayer} />
+        {:else if $selectedLayer.type === 'Dot Density'}
+          <DotDensityPropertiesPanel layer={$selectedLayer} />
+        {:else if $selectedLayer.type === 'Line'}
+          <LinePropertiesPanel layer={$selectedLayer} />
+        {:else if $selectedLayer.type === 'Fill'}
+          <FillPropertiesPanel layer={$selectedLayer} />
+        {:else if $selectedLayer.type === 'Choropleth'}
+          <ChoroplethPropertiesPanel layer={$selectedLayer} />
+        {/if}
+      </Menu>
+    {/if}
+    <BasemapPicker layout={dataOpen ? 'compact' : 'full'} />
+    <button
+      class={cs(
+        'absolute bottom-12 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-[400ms] ease-out',
+        {
+          '-translate-y-72': dataOpen,
+          '-translate-x-[33.333333vw]': editorOpen
+        }
+      )}
+      on:click={toggleEditorVisibility}
+    >
+      {editorOpen ? 'Close Editor' : 'Open Editor'}
+    </button>
+    {#if dataOpen && $selectedLayer}
+      <DataTable
+        data={$selectedLayer.data.geoJSON.features}
+        tableName={$selectedLayer.displayName}
+        onClose={onViewDataClose}
+        class={cs(
+          'absolute bottom-0 h-72 transition-all duration-[400ms] ease-out',
+          editorOpen ? 'w-2/3' : 'w-full'
+        )}
+      />
     {/if}
   </div>
+  {#if editorOpen}
+    <Editor />
+  {/if}
 </main>
 
 <style>
@@ -182,16 +189,26 @@
     @apply transition-transform duration-[400ms] ease-out;
   }
 
-  :global(#map.map--compact .maplibregl-ctrl-attrib.maplibregl-compact) {
+  :global(#map.map--y-compact .maplibregl-ctrl-attrib.maplibregl-compact) {
     @apply -translate-y-72;
+  }
+
+  :global(#map.map--x-compact .maplibregl-ctrl-attrib.maplibregl-compact) {
+    @apply -translate-x-[33.333333vw];
   }
 
   :global(.properties) {
     max-height: calc(100% - 2rem);
-    transition: max-height 200ms ease-out;
+    transition:
+      max-height 200ms ease-out,
+      transform 400ms cubic-bezier(0, 0, 0.2, 1);
   }
 
-  :global(.properties--compact) {
+  :global(.properties--x-compact) {
+    @apply -translate-x-[33.333333vw];
+  }
+
+  :global(.properties--y-compact) {
     max-height: calc(100% - 25.25rem);
   }
 </style>
