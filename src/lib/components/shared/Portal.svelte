@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
 
   export let target: HTMLElement = document.body;
   let ref: HTMLDivElement;
@@ -12,10 +12,10 @@
     portal = document.createElement('div');
     target.appendChild(portal);
     portal.appendChild(ref);
-  });
 
-  onDestroy(() => {
-    target.removeChild(portal);
+    return () => {
+      target.removeChild(portal);
+    };
   });
 </script>
 

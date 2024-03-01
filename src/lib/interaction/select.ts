@@ -2,6 +2,7 @@ import type { Map, MapLayerMouseEvent, MapMouseEvent } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import type { CartoKitIR } from '$lib/stores/ir';
+import { layout } from '$lib/stores/layout';
 import { listeners } from '$lib/stores/listeners';
 import { selectedFeature } from '$lib/stores/selected-feature';
 
@@ -162,10 +163,18 @@ export const onFeatureLeave = (
       layers: layerIds
     });
     const selFeature = get(selectedFeature);
+    const { dataVisible } = get(layout);
 
     // If the mouse event intersects no features and there is a currently selected feature, deselect it.
     if (features.length === 0 && typeof selFeature?.id !== 'undefined') {
       selectedFeature.set(null);
+      if (dataVisible) {
+        layout.update((lyt) => {
+          lyt.dataVisible = false;
+
+          return lyt;
+        });
+      }
 
       map.removeFeatureState(
         { source: selFeature.layer.id, id: selFeature.id },

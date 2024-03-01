@@ -16,19 +16,19 @@
   import LinePropertiesPanel from '$lib/components/properties/LinePropertiesPanel.svelte';
   import PointPropertiesPanel from '$lib/components/properties/PointPropertiesPanel.svelte';
   import ProportionalSymbolPropertiesPanel from '$lib/components/properties/ProportionalSymbolPropertiesPanel.svelte';
+  import Button from '$lib/components/shared/Button.svelte';
   import DataTable from '$lib/components/shared/DataTable.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
   import { ir } from '$lib/stores/ir';
+  import { layout } from '$lib/stores/layout';
   import { map as mapStore } from '$lib/stores/map';
   import { selectedFeature } from '$lib/stores/selected-feature';
   import { selectedLayer } from '$lib/stores/selected-layer';
 
   let map: maplibregl.Map;
-  let editorOpen = false;
-  let dataOpen = false;
 
   onMount(() => {
     // maplibre-gl is actually a CJS module, and not all module.exports may be
@@ -45,7 +45,7 @@
     map.on('click', onFeatureLeave(map, $ir));
 
     // When the map first reaches an idle state, set it in the store.
-    // This _should_ ensure that the map's styles and data have fully loaded.
+    // This should ensure that the map's styles and data have fully loaded.
     map.once('idle', () => {
       mapStore.set(map);
     });
@@ -73,18 +73,30 @@
   });
 
   const toggleEditorVisibility = () => {
-    editorOpen = !editorOpen;
+    layout.update((layout) => {
+      layout.editorVisible = !layout.editorVisible;
+
+      return layout;
+    });
   };
 
   const onViewDataClick = () => {
-    dataOpen = true;
+    layout.update((layout) => {
+      layout.dataVisible = !layout.dataVisible;
+
+      return layout;
+    });
   };
 
   const onViewDataClose = () => {
-    dataOpen = false;
+    layout.update((layout) => {
+      layout.dataVisible = false;
+
+      return layout;
+    });
   };
 
-  const onClosePropertiesMenu = () => {
+  const onPropertiesMenuClose = () => {
     if ($selectedFeature) {
       map.removeFeatureState(
         { source: $selectedFeature.layer.id, id: $selectedFeature.id },
@@ -93,18 +105,22 @@
 
       selectedFeature.set(null);
     }
-  };
 
-  $: if (!$selectedFeature) {
-    dataOpen = false;
-  }
+    if ($layout.dataVisible) {
+      layout.update((layout) => {
+        layout.dataVisible = false;
+
+        return layout;
+      });
+    }
+  };
 </script>
 
 <main class="absolute inset-0">
   <div
     class="relative h-full w-full"
-    class:map--y-compact={dataOpen}
-    class:map--x-compact={editorOpen}
+    class:map--y-compact={$layout.dataVisible}
+    class:map--x-compact={$layout.editorVisible}
     id="map"
   >
     <Menu class="min-w-xs absolute left-4 top-4 z-10 max-w-lg overflow-auto">
@@ -120,14 +136,14 @@
         class={cs(
           'properties absolute right-4 top-4 z-10 max-w-sm overflow-auto',
           {
-            'properties--y-compact': dataOpen,
-            'properties--x-compact': editorOpen
+            'properties--y-compact': $layout.dataVisible,
+            'properties--x-compact': $layout.editorVisible
           }
         )}
       >
-        <MenuTitle class="pr-4"
+        <MenuTitle class="mr-4"
           >{$selectedLayer.displayName}
-          <button on:click={onClosePropertiesMenu} slot="action">
+          <button on:click={onPropertiesMenuClose} slot="action">
             <CloseIcon />
           </button>
           <div class="stack-h stack-h-xs" slot="subtitle">
@@ -154,32 +170,32 @@
         {/if}
       </Menu>
     {/if}
-    <BasemapPicker layout={dataOpen ? 'compact' : 'full'} />
-    <button
+    <BasemapPicker />
+    <Button
       class={cs(
-        'absolute bottom-12 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-[400ms] ease-out',
+        'absolute bottom-12 right-4 z-10 rounded-md bg-slate-900 tracking-wider shadow-lg transition-transform duration-[400ms] ease-out',
         {
-          '-translate-y-72': dataOpen,
-          '-translate-x-[33.333333vw]': editorOpen
+          '-translate-y-72': $layout.dataVisible,
+          '-translate-x-[33.333333vw]': $layout.editorVisible
         }
       )}
       on:click={toggleEditorVisibility}
     >
-      {editorOpen ? 'Close Editor' : 'Open Editor'}
-    </button>
-    {#if dataOpen && $selectedLayer}
+      {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
+    </Button>
+    {#if $layout.dataVisible && $selectedLayer}
       <DataTable
         data={$selectedLayer.data.geoJSON.features}
         tableName={$selectedLayer.displayName}
         onClose={onViewDataClose}
         class={cs(
           'absolute bottom-0 h-72 transition-all duration-[400ms] ease-out',
-          editorOpen ? 'w-2/3' : 'w-full'
+          $layout.editorVisible ? 'w-2/3' : 'w-full'
         )}
       />
     {/if}
   </div>
-  {#if editorOpen}
+  {#if $layout.editorVisible}
     <Editor />
   {/if}
 </main>
