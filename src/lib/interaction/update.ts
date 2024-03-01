@@ -103,7 +103,6 @@ interface StrokeUpdate extends LayerUpdate {
   payload: {
     color: string;
   };
-  layer: CartoKitLayer;
 }
 
 interface StrokeWidthUpdate extends LayerUpdate {
@@ -111,7 +110,6 @@ interface StrokeWidthUpdate extends LayerUpdate {
   payload: {
     strokeWidth: number;
   };
-  layer: CartoKitLayer;
 }
 
 interface StrokeOpacityUpdate extends LayerUpdate {
@@ -119,7 +117,6 @@ interface StrokeOpacityUpdate extends LayerUpdate {
   payload: {
     opacity: number;
   };
-  layer: CartoKitLayer;
 }
 
 interface AddStrokeUpdate extends LayerUpdate {
@@ -208,10 +205,6 @@ interface TransformationUpdate extends LayerUpdate {
     geoJSON: FeatureCollection;
     transformation: Transformation;
   };
-  layer:
-    | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer
-    | CartoKitChoroplethLayer;
 }
 
 type DispatchLayerUpdateParams =

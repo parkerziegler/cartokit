@@ -23,7 +23,12 @@
     <slot name="action" />
   </div>
 {:else}
-  <p class="p-4 font-sans text-xl font-medium tracking-wider text-white">
+  <p
+    class={cs(
+      'p-4 font-sans text-xl font-medium tracking-wider text-white',
+      className
+    )}
+  >
     <slot />
   </p>
 {/if}

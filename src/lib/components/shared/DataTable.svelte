@@ -96,10 +96,7 @@
 </script>
 
 <div
-  class={cs(
-    'flex w-full flex-col overflow-hidden bg-slate-700 font-mono',
-    className
-  )}
+  class={cs('flex flex-col overflow-hidden bg-slate-700 font-mono', className)}
   transition:slide
 >
   <div class="flex justify-between px-3 py-2 text-xs text-white">

@@ -1,7 +1,6 @@
 <script lang="ts">
-  import cs from 'classnames';
   import maplibregl from 'maplibre-gl';
-  import { onDestroy, onMount, setContext } from 'svelte';
+  import { onMount, setContext } from 'svelte';
 
   // eslint-disable-next-line import/no-unresolved
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
@@ -9,15 +8,18 @@
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs, { type Tab } from '$lib/components/shared/Tabs.svelte';
   import { ir } from '$lib/stores/ir';
+  import { layout } from '$lib/stores/layout';
   import { map as mapStore } from '$lib/stores/map';
   import { BASEMAPS, type BasemapProvider } from '$lib/utils/basemap';
-
-  export let layout: 'compact' | 'full' = 'full';
 
   let picker: HTMLButtonElement;
   let maps: maplibregl.Map[] = [];
   let hovered = false;
   let showModal = false;
+
+  setContext('close-modal', () => {
+    showModal = false;
+  });
 
   const tabs: Tab<{ provider: BasemapProvider }>[] = Object.keys(BASEMAPS).map(
     (provider) => {
@@ -46,22 +48,30 @@
 
       return map;
     });
-  });
 
-  onDestroy(() => {
-    maps.forEach((map) => {
-      map.remove();
-    });
-  });
-
-  setContext('close-modal', () => {
-    showModal = false;
+    return () => {
+      maps.forEach((map) => {
+        map.remove();
+      });
+    };
   });
 
   const updateMapThumbnail = (map: maplibregl.Map, node: HTMLButtonElement) => {
     const { top, left } = node.getBoundingClientRect();
     map.setCenter($mapStore.unproject([left + 32, top + 32]));
     map.setZoom($ir.zoom);
+  };
+
+  const onMouseEnter = () => {
+    hovered = true;
+  };
+
+  const onMouseLeave = () => {
+    hovered = false;
+  };
+
+  const onClick = () => {
+    showModal = true;
   };
 
   $: if (maps.length > 0 && $mapStore && $ir) {
@@ -77,14 +87,12 @@
 </script>
 
 <button
-  class={cs(
-    'group absolute bottom-4 left-4 z-10 shadow-lg transition-transform duration-[400ms] ease-out',
-    { '-translate-y-72': layout === 'compact' }
-  )}
+  class="group absolute bottom-4 left-4 z-10 shadow-lg transition-transform duration-[400ms] ease-out"
+  class:-translate-y-72={$layout.dataVisible}
   bind:this={picker}
-  on:mouseenter={() => (hovered = true)}
-  on:mouseleave={() => (hovered = false)}
-  on:click={() => (showModal = true)}
+  on:mouseenter={onMouseEnter}
+  on:mouseleave={onMouseLeave}
+  on:click={onClick}
 >
   <div
     id={`inset-${mapStyles[0]}`}

@@ -4,7 +4,7 @@
   import { syntaxHighlighting } from '@codemirror/language';
   import cs from 'classnames';
   import { basicSetup, EditorView } from 'codemirror';
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
 
   import { syntaxTheme, editorTheme } from '$lib/utils/codemirror';
 
@@ -66,10 +66,10 @@
       extensions,
       parent: editor
     });
-  });
 
-  onDestroy(() => {
-    view?.destroy();
+    return () => {
+      view?.destroy();
+    };
   });
 
   $: if (view && config.kind === 'readonly') {
