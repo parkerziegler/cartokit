@@ -3,12 +3,9 @@
 
   export let title: string;
   export let titleClass = '';
-  export let containerClass = '';
 </script>
 
-<div
-  class={cs('stack stack-xs p-4 font-mono text-xs text-white', containerClass)}
->
+<div class="stack stack-xs p-4 font-mono text-xs text-white">
   {#if $$slots.action}
     <div class={cs('flex items-center justify-between', titleClass)}>
       <p class="font-sans text-base font-medium tracking-wider">

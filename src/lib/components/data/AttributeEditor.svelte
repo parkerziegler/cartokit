@@ -3,7 +3,7 @@
   import { EditorView } from 'codemirror';
   import { onDestroy } from 'svelte';
 
-  import TransformationAlert from '$lib/components/editor/TransformationAlert.svelte';
+  import TransformationAlert from '$lib/components/data/TransformationAlert.svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import PlayCircle from '$lib/components/icons/PlayCircle.svelte';
   import TerminalIcon from '$lib/components/icons/TerminalIcon.svelte';
@@ -13,11 +13,19 @@
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { selectedFeature } from '$lib/stores/selected-feature';
-  import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+  import type {
+    CartoKitChoroplethLayer,
+    CartoKitDotDensityLayer,
+    CartoKitProportionalSymbolLayer
+  } from '$lib/types/CartoKitLayer';
   import { functionNameRe } from '$lib/utils/regex';
   import { transformationWorker } from '$lib/utils/worker';
 
-  export let layer: CartoKitLayer;
+  export let onClose: () => void;
+  export let layer:
+    | CartoKitChoroplethLayer
+    | CartoKitProportionalSymbolLayer
+    | CartoKitDotDensityLayer;
 
   // Main editor state.
   let view: EditorView;
