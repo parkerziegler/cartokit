@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { DuckDBDataProtocol } from '@duckdb/duckdb-wasm/blocking';
+  import snakeCase from 'lodash.snakecase';
+  import uniqueId from 'lodash.uniqueid';
   import { getContext } from 'svelte';
 
   import Button from '$lib/components/shared/Button.svelte';
@@ -6,8 +9,8 @@
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { addSource } from '$lib/interaction/source';
+  import { db } from '$lib/stores/db';
   import { map } from '$lib/stores/map';
-  import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -29,27 +32,51 @@
     displayName = event.detail.value;
   }
 
-  function onSubmit() {
-    const reader = new FileReader();
+  async function onSubmit() {
+    const tableName = uniqueId(`${snakeCase(displayName)}__`);
 
-    reader.onload = function readGeoJSON(theFile) {
-      if (typeof theFile.target?.result === 'string') {
-        const featureCollection = normalizeGeoJSONToFeatureCollection(
-          JSON.parse(theFile.target.result)
-        );
+    const conn = await $db.connect();
+    await $db.registerFileHandle(
+      file.name,
+      file,
+      DuckDBDataProtocol.BROWSER_FSACCESS,
+      true
+    );
+    await conn.query(
+      `INSTALL spatial;
+    LOAD spatial;
+    CREATE TABLE ${tableName} AS SELECT * FROM ST_Read('${file.name}');`
+    );
 
-        addSource($map, {
-          kind: 'file',
-          displayName,
-          fileName: file.name,
-          featureCollection
-        });
+    const results = await conn.query(
+      `SELECT * EXCLUDE geom, ST_AsGeoJSON(geom) AS geom FROM ${tableName};`
+    );
 
-        closeModal();
+    const features = results
+      .toArray()
+      .map(
+        (row: { toJSON: () => { geom: string; [key: string]: unknown } }) => {
+          const { geom, ...properties } = row.toJSON();
+
+          return {
+            type: 'Feature',
+            properties,
+            geometry: JSON.parse(geom)
+          };
+        }
+      );
+
+    addSource($map, {
+      kind: 'file',
+      displayName,
+      fileName: file.name,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features
       }
-    };
+    });
 
-    reader.readAsText(file, 'UTF-8');
+    closeModal();
   }
 </script>
 
