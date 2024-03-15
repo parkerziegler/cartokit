@@ -38,3 +38,6 @@ export const MAPBOX_DEFAULTS = {
   'circle-stroke-width': 0,
   'circle-stroke-opacity': 1
 };
+
+// Transformation constants.
+export const BUFFER_UNITS = ['°', 'mi', 'km'] as const;

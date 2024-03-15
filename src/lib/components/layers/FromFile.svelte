@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { DuckDBDataProtocol } from '@duckdb/duckdb-wasm/blocking';
+  import snakeCase from 'lodash.snakecase';
+  import uniqueId from 'lodash.uniqueid';
   import { getContext } from 'svelte';
 
   import Button from '$lib/components/shared/Button.svelte';
@@ -6,15 +9,16 @@
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { addSource } from '$lib/interaction/source';
+  import { db } from '$lib/stores/db';
   import { map } from '$lib/stores/map';
-  import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
 
   const closeModal = getContext<() => void>('close-modal');
 
   let file: File;
   let displayName = '';
+  let dataLoading = false;
 
-  function onFileUpload(fileInput: HTMLSpanElement, event: Event) {
+  const onFileUpload = (fileInput: HTMLSpanElement, event: Event) => {
     const { files } = event.target as HTMLInputElement;
 
     if (files?.length) {
@@ -23,34 +27,61 @@
       const name = files[0].name;
       fileInput.setAttribute('data-content', name);
     }
-  }
+  };
 
-  function onDisplayNameChange(event: CustomEvent<{ value: string }>) {
+  const onDisplayNameChange = (event: CustomEvent<{ value: string }>) => {
     displayName = event.detail.value;
-  }
+  };
 
-  function onSubmit() {
-    const reader = new FileReader();
+  const onSubmit = async () => {
+    dataLoading = true;
+    const layerId = uniqueId(`${snakeCase(displayName)}__`);
 
-    reader.onload = function readGeoJSON(theFile) {
-      if (typeof theFile.target?.result === 'string') {
-        const featureCollection = normalizeGeoJSONToFeatureCollection(
-          JSON.parse(theFile.target.result)
-        );
+    const conn = await $db.connect();
+    await $db.registerFileHandle(
+      file.name,
+      file,
+      DuckDBDataProtocol.BROWSER_FSACCESS,
+      true
+    );
+    await conn.query(
+      `INSTALL spatial;
+    LOAD spatial;
+    CREATE TABLE ${layerId} AS SELECT * FROM ST_Read('${file.name}');`
+    );
 
-        addSource($map, {
-          kind: 'file',
-          displayName,
-          fileName: file.name,
-          featureCollection
-        });
+    const results = await conn.query(
+      `SELECT * EXCLUDE geom, ST_AsGeoJSON(geom) AS geom FROM ${layerId};`
+    );
 
-        closeModal();
+    const features = results
+      .toArray()
+      .map(
+        (row: { toJSON: () => { geom: string; [key: string]: unknown } }) => {
+          const { geom, ...properties } = row.toJSON();
+
+          return {
+            type: 'Feature',
+            properties,
+            geometry: JSON.parse(geom)
+          };
+        }
+      );
+
+    addSource($map, {
+      kind: 'file',
+      id: layerId,
+      displayName,
+      fileName: file.name,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features
       }
-    };
+    });
 
-    reader.readAsText(file, 'UTF-8');
-  }
+    dataLoading = false;
+    closeModal();
+  };
 </script>
 
 <form class="stack stack-sm" on:submit={onSubmit}>
@@ -67,5 +98,5 @@
       id="Display Name"
     />
   </div>
-  <Button class="self-end">Add</Button>
+  <Button class="self-end" loading={dataLoading}>Add</Button>
 </form>

@@ -1,7 +1,9 @@
 <script lang="ts">
+  import cs from 'classnames';
   import { slide } from 'svelte/transition';
 
   import Program from '$lib/components/editor/Program.svelte';
+  import Transformations from '$lib/components/editor/Transformations.svelte';
   import Tabs, { type Tab } from '$lib/components/shared/Tabs.svelte';
 
   let activeIndex: number;
@@ -10,6 +12,10 @@
     {
       name: 'Program',
       content: Program
+    },
+    {
+      name: 'Transformations',
+      content: Transformations
     }
   ];
 </script>
@@ -21,7 +27,7 @@
   <Tabs
     {tabs}
     containerClass="flex-1 pt-2 absolute inset-0"
-    bodyClass="flex flex-1 overflow-hidden !p-0"
+    bodyClass={cs('flex flex-1 overflow-hidden', { '!p-0': activeIndex === 0 })}
     bind:activeIndex
   />
 </div>

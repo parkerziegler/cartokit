@@ -1,6 +1,4 @@
 import type { FeatureCollection } from 'geojson';
-import kebabCase from 'lodash.kebabcase';
-import uniqueId from 'lodash.uniqueid';
 import type { Map } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
@@ -234,7 +232,12 @@ export const addLayer = (map: Map, layer: CartoKitLayer): void => {
  */
 export const generateCartoKitLayer = (
   featureCollection: FeatureCollection,
-  options: { displayName: string; url?: string; fileName?: string }
+  options: {
+    id: string;
+    displayName: string;
+    url?: string;
+    fileName?: string;
+  }
 ): CartoKitLayer => {
   const geometryType = getLayerGeometryType(featureCollection);
   const color = randomColor();
@@ -243,7 +246,7 @@ export const generateCartoKitLayer = (
     case 'Point':
     case 'MultiPoint':
       return {
-        id: uniqueId(`${kebabCase(options.displayName)}__`),
+        id: options.id,
         displayName: options.displayName,
         type: 'Point',
         data: {
@@ -269,7 +272,7 @@ export const generateCartoKitLayer = (
     case 'LineString':
     case 'MultiLineString':
       return {
-        id: uniqueId(`${kebabCase(options.displayName)}__`),
+        id: options.id,
         displayName: options.displayName,
         type: 'Line',
         data: {
@@ -290,7 +293,7 @@ export const generateCartoKitLayer = (
     case 'Polygon':
     case 'MultiPolygon':
       return {
-        id: uniqueId(`${kebabCase(options.displayName)}__`),
+        id: options.id,
         displayName: options.displayName,
         type: 'Fill',
         data: {

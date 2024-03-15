@@ -8,12 +8,14 @@ import { sourceWorker } from '$lib/utils/worker';
 type AddSourceOptions =
   | {
       kind: 'api';
+      id: string;
       displayName: string;
       url: string;
       onSourceLoaded: () => void;
     }
   | {
       kind: 'file';
+      id: string;
       displayName: string;
       fileName: string;
       featureCollection: FeatureCollection;
