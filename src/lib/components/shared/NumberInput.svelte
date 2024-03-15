@@ -12,28 +12,40 @@
   let className = '';
   export { className as class };
 
+  let widthMachine: HTMLSpanElement;
+  let input: HTMLInputElement;
+
   const dispatch = createEventDispatcher();
 
   function onChange(event: Event) {
     const target = event.target as HTMLInputElement;
     dispatch('change', { value: +target.value });
   }
+
+  const onKeyUp = () => {
+    widthMachine.innerHTML = input.value;
+  };
 </script>
 
-<input
-  type="number"
-  {id}
-  {min}
-  {max}
-  {value}
-  {step}
-  {disabled}
-  on:change={onChange}
-  class={cs(
-    'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
-    className
-  )}
-/>
+<span class="relative h-8">
+  <span class="px-4" aria-hidden="true" bind:this={widthMachine}> </span>
+  <input
+    type="number"
+    {id}
+    {min}
+    {max}
+    {value}
+    {step}
+    {disabled}
+    on:change={onChange}
+    bind:this={input}
+    on:keyup={onKeyUp}
+    class={cs(
+      'absolute left-0 w-full border border-transparent bg-slate-900 p-2 text-center hover:border-slate-600 focus:border-slate-600',
+      className
+    )}
+  />
+</span>
 
 <style>
   input:disabled {

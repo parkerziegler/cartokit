@@ -16,8 +16,9 @@
 
   let file: File;
   let displayName = '';
+  let dataLoading = false;
 
-  function onFileUpload(fileInput: HTMLSpanElement, event: Event) {
+  const onFileUpload = (fileInput: HTMLSpanElement, event: Event) => {
     const { files } = event.target as HTMLInputElement;
 
     if (files?.length) {
@@ -26,14 +27,15 @@
       const name = files[0].name;
       fileInput.setAttribute('data-content', name);
     }
-  }
+  };
 
-  function onDisplayNameChange(event: CustomEvent<{ value: string }>) {
+  const onDisplayNameChange = (event: CustomEvent<{ value: string }>) => {
     displayName = event.detail.value;
-  }
+  };
 
-  async function onSubmit() {
-    const tableName = uniqueId(`${snakeCase(displayName)}__`);
+  const onSubmit = async () => {
+    dataLoading = true;
+    const layerId = uniqueId(`${snakeCase(displayName)}__`);
 
     const conn = await $db.connect();
     await $db.registerFileHandle(
@@ -45,11 +47,11 @@
     await conn.query(
       `INSTALL spatial;
     LOAD spatial;
-    CREATE TABLE ${tableName} AS SELECT * FROM ST_Read('${file.name}');`
+    CREATE TABLE ${layerId} AS SELECT * FROM ST_Read('${file.name}');`
     );
 
     const results = await conn.query(
-      `SELECT * EXCLUDE geom, ST_AsGeoJSON(geom) AS geom FROM ${tableName};`
+      `SELECT * EXCLUDE geom, ST_AsGeoJSON(geom) AS geom FROM ${layerId};`
     );
 
     const features = results
@@ -68,6 +70,7 @@
 
     addSource($map, {
       kind: 'file',
+      id: layerId,
       displayName,
       fileName: file.name,
       featureCollection: {
@@ -76,8 +79,9 @@
       }
     });
 
+    dataLoading = false;
     closeModal();
-  }
+  };
 </script>
 
 <form class="stack stack-sm" on:submit={onSubmit}>
@@ -94,5 +98,5 @@
       id="Display Name"
     />
   </div>
-  <Button class="self-end">Add</Button>
+  <Button class="self-end" loading={dataLoading}>Add</Button>
 </form>
