@@ -22,11 +22,13 @@
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
+  import { db } from '$lib/stores/db';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import { map as mapStore } from '$lib/stores/map';
   import { selectedFeature } from '$lib/stores/selected-feature';
   import { selectedLayer } from '$lib/stores/selected-layer';
+  import { instantiateDuckDB } from '$lib/utils/duckdb';
 
   let map: maplibregl.Map;
 
@@ -65,6 +67,10 @@
 
         return ir;
       });
+    });
+
+    instantiateDuckDB().then((duckdb) => {
+      db.set(duckdb);
     });
 
     return () => {

@@ -41,6 +41,10 @@
     margin-inline: 0;
   }
 
+  .stack-h-2xs > * + * {
+    margin-inline-start: 0.25rem;
+  }
+
   .stack-h-xs > * + * {
     margin-inline-start: 0.5rem;
   }

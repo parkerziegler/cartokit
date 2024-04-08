@@ -1,4 +1,6 @@
 <script lang="ts">
+  import snakeCase from 'lodash.snakecase';
+  import uniqueId from 'lodash.uniqueid';
   import { getContext } from 'svelte';
 
   import Button from '$lib/components/shared/Button.svelte';
@@ -13,29 +15,30 @@
   let displayName = '';
   let dataLoading = false;
 
-  function onEndpointChange(event: CustomEvent<{ value: string }>) {
+  const onEndpointChange = (event: CustomEvent<{ value: string }>) => {
     endpoint = event.detail.value;
-  }
+  };
 
-  function onDisplayNameChange(event: CustomEvent<{ value: string }>) {
+  const onDisplayNameChange = (event: CustomEvent<{ value: string }>) => {
     displayName = event.detail.value;
-  }
+  };
 
-  function onSourceLoaded() {
+  const onSourceLoaded = () => {
     dataLoading = false;
     closeModal();
-  }
+  };
 
-  function onSubmit() {
+  const onSubmit = () => {
     dataLoading = true;
 
     addSource($map, {
       kind: 'api',
+      id: uniqueId(`${snakeCase(displayName)}__`),
       displayName,
       url: endpoint,
       onSourceLoaded
     });
-  }
+  };
 </script>
 
 <form class="stack stack-sm" on:submit={onSubmit}>
@@ -59,35 +62,5 @@
       class="w-full"
     />
   </div>
-  <Button class="self-end">
-    {#if dataLoading}
-      <span class="loader align-text-top" />
-    {:else}
-      Add
-    {/if}
-  </Button>
+  <Button class="self-end" loading={dataLoading}>Add</Button>
 </form>
-
-<style>
-  .loader {
-    @apply relative inline-block h-4 w-4;
-  }
-  .loader::after,
-  .loader::before {
-    @apply absolute left-0 top-0 h-4 w-4 rounded-full bg-white;
-    content: '';
-    animation: animloader 0.5s ease-in-out infinite;
-  }
-
-  @keyframes animloader {
-    0% {
-      transform: scale(0);
-      opacity: 1;
-    }
-
-    100% {
-      transform: scale(1);
-      opacity: 0;
-    }
-  }
-</style>
