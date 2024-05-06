@@ -1,4 +1,3 @@
-import { randomPoint as turfRandomPoint } from '@turf/random';
 import * as turf from '@turf/turf';
 import * as d3 from 'd3';
 import type { Feature, FeatureCollection } from 'geojson';
@@ -87,7 +86,7 @@ export function generateDotDensityPoints({
     // keeping them only if they fall within the polygon.
     const selectedFeatures: Feature[] = [];
     while (selectedFeatures.length < numPoints) {
-      const candidate = turfRandomPoint(1, { bbox }).features[0];
+      const candidate = turf.randomPoint(1, { bbox }).features[0];
 
       if (turf.booleanWithin(candidate, feature)) {
         selectedFeatures.push(candidate);
