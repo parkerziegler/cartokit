@@ -14,9 +14,8 @@ node_modules
 .env.*
 !.env.example
 
-# Yarn
-yarn.lock
-/.yarn
+# pnpm
+pnpm-lock.yaml
 
 # Vercel
 /.vercel
