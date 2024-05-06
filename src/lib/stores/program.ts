@@ -8,6 +8,16 @@ import { map } from '$lib/stores/map';
 export const program = derived<[Writable<Map>, Writable<CartoKitIR>], string>(
   [map, ir],
   ([$map, $ir], set) => {
-    codegen($map, $ir).then(set);
+    performance.mark('codegen-start');
+    codegen($map, $ir).then((prog) => {
+      set(prog);
+      performance.mark('codegen-end');
+      const { duration } = performance.measure(
+        'codegen',
+        'codegen-start',
+        'codegen-end'
+      );
+      console.log(`Codegen took ${duration}ms`);
+    });
   }
 );

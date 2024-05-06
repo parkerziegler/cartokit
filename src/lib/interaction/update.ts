@@ -241,6 +241,7 @@ export const dispatchLayerUpdate = ({
   layer,
   payload
 }: DispatchLayerUpdateParams): void => {
+  performance.mark('update-start');
   const map = get(mapStore);
 
   switch (type) {
@@ -748,4 +749,12 @@ export const dispatchLayerUpdate = ({
       });
     }
   }
+
+  performance.mark('update-end');
+  const { duration } = performance.measure(
+    'update',
+    'update-start',
+    'update-end'
+  );
+  console.log(`Update took ${duration}ms`);
 };

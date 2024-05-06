@@ -34,6 +34,7 @@ export const switchBasemapWithPreservedLayers = async (
   ir: CartoKitIR,
   config: BasemapSwitchConfig
 ) => {
+  performance.mark('switchBasemapWithPreservedLayers:start');
   const { layers, sources } = map.getStyle();
 
   const lyrs = Object.values(ir.layers).reduce<LayerSpecification[]>(
@@ -83,4 +84,11 @@ export const switchBasemapWithPreservedLayers = async (
   } catch (err) {
     console.error('Error switching basemap', err);
   }
+  performance.mark('switchBasemapWithPreservedLayers:end');
+  const { duration } = performance.measure(
+    'switchBasemapWithPreservedLayers',
+    'switchBasemapWithPreservedLayers:start',
+    'switchBasemapWithPreservedLayers:end'
+  );
+  console.log(`Switched basemap in ${duration}ms`);
 };
