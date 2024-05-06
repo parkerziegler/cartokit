@@ -17,10 +17,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
+          cache: pnpm
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --non-interactive
+        run: pnpm install --frozen-lockfile
       - name: Lint
-        run: yarn lint
+        run: pnpm lint

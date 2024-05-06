@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { featureCollection as turfFeatureCollection } from '@turf/helpers';
+  import * as turf from '@turf/turf';
   import { EditorView } from 'codemirror';
   import { onDestroy } from 'svelte';
 
@@ -102,7 +102,7 @@
     if ($selectedFeature) {
       transformationWorker(
         program,
-        turfFeatureCollection([$selectedFeature]),
+        turf.featureCollection([$selectedFeature]),
         (message) => {
           // TODO: Split out the additional edge cases here.
           // - message.data?.[0] is strictly a GeoJSON feature.
