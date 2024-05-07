@@ -26,3 +26,5 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Lint
         run: pnpm lint
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
