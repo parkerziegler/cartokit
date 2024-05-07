@@ -10,25 +10,23 @@
 
   const target = document.getElementById('map') ?? document.body;
   let ref: Select<ColorScale>;
-  let dimensions = {
-    top: 0,
-    left: 0,
-    right: 0
-  };
+  let top = 0;
+  let left = 0;
+  let displayBreaksEditor = false;
 
-  $: selected = layer.style.fill.scale;
   const options = COLOR_SCALES.map((scale) => ({
     value: scale,
     label: scale
   }));
 
-  let displayBreaksEditor = false;
+  $: selected = layer.style.fill.scale;
 
   function onChange(event: CustomEvent<{ value: ColorScale }>) {
     if (event.detail.value === 'Manual') {
-      const { top, left, right } = ref.getBoundingClientRect();
-      dimensions = { top, left, right };
+      ({ top, left } = ref.getBoundingClientRect());
       displayBreaksEditor = true;
+    } else {
+      displayBreaksEditor = false;
     }
 
     dispatchLayerUpdate({
@@ -43,12 +41,20 @@
   function toggleBreaksEditorVisibility() {
     displayBreaksEditor = !displayBreaksEditor;
   }
+
+  function onClick(event: CustomEvent<{ value: ColorScale }>) {
+    if (event.detail.value === 'Manual') {
+      ({ top, left } = ref.getBoundingClientRect());
+      toggleBreaksEditorVisibility();
+    }
+  }
 </script>
 
 <Select
   {options}
   {selected}
   on:change={onChange}
+  on:click={onClick}
   title="Method"
   bind:this={ref}
 />
@@ -56,9 +62,7 @@
   <Portal
     class="absolute"
     {target}
-    style="top: {dimensions.top}px; right: {dimensions.right -
-      dimensions.left +
-      32 * 2}px;"
+    style="top: {top}px; left: {left - 24 - 20 * 16}px;"
   >
     <ManualBreaks {layer} {toggleBreaksEditorVisibility} />
   </Portal>

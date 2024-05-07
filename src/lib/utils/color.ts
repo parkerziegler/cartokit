@@ -32,17 +32,11 @@ export function decimalToPercent(decimal: number): number {
 }
 
 /**
- * Reverse a D3 color scheme.
+ * Reverse a color scheme.
  *
- * @param scheme – The D3 color scheme to reverse.
- * @returns – The reversed D3 color scheme.
+ * @param scheme – The color scheme to reverse.
+ * @returns – The reversed color scheme.
  */
-export function reverseD3ColorScheme(scheme: ColorScheme) {
-  const revScheme = scheme.map((indexedScheme) => {
-    const revIndexedScheme = [...indexedScheme].reverse();
-
-    return revIndexedScheme;
-  });
-
-  return revScheme;
+export function reverseColorScheme(scheme: ColorScheme) {
+  return scheme.map((indexedScheme) => [...indexedScheme]).reverse();
 }
