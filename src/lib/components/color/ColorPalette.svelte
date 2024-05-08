@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ColorScaleSelect from '$lib/components/color/ColorScaleSelect.svelte';
-  import ColorSchemeDropdown from '$lib/components/color/ColorSchemeDropdown.svelte';
+  import ColorScaleMethodSelect from '$lib/components/color/ColorScaleMethodSelect.svelte';
+  import ColorSchemeSelect from '$lib/components/color/ColorSchemeSelect.svelte';
   import ColorStopsSelect from '$lib/components/color/ColorStopsSelect.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
@@ -11,8 +11,8 @@
 
 <div class="stack stack-xs">
   <AttributeSelect {layer} selected={layer.style.fill.attribute} />
-  <ColorScaleSelect {layer} />
+  <ColorScaleMethodSelect {layer} />
   <ColorStopsSelect {layer} />
-  <ColorSchemeDropdown {layer} />
+  <ColorSchemeSelect {layer} />
   <OpacityInput {layer} property="fill" />
 </div>

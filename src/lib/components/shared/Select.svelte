@@ -27,6 +27,11 @@
     dispatch('change', { value: target.value });
   };
 
+  function onClick(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    dispatch('click', { value: target.value });
+  }
+
   export const getBoundingClientRect = () => ref.getBoundingClientRect();
 </script>
 
@@ -42,6 +47,7 @@
       )}
       value={selected}
       on:change={onChange}
+      on:click={onClick}
       id={title}
     >
       {#each options as option}
@@ -59,6 +65,7 @@
     )}
     value={selected}
     on:change={onChange}
+    on:click={onClick}
     bind:this={ref}
   >
     {#each options as option}

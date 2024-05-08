@@ -5,6 +5,7 @@
   import { deriveExtent } from '$lib/interaction/scales';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
+  import { clickOutside } from '$lib/utils/actions';
 
   export let layer: CartoKitChoroplethLayer;
   export let toggleBreaksEditorVisibility: () => void;
@@ -33,8 +34,8 @@
   }
 </script>
 
-<Menu class="max-w-xs overflow-auto">
-  <MenuItem title="Set Stops">
+<Menu class="w-80 overflow-auto">
+  <MenuItem title="Set steps">
     <button on:click={toggleBreaksEditorVisibility} slot="action">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +52,11 @@
         <line x1="6" y1="6" x2="18" y2="18" />
       </svg>
     </button>
-    <div class="breaks-grid grid gap-x-2 gap-y-1">
+    <div
+      class="breaks-grid grid gap-x-2 gap-y-1"
+      use:clickOutside
+      on:clickoutside={toggleBreaksEditorVisibility}
+    >
       {#each [min, ...thresholds] as threshold, i}
         <span class="h-6 self-center" style="background-color: {colors[i]};" />
         <span class="self-center">{threshold.toFixed(2)}</span>

@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-import { reverseD3ColorScheme } from '$lib/utils/color';
+import { reverseColorScheme } from '$lib/utils/color';
 
 export const COLOR_SCALES = [
   'Quantile',
@@ -42,6 +42,6 @@ export const COLOR_SCHEMES = [
   d3.schemeRdYlGn,
   d3.schemeSpectral
 ];
-export const COLOR_SCHEMES_REV = COLOR_SCHEMES.map(reverseD3ColorScheme);
+export const COLOR_SCHEMES_REV = COLOR_SCHEMES.map(reverseColorScheme);
 
 export type ColorScheme = (typeof COLOR_SCHEMES)[number];
