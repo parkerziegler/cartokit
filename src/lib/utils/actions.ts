@@ -1,15 +1,18 @@
-import type { Action } from 'svelte/action';
+import type { ActionReturn } from 'svelte/action';
 
 /**
- * A svelte action to detect clicks outside of an element.
- * @param node
- * @returns
+ * A Svelte action to detect clicks outside of an element.
+ *
+ * @param node – The element to detect clicks outside of.
+ * @returns – An ActionReturn object with a `destroy` method to remove the event
+ * listener.
  */
-export const clickOutside: Action<
-  HTMLElement,
+export function clickOutside<T extends HTMLElement>(
+  node: T
+): ActionReturn<
   undefined,
   { 'on:clickoutside': (event: CustomEvent<MouseEvent>) => void }
-> = (node) => {
+> {
   const handle = (event: MouseEvent) => {
     if (!event.target) {
       return;
@@ -27,4 +30,4 @@ export const clickOutside: Action<
       document.removeEventListener('click', handle, true);
     }
   };
-};
+}
