@@ -25,6 +25,4 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Lint
-        run: pnpm lint
-        env:
-          NODE_OPTIONS: '--max-old-space-size=8192'
+        run: DEBUG=eslint:*,eslintrc:* pnpm lint
