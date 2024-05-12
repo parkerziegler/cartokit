@@ -40,12 +40,12 @@
 
 <form class="stack stack-sm" on:submit={onSubmit}>
   <div class="stack stack-xs">
-    <FieldLabel fieldId="Endpoint">Endpoint</FieldLabel>
+    <FieldLabel fieldId="from-endpoint-input">Endpoint</FieldLabel>
     <TextInput
       on:change={onEndpointChange}
       value={endpoint}
       placeholder="(e.g., https://www.nps.gov/lib/npmap.js/4.0.0/examples/data/national-parks.geojson)"
-      id="Endpoint"
+      id="from-endpoint-input"
       class="w-full"
     />
   </div>

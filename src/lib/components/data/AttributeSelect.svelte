@@ -86,8 +86,9 @@
   <Select
     {options}
     {selected}
-    on:change={onChange}
+    id="attribute-select"
     title="Attribute"
+    on:change={onChange}
     bind:this={ref}
   />
   <button on:click={onClickComputedAttribute}><GearIcon /></button>

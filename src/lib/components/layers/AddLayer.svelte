@@ -23,7 +23,7 @@
   }
 </script>
 
-<button on:click={onClick}>
+<button on:click={onClick} data-testid="add-layer">
   <PlusIcon />
 </button>
 <Modal bind:showModal class="max-w-lg">

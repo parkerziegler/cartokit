@@ -53,9 +53,10 @@
 <Select
   {options}
   {selected}
+  title="Method"
+  id="color-scale-method-select"
   on:change={onChange}
   on:click={onClick}
-  title="Method"
   bind:this={ref}
 />
 {#if displayBreaksEditor}

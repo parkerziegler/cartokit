@@ -180,6 +180,7 @@
         }
       )}
       on:click={toggleEditorVisibility}
+      testId="editor-toggle"
     >
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
     </Button>

@@ -58,6 +58,7 @@
       />
       <HexInput
         hex={d3.color(layer.style.stroke.color)?.formatHex() ?? DEFAULT_STROKE}
+        testId="stroke-color-input"
         onHexChange={onStrokeHexChange}
       />
     </div>

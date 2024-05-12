@@ -2,6 +2,7 @@
   import { DEFAULT_FILL } from '$lib/utils/constants';
 
   export let hex: string;
+  export let testId: string;
   export let onHexChange: (hex: string) => void;
   const hexPattern = /^#([0-9A-Fa-f]{3}){1,2}$/i;
 
@@ -26,4 +27,5 @@
   value={hex}
   on:change={validateHex}
   class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
+  data-testid={testId}
 />

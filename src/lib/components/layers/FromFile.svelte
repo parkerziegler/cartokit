@@ -55,8 +55,8 @@
 
 <form class="stack stack-sm" on:submit={onSubmit}>
   <div class="stack stack-xs">
-    <FieldLabel fieldId="File">File</FieldLabel>
-    <FileInput id="File" onChange={onFileUpload} {file} />
+    <FieldLabel fieldId="from-file-input">File</FieldLabel>
+    <FileInput id="from-file-input" onChange={onFileUpload} {file} />
   </div>
   <div class="stack stack-xs">
     <FieldLabel fieldId="Display Name">Display Name</FieldLabel>
