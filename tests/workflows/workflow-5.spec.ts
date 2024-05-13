@@ -18,7 +18,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  */
 test('workflow-5', async ({ page }) => {
   // Navigate to cartokit, running on a local development server.
-  await page.goto('http://localhost:5173/');
+  await page.goto('/');
 
   // Wait for MapLibre to request tiles from the tile server and instantiate the
   // map instance.
