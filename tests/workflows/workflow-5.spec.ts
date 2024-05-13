@@ -22,15 +22,23 @@ test('workflow-5', async ({ page }) => {
 
   // Wait for MapLibre to request tiles from the tile server and instantiate the
   // map instance.
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('load');
+  await page.waitForResponse((response) => response.url().includes('tiles'));
+
+  // Click the Open Editor button.
+  await page.getByTestId('editor-toggle').click();
+
+  // Ensure the Editor Panel is visible.
+  await expect(page.getByTestId('program-editor')).toBeVisible();
 
   // Open the Add Layers modal.
-  await page.getByTestId('add-layer').click();
+  await expect(page.getByTestId('add-layer-button')).toBeEnabled();
+  await page.getByTestId('add-layer-button').click();
+  await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
   // Select the From File tab.
-  const fromFile = page.getByRole('button', { name: 'From File' });
-  await fromFile.waitFor();
-  await fromFile.click();
+  await page.getByRole('button', { name: 'From File' }).waitFor();
+  await page.getByRole('button', { name: 'From File' }).click();
 
   // Upload the American Crow Range GeoJSON file.
   await page
@@ -45,6 +53,9 @@ test('workflow-5', async ({ page }) => {
   // Add the layer.
   await page.getByRole('button', { name: 'Add' }).click();
 
+  // Wait for MapLibre to render the American Crow Range layer.
+  await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
+
   // Click on a page location that will trigger selection of the American Crow
   // Range layer.
   await page.locator('#map').click({
@@ -55,8 +66,7 @@ test('workflow-5', async ({ page }) => {
   });
 
   // Ensure that the Properties Panel is visible.
-  await page.locator('#properties').waitFor();
-  expect(page.locator('#properties')).toBeVisible();
+  await expect(page.locator('#properties')).toBeVisible();
 
   // Remove the layer's stroke.
   await page.getByTestId('remove-stroke').click();
@@ -79,10 +89,11 @@ test('workflow-5', async ({ page }) => {
   });
 
   // Open Add Layers modal.
-  await page.getByTestId('add-layer').click();
+  await page.getByTestId('add-layer-button').click();
 
-  // Select From File tab.
-  await fromFile.click();
+  // Select the From File tab.
+  await page.getByRole('button', { name: 'From File' }).waitFor();
+  await page.getByRole('button', { name: 'From File' }).click();
 
   // Upload the American Crow Population Change GeoJSON file.
   await page
@@ -115,8 +126,7 @@ test('workflow-5', async ({ page }) => {
   });
 
   // Ensure the Properties Panel is visible.
-  await page.locator('#properties').waitFor();
-  expect(page.locator('#properties')).toBeVisible();
+  await expect(page.locator('#properties')).toBeVisible();
 
   // Set the layer's Map Type to Choropleth.
   await page.locator('#map-type-select').selectOption('Choropleth');
@@ -162,9 +172,4 @@ test('workflow-5', async ({ page }) => {
       y: 360
     }
   });
-
-  // Click the Open Editor button.
-  await page.getByTestId('#editor-toggle').click();
-
-  // Ensure the Editor Panel is visible.
 });

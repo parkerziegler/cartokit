@@ -5,6 +5,7 @@
   export let showModal: boolean;
   let className = '';
   export { className as class };
+  export let testId: string | undefined = undefined;
 
   let dialog: HTMLDialogElement;
 
@@ -24,6 +25,7 @@
   bind:this={dialog}
   on:close={() => (showModal = false)}
   on:click|self={() => dialog.close()}
+  data-testid={testId}
 >
   <div class="flex items-center justify-between p-4">
     <slot name="header" />

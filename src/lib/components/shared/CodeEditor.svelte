@@ -28,7 +28,7 @@
   export let view: EditorView | null = null;
   let className = '';
   export { className as class };
-  export let testId = '';
+  export let testId: string | undefined = undefined;
 
   let editor: HTMLDivElement;
 
