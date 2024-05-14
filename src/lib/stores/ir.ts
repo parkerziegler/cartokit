@@ -20,7 +20,7 @@ export interface CartoKitIR {
 export const ir = writable<CartoKitIR>({
   center: [-98.35, 39.5],
   basemap: {
-    url: `https://api.maptiler.com/maps/dataviz-light/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
+    url: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json',
     provider: 'MapTiler'
   },
   zoom: 4,

@@ -22,8 +22,7 @@ test('workflow-5', async ({ page }) => {
 
   // Wait for MapLibre to request tiles from the tile server and instantiate the
   // map instance.
-  await page.waitForLoadState('load');
-  await page.waitForResponse((response) => response.url().includes('tiles'));
+  await page.waitForLoadState('networkidle');
 
   // Click the Open Editor button.
   await page.getByTestId('editor-toggle').click();
