@@ -25,6 +25,7 @@ test('workflow-5', async ({ page }) => {
   await page.waitForLoadState('networkidle');
 
   // Click the Open Editor button.
+  await expect(page.getByTestId('editor-toggle')).toBeEnabled();
   await page.getByTestId('editor-toggle').click();
 
   // Ensure the Editor Panel is visible.

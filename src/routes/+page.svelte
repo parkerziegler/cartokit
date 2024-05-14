@@ -180,6 +180,7 @@
         }
       )}
       on:click={toggleEditorVisibility}
+      disabled={!$mapStore}
       testId="editor-toggle"
     >
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
