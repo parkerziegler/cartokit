@@ -35,7 +35,14 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          // force GPU hardware acceleration
+          // (even in headless mode)
+          args: ['--use-gl=egl']
+        }
+      }
     },
     {
       name: 'firefox',
