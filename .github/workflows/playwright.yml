@@ -4,10 +4,7 @@ on:
 jobs:
   test:
     timeout-minutes: 60
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest-large]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     if: github.event.deployment_status.state == 'success'
     steps:
       - uses: actions/checkout@v4
