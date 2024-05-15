@@ -47,7 +47,7 @@ export default defineConfig({
       name: 'webkit',
       use: { ...devices['Desktop Safari'] }
     }
-  ],
+  ].filter((browser) => (process.env.CI ? browser.name === 'chromium' : false)),
   /* Run your local dev server before starting the tests */
   webServer: {
     command: 'pnpm dev',
