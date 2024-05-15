@@ -41,7 +41,7 @@ export default defineConfig({
           channel: 'chrome',
           // force GPU hardware acceleration
           // (even in headless mode)
-          args: ['--use-gl=egl']
+          args: ['--enable-gpu', '--use-angle']
         }
       }
     },
