@@ -36,13 +36,7 @@ export default defineConfig({
     {
       name: 'chromium',
       use: {
-        ...devices['Desktop Chrome'],
-        launchOptions: {
-          channel: 'chrome',
-          // force GPU hardware acceleration
-          // (even in headless mode)
-          args: ['--enable-gpu', '--use-angle']
-        }
+        ...devices['Desktop Chrome']
       }
     },
     {
