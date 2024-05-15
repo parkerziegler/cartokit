@@ -38,6 +38,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         launchOptions: {
+          channel: 'chrome',
           // force GPU hardware acceleration
           // (even in headless mode)
           args: ['--use-gl=egl']
