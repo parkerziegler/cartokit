@@ -17,7 +17,7 @@ export interface CartoKitIR {
   layers: Record<string, CartoKitLayer>;
 }
 
-console.log(import.meta.env);
+console.log(process.env.VERCEL_ENV);
 
 export const ir = writable<CartoKitIR>({
   center: [-98.35, 39.5],
