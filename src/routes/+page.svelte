@@ -3,6 +3,8 @@
   import maplibregl from 'maplibre-gl';
   import { onMount } from 'svelte';
 
+  import type { PageData } from './$types';
+
   import BasemapPicker from '$lib/components/basemap/BasemapPicker.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
@@ -28,6 +30,8 @@
   import { selectedFeature } from '$lib/stores/selected-feature';
   import { selectedLayer } from '$lib/stores/selected-layer';
 
+  export let data: PageData;
+
   let map: maplibregl.Map;
 
   onMount(() => {
@@ -36,7 +40,7 @@
     // eslint-disable-next-line import/no-named-as-default-member
     map = new maplibregl.Map({
       container: 'map',
-      style: $ir.basemap.url,
+      style: data.basemap.url,
       center: $ir.center,
       zoom: $ir.zoom
     });
@@ -48,6 +52,13 @@
     // This should ensure that the map's styles and data have fully loaded.
     map.once('idle', () => {
       mapStore.set(map);
+
+      ir.update((ir) => {
+        ir.basemap.url = data.basemap.url;
+        ir.basemap.provider = data.basemap.provider;
+
+        return ir;
+      });
     });
 
     map.on('move', (event) => {
