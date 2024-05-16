@@ -17,6 +17,8 @@ export interface CartoKitIR {
   layers: Record<string, CartoKitLayer>;
 }
 
+console.log(import.meta.env);
+
 export const ir = writable<CartoKitIR>({
   center: [-98.35, 39.5],
   basemap: {
