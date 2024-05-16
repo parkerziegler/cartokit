@@ -20,8 +20,12 @@ export interface CartoKitIR {
 export const ir = writable<CartoKitIR>({
   center: [-98.35, 39.5],
   basemap: {
-    url: `https://api.maptiler.com/maps/dataviz-light/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
-    provider: 'MapTiler'
+    url: import.meta.env.BASE_URL.includes('vercel.app')
+      ? `https://api.maptiler.com/maps/dataviz-light/style.json?key=${PUBLIC_MAPTILER_API_KEY}`
+      : 'https://tiles.stadiamaps.com/styles/stamen_toner_lite.json',
+    provider: import.meta.env.BASE_URL.includes('vercel.app')
+      ? 'MapTiler'
+      : 'Stamen'
   },
   zoom: 4,
   layers: {}
