@@ -5,7 +5,7 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    if: github.event.deployment_status.state == 'success'
+    if: github.event.deployment_status.state == 'success' && github.event.deployment_status.environment != 'production'
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v3
