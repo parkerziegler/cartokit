@@ -21,6 +21,26 @@ export interface Basemap {
   src: string;
 }
 
+const STAMEN_BASEMAPS: Basemap[] = [
+  { title: 'Toner', tileId: 'stamen_toner', src: StamenToner },
+  { title: 'Toner Lite', tileId: 'stamen_toner_lite', src: StamenTonerLite },
+  { title: 'Terrain', tileId: 'stamen_terrain', src: StamenTerrain }
+];
+
+const STADIA_MAPS_BASEMAPS: Basemap[] = [
+  {
+    title: 'Alidade Smooth',
+    tileId: 'alidade_smooth',
+    src: StadiaMapsAlidadeSmooth
+  },
+  {
+    title: 'Alidade Smooth Dark',
+    tileId: 'alidade_smooth_dark',
+    src: StadiaMapsAlidadeSmoothDark
+  },
+  { title: 'Outdoors', tileId: 'outdoors', src: StadiaMapsOutdoors }
+];
+
 const MAPTILER_BASEMAPS: Basemap[] = [
   {
     title: 'Basic',
@@ -60,41 +80,21 @@ const MAPTILER_BASEMAPS: Basemap[] = [
   }
 ];
 
-const STADIA_MAPS_BASEMAPS: Basemap[] = [
-  {
-    title: 'Alidade Smooth',
-    tileId: 'alidade_smooth',
-    src: StadiaMapsAlidadeSmooth
-  },
-  {
-    title: 'Alidade Smooth Dark',
-    tileId: 'alidade_smooth_dark',
-    src: StadiaMapsAlidadeSmoothDark
-  },
-  { title: 'Outdoors', tileId: 'outdoors', src: StadiaMapsOutdoors }
-];
-
-const STAMEN_BASEMAPS: Basemap[] = [
-  { title: 'Toner', tileId: 'stamen_toner', src: StamenToner },
-  { title: 'Toner Light', tileId: 'stamen_toner_lite', src: StamenTonerLite },
-  { title: 'Terrain', tileId: 'stamen_terrain', src: StamenTerrain }
-];
-
 export const BASEMAPS = {
-  MapTiler: MAPTILER_BASEMAPS,
-  'Stadia Maps': STADIA_MAPS_BASEMAPS,
   Stamen: STAMEN_BASEMAPS,
+  'Stadia Maps': STADIA_MAPS_BASEMAPS,
+  MapTiler: MAPTILER_BASEMAPS,
   Custom: []
 };
 
 export type BasemapProvider = keyof typeof BASEMAPS;
 
 export const TILE_URLS = {
-  MapTiler: (tileId: string) =>
-    `https://api.maptiler.com/maps/${tileId}/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
+  Stamen: (tileId: string) =>
+    `https://tiles.stadiamaps.com/styles/${tileId}.json`,
   'Stadia Maps': (tileId: string) =>
     `https://tiles.stadiamaps.com/styles/${tileId}.json`,
-  Stamen: (tileId: string) =>
-    `https://tiles-beta.stadiamaps.com/styles/${tileId}.json`,
+  MapTiler: (tileId: string) =>
+    `https://api.maptiler.com/maps/${tileId}/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
   Custom: () => ''
 };

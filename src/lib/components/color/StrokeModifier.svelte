@@ -17,29 +17,29 @@
     | CartoKitFillLayer
     | CartoKitChoroplethLayer;
 
-  const onRemoveStroke = (): void => {
+  function onRemoveStroke() {
     dispatchLayerUpdate({
       type: 'remove-stroke',
       layer,
       payload: {}
     });
-  };
+  }
 
-  const onAddStroke = (): void => {
+  function onAddStroke() {
     dispatchLayerUpdate({
       type: 'add-stroke',
       layer,
       payload: {}
     });
-  };
+  }
 </script>
 
 {#if layer.style.stroke}
-  <button on:click={onRemoveStroke}>
+  <button on:click={onRemoveStroke} data-testid="remove-stroke">
     <MinusIcon />
   </button>
 {:else}
-  <button on:click={onAddStroke}>
+  <button on:click={onAddStroke} data-testid="add-stroke">
     <PlusIcon />
   </button>
 {/if}

@@ -14,6 +14,7 @@
 
   export let selected: T;
   export let options: SelectOption<T>[] = [];
+  export let id;
   export let title = '';
   let ref: HTMLSelectElement | HTMLDivElement;
 
@@ -22,10 +23,10 @@
 
   const dispatch = createEventDispatcher();
 
-  const onChange = (event: Event) => {
+  function onChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     dispatch('change', { value: target.value });
-  };
+  }
 
   function onClick(event: Event) {
     const target = event.target as HTMLSelectElement;
@@ -37,7 +38,7 @@
 
 {#if title}
   <div class="stack-h stack-h-xs items-baseline" bind:this={ref}>
-    <FieldLabel fieldId={title}>
+    <FieldLabel fieldId={id}>
       {title}
     </FieldLabel>
     <select
@@ -48,7 +49,7 @@
       value={selected}
       on:change={onChange}
       on:click={onClick}
-      id={title}
+      {id}
     >
       {#each options as option}
         <option value={option.value} selected={option.value === selected}
@@ -64,6 +65,7 @@
       className
     )}
     value={selected}
+    {id}
     on:change={onChange}
     on:click={onClick}
     bind:this={ref}

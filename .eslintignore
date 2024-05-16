@@ -29,3 +29,6 @@ svelte.config.js
 
 # ESLint
 .eslintrc.cjs
+
+# Playwright
+playwright.config.ts

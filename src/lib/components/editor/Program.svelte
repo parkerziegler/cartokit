@@ -5,4 +5,5 @@
 
 <CodeEditor
   config={{ kind: 'readonly', doc: $program, language: 'javascript' }}
+  testId="program-editor"
 />

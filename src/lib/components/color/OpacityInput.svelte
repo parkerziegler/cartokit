@@ -14,7 +14,7 @@
       : layer.style[property]?.opacity ?? DEFAULT_OPACITY
   );
 
-  const validateOpacity = (event: Event) => {
+  function validateOpacity(event: Event) {
     const target = event.target as HTMLInputElement;
     let output = target.value;
 
@@ -27,9 +27,9 @@
     } else {
       onOpacityChange(percentToDecimal(Math.min(100, Math.max(0, +output))));
     }
-  };
+  }
 
-  const onOpacityChange = (opacity: number) => {
+  function onOpacityChange(opacity: number) {
     if (property === 'fill' && layer.type !== 'Line') {
       dispatchLayerUpdate({
         type: 'fill-opacity',
@@ -43,13 +43,13 @@
         payload: { opacity }
       });
     }
-  };
+  }
 </script>
 
 <div class="stack-h stack-h-xs items-center">
-  <FieldLabel fieldId={`${property}-opacity`}>Opacity</FieldLabel>
+  <FieldLabel fieldId="{property}-opacity-input">Opacity</FieldLabel>
   <input
-    id={`${property}-opacity`}
+    id="{property}-opacity-input"
     size="4"
     class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
     value={`${opacity}%`}

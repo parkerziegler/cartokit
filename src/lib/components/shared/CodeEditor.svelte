@@ -28,6 +28,7 @@
   export let view: EditorView | null = null;
   let className = '';
   export { className as class };
+  export let testId: string | undefined = undefined;
 
   let editor: HTMLDivElement;
 
@@ -87,4 +88,5 @@
       'transition-colors focus-within:border-slate-400 hover:border-slate-400 focus:border-slate-400',
     className
   )}
+  data-testid={testId || undefined}
 />

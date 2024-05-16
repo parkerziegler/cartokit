@@ -53,6 +53,7 @@
       />
       <HexInput
         hex={d3.color(layer.style.fill.color)?.formatHex() ?? DEFAULT_FILL}
+        testId="fill-color-input"
         onHexChange={onFillHexChange}
       />
     </div>

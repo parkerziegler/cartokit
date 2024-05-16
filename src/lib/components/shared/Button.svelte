@@ -5,11 +5,13 @@
   let className = '';
   export { className as class };
   export let disabled = false;
+  export let testId = '';
 
   const dispatch = createEventDispatcher();
-  const onClick = () => {
+
+  function onClick() {
     dispatch('click');
-  };
+  }
 </script>
 
 <button
@@ -18,5 +20,6 @@
   class={cs(
     'rounded bg-slate-700 px-3 py-2 text-sm text-white transition-opacity enabled:hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:cursor-not-allowed',
     className
-  )}><slot /></button
+  )}
+  data-testid={testId || undefined}><slot /></button
 >
