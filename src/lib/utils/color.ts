@@ -38,5 +38,5 @@ export function decimalToPercent(decimal: number): number {
  * @returns – The reversed color scheme.
  */
 export function reverseColorScheme(scheme: ColorScheme) {
-  return scheme.map((indexedScheme) => [...indexedScheme]).reverse();
+  return scheme.map((indexedScheme) => [...indexedScheme].reverse());
 }

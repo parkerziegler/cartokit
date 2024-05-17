@@ -44,7 +44,10 @@ test('workflow-5', async ({ page }) => {
   await page
     .locator('#from-file-input')
     .setInputFiles(
-      path.join(__dirname, '../data/wapo-american-crow-population-range.json')
+      path.join(
+        __dirname,
+        '../data/workflow-5/wapo-american-crow-population-range.json'
+      )
     );
 
   // Specify the layer's Display Name.
@@ -99,7 +102,10 @@ test('workflow-5', async ({ page }) => {
   await page
     .getByLabel('File')
     .setInputFiles(
-      path.join(__dirname, '../data/wapo-american-crow-population-change.json')
+      path.join(
+        __dirname,
+        '../data/workflow-5/wapo-american-crow-population-change.json'
+      )
     );
 
   // Specify the layer's Display Name.
@@ -147,17 +153,17 @@ test('workflow-5', async ({ page }) => {
   await page.locator('.breaks-grid > input').first().fill('-30');
   await page.locator('.breaks-grid > input').first().press('Enter');
   await page.locator('.breaks-grid > input').nth(1).fill('-20');
-  await page.locator('.breaks-grid > input').first().press('Enter');
+  await page.locator('.breaks-grid > input').nth(1).press('Enter');
   await page.locator('.breaks-grid > input').nth(2).fill('-10');
-  await page.locator('.breaks-grid > input').first().press('Enter');
+  await page.locator('.breaks-grid > input').nth(2).press('Enter');
   await page.locator('.breaks-grid > input').nth(3).fill('0');
-  await page.locator('.breaks-grid > input').first().press('Enter');
+  await page.locator('.breaks-grid > input').nth(3).press('Enter');
   await page.locator('.breaks-grid > input').nth(4).fill('10');
-  await page.locator('.breaks-grid > input').first().press('Enter');
+  await page.locator('.breaks-grid > input').nth(4).press('Enter');
   await page.locator('.breaks-grid > input').nth(5).fill('20');
-  await page.locator('.breaks-grid > input').first().press('Enter');
+  await page.locator('.breaks-grid > input').nth(5).press('Enter');
   await page.locator('.breaks-grid > input').nth(6).fill('30');
-  await page.locator('.breaks-grid > input').first().press('Enter');
+  await page.locator('.breaks-grid > input').nth(6).press('Enter');
 
   // Set the layer's Color Scheme to RdYlBu.
   await page.locator('#color-scheme').getByRole('button').click();
