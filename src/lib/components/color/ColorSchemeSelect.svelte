@@ -118,7 +118,9 @@
       </Portal>
     {/if}
   </div>
-  <button on:click={onSchemeReverse}><ReverseIcon /></button>
+  <button on:click={onSchemeReverse} data-testid="color-scheme-reverse-button"
+    ><ReverseIcon /></button
+  >
 </div>
 
 <style>
