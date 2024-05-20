@@ -79,7 +79,7 @@ test('workflow-6', async ({ page }) => {
   await expect(page.locator('#properties')).toBeVisible();
 
   // Remove the layer's stroke.
-  await page.getByTestId('remove-stroke').click();
+  await page.getByTestId('remove-stroke-button').click();
 
   // Switch the layer's Map Type to Choropleth.
   await page.locator('#map-type-select').selectOption('Choropleth');

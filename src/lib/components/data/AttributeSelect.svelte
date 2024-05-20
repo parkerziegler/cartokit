@@ -1,5 +1,5 @@
 <script lang="ts">
-  import AttributeEditor from '$lib/components/data/AttributeEditor.svelte';
+  import TransformationEditor from '$lib/components/data/TransformationEditor.svelte';
   import GearIcon from '$lib/components/icons/GearIcon.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
@@ -18,13 +18,10 @@
     | CartoKitDotDensityLayer;
 
   const target = document.getElementById('map') ?? document.body;
-  let ref: Select<string>;
-  let editor: AttributeEditor;
-  let dimensions: { top: number; left: number; right: number } = {
-    top: 0,
-    left: 0,
-    right: 0
-  };
+  let editor: TransformationEditor;
+  let trigger: HTMLButtonElement;
+  let left = 0;
+  let attributeEditorVisible = false;
 
   $: properties = Object.keys(
     layer.data.geoJSON.features[0]?.properties ?? {}
@@ -45,6 +42,7 @@
 
   function onChange(event: CustomEvent<{ value: string }>) {
     const attribute = event.detail.value;
+
     dispatchLayerUpdate({
       type: 'attribute',
       layer,
@@ -54,26 +52,23 @@
     });
   }
 
-  let attributeEditorVisible = false;
-
   function onClickComputedAttribute() {
     attributeEditorVisible = true;
-
     const propertiesMenu = document.getElementById('properties');
 
     if (propertiesMenu) {
-      const { top } = ref.getBoundingClientRect();
-      const { left, right } = propertiesMenu.getBoundingClientRect();
-      dimensions = {
-        left,
-        right,
-        top
-      };
+      ({ left } = propertiesMenu.getBoundingClientRect());
     }
   }
 
   function onCloseComputedAttribute() {
     attributeEditorVisible = false;
+  }
+
+  function onClickOutside(event: CustomEvent<MouseEvent>) {
+    if (!trigger.contains(event.detail.target as Node)) {
+      onCloseComputedAttribute();
+    }
   }
 
   // When the editor opens, focus it.
@@ -89,20 +84,22 @@
     id="attribute-select"
     title="Attribute"
     on:change={onChange}
-    bind:this={ref}
   />
-  <button on:click={onClickComputedAttribute}><GearIcon /></button>
+  <button
+    bind:this={trigger}
+    on:click={onClickComputedAttribute}
+    data-testid="open-transformation-editor-button"><GearIcon /></button
+  >
 </div>
 {#if attributeEditorVisible}
   <Portal
-    class="absolute"
+    class="absolute top-4"
     {target}
-    style="top: {dimensions.top}px; right: {dimensions.right -
-      dimensions.left +
-      32}px;"
+    style="left: {left - 16 - 24 * 16}px;"
   >
-    <AttributeEditor
+    <TransformationEditor
       onClose={onCloseComputedAttribute}
+      {onClickOutside}
       {layer}
       bind:this={editor}
     />

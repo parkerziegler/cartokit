@@ -63,9 +63,9 @@
       />
     </div>
     <div class="stack-h stack-h-xs items-center">
-      <FieldLabel fieldId="stroke-width">Width</FieldLabel>
+      <FieldLabel fieldId="stroke-width-input">Width</FieldLabel>
       <NumberInput
-        id="stroke-width"
+        id="stroke-width-input"
         value={layer.style.stroke.width}
         on:change={onStrokeWidthChange}
         class="w-12"

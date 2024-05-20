@@ -8,9 +8,9 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 /**
  * Workflow 5. https://www.washingtonpost.com/climate-environment/interactive/2024/bird-population-decline-united-states-maps/
  *
- * This workflow reproduces the central map published in "Bird pop-
- * ulations are declining. Some are in your neighborhood." by Harry Stevens at
- * The Washington Post. The map comprises two GeoJSON layers:
+ * This workflow reproduces the central map published in "Bird populations are
+ * declining. Some are in your neighborhood." by Harry Stevens at The Washington
+ * Post. The map comprises two GeoJSON layers:
  *
  * - The geographic range of the American Crow.
  * - The breeding season population trends for the American Crow in the conti-
@@ -72,7 +72,7 @@ test('workflow-5', async ({ page }) => {
   await expect(page.locator('#properties')).toBeVisible();
 
   // Remove the layer's stroke.
-  await page.getByTestId('remove-stroke').click();
+  await page.getByTestId('remove-stroke-button').click();
 
   // Set the layer's fill color to #ffffff.
   await page.getByTestId('fill-color-input').fill('#ffffff');
@@ -138,7 +138,7 @@ test('workflow-5', async ({ page }) => {
   await page.locator('#map-type-select').selectOption('Choropleth');
 
   // Remove the layer's stroke.
-  await page.getByTestId('remove-stroke').click();
+  await page.getByTestId('remove-stroke-button').click();
 
   // Set the layer's Attribute to abd_trend.
   await page.locator('#attribute-select').selectOption('abd_trend');

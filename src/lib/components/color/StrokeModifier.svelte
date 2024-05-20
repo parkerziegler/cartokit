@@ -35,7 +35,7 @@
 </script>
 
 {#if layer.style.stroke}
-  <button on:click={onRemoveStroke} data-testid="remove-stroke">
+  <button on:click={onRemoveStroke} data-testid="remove-stroke-button">
     <MinusIcon />
   </button>
 {:else}
