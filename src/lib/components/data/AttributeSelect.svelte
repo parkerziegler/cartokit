@@ -18,10 +18,8 @@
     | CartoKitDotDensityLayer;
 
   const target = document.getElementById('map') ?? document.body;
-  let ref: Select<string>;
   let editor: TransformationEditor;
   let trigger: HTMLButtonElement;
-  let top = 0;
   let left = 0;
   let attributeEditorVisible = false;
 
@@ -59,7 +57,6 @@
     const propertiesMenu = document.getElementById('properties');
 
     if (propertiesMenu) {
-      ({ top } = ref.getBoundingClientRect());
       ({ left } = propertiesMenu.getBoundingClientRect());
     }
   }
@@ -87,7 +84,6 @@
     id="attribute-select"
     title="Attribute"
     on:change={onChange}
-    bind:this={ref}
   />
   <button
     bind:this={trigger}
@@ -97,9 +93,9 @@
 </div>
 {#if attributeEditorVisible}
   <Portal
-    class="absolute"
+    class="absolute top-4"
     {target}
-    style="top: {top}px; left: {left - 16 - 24 * 16}px;"
+    style="left: {left - 16 - 24 * 16}px;"
   >
     <TransformationEditor
       onClose={onCloseComputedAttribute}
