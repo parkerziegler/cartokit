@@ -106,7 +106,7 @@ test('workflow-1', async ({ page }) => {
 
   // Fill the Transformation Editor with JS code to reverse the order of feat-
   // ures in the Penumbra Paths layer.
-  await page.getByTestId('transformation-editor').press('Meta+A');
+  await page.getByTestId('transformation-editor').press('ControlOrMeta+A');
   await page.getByTestId('transformation-editor').press('Backspace');
   await page.getByTestId('transformation-editor')
     .pressSequentially(`function transformGeoJSON(geoJSON) {
