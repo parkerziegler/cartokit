@@ -13,7 +13,7 @@ export function clickOutside<T extends HTMLElement>(
   undefined,
   { 'on:clickoutside': (event: CustomEvent<MouseEvent>) => void }
 > {
-  const handle = (event: MouseEvent) => {
+  function handle(event: MouseEvent) {
     if (!event.target) {
       return;
     }
@@ -21,7 +21,7 @@ export function clickOutside<T extends HTMLElement>(
     if (!node.contains(event.target as Node) && !event.defaultPrevented) {
       node.dispatchEvent(new CustomEvent('clickoutside', { detail: event }));
     }
-  };
+  }
 
   document.addEventListener('click', handle);
 
