@@ -8,10 +8,14 @@ jobs:
     if: github.event.deployment_status.state == 'success'
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: pnpm/action-setup@v3
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
+      - name: Checkout LFS objects
+        run: git lfs checkout
       - name: Install dependencies
         run: pnpm install
       - name: Install Playwright Browsers
