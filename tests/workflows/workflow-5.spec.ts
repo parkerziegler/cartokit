@@ -31,7 +31,7 @@ test('workflow-5', async ({ page }) => {
   // Ensure the Editor Panel is visible.
   await expect(page.getByTestId('program-editor')).toBeVisible();
 
-  // Open the Add Layers modal.
+  // Open the Add Layer modal.
   await expect(page.getByTestId('add-layer-button')).toBeEnabled();
   await page.getByTestId('add-layer-button').click();
   await expect(page.getByTestId('add-layer-modal')).toBeVisible();
@@ -56,8 +56,19 @@ test('workflow-5', async ({ page }) => {
   // Add the layer.
   await page.getByRole('button', { name: 'Add' }).click();
 
-  // Wait for MapLibre to render the American Crow Range layer.
+  // Wait for the loading indicator to disappear.
+  await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
+
+  // Ensure the Add Layer modal is no longer visible.
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
+
+  // Wait for MapLibre to render the American Crow Range layer.
+  //
+  // Tiles are generated on the fly by MapLibre, so we need to wait for them to
+  // load. In theory, we'd like to hook into MapLibre's event system to deter-
+  // mine when the map is idle; however, we don't want to attach the map inst-
+  // ance to the global window object just for the sake of testing.
+  await page.waitForTimeout(500);
 
   // Click on a page location that will trigger selection of the American Crow
   // Range layer.
@@ -91,7 +102,7 @@ test('workflow-5', async ({ page }) => {
     }
   });
 
-  // Open Add Layers modal.
+  // Open the Add Layer modal.
   await page.getByTestId('add-layer-button').click();
 
   // Select the From File tab.
@@ -113,6 +124,12 @@ test('workflow-5', async ({ page }) => {
 
   // Add the layer.
   await page.getByRole('button', { name: 'Add' }).click();
+
+  // Wait for the loading indicator to disappear.
+  await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
+
+  // Ensure the Add Layer modal is no longer visible.
+  await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
 
   // Wait for MapLibre to render the American Crow Population Change layer.
   //
@@ -165,7 +182,7 @@ test('workflow-5', async ({ page }) => {
   await page.locator('.breaks-grid > input').nth(6).fill('30');
   await page.locator('.breaks-grid > input').nth(6).press('Enter');
 
-  // Set the layer's Color Scheme to RdYlBu.
+  // Set the layer's Color Scheme to RdBu.
   await page.locator('#color-scheme').getByRole('button').click();
   await page.locator('button:nth-child(23)').click();
   await page.locator('#color-scheme').click();
@@ -178,4 +195,7 @@ test('workflow-5', async ({ page }) => {
       y: 360
     }
   });
+
+  // Ensure the Properties Panel is hidden.
+  await expect(page.locator('#properties')).not.toBeVisible();
 });

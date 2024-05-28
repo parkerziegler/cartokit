@@ -6,16 +6,17 @@ import { test, expect } from '@playwright/test';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 /**
- * Workflow 6. https://www.washingtonpost.com/climate-environment/interactive/2023/hot-cold-extreme-temperature-deaths/
+ * Workflow 4. https://www.washingtonpost.com/climate-environment/interactive/2023/map-illegal-fishing/
  *
- * This workflow reproduces the central map published in "Will global warming
- * make temperature less deadly?" by Harry Stevens at The Washington Post. The
- * map comprises one GeoJSON layer:
+ * This workflow reproduces the central map published in "A boat went dark.
+ * Finding it could help save the world's fish." by Harry Stevens at The Wash-
+ * ington Post. The map comprises one GeoJSON layer:
  *
- * - Climate impact regions as demarcated by Carleton et al. (2022).
- * https://academic.oup.com/qje/article/137/4/2037/6571943
+ * - A grid of 0.5° lat/lon cells with the count of associated AIS (Automatic
+ * Identification System) transpoder signal disabling events at that location in
+ * geographic space.
  */
-test('workflow-6', async ({ page }) => {
+test('workflow-4', async ({ page }) => {
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
 
@@ -39,18 +40,18 @@ test('workflow-6', async ({ page }) => {
   await page.getByRole('button', { name: 'From File' }).waitFor();
   await page.getByRole('button', { name: 'From File' }).click();
 
-  // Upload the Climate Impact Regions GeoJSON file.
+  // Upload the Fish Transponder Gaps GeoJSON file.
   await page
     .locator('#from-file-input')
     .setInputFiles(
       path.join(
         __dirname,
-        '../data/workflow-6/wapo-climate-impact-regions.json'
+        '../data/workflow-4/wapo-fishing-boat-transponder-gaps.json'
       )
     );
 
   // Specify the layer's Display Name.
-  await page.getByLabel('Display Name').fill('Climate Impact Regions');
+  await page.getByLabel('Display Name').fill('Transponder Gaps');
 
   // Add the layer.
   await page.getByRole('button', { name: 'Add' }).click();
@@ -61,7 +62,7 @@ test('workflow-6', async ({ page }) => {
   // Ensure the Add Layer modal is no longer visible.
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
 
-  // Wait for MapLibre to render the Climate Impact Regions layer.
+  // Wait for MapLibre to render the Fishing Boat Transponder Gaps layer.
   //
   // Tiles are generated on the fly by MapLibre, so we need to wait for them to
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
@@ -69,12 +70,35 @@ test('workflow-6', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(2000);
 
-  // Click on a page location that will trigger selection of the Climate Impact
-  // Regions layer.
+  // Focus the map and trigger a 'wheel' event to zoom out.
   await page.locator('#map').click({
     position: {
-      x: 720,
-      y: 450
+      x: 640,
+      y: 360
+    }
+  });
+  await page.mouse.wheel(0, 1200);
+
+  // Pan the map to focus South America.
+  await page.locator('#map').click({
+    position: {
+      x: 640,
+      y: 360
+    }
+  });
+  await page.mouse.down();
+  await page.mouse.move(-100, -600);
+  await page.mouse.up();
+
+  // Wait for MapLibre to render tiles after panning.
+  await page.waitForTimeout(5000);
+
+  // Click on a page location that will trigger selection of the Fishing Boat
+  // Transponder Gaps layer.
+  await page.locator('#map').click({
+    position: {
+      x: 331,
+      y: 498
     }
   });
 
@@ -87,43 +111,38 @@ test('workflow-6', async ({ page }) => {
   // Switch the layer's Map Type to Choropleth.
   await page.locator('#map-type-select').selectOption('Choropleth');
 
-  // Set the layer's Attribute to 'years_2080_2099'.
-  await page.locator('#attribute-select').selectOption('years_2080_2099');
-
-  // Switch the layer's Color Scheme to PRGn.
-  await page.locator('#color-scheme').getByRole('button').click();
-  await page.locator('button:nth-child(20)').click();
-
-  // Reverse the color scheme.
-  await page.getByTestId('color-scheme-reverse-button').click();
-
   // Set the layer's Steps to 8.
   await page.locator('#color-stops-select').selectOption('8');
+
+  // Set the layer's Color Scheme to RdYlBu.
+  await page.locator('#color-scheme').getByRole('button').click();
+  await page.locator('button:nth-child(25)').click();
 
   // Set the layer's Method to Manual.
   await page.locator('#color-scale-method-select').selectOption('Manual');
 
-  // Set the layer's Breaks to -200, -100, -50, 0, 50, 100, 200.
-  await page.locator('.breaks-grid > input').first().fill('-200');
+  // Set the layer's Breaks to 614.791, 973.836, 1228.582, 1426.178, 1587.626,
+  // 1724.178, 1842.373.
+  await page.locator('.breaks-grid > input').first().fill('614.791');
   await page.locator('.breaks-grid > input').first().press('Enter');
-  await page.locator('.breaks-grid > input').nth(1).fill('-100');
+  await page.locator('.breaks-grid > input').nth(1).fill('973.836');
   await page.locator('.breaks-grid > input').nth(1).press('Enter');
-  await page.locator('.breaks-grid > input').nth(2).fill('-50');
+  await page.locator('.breaks-grid > input').nth(2).fill('1228.582');
   await page.locator('.breaks-grid > input').nth(2).press('Enter');
-  await page.locator('.breaks-grid > input').nth(3).fill('0');
+  await page.locator('.breaks-grid > input').nth(3).fill('1426.178');
   await page.locator('.breaks-grid > input').nth(3).press('Enter');
-  await page.locator('.breaks-grid > input').nth(4).fill('50');
+  await page.locator('.breaks-grid > input').nth(4).fill('1587.626');
   await page.locator('.breaks-grid > input').nth(4).press('Enter');
-  await page.locator('.breaks-grid > input').nth(5).fill('100');
+  await page.locator('.breaks-grid > input').nth(5).fill('1724.178');
   await page.locator('.breaks-grid > input').nth(5).press('Enter');
-  await page.locator('.breaks-grid > input').nth(6).fill('200');
+  await page.locator('.breaks-grid > input').nth(6).fill('1842.373');
   await page.locator('.breaks-grid > input').nth(6).press('Enter');
 
-  // Click on a page location that will trigger deselection of both layers.
+  // Deselect the layer.
   await page.locator('#map').click({
     position: {
-      x: 20,
-      y: 360
+      x: 0,
+      y: 0
     }
   });
 

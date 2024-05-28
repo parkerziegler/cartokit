@@ -24,7 +24,12 @@
   }
 </script>
 
-<button on:click={onClick} data-testid="add-layer-button" disabled={!$map}>
+<button
+  on:click={onClick}
+  class="disabled:cursor-not-allowed disabled:hover:cursor-not-allowed"
+  data-testid="add-layer-button"
+  disabled={!$map}
+>
   <PlusIcon />
 </button>
 <Modal bind:showModal class="max-w-lg" testId="add-layer-modal">

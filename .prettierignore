@@ -22,3 +22,6 @@ pnpm-lock.yaml
 
 # VSCode
 /.vscode
+
+# Test data
+tests/data/*

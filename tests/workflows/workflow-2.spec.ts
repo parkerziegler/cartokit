@@ -6,16 +6,20 @@ import { test, expect } from '@playwright/test';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 /**
- * Workflow 6. https://www.washingtonpost.com/climate-environment/interactive/2023/hot-cold-extreme-temperature-deaths/
+ * Workflow 2. https://www.washingtonpost.com/climate-environment/interactive/2024/spring-earlier-arrival-plants-map/
  *
- * This workflow reproduces the central map published in "Will global warming
- * make temperature less deadly?" by Harry Stevens at The Washington Post. The
- * map comprises one GeoJSON layer:
+ * This workflow reproduces the central map published in "You're not crazy.
+ * Spring is getting earlier. Find out how it's changed in your town." by Harry
+ * Stevens at The Washington Post. The map comprises one GeoJSON layer:
  *
- * - Climate impact regions as demarcated by Carleton et al. (2022).
- * https://academic.oup.com/qje/article/137/4/2037/6571943
+ * - 4km grid cells containing data on the change in expected arrival of leaves
+ * at that location in geographic space from 1981-2023.
  */
-test('workflow-6', async ({ page }) => {
+test('workflow-2', async ({ page }) => {
+  // Mark this test as slow. We're working with a 129MB GeoJSON file, which will
+  // take a long time for MapLibre to render.
+  test.slow();
+
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
 
@@ -39,18 +43,18 @@ test('workflow-6', async ({ page }) => {
   await page.getByRole('button', { name: 'From File' }).waitFor();
   await page.getByRole('button', { name: 'From File' }).click();
 
-  // Upload the Climate Impact Regions GeoJSON file.
+  // Upload the Spring Leaf Appearance GeoJSON file.
   await page
     .locator('#from-file-input')
     .setInputFiles(
       path.join(
         __dirname,
-        '../data/workflow-6/wapo-climate-impact-regions.json'
+        '../data/workflow-2/wapo-spring-leaf-appearance.json'
       )
     );
 
   // Specify the layer's Display Name.
-  await page.getByLabel('Display Name').fill('Climate Impact Regions');
+  await page.getByLabel('Display Name').fill('Spring Leaf Appearance');
 
   // Add the layer.
   await page.getByRole('button', { name: 'Add' }).click();
@@ -61,20 +65,20 @@ test('workflow-6', async ({ page }) => {
   // Ensure the Add Layer modal is no longer visible.
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
 
-  // Wait for MapLibre to render the Climate Impact Regions layer.
+  // Wait for MapLibre to render the Spring Leaf Appearance layer.
   //
   // Tiles are generated on the fly by MapLibre, so we need to wait for them to
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(30000);
 
-  // Click on a page location that will trigger selection of the Climate Impact
-  // Regions layer.
+  // Click on a page location that will trigger selection of the Spring Leaf
+  // Appearance layer.
   await page.locator('#map').click({
     position: {
-      x: 720,
-      y: 450
+      x: 530,
+      y: 100
     }
   });
 
@@ -87,43 +91,43 @@ test('workflow-6', async ({ page }) => {
   // Switch the layer's Map Type to Choropleth.
   await page.locator('#map-type-select').selectOption('Choropleth');
 
-  // Set the layer's Attribute to 'years_2080_2099'.
-  await page.locator('#attribute-select').selectOption('years_2080_2099');
+  // Set the layer's Attribute to 'trend'.
+  await page.locator('#attribute-select').selectOption('trend');
+
+  // Set the layer's Steps to 6.
+  await page.locator('#color-stops-select').selectOption('6');
 
   // Switch the layer's Color Scheme to PRGn.
   await page.locator('#color-scheme').getByRole('button').click();
   await page.locator('button:nth-child(20)').click();
 
-  // Reverse the color scheme.
+  // Reverse the layer's Color Scheme.
   await page.getByTestId('color-scheme-reverse-button').click();
-
-  // Set the layer's Steps to 8.
-  await page.locator('#color-stops-select').selectOption('8');
 
   // Set the layer's Method to Manual.
   await page.locator('#color-scale-method-select').selectOption('Manual');
 
-  // Set the layer's Breaks to -200, -100, -50, 0, 50, 100, 200.
-  await page.locator('.breaks-grid > input').first().fill('-200');
+  // Set the layer's Breaks to -21, -14, -7, 0, 7.
+  await page.locator('.breaks-grid > input').first().fill('-21');
   await page.locator('.breaks-grid > input').first().press('Enter');
-  await page.locator('.breaks-grid > input').nth(1).fill('-100');
+  await page.locator('.breaks-grid > input').nth(1).fill('-14');
   await page.locator('.breaks-grid > input').nth(1).press('Enter');
-  await page.locator('.breaks-grid > input').nth(2).fill('-50');
+  await page.locator('.breaks-grid > input').nth(2).fill('-7');
   await page.locator('.breaks-grid > input').nth(2).press('Enter');
   await page.locator('.breaks-grid > input').nth(3).fill('0');
   await page.locator('.breaks-grid > input').nth(3).press('Enter');
-  await page.locator('.breaks-grid > input').nth(4).fill('50');
+  await page.locator('.breaks-grid > input').nth(4).fill('7');
   await page.locator('.breaks-grid > input').nth(4).press('Enter');
-  await page.locator('.breaks-grid > input').nth(5).fill('100');
-  await page.locator('.breaks-grid > input').nth(5).press('Enter');
-  await page.locator('.breaks-grid > input').nth(6).fill('200');
-  await page.locator('.breaks-grid > input').nth(6).press('Enter');
 
-  // Click on a page location that will trigger deselection of both layers.
+  // Set the layer's fill-opacity to 100%.
+  await page.locator('#fill-opacity-input').fill('100');
+  await page.locator('#fill-opacity-input').press('Enter');
+
+  // Click on a page location that will trigger deselection of the layer.
   await page.locator('#map').click({
     position: {
-      x: 20,
-      y: 360
+      x: 0,
+      y: 0
     }
   });
 
