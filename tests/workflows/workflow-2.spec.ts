@@ -18,7 +18,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 test('workflow-2', async ({ page }) => {
   // Increase the timeout for this workflow. We're working with a 129MB GeoJSON
   // file, which will take a long time for MapLibre to render.
-  test.setTimeout(240000);
+  test.setTimeout(300000);
 
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
