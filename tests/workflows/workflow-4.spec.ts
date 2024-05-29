@@ -97,8 +97,8 @@ test('workflow-4', async ({ page }) => {
   // Transponder Gaps layer.
   await page.locator('#map').click({
     position: {
-      x: 331,
-      y: 498
+      x: 340,
+      y: 500
     }
   });
 
@@ -142,7 +142,7 @@ test('workflow-4', async ({ page }) => {
   await page.locator('#map').click({
     position: {
       x: 0,
-      y: 0
+      y: 360
     }
   });
 

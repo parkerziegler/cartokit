@@ -191,7 +191,7 @@ test('workflow-5', async ({ page }) => {
   // Click on a page location that will trigger deselection of both layers.
   await page.locator('#map').click({
     position: {
-      x: 20,
+      x: 0,
       y: 360
     }
   });

@@ -16,9 +16,9 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * location in geographic space from 1980-2024.
  */
 test('workflow-3', async ({ page }) => {
-  // Mark this test as slow. We're working with a 250MB GeoJSON file, which will
-  // take a long time for MapLibre to render.
-  test.slow();
+  // Increase the timeout for this workflow. We're working with a 250MB GeoJSON
+  // file, which will take a long time for MapLibre to render.
+  test.setTimeout(120000);
 
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
