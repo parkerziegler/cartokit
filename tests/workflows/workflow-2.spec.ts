@@ -1,9 +1,55 @@
+import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as stream from 'node:stream';
 import * as url from 'node:url';
+import * as zlib from 'node:zlib';
 
 import { test, expect } from '@playwright/test';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
+test.beforeAll(() => {
+  // Unzip the Spring Leaf Appearance GeoJSON file.
+  const unzip = zlib.createUnzip();
+  const input = fs.createReadStream(
+    path.join(
+      __dirname,
+      '../data/workflow-2/wapo-spring-leaf-appearance.json.gz'
+    )
+  );
+  const output = fs.createWriteStream(
+    path.join(__dirname, '../data/workflow-2/wapo-spring-leaf-appearance.json')
+  );
+
+  stream.pipeline(input, unzip, output, (error) => {
+    if (error) {
+      throw error;
+    }
+  });
+});
+
+test.afterAll(() => {
+  if (
+    fs.existsSync(
+      path.join(
+        __dirname,
+        '../data/workflow-2/wapo-spring-leaf-appearance.json'
+      )
+    )
+  ) {
+    fs.rm(
+      path.join(
+        __dirname,
+        '../data/workflow-2/wapo-spring-leaf-appearance.json'
+      ),
+      (error) => {
+        if (error) {
+          throw error;
+        }
+      }
+    );
+  }
+});
 
 /**
  * Workflow 2. https://www.washingtonpost.com/climate-environment/interactive/2024/spring-earlier-arrival-plants-map/
