@@ -62,6 +62,10 @@ test.afterAll(() => {
  * at that location in geographic space from 1981-2023.
  */
 test('workflow-2', async ({ page }) => {
+  // Mark this test as slow. We're working with a 129MB GeoJSON file, which will
+  // take some time for MapLibre to render, even at high zooms.
+  test.slow();
+
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
 
