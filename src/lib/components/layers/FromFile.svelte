@@ -13,6 +13,7 @@
 
   let file: File;
   let displayName = '';
+  let dataLoading = false;
 
   function onFileUpload(fileInput: HTMLSpanElement, event: Event) {
     const { files } = event.target as HTMLInputElement;
@@ -29,7 +30,13 @@
     displayName = event.detail.value;
   }
 
+  function onSourceLoaded() {
+    dataLoading = false;
+    closeModal();
+  }
+
   function onSubmit() {
+    dataLoading = true;
     const reader = new FileReader();
 
     reader.onload = function readGeoJSON(theFile) {
@@ -42,7 +49,8 @@
           kind: 'file',
           displayName,
           fileName: file.name,
-          featureCollection
+          featureCollection,
+          onSourceLoaded
         });
 
         closeModal();
@@ -67,5 +75,5 @@
       id="Display Name"
     />
   </div>
-  <Button class="self-end">Add</Button>
+  <Button class="self-end" loading={dataLoading}>Add</Button>
 </form>

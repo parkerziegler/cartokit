@@ -17,59 +17,61 @@ type AddSourceOptions =
       displayName: string;
       fileName: string;
       featureCollection: FeatureCollection;
+      onSourceLoaded: () => void;
     };
+
+/**
+ * Load a source for a CartoKit layer.
+ *
+ * @param map – The top-level MapLibre GL map instance.
+ * @param options – The options for the source.
+ * @param data – The GeoJSON data for the source.
+ */
+function loadSource(
+  map: Map,
+  options: AddSourceOptions,
+  data: FeatureCollection
+) {
+  const layer = generateCartoKitLayer(data, options);
+
+  const handleSourceLoaded = (event: MapSourceDataEvent) => {
+    if (event.sourceId === layer.id) {
+      options.onSourceLoaded();
+      map.off('sourcedata', handleSourceLoaded);
+    }
+  };
+
+  map.on('sourcedata', handleSourceLoaded);
+
+  map.addSource(layer.id, {
+    type: 'geojson',
+    // Still use the API endpoint when available to speed up vector tile generation.
+    data: options.kind === 'api' ? options.url : options.featureCollection,
+    generateId: true
+  });
+
+  ir.update((ir) => {
+    ir.layers[layer.id] = layer;
+
+    return ir;
+  });
+
+  addLayer(map, layer);
+}
 
 /**
  * Add a source for a CartoKit layer to the map.
  *
  * @param map – The top-level MapLibre GL map instance.
- * @param layer – The CartoKit layer to add a source for.
+ * @param layer – The CartoKit layer.
  */
-export const addSource = (map: Map, options: AddSourceOptions) => {
+export function addSource(map: Map, options: AddSourceOptions) {
   if (options.kind === 'api') {
     // Load the data in a worker thread.
     sourceWorker(options.url, (data) => {
-      const layer = generateCartoKitLayer(data, options);
-
-      const handleSourceLoaded = (event: MapSourceDataEvent) => {
-        if (event.sourceId === layer.id) {
-          options.onSourceLoaded();
-          map.off('sourcedata', handleSourceLoaded);
-        }
-      };
-
-      map.on('sourcedata', handleSourceLoaded);
-
-      map.addSource(layer.id, {
-        type: 'geojson',
-        // Still use the API endpoint when available to speed up vector tile generation.
-        data: options.url,
-        generateId: true
-      });
-
-      ir.update((ir) => {
-        ir.layers[layer.id] = layer;
-
-        return ir;
-      });
-
-      addLayer(map, layer);
+      loadSource(map, options, data);
     });
   } else {
-    const layer = generateCartoKitLayer(options.featureCollection, options);
-
-    map.addSource(layer.id, {
-      type: 'geojson',
-      data: options.featureCollection,
-      generateId: true
-    });
-
-    ir.update((ir) => {
-      ir.layers[layer.id] = layer;
-
-      return ir;
-    });
-
-    addLayer(map, layer);
+    loadSource(map, options, options.featureCollection);
   }
-};
+}

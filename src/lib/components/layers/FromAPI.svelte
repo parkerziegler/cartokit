@@ -59,35 +59,5 @@
       class="w-full"
     />
   </div>
-  <Button class="self-end">
-    {#if dataLoading}
-      <span class="loader align-text-top" />
-    {:else}
-      Add
-    {/if}
-  </Button>
+  <Button class="self-end" loading={dataLoading}>Add</Button>
 </form>
-
-<style>
-  .loader {
-    @apply relative inline-block h-4 w-4;
-  }
-  .loader::after,
-  .loader::before {
-    @apply absolute left-0 top-0 h-4 w-4 rounded-full bg-white;
-    content: '';
-    animation: animloader 0.5s ease-in-out infinite;
-  }
-
-  @keyframes animloader {
-    0% {
-      transform: scale(0);
-      opacity: 1;
-    }
-
-    100% {
-      transform: scale(1);
-      opacity: 0;
-    }
-  }
-</style>

@@ -30,7 +30,7 @@ test('workflow-6', async ({ page }) => {
   // Ensure the Editor Panel is visible.
   await expect(page.getByTestId('program-editor')).toBeVisible();
 
-  // Open the Add Layers modal.
+  // Open the Add Layer modal.
   await expect(page.getByTestId('add-layer-button')).toBeEnabled();
   await page.getByTestId('add-layer-button').click();
   await expect(page.getByTestId('add-layer-modal')).toBeVisible();
@@ -55,7 +55,10 @@ test('workflow-6', async ({ page }) => {
   // Add the layer.
   await page.getByRole('button', { name: 'Add' }).click();
 
-  // Wait for MapLibre to render the Climate Impact Regions layer.
+  // Wait for the loading indicator to disappear.
+  await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
+
+  // Ensure the Add Layer modal is no longer visible.
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
 
   // Wait for MapLibre to render the Climate Impact Regions layer.
@@ -87,7 +90,7 @@ test('workflow-6', async ({ page }) => {
   // Set the layer's Attribute to 'years_2080_2099'.
   await page.locator('#attribute-select').selectOption('years_2080_2099');
 
-  // Switch the color scheme to PRGn.
+  // Switch the layer's Color Scheme to PRGn.
   await page.locator('#color-scheme').getByRole('button').click();
   await page.locator('button:nth-child(20)').click();
 
@@ -119,8 +122,11 @@ test('workflow-6', async ({ page }) => {
   // Click on a page location that will trigger deselection of both layers.
   await page.locator('#map').click({
     position: {
-      x: 20,
-      y: 360
+      x: 0,
+      y: 0
     }
   });
+
+  // Ensure the Properties Panel is hidden.
+  await expect(page.locator('#properties')).not.toBeVisible();
 });

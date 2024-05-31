@@ -40,7 +40,7 @@ test('workflow-1', async ({ page }) => {
   // Ensure the Editor Panel is visible.
   await expect(page.getByTestId('program-editor')).toBeVisible();
 
-  // Open the Add Layers modal.
+  // Open the Add Layer modal.
   await expect(page.getByTestId('add-layer-button')).toBeEnabled();
   await page.getByTestId('add-layer-button').click();
   await expect(page.getByTestId('add-layer-modal')).toBeVisible();
@@ -62,7 +62,10 @@ test('workflow-1', async ({ page }) => {
   // Add the layer.
   await page.getByRole('button', { name: 'Add' }).click();
 
-  // Wait for MapLibre to render the Penumbra Paths layer.
+  // Wait for the loading indicator to disappear.
+  await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
+
+  // Ensure the Add Layer modal is no longer visible.
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
 
   // Wait for MapLibre to render the Penumbra Paths layer.
@@ -150,7 +153,18 @@ test('workflow-1', async ({ page }) => {
   await page.getByLabel('Display Name').fill('Path of Totality');
   await page.getByRole('button', { name: 'Add' }).click();
 
+  // Wait for the loading indicator to disappear.
+  await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
+
+  // Ensure the Add Layer modal is no longer visible.
+  await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
+
   // Wait for MapLibre to render the Path of Totality layer.
+  //
+  // Tiles are generated on the fly by MapLibre, so we need to wait for them to
+  // load. In theory, we'd like to hook into MapLibre's event system to deter-
+  // mine when the map is idle; however, we don't want to attach the map inst-
+  // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(2000);
 
   // Click on a page location that will trigger selection of the Path of Total-
@@ -173,4 +187,15 @@ test('workflow-1', async ({ page }) => {
 
   // Remove the layer's stroke.
   await page.getByTestId('remove-stroke-button').click();
+
+  // Deselect the layer.
+  await page.locator('#map').click({
+    position: {
+      x: 0,
+      y: 0
+    }
+  });
+
+  // Ensure the Properties Panel is hidden.
+  await expect(page.locator('#properties')).not.toBeVisible();
 });
