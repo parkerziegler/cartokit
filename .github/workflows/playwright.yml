@@ -16,8 +16,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-      - name: Checkout LFS objects
-        run: git lfs checkout
       - name: Install dependencies
         run: pnpm install
       - name: Install Playwright Browsers
