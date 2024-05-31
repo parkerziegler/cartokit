@@ -62,16 +62,34 @@ test.afterAll(() => {
  * at that location in geographic space from 1981-2023.
  */
 test('workflow-2', async ({ page }) => {
-  // Increase the timeout for this workflow. We're working with a 129MB GeoJSON
-  // file, which will take a long time for MapLibre to render.
-  test.setTimeout(480000);
-
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
 
   // Wait for MapLibre to request tiles from the tile server and instantiate the
   // map instance.
   await page.waitForLoadState('networkidle');
+
+  // Pan and zoom the map to the Bay Area to reduce future rendering time when
+  // MapLibre generates tiles on the fly.
+  await page.locator('#map').click({
+    position: {
+      x: 640,
+      y: 360
+    }
+  });
+  await page.mouse.down();
+  await page.mouse.move(1175, 312.5);
+  await page.mouse.up();
+
+  for (let i = 0; i < 4; i++) {
+    await page.locator('#map').click({
+      position: {
+        x: 640,
+        y: 360
+      }
+    });
+    await page.mouse.wheel(0, -1200);
+  }
 
   // Click the Open Editor button.
   await expect(page.getByTestId('editor-toggle')).toBeEnabled();
@@ -117,7 +135,7 @@ test('workflow-2', async ({ page }) => {
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(30000);
+  await page.waitForTimeout(5000);
 
   // Click on a page location that will trigger selection of the Spring Leaf
   // Appearance layer.

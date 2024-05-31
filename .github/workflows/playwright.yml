@@ -8,8 +8,8 @@ jobs:
     if: github.event.deployment_status.state == 'success'
     strategy:
       matrix:
-        shardIndex: [1, 2, 3, 4, 5, 6]
-        shardTotal: [6]
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v3
