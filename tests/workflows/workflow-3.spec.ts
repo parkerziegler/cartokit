@@ -145,8 +145,8 @@ test('workflow-3', async ({ page }) => {
   // ture Change layer.
   await page.locator('#map').click({
     position: {
-      x: 530,
-      y: 100
+      x: 700,
+      y: 200
     }
   });
 
