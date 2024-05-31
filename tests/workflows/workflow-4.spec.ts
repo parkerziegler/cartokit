@@ -24,6 +24,26 @@ test('workflow-4', async ({ page }) => {
   // map instance.
   await page.waitForLoadState('networkidle');
 
+  // Focus the map and trigger a 'wheel' event to zoom out.
+  await page.locator('#map').click({
+    position: {
+      x: 640,
+      y: 360
+    }
+  });
+  await page.mouse.wheel(0, 1200);
+
+  // Pan the map to focus South America.
+  await page.locator('#map').click({
+    position: {
+      x: 640,
+      y: 360
+    }
+  });
+  await page.mouse.down();
+  await page.mouse.move(-100, -600);
+  await page.mouse.up();
+
   // Click the Open Editor button.
   await expect(page.getByTestId('editor-toggle')).toBeEnabled();
   await page.getByTestId('editor-toggle').click();
@@ -69,29 +89,6 @@ test('workflow-4', async ({ page }) => {
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(2000);
-
-  // Focus the map and trigger a 'wheel' event to zoom out.
-  await page.locator('#map').click({
-    position: {
-      x: 640,
-      y: 360
-    }
-  });
-  await page.mouse.wheel(0, 1200);
-
-  // Pan the map to focus South America.
-  await page.locator('#map').click({
-    position: {
-      x: 640,
-      y: 360
-    }
-  });
-  await page.mouse.down();
-  await page.mouse.move(-100, -600);
-  await page.mouse.up();
-
-  // Wait for MapLibre to render tiles after panning.
-  await page.waitForTimeout(5000);
 
   // Click on a page location that will trigger selection of the Fishing Boat
   // Transponder Gaps layer.
