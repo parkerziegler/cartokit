@@ -7,27 +7,17 @@
 
   import BasemapPicker from '$lib/components/basemap/BasemapPicker.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
-  import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
-  import TableIcon from '$lib/components/icons/TableIcon.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
-  import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
-  import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
-  import DotDensityPropertiesPanel from '$lib/components/properties/DotDensityPropertiesPanel.svelte';
-  import FillPropertiesPanel from '$lib/components/properties/FillPropertiesPanel.svelte';
-  import LinePropertiesPanel from '$lib/components/properties/LinePropertiesPanel.svelte';
-  import PointPropertiesPanel from '$lib/components/properties/PointPropertiesPanel.svelte';
-  import ProportionalSymbolPropertiesPanel from '$lib/components/properties/ProportionalSymbolPropertiesPanel.svelte';
+  import PropertiesMenu from '$lib/components/properties/PropertiesMenu.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import DataTable from '$lib/components/shared/DataTable.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
-  import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import { map as mapStore } from '$lib/stores/map';
-  import { selectedFeature } from '$lib/stores/selected-feature';
   import { selectedLayer } from '$lib/stores/selected-layer';
 
   export let data: PageData;
@@ -83,48 +73,21 @@
     };
   });
 
-  const toggleEditorVisibility = () => {
+  function toggleEditorVisibility() {
     layout.update((layout) => {
       layout.editorVisible = !layout.editorVisible;
 
       return layout;
     });
-  };
+  }
 
-  const onViewDataClick = () => {
-    layout.update((layout) => {
-      layout.dataVisible = !layout.dataVisible;
-
-      return layout;
-    });
-  };
-
-  const onViewDataClose = () => {
+  function onViewDataClose() {
     layout.update((layout) => {
       layout.dataVisible = false;
 
       return layout;
     });
-  };
-
-  const onPropertiesMenuClose = () => {
-    if ($selectedFeature) {
-      map.removeFeatureState(
-        { source: $selectedFeature.layer.id, id: $selectedFeature.id },
-        'selected'
-      );
-
-      selectedFeature.set(null);
-    }
-
-    if ($layout.dataVisible) {
-      layout.update((layout) => {
-        layout.dataVisible = false;
-
-        return layout;
-      });
-    }
-  };
+  }
 </script>
 
 <main class="absolute inset-0">
@@ -142,44 +105,7 @@
       <LayerPanel />
     </Menu>
     {#if $selectedLayer}
-      <Menu
-        id="properties"
-        class={cs(
-          'properties absolute right-4 top-4 z-10 max-w-sm overflow-auto',
-          {
-            'properties--y-compact': $layout.dataVisible,
-            'properties--x-compact': $layout.editorVisible
-          }
-        )}
-      >
-        <MenuTitle class="mr-4"
-          >{$selectedLayer.displayName}
-          <button on:click={onPropertiesMenuClose} slot="action">
-            <CloseIcon />
-          </button>
-          <div class="stack-h stack-h-xs" slot="subtitle">
-            <button on:click={onViewDataClick}>
-              <TableIcon />
-            </button>
-          </div>
-        </MenuTitle>
-        <MenuItem title="Map Type">
-          <MapTypeSelect layer={$selectedLayer} />
-        </MenuItem>
-        {#if $selectedLayer.type === 'Point'}
-          <PointPropertiesPanel layer={$selectedLayer} />
-        {:else if $selectedLayer.type === 'Proportional Symbol'}
-          <ProportionalSymbolPropertiesPanel layer={$selectedLayer} />
-        {:else if $selectedLayer.type === 'Dot Density'}
-          <DotDensityPropertiesPanel layer={$selectedLayer} />
-        {:else if $selectedLayer.type === 'Line'}
-          <LinePropertiesPanel layer={$selectedLayer} />
-        {:else if $selectedLayer.type === 'Fill'}
-          <FillPropertiesPanel layer={$selectedLayer} />
-        {:else if $selectedLayer.type === 'Choropleth'}
-          <ChoroplethPropertiesPanel layer={$selectedLayer} />
-        {/if}
-      </Menu>
+      <PropertiesMenu {map} layer={$selectedLayer} />
     {/if}
     <BasemapPicker />
     <Button

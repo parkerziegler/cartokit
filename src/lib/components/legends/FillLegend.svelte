@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { CartoKitFillLayer } from '$lib/types/CartoKitLayer';
+  import { pluralize } from '$lib/utils/format';
   import { getLayerGeometryType } from '$lib/utils/geojson';
 
   export let layer: CartoKitFillLayer;
@@ -22,6 +23,6 @@
   </svg>
   <span
     >{layer.data.geoJSON.features.length}
-    {geometryType + (geometryType.length !== 1 ? 's' : '')}</span
+    {pluralize(geometryType, layer.data.geoJSON.features.length)}</span
   >
 </div>
