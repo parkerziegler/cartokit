@@ -23,6 +23,6 @@
   </svg>
   <span
     >{layer.data.geoJSON.features.length}
-    {pluralize(layer.data.geoJSON.features.length, geometryType)}</span
+    {pluralize(geometryType, layer.data.geoJSON.features.length)}</span
   >
 </div>

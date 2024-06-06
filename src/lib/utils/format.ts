@@ -6,6 +6,6 @@
  * @param suffix – The pluralization suffix.
  * @returns – The pluralized noun, if necessary.
  */
-export function pluralize(n: number, noun: string, suffix = 's'): string {
+export function pluralize(noun: string, n: number, suffix = 's'): string {
   return n === 1 ? noun : `${noun}${suffix}`;
 }

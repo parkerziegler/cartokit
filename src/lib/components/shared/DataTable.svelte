@@ -105,7 +105,7 @@
       {tableName}
     </span>
     <div class="stack-h stack-h-sm">
-      <span>{N} {pluralize(N, 'Feature')}</span>
+      <span>{N} {pluralize('Feature', N)}</span>
       <button on:click={onClose}>
         <CloseIcon />
       </button>
