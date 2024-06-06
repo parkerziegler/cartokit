@@ -10,6 +10,7 @@
   /* eslint-enable import/no-duplicates */
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
+  import { pluralize } from '$lib/utils/format';
 
   const ROW_HEIGHT = 33;
   const rows = 7;
@@ -104,7 +105,7 @@
       {tableName}
     </span>
     <div class="stack-h stack-h-sm">
-      <span>{N} Features</span>
+      <span>{N} {pluralize(N, 'Feature')}</span>
       <button on:click={onClose}>
         <CloseIcon />
       </button>
