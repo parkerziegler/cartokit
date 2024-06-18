@@ -65,16 +65,26 @@ test.afterAll(() => {
  * location in geographic space from 1980-2024.
  */
 test('workflow-3', async ({ page }) => {
-  // Mark this test as slow. We're working with a 250MB GeoJSON file, which will
-  // take some time for MapLibre to render, even at high zooms.
+  // Mark workflow tests as slow.
   test.slow();
 
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
 
-  // Wait for MapLibre to request tiles from the tile server and instantiate the
-  // map instance.
-  await page.waitForLoadState('networkidle');
+  // Wait for the Open Editor button and Add Layer button to become enabled. These
+  // are proxies for the map reaching an idle state.
+  await expect(page.getByTestId('editor-toggle')).toBeEnabled({
+    timeout: 10000
+  });
+  await expect(page.getByTestId('add-layer-button')).toBeEnabled({
+    timeout: 10000
+  });
+
+  // Click the Open Editor button.
+  await page.getByTestId('editor-toggle').click();
+
+  // Ensure the Editor Panel is visible.
+  await expect(page.getByTestId('program-editor')).toBeVisible();
 
   // Pan and zoom the map to the Bay Area to reduce future rendering time when
   // MapLibre generates tiles on the fly.
@@ -97,13 +107,6 @@ test('workflow-3', async ({ page }) => {
     });
     await page.mouse.wheel(0, -1200);
   }
-
-  // Click the Open Editor button.
-  await expect(page.getByTestId('editor-toggle')).toBeEnabled();
-  await page.getByTestId('editor-toggle').click();
-
-  // Ensure the Editor Panel is visible.
-  await expect(page.getByTestId('program-editor')).toBeVisible();
 
   // Open the Add Layer modal.
   await expect(page.getByTestId('add-layer-button')).toBeEnabled();
@@ -130,7 +133,7 @@ test('workflow-3', async ({ page }) => {
   // Add the layer.
   await page.getByRole('button', { name: 'Add' }).click();
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible({
-    timeout: 10000
+    timeout: 30000
   });
 
   // Wait for MapLibre to render the Winter Temperature Change layer.
@@ -139,7 +142,7 @@ test('workflow-3', async ({ page }) => {
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(10000);
+  await page.waitForTimeout(20000);
 
   // Click on a page location that will trigger selection of the Winter Tempera-
   // ture Change layer.

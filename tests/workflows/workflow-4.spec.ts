@@ -20,9 +20,20 @@ test('workflow-4', async ({ page }) => {
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
 
-  // Wait for MapLibre to request tiles from the tile server and instantiate the
-  // map instance.
-  await page.waitForLoadState('networkidle');
+  // Wait for the Open Editor button and Add Layer button to become enabled. These
+  // are proxies for the map reaching an idle state.
+  await expect(page.getByTestId('editor-toggle')).toBeEnabled({
+    timeout: 10000
+  });
+  await expect(page.getByTestId('add-layer-button')).toBeEnabled({
+    timeout: 10000
+  });
+
+  // Click the Open Editor button.
+  await page.getByTestId('editor-toggle').click();
+
+  // Ensure the Editor Panel is visible.
+  await expect(page.getByTestId('program-editor')).toBeVisible();
 
   // Focus the map and trigger a 'wheel' event to zoom out.
   await page.locator('#map').click({
@@ -40,19 +51,12 @@ test('workflow-4', async ({ page }) => {
       y: 360
     }
   });
+
   await page.mouse.down();
-  await page.mouse.move(-100, -600);
+  await page.mouse.move(-50, -400);
   await page.mouse.up();
 
-  // Click the Open Editor button.
-  await expect(page.getByTestId('editor-toggle')).toBeEnabled();
-  await page.getByTestId('editor-toggle').click();
-
-  // Ensure the Editor Panel is visible.
-  await expect(page.getByTestId('program-editor')).toBeVisible();
-
   // Open the Add Layer modal.
-  await expect(page.getByTestId('add-layer-button')).toBeEnabled();
   await page.getByTestId('add-layer-button').click();
   await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
@@ -88,14 +92,14 @@ test('workflow-4', async ({ page }) => {
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(5000);
 
   // Click on a page location that will trigger selection of the Fishing Boat
   // Transponder Gaps layer.
   await page.locator('#map').click({
     position: {
-      x: 340,
-      y: 500
+      x: 180,
+      y: 300
     }
   });
 
