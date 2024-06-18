@@ -16,7 +16,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * Identification System) transpoder signal disabling events at that location in
  * geographic space.
  */
-test('workflow-4', async ({ page, browserName }) => {
+test('workflow-4', async ({ page }) => {
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
 
