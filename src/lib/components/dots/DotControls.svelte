@@ -30,6 +30,7 @@
       max={Infinity}
       value={layer.style.dots.value}
       on:change={onDotValueChange}
+      class="w-10"
     />
   </div>
 </div>
