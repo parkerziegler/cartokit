@@ -19,7 +19,7 @@
   on:click={onClick}
   disabled={disabled || loading}
   class={cs(
-    'rounded bg-slate-700 px-3 py-2 text-sm text-white transition-opacity enabled:hover:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:cursor-not-allowed',
+    'rounded border border-slate-600 px-3 py-2 text-sm text-white transition focus:border-slate-400 enabled:hover:border-slate-400 disabled:cursor-not-allowed  disabled:text-slate-500',
     className
   )}
   data-testid={testId}

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import cs from 'classnames';
   import { getContext } from 'svelte';
 
   import Button from '$lib/components/shared/Button.svelte';
@@ -22,12 +21,8 @@
   }
 </script>
 
-<div class="flex h-full flex-col">
-  <div
-    class={cs(
-      'stack stack-xs basis-1/3 rounded-sm border border-transparent p-2 transition-colors'
-    )}
-  >
+<form class="stack stack-sm">
+  <div class="stack stack-xs">
     <FieldLabel fieldId="tile-url">Tile URL</FieldLabel>
     <TextInput
       on:input={onTileUrlInput}
@@ -42,4 +37,4 @@
     on:click={onSubmit}
     disabled={!tileUrl || tileUrl === $ir.basemap.url}>Apply</Button
   >
-</div>
+</form>
