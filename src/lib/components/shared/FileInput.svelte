@@ -1,24 +1,30 @@
 <script lang="ts">
-  export let id = '';
-  export let onChange: (fileInput: HTMLSpanElement, event: Event) => void;
-  export let file: File;
+  import { createEventDispatcher } from 'svelte';
 
-  let fileInput: HTMLSpanElement;
+  export let id = '';
+
+  const dispatch = createEventDispatcher();
+
+  let files: FileList;
+
+  $: if (files) {
+    dispatch('change', { file: files[0] });
+  }
 </script>
 
 <label class="file relative inline-block cursor-pointer">
   <input
     {id}
-    on:change={(event) => onChange(fileInput, event)}
     type="file"
     tabindex="0"
+    bind:files
     class="m-0 min-w-0 opacity-0"
+    accept=".geojson,.json"
   />
   <span
     class="file-prompt"
-    class:file-prompt--uploaded={file}
-    bind:this={fileInput}
-    data-content="Choose file..."
+    class:file-prompt--uploaded={files?.[0].name}
+    data-content={files?.[0]?.name ?? 'Choose file...'}
   />
 </label>
 

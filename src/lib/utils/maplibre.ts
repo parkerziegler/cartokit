@@ -1,86 +1,55 @@
-import type {
-  LayerSpecification,
-  Map,
-  SourceSpecification,
-  StyleSpecification
-} from 'maplibre-gl';
+import { get } from 'svelte/store';
 
-import type { CartoKitIR } from '$lib/stores/ir';
+import { ir as irStore } from '$lib/stores/ir';
+import { map as mapStore } from '$lib/stores/map';
+import type { BasemapProvider } from '$lib/utils/basemap';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
 
-interface URLTileConfig {
-  kind: 'url';
-  url: string;
-}
-
-interface JSONTileConfig {
-  kind: 'json';
-  json: StyleSpecification;
-}
-
-export type BasemapSwitchConfig = URLTileConfig | JSONTileConfig;
-
 /**
- * Switch the basemap of the map while preserving all currently renderedlayers
- * and sources. By default, map.setStyle() will remove all layers and sources.
- * See: https://github.com/mapbox/mapbox-gl-js/issues/4006.
+ * Switch the basemap of the map while preserving all currently rendered layers
+ * and sources. By default, map.setStyle() will not preserve custom layers.
+ * See: https://github.com/maplibre/maplibre-gl-js/issues/2587.
  *
- * @param map – The MapLibre map instance.
- * @param ir – The CartoKit IR.
- * @param config – The configuration of the target basemap style.z
+ * @param tileUrl – The url of the new vector basemap style.
+ * @param provider – The basemap provider of the new vector basemap style.
  */
-export const switchBasemapWithPreservedLayers = async (
-  map: Map,
-  ir: CartoKitIR,
-  config: BasemapSwitchConfig
-) => {
-  const { layers, sources } = map.getStyle();
+export function switchBasemapWithPreservedLayers(
+  tileUrl: string,
+  provider: BasemapProvider
+): void {
+  // Update the IR with the new basemap information.
+  irStore.update((ir) => {
+    ir.basemap.url = tileUrl;
+    ir.basemap.provider = provider;
 
-  const lyrs = Object.values(ir.layers).reduce<LayerSpecification[]>(
-    (acc, layer) => {
-      // Get the ids of all layers in the IR in addition to their instrumented layers.
-      const ids = [layer.id, ...getInstrumentedLayerIds(layer)];
+    return ir;
+  });
 
-      // Return the LayerSpecifications of the layers possessing one of the above ids.
-      return [
-        ...acc,
-        ...ids.reduce<LayerSpecification[]>((acc, id) => {
-          const lyr = layers.find((lyr) => lyr.id === id);
-          if (lyr) {
-            acc.push(lyr);
+  // Preserve all currently rendered layers and sources when calling map.setStyle().
+  const ir = get(irStore);
+  const map = get(mapStore);
+
+  map.setStyle(tileUrl, {
+    transformStyle: (previousStyle, nextStyle) => {
+      const ids = Object.values(ir.layers).reduce<string[]>(
+        (acc, layer) => [...acc, layer.id, ...getInstrumentedLayerIds(layer)],
+        []
+      );
+
+      const customLayers =
+        previousStyle?.layers?.filter((layer) => ids.includes(layer.id)) ?? [];
+      const layers = nextStyle.layers.concat(customLayers);
+
+      const sources = nextStyle.sources;
+      if (previousStyle?.sources) {
+        for (const [id, value] of Object.entries(previousStyle.sources)) {
+          if (ids.includes(id)) {
+            sources[id] = value;
           }
-
-          return acc;
-        }, [])
-      ];
-    },
-    []
-  );
-  const srcs = Object.keys(sources).reduce<Record<string, SourceSpecification>>(
-    (acc, src) => {
-      if (sources[src]) {
-        acc[src] = sources[src];
+        }
       }
 
-      return acc;
-    },
-    {}
-  );
-
-  try {
-    let style: StyleSpecification;
-
-    if (config.kind === 'url') {
-      style = await fetch(config.url).then((res) => res.json());
-    } else {
-      style = config.json;
+      return { ...nextStyle, layers, sources };
     }
-
-    style.layers = [...style.layers, ...lyrs];
-    style.sources = { ...style.sources, ...srcs };
-
-    map.setStyle(style);
-  } catch (err) {
-    console.error('Error switching basemap', err);
-  }
-};
+  });
+}

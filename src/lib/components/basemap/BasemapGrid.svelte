@@ -4,7 +4,6 @@
 
   import CustomTiles from '$lib/components/basemap/CustomTiles.svelte';
   import { ir } from '$lib/stores/ir';
-  import { map } from '$lib/stores/map';
   import {
     BASEMAPS,
     TILE_URLS,
@@ -18,21 +17,14 @@
 
   $: basemaps = BASEMAPS[provider];
 
-  const onSelectBasemap = (tileId: Basemap['tileId']) => {
-    return async () => {
-      const url = TILE_URLS[provider](tileId);
+  function onSelectBasemap(tileId: Basemap['tileId']) {
+    return function updateBasemap() {
+      const tileUrl = TILE_URLS[provider](tileId);
 
-      ir.update((ir) => {
-        ir.basemap.url = url;
-        ir.basemap.provider = provider;
-
-        return ir;
-      });
-
-      await switchBasemapWithPreservedLayers($map, $ir, { kind: 'url', url });
+      switchBasemapWithPreservedLayers(tileUrl, provider);
       closeModal();
     };
-  };
+  }
 </script>
 
 {#if provider === 'Custom'}

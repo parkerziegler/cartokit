@@ -1,5 +1,3 @@
-import memoize from 'lodash.memoize';
-
 // eslint-disable-next-line import/no-unresolved
 import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
 import type { CartoKitIR } from '$lib/stores/ir';
@@ -12,13 +10,9 @@ import type { CartoKitIR } from '$lib/stores/ir';
  * @param ir – The CartoKit IR.
  * @returns – A Mapbox GL JS program fragment representing the map's style.
  */
-export const codegenMapStyle = memoize((ir: CartoKitIR): string => {
-  if (ir.basemap.json) {
-    return JSON.stringify(ir.basemap.json, null, 2);
-  } else {
-    return `'${ir.basemap.url.replace(
-      PUBLIC_MAPTILER_API_KEY,
-      '<YOUR_MAPTILER_API_KEY>'
-    )}'`;
-  }
-});
+export function codegenMapStyle(ir: CartoKitIR): string {
+  return `'${ir.basemap.url.replace(
+    PUBLIC_MAPTILER_API_KEY,
+    '<YOUR_MAPTILER_API_KEY>'
+  )}'`;
+}

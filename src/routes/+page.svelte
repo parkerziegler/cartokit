@@ -10,7 +10,6 @@
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import PropertiesMenu from '$lib/components/properties/PropertiesMenu.svelte';
-  import Button from '$lib/components/shared/Button.svelte';
   import DataTable from '$lib/components/shared/DataTable.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
@@ -108,9 +107,9 @@
       <PropertiesMenu {map} layer={$selectedLayer} />
     {/if}
     <BasemapPicker />
-    <Button
+    <button
       class={cs(
-        'absolute bottom-12 right-4 z-10 rounded-md bg-slate-900 tracking-wider shadow-lg transition-transform duration-[400ms] ease-out',
+        'absolute bottom-12 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-[400ms] ease-out disabled:cursor-not-allowed',
         {
           '-translate-y-72': $layout.dataVisible,
           '-translate-x-[33.333333vw]': $layout.editorVisible
@@ -118,10 +117,10 @@
       )}
       on:click={toggleEditorVisibility}
       disabled={!$mapStore}
-      testId="editor-toggle"
+      data-testid="editor-toggle"
     >
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
-    </Button>
+    </button>
     {#if $layout.dataVisible && $selectedLayer}
       <DataTable
         data={$selectedLayer.data.geoJSON.features}

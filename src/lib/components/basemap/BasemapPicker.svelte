@@ -109,7 +109,7 @@
     style="position: inherit;"
   />
 </button>
-<Modal bind:showModal class="max-w-2xl">
+<Modal bind:showModal class="max-w-2xl" initialHeight={277}>
   <h2 slot="header" class="text-xl font-semibold">Select Basemap</h2>
-  <Tabs {tabs} slot="body" bodyClass="h-[32rem]" />
+  <Tabs {tabs} slot="body" />
 </Modal>
