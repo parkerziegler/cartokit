@@ -18,11 +18,11 @@ export function switchBasemapWithPreservedLayers(
   provider: BasemapProvider
 ): void {
   // Update the IR with the new basemap information.
-  irStore.update((irs) => {
-    irs.basemap.url = tileUrl;
-    irs.basemap.provider = provider;
+  irStore.update((ir) => {
+    ir.basemap.url = tileUrl;
+    ir.basemap.provider = provider;
 
-    return irs;
+    return ir;
   });
 
   // Preserve all currently rendered layers and sources when calling map.setStyle().
