@@ -9,7 +9,7 @@
   export let layer: CartoKitChoroplethLayer;
 </script>
 
-<div class="stack stack-xs">
+<div class="stack stack-2xs">
   <AttributeSelect {layer} selected={layer.style.fill.attribute} />
   <ColorScaleMethodSelect {layer} />
   <ColorScaleStepsSelect {layer} />

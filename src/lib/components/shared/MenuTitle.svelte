@@ -8,7 +8,7 @@
 {#if $$slots.action && $$slots.subtitle}
   <div class="stack stack-xs p-4 text-white">
     <div class="flex items-center justify-between">
-      <p class={cs('font-sans text-xl font-medium tracking-wider', className)}>
+      <p class={cs('font-sans text-lg font-medium tracking-wider', className)}>
         <slot />
       </p>
       <slot name="action" />

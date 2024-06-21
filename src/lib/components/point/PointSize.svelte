@@ -9,7 +9,7 @@
 
   export let layer: CartoKitPointLayer | CartoKitDotDensityLayer;
 
-  const onPointSizeChange = (event: CustomEvent<{ value: number }>): void => {
+  function onPointSizeChange(event: CustomEvent<{ value: number }>): void {
     dispatchLayerUpdate({
       type: 'point-size',
       layer,
@@ -17,7 +17,7 @@
         size: event.detail.value
       }
     });
-  };
+  }
 
   $: ({ size, fieldId, label } =
     layer.type === 'Point'
@@ -37,5 +37,6 @@
     max={Infinity}
     value={size}
     on:change={onPointSizeChange}
+    class="w-10"
   />
 </div>

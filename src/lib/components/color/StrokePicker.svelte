@@ -45,7 +45,7 @@
 </script>
 
 {#if layer.style.stroke}
-  <div class="color-picker stack stack-xs" transition:slide>
+  <div class="color-picker stack stack-2xs" transition:slide>
     <div class="flex items-center">
       <FieldLabel fieldId="stroke-color">Color</FieldLabel>
       <input
@@ -68,7 +68,7 @@
         id="stroke-width-input"
         value={layer.style.stroke.width}
         on:change={onStrokeWidthChange}
-        class="w-12"
+        class="w-10"
       />
     </div>
     <OpacityInput {layer} property="stroke" />

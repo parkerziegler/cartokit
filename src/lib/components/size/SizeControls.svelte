@@ -22,14 +22,26 @@
   }
 </script>
 
-<div class="stack stack-xs">
+<div class="stack stack-2xs">
   <AttributeSelect {layer} selected={layer.style.size.attribute} />
   <div class="stack-h stack-h-xs items-center">
     <FieldLabel fieldId="min">Min</FieldLabel>
-    <NumberInput id="min" min={1} value={min} on:change={onSizeChange('min')} />
+    <NumberInput
+      id="min"
+      min={1}
+      value={min}
+      on:change={onSizeChange('min')}
+      class="w-10"
+    />
   </div>
   <div class="stack-h stack-h-xs items-center">
     <FieldLabel fieldId="max">Max</FieldLabel>
-    <NumberInput id="max" min={1} value={max} on:change={onSizeChange('max')} />
+    <NumberInput
+      id="max"
+      min={1}
+      value={max}
+      on:change={onSizeChange('max')}
+      class="w-10"
+    />
   </div>
 </div>

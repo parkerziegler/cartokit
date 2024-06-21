@@ -44,7 +44,7 @@
 
 <Menu
   id="properties"
-  class={cs('properties absolute right-4 top-4 z-10 max-w-sm overflow-auto', {
+  class={cs('properties absolute right-4 top-4 z-10 overflow-auto', {
     'properties--y-compact': $layout.dataVisible,
     'properties--x-compact': $layout.editorVisible
   })}
