@@ -32,7 +32,12 @@
 >
   <PlusIcon />
 </button>
-<Modal bind:showModal class="max-w-lg" testId="add-layer-modal">
+<Modal
+  bind:showModal
+  class="max-w-lg"
+  testId="add-layer-modal"
+  initialHeight={327}
+>
   <h2 slot="header" class="text-xl font-semibold">Add Layer</h2>
   <Tabs {tabs} slot="body" />
 </Modal>

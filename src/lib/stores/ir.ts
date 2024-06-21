@@ -1,4 +1,3 @@
-import type { StyleSpecification } from 'maplibre-gl';
 import { writable } from 'svelte/store';
 
 import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
@@ -9,7 +8,6 @@ export interface CartoKitIR {
   zoom: number;
   basemap: {
     url: string;
-    json?: StyleSpecification;
     provider: BasemapProvider;
   };
   layers: Record<string, CartoKitLayer>;

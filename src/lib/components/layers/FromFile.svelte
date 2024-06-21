@@ -11,36 +11,36 @@
 
   const closeModal = getContext<() => void>('close-modal');
 
-  let file: File;
+  let file: File | null = null;
   let displayName = '';
   let dataLoading = false;
 
-  function onFileUpload(fileInput: HTMLSpanElement, event: Event) {
-    const { files } = event.target as HTMLInputElement;
-
-    if (files?.length) {
-      file = files[0];
-
-      const name = files[0].name;
-      fileInput.setAttribute('data-content', name);
-    }
+  function onFileUpload(event: CustomEvent<{ file: File }>) {
+    file = event.detail.file;
   }
 
-  function onDisplayNameChange(event: CustomEvent<{ value: string }>) {
+  function onDisplayNameInput(event: CustomEvent<{ value: string }>) {
     displayName = event.detail.value;
   }
 
   function onSourceLoaded() {
     dataLoading = false;
+    file = null;
+    displayName = '';
+
     closeModal();
   }
 
   function onSubmit() {
+    if (!file || !displayName) {
+      return;
+    }
+
     dataLoading = true;
     const reader = new FileReader();
 
     reader.onload = function readGeoJSON(theFile) {
-      if (typeof theFile.target?.result === 'string') {
+      if (typeof theFile.target?.result === 'string' && file) {
         const featureCollection = normalizeGeoJSONToFeatureCollection(
           JSON.parse(theFile.target.result)
         );
@@ -64,16 +64,19 @@
 <form class="stack stack-sm" on:submit={onSubmit}>
   <div class="stack stack-xs">
     <FieldLabel fieldId="from-file-input">File</FieldLabel>
-    <FileInput id="from-file-input" onChange={onFileUpload} {file} />
+    <FileInput id="from-file-input" on:change={onFileUpload} {file} />
   </div>
   <div class="stack stack-xs">
     <FieldLabel fieldId="Display Name">Display Name</FieldLabel>
     <TextInput
-      on:change={onDisplayNameChange}
+      on:input={onDisplayNameInput}
       value={displayName}
-      placeholder="(e.g., National Parks)"
       id="Display Name"
     />
   </div>
-  <Button class="self-end" loading={dataLoading}>Add</Button>
+  <Button
+    class="self-end"
+    loading={dataLoading}
+    disabled={!file || !displayName}>Add</Button
+  >
 </form>

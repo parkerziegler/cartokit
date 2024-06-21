@@ -13,20 +13,27 @@
   let displayName = '';
   let dataLoading = false;
 
-  function onEndpointChange(event: CustomEvent<{ value: string }>) {
+  function onEndpointInput(event: CustomEvent<{ value: string }>) {
     endpoint = event.detail.value;
   }
 
-  function onDisplayNameChange(event: CustomEvent<{ value: string }>) {
+  function onDisplayNameInput(event: CustomEvent<{ value: string }>) {
     displayName = event.detail.value;
   }
 
   function onSourceLoaded() {
     dataLoading = false;
+    endpoint = '';
+    displayName = '';
+
     closeModal();
   }
 
   function onSubmit() {
+    if (!endpoint || !displayName) {
+      return;
+    }
+
     dataLoading = true;
 
     addSource($map, {
@@ -42,22 +49,26 @@
   <div class="stack stack-xs">
     <FieldLabel fieldId="from-endpoint-input">Endpoint</FieldLabel>
     <TextInput
-      on:change={onEndpointChange}
+      on:input={onEndpointInput}
       value={endpoint}
-      placeholder="(e.g., https://www.nps.gov/lib/npmap.js/4.0.0/examples/data/national-parks.geojson)"
       id="from-endpoint-input"
       class="w-full"
+      placeholder="(e.g., https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson)"
     />
   </div>
   <div class="stack stack-xs">
     <FieldLabel fieldId="Display Name">Display Name</FieldLabel>
     <TextInput
-      on:change={onDisplayNameChange}
+      on:input={onDisplayNameInput}
       value={displayName}
-      placeholder="(e.g., National Parks)"
       id="Display Name"
       class="w-full"
+      placeholder="(e.g., Earthquakes)"
     />
   </div>
-  <Button class="self-end" loading={dataLoading}>Add</Button>
+  <Button
+    class="self-end"
+    loading={dataLoading}
+    disabled={!endpoint || !displayName}>Add</Button
+  >
 </form>
