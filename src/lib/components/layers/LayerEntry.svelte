@@ -57,7 +57,10 @@
           <ChoroplethIcon />
         {/if}
       </span>
-      <span class="ml-2 mr-8 truncate text-sm">{layer.displayName}</span>
+      <span
+        class="ml-2 mr-8 truncate font-sans text-sm font-medium tracking-wider"
+        >{layer.displayName}</span
+      >
     </div>
     {#if layerVisible}
       <button on:click={toggleLayerVisibility}>

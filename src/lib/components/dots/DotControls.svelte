@@ -8,7 +8,7 @@
 
   export let layer: CartoKitDotDensityLayer;
 
-  const onDotValueChange = (event: CustomEvent<{ value: number }>) => {
+  function onDotValueChange(event: CustomEvent<{ value: number }>) {
     dispatchLayerUpdate({
       type: 'dot-value',
       layer,
@@ -16,10 +16,10 @@
         value: event.detail.value
       }
     });
-  };
+  }
 </script>
 
-<div class="stack stack-xs">
+<div class="stack stack-2xs">
   <AttributeSelect {layer} selected={layer.style.dots.attribute} />
   <PointSize {layer} />
   <div class="stack-h stack-h-xs items-center">

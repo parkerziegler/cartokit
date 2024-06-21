@@ -2,10 +2,11 @@
   import { createEventDispatcher } from 'svelte';
 
   export let id = '';
+  export let file: File | null = null;
+
+  let files: FileList | null = null;
 
   const dispatch = createEventDispatcher();
-
-  let files: FileList;
 
   $: if (files) {
     dispatch('change', { file: files[0] });
@@ -23,8 +24,8 @@
   />
   <span
     class="file-prompt"
-    class:file-prompt--uploaded={files?.[0].name}
-    data-content={files?.[0]?.name ?? 'Choose file...'}
+    class:file-prompt--uploaded={file?.name}
+    data-content={file?.name ?? 'Choose file...'}
   />
 </label>
 
