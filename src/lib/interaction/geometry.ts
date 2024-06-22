@@ -83,11 +83,11 @@ export function generateDotDensityPoints({
   attribute,
   value
 }: GenerateDotDensityPointsParams): FeatureCollection {
-  const dots = features.flatMap((f) => {
-    const numPoints = Math.floor(f.properties?.[attribute] / value) ?? 0;
+  const dots = features.flatMap(({ geometry, properties }) => {
+    const numPoints = Math.floor(properties?.[attribute] / value) ?? 0;
 
     // Obtain the bounding box of the polygon.
-    const boundingBox = bbox(f);
+    const boundingBox = bbox(geometry);
 
     // Begin "throwing" random points within the bounding box,
     // keeping them only if they fall within the polygon.
@@ -96,13 +96,13 @@ export function generateDotDensityPoints({
     while (selectedFeatures.length < numPoints) {
       const candidate = randomPoint(1, { bbox: boundingBox }).features[0];
 
-      if (booleanPointInPolygon(candidate, f)) {
+      if (booleanPointInPolygon(candidate, geometry)) {
         selectedFeatures.push(candidate);
       }
     }
 
     return selectedFeatures.flatMap((point) =>
-      feature(point.geometry, f.properties)
+      feature(point.geometry, properties)
     );
   });
 
