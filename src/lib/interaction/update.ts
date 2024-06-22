@@ -1,4 +1,9 @@
-import type { FeatureCollection } from 'geojson';
+import type {
+  FeatureCollection,
+  Feature,
+  Polygon,
+  MultiPolygon
+} from 'geojson';
 import type { GeoJSONSource } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
@@ -279,7 +284,9 @@ export const dispatchLayerUpdate = ({
             );
 
             const features = generateDotDensityPoints({
-              features: lyr.data.rawGeoJSON.features,
+              features: lyr.data.rawGeoJSON.features as Feature<
+                Polygon | MultiPolygon
+              >[],
               attribute: payload.attribute,
               value: dotValue
             });
@@ -711,7 +718,9 @@ export const dispatchLayerUpdate = ({
         // conversely, the current layer geometry will be points, which do not
         // allow us to generate a dot density.
         const features = generateDotDensityPoints({
-          features: lyr.data.rawGeoJSON.features,
+          features: lyr.data.rawGeoJSON.features as Feature<
+            Polygon | MultiPolygon
+          >[],
           attribute: lyr.style.dots.attribute,
           value: payload.value
         });

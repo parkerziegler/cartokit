@@ -18,7 +18,7 @@
     "@codemirror/view": "^6.26.3",
     "@lezer/highlight": "^1.2.0",
     "@turf/bbox": "^7.0.0",
-    "@turf/boolean-within": "^7.0.0",
+    "@turf/boolean-point-in-polygon": "^7.0.0",
     "@turf/centroid": "^7.0.0",
     "@turf/helpers": "^7.0.0",
     "@turf/random": "^7.0.0",

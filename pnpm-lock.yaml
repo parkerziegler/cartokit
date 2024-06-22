@@ -26,7 +26,7 @@ importers:
       '@turf/bbox':
         specifier: ^7.0.0
         version: 7.0.0
-      '@turf/boolean-within':
+      '@turf/boolean-point-in-polygon':
         specifier: ^7.0.0
         version: 7.0.0
       '@turf/centroid':
@@ -724,12 +724,6 @@ packages:
 
   '@turf/boolean-point-in-polygon@7.0.0':
     resolution: {integrity: sha512-Z9swETfICqUJ8iVLZimvIOh8r4Wrlu9/X/c/5vIEeVvG4Lu78Ztmgu1KaobZJFC93/ntOAjMBavc9aNgw7TXgQ==}
-
-  '@turf/boolean-point-on-line@7.0.0':
-    resolution: {integrity: sha512-9/1hj2MxcUU4fZu+MQC6rdMsdvAYNTtfxssLrZ1dGXo+NcAoWFbZSrfk62pSJBflveyKY5kXPYY+xQfLT0NeDQ==}
-
-  '@turf/boolean-within@7.0.0':
-    resolution: {integrity: sha512-QmOX34T7z9wzuzUVsXx3KMCMsxLi71/SOcrgkcHhcWsThx+VPPmyIUtTa8XnBt1BBlx7IIrR2pAeORkUi0CdEg==}
 
   '@turf/centroid@7.0.0':
     resolution: {integrity: sha512-TMKp5yadglNVRxX3xuk1qQDEy5JFHmlYVBamzXuD8DL8rYdVog2x4gQHrwn7xrUyAlKJ4fUZZPkYBWfW6TDWbw==}
@@ -3403,21 +3397,6 @@ snapshots:
       '@turf/helpers': 7.0.0
       '@turf/invariant': 7.0.0
       point-in-polygon-hao: 1.1.0
-      tslib: 2.6.3
-
-  '@turf/boolean-point-on-line@7.0.0':
-    dependencies:
-      '@turf/helpers': 7.0.0
-      '@turf/invariant': 7.0.0
-      tslib: 2.6.3
-
-  '@turf/boolean-within@7.0.0':
-    dependencies:
-      '@turf/bbox': 7.0.0
-      '@turf/boolean-point-in-polygon': 7.0.0
-      '@turf/boolean-point-on-line': 7.0.0
-      '@turf/helpers': 7.0.0
-      '@turf/invariant': 7.0.0
       tslib: 2.6.3
 
   '@turf/centroid@7.0.0':

@@ -1,10 +1,15 @@
 import { bbox } from '@turf/bbox';
-import { booleanWithin } from '@turf/boolean-within';
+import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
 import { centroid } from '@turf/centroid';
 import { feature, featureCollection } from '@turf/helpers';
 import { randomPoint } from '@turf/random';
 import * as d3 from 'd3';
-import type { Feature, FeatureCollection } from 'geojson';
+import type {
+  Feature,
+  FeatureCollection,
+  MultiPolygon,
+  Polygon
+} from 'geojson';
 import type { ExpressionSpecification } from 'maplibre-gl';
 
 import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
@@ -59,7 +64,7 @@ export function deriveCentroids(features: Feature[]): FeatureCollection {
 }
 
 interface GenerateDotDensityPointsParams {
-  features: Feature[];
+  features: Feature<Polygon | MultiPolygon>[];
   attribute: string;
   value: number;
 }
@@ -91,7 +96,7 @@ export function generateDotDensityPoints({
     while (selectedFeatures.length < numPoints) {
       const candidate = randomPoint(1, { bbox: boundingBox }).features[0];
 
-      if (booleanWithin(candidate, f)) {
+      if (booleanPointInPolygon(candidate, f)) {
         selectedFeatures.push(candidate);
       }
     }
