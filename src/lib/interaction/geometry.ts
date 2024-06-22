@@ -1,4 +1,8 @@
-import * as turf from '@turf/turf';
+import { bbox } from '@turf/bbox';
+import { booleanWithin } from '@turf/boolean-within';
+import { centroid } from '@turf/centroid';
+import { feature, featureCollection } from '@turf/helpers';
+import { randomPoint } from '@turf/random';
 import * as d3 from 'd3';
 import type { Feature, FeatureCollection } from 'geojson';
 import type { ExpressionSpecification } from 'maplibre-gl';
@@ -47,13 +51,11 @@ export function deriveSize(
  * @returns – a FeatureCollection of centroids.
  */
 export function deriveCentroids(features: Feature[]): FeatureCollection {
-  const feats = features.map((feature) => {
-    const centroid = turf.centroid(feature);
-
-    return turf.feature(centroid.geometry, feature.properties);
-  });
-
-  return turf.featureCollection(feats);
+  return featureCollection(
+    features.map(({ geometry, properties }) =>
+      feature(centroid(geometry).geometry, properties)
+    )
+  );
 }
 
 interface GenerateDotDensityPointsParams {
@@ -76,29 +78,30 @@ export function generateDotDensityPoints({
   attribute,
   value
 }: GenerateDotDensityPointsParams): FeatureCollection {
-  const dots = features.flatMap((feature) => {
-    const numPoints = Math.floor(feature.properties?.[attribute] / value) ?? 0;
+  const dots = features.flatMap((f) => {
+    const numPoints = Math.floor(f.properties?.[attribute] / value) ?? 0;
 
     // Obtain the bounding box of the polygon.
-    const bbox = turf.bbox(feature);
+    const boundingBox = bbox(f);
 
     // Begin "throwing" random points within the bounding box,
     // keeping them only if they fall within the polygon.
     const selectedFeatures: Feature[] = [];
-    while (selectedFeatures.length < numPoints) {
-      const candidate = turf.randomPoint(1, { bbox }).features[0];
 
-      if (turf.booleanWithin(candidate, feature)) {
+    while (selectedFeatures.length < numPoints) {
+      const candidate = randomPoint(1, { bbox: boundingBox }).features[0];
+
+      if (booleanWithin(candidate, f)) {
         selectedFeatures.push(candidate);
       }
     }
 
-    return selectedFeatures.flatMap((point) => {
-      return turf.feature(point.geometry, feature.properties);
-    });
+    return selectedFeatures.flatMap((point) =>
+      feature(point.geometry, f.properties)
+    );
   });
 
-  return turf.featureCollection(dots);
+  return featureCollection(dots);
 }
 
 /**
