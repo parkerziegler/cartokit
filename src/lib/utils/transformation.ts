@@ -39,7 +39,7 @@ export function transformDotDensity(
           }
         }
 
-        return selectedFeatures.flatMap((point) =>
+        return selectedFeatures.map((point) =>
           turf.feature(point.geometry, feature.properties)
         );
       });
