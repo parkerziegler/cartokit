@@ -1,4 +1,4 @@
-import type { Geometry } from 'geojson';
+import type { Geometry, Feature, Polygon, MultiPolygon } from 'geojson';
 import type { Map, GeoJSONSource } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
@@ -491,7 +491,9 @@ const transitionToDotDensity = (
         generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
       }
 
-      const features = layer.data.rawGeoJSON.features;
+      const features = layer.data.rawGeoJSON.features as Feature<
+        Polygon | MultiPolygon
+      >[];
       const attribute = selectNumericAttribute(features);
       const dotValue = deriveDotDensityStartingValue(features, attribute);
 
@@ -534,7 +536,9 @@ const transitionToDotDensity = (
         generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
       }
 
-      const features = layer.data.rawGeoJSON.features;
+      const features = layer.data.rawGeoJSON.features as Feature<
+        Polygon | MultiPolygon
+      >[];
       const attribute = layer.style.size.attribute;
       const dotValue = deriveDotDensityStartingValue(
         features,
@@ -588,7 +592,9 @@ const transitionToDotDensity = (
       throw error;
     }
     case 'Fill': {
-      const features = layer.data.geoJSON.features;
+      const features = layer.data.geoJSON.features as Feature<
+        Polygon | MultiPolygon
+      >[];
       const attribute = selectNumericAttribute(features);
       const dotValue = deriveDotDensityStartingValue(features, attribute);
 
@@ -625,7 +631,9 @@ const transitionToDotDensity = (
       };
     }
     case 'Choropleth': {
-      const features = layer.data.geoJSON.features;
+      const features = layer.data.geoJSON.features as Feature<
+        Polygon | MultiPolygon
+      >[];
       const attribute = layer.style.fill.attribute;
       const dotValue = deriveDotDensityStartingValue(features, attribute);
 

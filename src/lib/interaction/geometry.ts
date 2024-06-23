@@ -1,6 +1,16 @@
-import * as turf from '@turf/turf';
+import { bbox } from '@turf/bbox';
+import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
+import { centroid } from '@turf/centroid';
+import { feature, featureCollection } from '@turf/helpers';
+import { randomPoint } from '@turf/random';
 import * as d3 from 'd3';
-import type { Feature, FeatureCollection } from 'geojson';
+import type {
+  Feature,
+  FeatureCollection,
+  Point,
+  MultiPolygon,
+  Polygon
+} from 'geojson';
 import type { ExpressionSpecification } from 'maplibre-gl';
 
 import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
@@ -10,7 +20,7 @@ import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
  *
  * @param layer – The CartoKitProportionalSymbolLayer to derive a radius scale for.
  *
- * @returns – a MapLibre GL JS expression for a proportional symbol radius scale.
+ * @returns – A MapLibre GL JS expression for a proportional symbol radius scale.
  */
 export function deriveSize(
   layer: CartoKitProportionalSymbolLayer
@@ -42,22 +52,20 @@ export function deriveSize(
 /**
  * Derive centroids for a set of GeoJSON features.
  *
- * @param features – the input features to derive centroids for.
+ * @param features – The input features to derive centroids for.
  *
- * @returns – a FeatureCollection of centroids.
+ * @returns – A FeatureCollection of centroids.
  */
 export function deriveCentroids(features: Feature[]): FeatureCollection {
-  const feats = features.map((feature) => {
-    const centroid = turf.centroid(feature);
-
-    return turf.feature(centroid.geometry, feature.properties);
-  });
-
-  return turf.featureCollection(feats);
+  return featureCollection(
+    features.map(({ geometry, properties }) =>
+      feature(centroid(geometry).geometry, properties)
+    )
+  );
 }
 
 interface GenerateDotDensityPointsParams {
-  features: Feature[];
+  features: Feature<Polygon | MultiPolygon>[];
   attribute: string;
   value: number;
 }
@@ -65,45 +73,46 @@ interface GenerateDotDensityPointsParams {
 /**
  * Generate dots for a dot density layer.
  *
- * @param features – the polygon features within which to generate dots.
- * @param attribute – the attribute being visualized.
- * @param value – the value of dots to attribute value.
+ * @param features – The polygon features within which to generate dots.
+ * @param attribute – The attribute being visualized.
+ * @param value – The dot value of the dot density layer.
  *
- * @returns – a FeatureCollection of dots.
+ * @returns – A FeatureCollection of dots.
  */
 export function generateDotDensityPoints({
   features,
   attribute,
   value
-}: GenerateDotDensityPointsParams): FeatureCollection {
-  const dots = features.flatMap((feature) => {
-    const numPoints = Math.floor(feature.properties?.[attribute] / value) ?? 0;
+}: GenerateDotDensityPointsParams): FeatureCollection<Point> {
+  return featureCollection(
+    features.flatMap(({ geometry, properties }) => {
+      const numPoints = Math.floor(properties?.[attribute] / value) ?? 0;
 
-    // Obtain the bounding box of the polygon.
-    const bbox = turf.bbox(feature);
+      // Obtain the bounding box of the polygon.
+      const boundingBox = bbox(geometry);
 
-    // Begin "throwing" random points within the bounding box,
-    // keeping them only if they fall within the polygon.
-    const selectedFeatures: Feature[] = [];
-    while (selectedFeatures.length < numPoints) {
-      const candidate = turf.randomPoint(1, { bbox }).features[0];
+      // Begin "throwing" random points within the bounding box, keeping them only
+      // if they fall within the polygon.
+      const selectedFeatures: Feature<Point>[] = [];
 
-      if (turf.booleanWithin(candidate, feature)) {
-        selectedFeatures.push(candidate);
+      while (selectedFeatures.length < numPoints) {
+        const candidate = randomPoint(1, { bbox: boundingBox }).features[0];
+
+        if (booleanPointInPolygon(candidate, geometry)) {
+          selectedFeatures.push(candidate);
+        }
       }
-    }
 
-    return selectedFeatures.flatMap((point) => {
-      return turf.feature(point.geometry, feature.properties);
-    });
-  });
-
-  return turf.featureCollection(dots);
+      return selectedFeatures.map((point) =>
+        feature(point.geometry, properties)
+      );
+    })
+  );
 }
 
 /**
- * Derive a starting dot value for a dot density layer. This value represents the ratio
- * of dots to data value, e.g., 1 dot = 100 people.
+ * Derive a starting dot value for a dot density layer. This value represents
+ * the ratio of dots to data value, e.g., 1 dot = 100 people.
  *
  * @param features – The GeoJSON features to derive a dot density value for.
  * @param attribute – The data attribute.

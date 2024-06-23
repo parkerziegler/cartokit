@@ -5,11 +5,11 @@ export function transformGeometryToCentroids(): Transformation {
     name: 'transformGeometryToCentroids',
     definition: `
     function transformGeometryToCentroids(geoJSON) {
-      const centroids = geoJSON.features.map((feature) => {
-        return turf.feature(turf.centroid(feature).geometry, feature.properties);
-      });
-
-      return turf.featureCollection(centroids)
+      return turf.featureCollection(
+        geoJSON.features.map((feature) =>
+          turf.feature(turf.centroid(feature).geometry, feature.properties);
+        )
+      );
     }`,
     type: 'geometric'
   };
@@ -34,14 +34,14 @@ export function transformDotDensity(
         while (selectedFeatures.length < numPoints) {
           const candidate = turf.randomPoint(1, { bbox }).features[0];
 
-          if (turf.booleanWithin(candidate, feature)) {
+          if (turf.booleanPointInPolygon(candidate, feature)) {
             selectedFeatures.push(candidate);
           }
         }
 
-        return selectedFeatures.flatMap((point) => {
-          return turf.feature(point.geometry, feature.properties);
-        });
+        return selectedFeatures.map((point) =>
+          turf.feature(point.geometry, feature.properties)
+        );
       });
 
       return turf.featureCollection(dots);
