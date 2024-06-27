@@ -16,11 +16,11 @@
   export let containerClass = '';
   export let bodyClass = '';
 
-  const setActiveTab = (i: number): (() => void) => {
-    return (): void => {
+  function onClickTab(i: number) {
+    return function setActiveTab() {
       activeIndex = i;
     };
-  };
+  }
 </script>
 
 <div class={cs('stack', containerClass)}>
@@ -31,7 +31,7 @@
         class:active={activeIndex === i}
         class:inactive={activeIndex !== i}
       >
-        <button on:click={setActiveTab(i)}>{tab.name}</button>
+        <button on:click={onClickTab(i)}>{tab.name}</button>
       </li>
     {/each}
   </ul>

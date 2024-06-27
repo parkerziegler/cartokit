@@ -67,7 +67,10 @@ export function transformationWorker(
     // Invoke user transformation code using an IIFE.
     // Wrap in a try-catch so we can send errors back to the main thread.
     [
-      `(${interceptConsoleInWebWorker.toString()})();
+      `
+      import * as Comlink from 'comlink';
+      
+      (${interceptConsoleInWebWorker.toString()})();
       try {
         const data = (${program})(${JSON.stringify(featureCollection)});
         self.postMessage({ type: 'data', data });
@@ -79,15 +82,29 @@ export function transformationWorker(
   );
 
   const source = URL.createObjectURL(blob);
-  const worker = new Worker(source);
+  const worker = new Worker(source, { type: 'module' });
 
   worker.addEventListener(
     'message',
     (event: MessageEvent<TransformationWorkerMessage>) => {
-      cb(event.data);
-
-      worker.terminate();
-      URL.revokeObjectURL(source);
+      switch (event.data.type) {
+        case 'console':
+          cb(event.data);
+          break;
+        case 'data':
+          cb(event.data);
+          worker.terminate();
+          URL.revokeObjectURL(source);
+          break;
+        case 'error':
+          cb({
+            type: 'error',
+            error: event.data.error
+          });
+          worker.terminate();
+          URL.revokeObjectURL(source);
+          break;
+      }
     }
   );
 

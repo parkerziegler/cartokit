@@ -18,6 +18,7 @@
   import { layout } from '$lib/stores/layout';
   import { map as mapStore } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
+  import TransformationEditor from '$lib/components/data/TransformationEditor.svelte';
 
   export let data: PageData;
 

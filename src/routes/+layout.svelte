@@ -1,6 +1,7 @@
 <script>
   import 'maplibre-gl/dist/maplibre-gl.css';
-  import '../app.css';
+  import '../styles/app.css';
+  import '../styles/inspector.css';
 </script>
 
 <svelte:head>

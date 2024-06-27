@@ -1,10 +1,12 @@
 <script lang="ts">
-  import TableIcon from '$lib/components/icons/TableIcon.svelte';
+  import CodeBlockIcon from '$lib/components/icons/CodeBlockIcon.svelte';
+  import { editor } from '$lib/stores/editor';
   import { layout } from '$lib/stores/layout';
 
   function onClick() {
+    editor.set(1);
     layout.update((layout) => {
-      layout.dataVisible = !layout.dataVisible;
+      layout.editorVisible = true;
 
       return layout;
     });
@@ -12,5 +14,5 @@
 </script>
 
 <button on:click={onClick}>
-  <TableIcon />
+  <CodeBlockIcon />
 </button>

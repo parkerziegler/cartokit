@@ -17,6 +17,7 @@
     "@codemirror/language": "^6.10.1",
     "@codemirror/view": "^6.26.3",
     "@lezer/highlight": "^1.2.0",
+    "@observablehq/inspector": "^5.0.0",
     "@turf/bbox": "^7.0.0",
     "@turf/boolean-point-in-polygon": "^7.0.0",
     "@turf/centroid": "^7.0.0",
@@ -24,6 +25,7 @@
     "@turf/random": "^7.0.0",
     "classnames": "^2.3.2",
     "codemirror": "^6.0.1",
+    "comlink": "^4.4.1",
     "d3": "^7.8.2",
     "lodash.camelcase": "^4.3.0",
     "lodash.isfinite": "^3.3.2",
@@ -32,6 +34,7 @@
     "lodash.uniqueid": "^4.0.1",
     "maplibre-gl": "^4.0.0",
     "prettier": "^3.0.0",
+    "recast": "^0.23.9",
     "simple-statistics": "^7.8.3"
   },
   "devDependencies": {

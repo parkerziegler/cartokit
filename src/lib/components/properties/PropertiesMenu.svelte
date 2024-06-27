@@ -5,6 +5,7 @@
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
   import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
+  import CreateTransformation from '$lib/components/properties/CreateTransformation.svelte';
   import DotDensityPropertiesPanel from '$lib/components/properties/DotDensityPropertiesPanel.svelte';
   import DownloadData from '$lib/components/properties/DownloadData.svelte';
   import FillPropertiesPanel from '$lib/components/properties/FillPropertiesPanel.svelte';
@@ -57,6 +58,7 @@
     <div class="stack-h stack-h-xs" slot="subtitle">
       <ViewData />
       <DownloadData {layer} />
+      <CreateTransformation />
     </div>
   </MenuTitle>
   <MenuItem title="Map Type">

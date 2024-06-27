@@ -17,8 +17,6 @@
   interface EditableCodeEditorConfig {
     kind: 'editable';
     initialDoc: string;
-    onChange: (value: string) => void;
-    onFocusChange?: (focusing: boolean) => void;
     language: 'javascript' | 'json';
   }
 
@@ -40,25 +38,7 @@
       syntaxHighlighting(syntaxTheme)
     ];
 
-    if (config.kind === 'editable') {
-      const { onChange, onFocusChange } = config;
-
-      extensions.push(
-        EditorView.updateListener.of((v) => {
-          if (v.docChanged) {
-            onChange(v.state.doc.toString());
-          }
-        })
-      );
-
-      extensions.push(
-        EditorView.updateListener.of((v) => {
-          if (v.focusChanged) {
-            onFocusChange?.(view?.hasFocus ?? false);
-          }
-        })
-      );
-    } else {
+    if (config.kind === 'readonly') {
       extensions.push(EditorView.editable.of(false));
     }
 

@@ -3,30 +3,18 @@
   import { EditorView } from 'codemirror';
   import { onDestroy } from 'svelte';
 
-  import TransformationAlert from '$lib/components/data/TransformationAlert.svelte';
-  import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import PlayCircle from '$lib/components/icons/PlayCircle.svelte';
   import TerminalIcon from '$lib/components/icons/TerminalIcon.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import CodeEditor from '$lib/components/shared/CodeEditor.svelte';
-  import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { selectedFeature } from '$lib/stores/selected-feature';
-  import type {
-    CartoKitChoroplethLayer,
-    CartoKitDotDensityLayer,
-    CartoKitProportionalSymbolLayer
-  } from '$lib/types/CartoKitLayer';
+  import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
   import { functionNameRe } from '$lib/utils/regex';
   import { transformationWorker } from '$lib/utils/worker';
 
-  export let onClose: () => void;
-  export let onClickOutside: (event: CustomEvent<MouseEvent>) => void;
-  export let layer:
-    | CartoKitChoroplethLayer
-    | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer;
+  export let layer: CartoKitLayer;
 
   // Main editor state.
   let view: EditorView;
@@ -156,9 +144,11 @@
   });
 </script>
 
-<Menu class="relative z-10 w-96" {onClickOutside}>
+<div
+  class="absolute right-0 top-0 flex h-full w-1/3 flex-col bg-slate-900 shadow-lg"
+  transition:slide={{ axis: 'x' }}
+>
   <MenuItem title="Transform Data">
-    <button on:click={onClose} slot="action"><CloseIcon /></button>
     <div class="stack stack-sm">
       <p class="font-sans">
         Use the editor below to transform your dataset using JavaScript.
@@ -174,11 +164,11 @@
         bind:view
         testId="transformation-editor"
       />
-      {#if error}
+      <!-- {#if error}
         <TransformationAlert alert={{ kind: 'error', message: error }} />
       {:else if success}
         <TransformationAlert alert={{ kind: 'success' }} />
-      {/if}
+      {/if} -->
       <Button
         class="stack-h stack-h-xs items-center self-end"
         on:click={onClick}
@@ -211,4 +201,4 @@
       </li>
     </ul>
   </MenuItem>
-</Menu>
+</div>
