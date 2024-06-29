@@ -7,7 +7,7 @@ export function transformGeometryToCentroids(): Transformation {
     function transformGeometryToCentroids(geoJSON) {
       return turf.featureCollection(
         geoJSON.features.map((feature) =>
-          turf.feature(turf.centroid(feature).geometry, feature.properties);
+          turf.feature(turf.centroid(feature).geometry, feature.properties)
         )
       );
     }`,
