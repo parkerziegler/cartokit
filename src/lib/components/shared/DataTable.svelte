@@ -31,13 +31,13 @@
   let n = Math.min(N, Math.floor(rows * 2)); // The number of rows displayed.
   let sort = { col: '', desc: true };
 
-  const minlengthof = (length: number) => {
+  function minlengthof(length: number) {
     length = Math.floor(length);
 
     return Math.min(N, length);
-  };
+  }
 
-  const materialize = (data: Feature[]) => {
+  function materialize(data: Feature[]) {
     // Empty array and reinstantiate the iterator and n.
     array = [];
     iterator = data[Symbol.iterator]();
@@ -48,9 +48,9 @@
 
     // Scroll to the top.
     root.scrollTo(root.scrollLeft, 0);
-  };
+  }
 
-  const appendRows = (start: number, end: number) => {
+  function appendRows(start: number, end: number) {
     for (; start < end; start++) {
       const { done, value } = iterator.next();
 
@@ -61,9 +61,9 @@
       array.push(value);
     }
     array = array;
-  };
+  }
 
-  const resort = (col: string) => {
+  function resort(col: string) {
     return () => {
       sort = {
         col,
@@ -76,16 +76,16 @@
 
       materialize(d);
     };
-  };
+  }
 
-  const onScroll = () => {
+  function onScroll() {
     if (
       root.scrollHeight - root.scrollTop < rows * ROW_HEIGHT * 1.5 &&
       n < minlengthof(n + 1)
     ) {
       appendRows(n, (n = minlengthof(n + rows)));
     }
-  };
+  }
 
   onMount(() => {
     appendRows(0, n);
@@ -116,7 +116,7 @@
     bind:this={root}
     on:scroll={onScroll}
   >
-    <table class="border-collapse">
+    <table class="w-full border-collapse">
       <thead>
         <tr class="sticky top-0">
           {#each cols as col}
