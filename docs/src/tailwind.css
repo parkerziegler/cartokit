@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root[data-theme='light'],
+:root[data-theme='dark'] {
+  --sl-color-bg-inline-code: theme('colors.accent.200');
+}
+
+header {
+  @apply border-b border-b-transparent !bg-transparent shadow backdrop-blur;
+}
+
+[data-has-hero] .content-panel {
+  background-image: url('data:image/svg+xml,<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(%23clip0_568_2)"><rect width="16" height="16" fill="transparent"/><rect width="16" height="16" stroke="%23999999" stroke-width="0.5" stroke-opacity="0.15" /></g><defs><clipPath id="clip0_568_2"><rect width="16" height="16" fill="transparent"/></clipPath></defs></svg>');
+  background-repeat: repeat;
+}
+
+code {
+  @apply text-accent-700 rounded;
+}
