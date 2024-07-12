@@ -9,7 +9,8 @@ export default defineConfig({
       title: 'cartokit Docs',
       customCss: ['./src/tailwind.css'],
       logo: {
-        src: './src/assets/logo.svg',
+        dark: './src/assets/logo-dark.svg',
+        light: './src/assets/logo.svg',
         alt: 'cartokit',
         replacesTitle: true
       },
