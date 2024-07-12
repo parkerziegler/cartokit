@@ -2,6 +2,7 @@
 title: 'Step 4: Running the program'
 description: 'Learn how to run cartokit-generated programs in a web browser.'
 ---
+
 import { Code, Tabs, TabItem, Steps } from '@astrojs/starlight/components';
 
 import Video from '../../../components/Video.astro';
@@ -45,9 +46,12 @@ export const mapboxAccessTokenDiff = `
  
  const map = new mapboxgl.Map({
    container: "map",
-`
+`;
 
-<p class="text-xl text-gray-700 tracking-wide dark:text-gray-200">`cartokit` compiles your map into a Mapbox GL JS program in real-time, making it easy to transfer the code to your development environment.</p>
+<p class="text-xl tracking-wide text-gray-700 dark:text-gray-200">
+  `cartokit` compiles your map into a Mapbox GL JS program in real-time, making
+  it easy to transfer the code to your development environment.
+</p>
 
 A core goal of `cartokit` is to provide access to your map's code at all phases of the design process. There is no separate "Export" workflow here; the program is always available under the **Program** tab in the **Editor**.
 
@@ -81,39 +85,33 @@ Once you have your project scaffolded, take the following steps:
       </TabItem>
     </Tabs>
 
-2. Apply the following diff to the root `index.html` file:
+2.  Apply the following diff to the root `index.html` file:
 
     <Code code={diff} lang="html" title="index.html" useDiffSyntax />
 
-3. Copy the program from the **Program** tab in the **Editor** and paste it into `src/main.js`.
+3.  Copy the program from the **Program** tab in the **Editor** and paste it into `src/main.js`.
 
     <Video src="/copy-program.mp4" />
 
-4. Replace `"<YOUR_MAPBOX_ACCESS_TOKEN>"` in the program with your own [Mapbox access token](https://docs.mapbox.com/help/getting-started/access-tokens/).
+4.  Replace `"<YOUR_MAPBOX_ACCESS_TOKEN>"` in the program with your own [Mapbox access token](https://docs.mapbox.com/help/getting-started/access-tokens/).
 
-    <Code code={mapboxAccessTokenDiff} lang="javascript" title="src/main.js" useDiffSyntax />
+    <Code
+      code={mapboxAccessTokenDiff}
+      lang="javascript"
+      title="src/main.js"
+      useDiffSyntax
+    />
 
-5. Run your `dev` command and navigate to `http://localhost:5173` in your browser. You should see your map running in a web browser.
+5.  Run your `dev` command and navigate to `http://localhost:5173` in your browser. You should see your map running in a web browser.
 
     <Tabs>
-      <TabItem label="npm">
-        ```sh
-        npm run dev
-        ```
-      </TabItem>
-      <TabItem label="pnpm">
-        ```sh
-        pnpm dev
-        ```
-      </TabItem>
-      <TabItem label="yarn">
-        ```sh
-        yarn dev
-        ```
-      </TabItem>
+      <TabItem label="npm">```sh npm run dev ```</TabItem>
+      <TabItem label="pnpm">```sh pnpm dev ```</TabItem>
+      <TabItem label="yarn">```sh yarn dev ```</TabItem>
     </Tabs>
 
     <Video src="/run-dev.mp4" />
+
 </Steps>
 
 That's it! With just a few code modifications, we've got our `cartokit`-generated program running in our own local development environment. Notice that we wrote none of the core mapping code ourselves; `cartokit` did all the heavy lifting for us!

@@ -2,11 +2,15 @@
 title: 'Step 1: Loading geospatial data'
 description: 'Learn how to load vector geospatial data into cartokit.'
 ---
+
 import { Aside } from '@astrojs/starlight/components';
 
 import Video from '../../../components/Video.astro';
 
-<p class="text-xl text-gray-700 tracking-wide dark:text-gray-200">Use `cartokit` to quickly load and display vector geospatial data on an interactive map.</p>
+<p class="text-xl tracking-wide text-gray-700 dark:text-gray-200">
+  Use `cartokit` to quickly load and display vector geospatial data on an
+  interactive map.
+</p>
 
 Often, the first thing you'll want to do with `cartokit` is display some data. To load vector geospatial data into `cartokit`, click the <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="!inline"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12"/></svg> button in the **Layers** panel. This will open the **Add Layer** modal.
 
@@ -19,7 +23,12 @@ https://storage.googleapis.com/cartokit-datasets/us-counties-unemployment.json
 ```
 
 <Aside>
-  cartokit currently only supports loading [GeoJSON](https://geojson.org/) datasets. If you have data in another format, you'll need to convert it to GeoJSON before loading it into cartokit. We recommend using [MapShaper](https://mapshaper.org/) or [`ogr2ogr`](https://gdal.org/programs/ogr2ogr.html) for this purpose. Support for additional formats is planned for future releases.
+  cartokit currently only supports loading [GeoJSON](https://geojson.org/)
+  datasets. If you have data in another format, you'll need to convert it to
+  GeoJSON before loading it into cartokit. We recommend using
+  [MapShaper](https://mapshaper.org/) or
+  [`ogr2ogr`](https://gdal.org/programs/ogr2ogr.html) for this purpose. Support
+  for additional formats is planned for future releases.
 </Aside>
 
 Next, give the layer a display name, such as "Unemployment Rate", in the **Display Name** field. Finally, click the **Add** button to add the layer to the map.

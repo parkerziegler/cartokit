@@ -14,10 +14,6 @@ node_modules
 .env.*
 !.env.example
 
-# Yarn
-yarn.lock
-/.yarn
-
 # Vercel
 /.vercel
 
@@ -32,3 +28,7 @@ svelte.config.js
 
 # Playwright
 playwright.config.ts
+
+# Astro
+/docs/.astro
+/docs/dist
