@@ -20,7 +20,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-      - name: Install dependencies
+      - name: Install root dependencies
         run: pnpm install --frozen-lockfile
+      - name: Install docs dependencies
+        run: cd docs && pnpm install --frozen-lockfile && cd ..
+      - name: Build cartokit
+        run: pnpm build
+      - name: Build cartokit docs
+        run: cd docs && pnpm build && cd ..
       - name: Lint
         run: pnpm lint
