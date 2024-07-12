@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root[data-theme='light'],
+:root[data-theme='dark'] {
+  --sl-color-bg-inline-code: theme('colors.accent.200');
+}
+
+header {
+  @apply border-b border-b-transparent !bg-transparent shadow backdrop-blur;
+}
+
+[data-theme='light'][data-has-hero] .content-panel {
+  background-image: url('data:image/svg+xml,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" stroke="%23F3F4F6"/></svg>');
+  background-repeat: repeat;
+}
+
+[data-theme='dark'][data-has-hero] .content-panel {
+  background-image: url('data:image/svg+xml,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" stroke="%231F2937"/></svg>');
+  background-repeat: repeat;
+}
+
+code {
+  @apply text-accent-700 rounded;
+}

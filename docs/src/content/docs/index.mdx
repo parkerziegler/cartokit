@@ -1,0 +1,68 @@
+---
+title: cartokit
+description: Style Maps. Get Programs.
+template: splash
+hero:
+  tagline: Style Maps. Get Programs.
+  actions:
+    - text: Get Started
+      link: /get-started/
+      icon: right-arrow
+      variant: primary
+    - text: Guides
+      link: /guides/
+      icon: right-arrow
+---
+
+import { CardGrid } from '@astrojs/starlight/components';
+import colors from 'tailwindcss/colors';
+
+import Card from '../../components/Card.astro';
+
+<CardGrid stagger>
+  <Card
+    title="Direct Manipulation"
+    icon="kv"
+    colors={{ background: colors.amber['50'], border: colors.amber['500'] }}
+  >
+    <code>cartokit</code> allows you to style geospatial data with familiar
+    interactions from design tools like Adobe Illustrator, Figma, Felt, and
+    Mapbox Studio.
+  </Card>
+  <Card
+    title="Portable Compilation"
+    icon="puzzle"
+    colors={{ background: colors.indigo['50'], border: colors.indigo['500'] }}
+  >
+    While styling your data, <code>cartokit</code> compiles your map in
+    real-time to a Mapbox GL JS program. Take the code to your IDE or
+    computational notebook to further customize your map.
+  </Card>
+  <Card
+    title="Cartography-First Primitives"
+    icon="compass"
+    colors={{ background: colors.rose['50'], border: colors.rose['500'] }}
+  >
+    <code>cartokit</code> renders your data using high-level cartographic forms,
+    such as choropleth, proportional symbol, and dot density. Transitioning data
+    between these forms is automatic and non-destructive.
+  </Card>
+  <Card
+    title="Ad-Hoc Data Transformation"
+    icon="function"
+    colors={{ background: colors.green['50'], border: colors.green['500'] }}
+  >
+    <code>cartokit</code> allows you to transform your data on-the-fly using
+    JavaScript. Pull in libraries from npm or write your own functions to
+    transform your data.
+  </Card>
+  <Card
+    title="It's Fast!"
+    icon="stopwatch"
+    colors={{ background: colors.slate['50'], border: colors.slate['500'] }}
+  >
+    <code>cartokit</code> compiles most programs in &lt;20ms, even with
+    thousands of features. Iterate quickly on your map's data and design, and
+    let <code>cartokit</code> handle the code.
+  </Card>
+</CardGrid>

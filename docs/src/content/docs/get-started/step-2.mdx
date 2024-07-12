@@ -1,0 +1,21 @@
+---
+title: 'Step 2: Creating a choropleth'
+description: Create a choropleth layer in cartokit.
+---
+
+import Video from '../../../components/Video.astro';
+
+<p class="text-xl tracking-wide text-gray-700 dark:text-gray-200">
+  `cartokit` supports styling geospatial data using a wide range of cartographic
+  forms, including choropleth, proportional symbol, dot density, and more.
+</p>
+
+We have some `Polygon`s rendering on our map, but they don't yet convey any underlying data. Let's fix that! To begin the visualization process, select any feature of the layer on the map. This will open the **Properties Panel**.
+
+<Video src="/open-properties-panel.mp4" />
+
+The **Properties Panel** contains a handful of controls for styling the layer. The most powerful of these is the **Map Type** select, which controls the core cartographic representation of the layer. By default, `cartokit` uses the **Fill** type to style `Polygon` and `MultiPolygon` geometries. We'll switch to a **Choropleth** type, which will allow us to color each county according to its unemployment rate.
+
+<Video src="/switch-map-type.mp4" />
+
+Et voilà—in a single click, we've created a choropleth map! Notice that `cartokit` has already chosen the `rate` property of our GeoJSON dataset as the value driving each `Polygon`'s color. By default, `cartokit` selects the first numeric property it identifies in the dataset for visualization; you can select any property you like from the **Attribute** dropdown. In addition, the transition to a **Choropleth** layer has unveiled a new set of controls in the **Properties Panel**, including dropdowns for the color scheme, number of steps, and the classification method used to bin the data. In the next section, we'll use these controls to style our **Choropleth** to match the D3 map.

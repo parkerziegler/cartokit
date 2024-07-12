@@ -25,3 +25,7 @@ pnpm-lock.yaml
 
 # Test data
 tests/data/*
+
+# Astro
+/docs/.astro
+/docs/dist

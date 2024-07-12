@@ -1,0 +1,38 @@
+---
+title: 'Step 3: Styling the choropleth'
+description: 'Learn how to style a choropleth layer in cartokit using the Properties Panel.'
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+import Video from '../../../components/Video.astro';
+
+<p class="text-xl tracking-wide text-gray-700 dark:text-gray-200">
+  `cartokit`'s **Properties Panel** provides flexible controls for fine-tuning
+  the display of your data.
+</p>
+
+With our choropleth layer in place, let's style it to match the D3 map. This will be a five-step process.
+
+<Steps>
+  1. Remove the default **Stroke**. 2. Increase the **Fill Opacity** to 100%. 3.
+  Adjust the **Color Scheme** to a sequential white-to-blue palette. 4. Increase
+  the number of **Steps** to 9. 5. Use a **Manual** classification method to
+  match the D3 map's breaks exactly.
+</Steps>
+
+Here's what that'll look like.
+
+<Video src="/style-choropleth.mp4" />
+
+With these changes, we're 95% of the way there. As a final step, let's overlay state boundaries on top of our choropleth layer. Re-open the **Add Layer Modal** by clicking the <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="!inline"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12"/></svg> button in the **Layers** panel and enter the following url into the **Endpoint** field:
+
+```
+https://storage.googleapis.com/cartokit-datasets/us-states.json
+```
+
+This layer is a redistribution of the [US Census Bureau's 2023 Cartographic Boundary Files](https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html). Give the layer a display name, such as "States", in the **Display Name** field, and click the **Add** button to add the layer to the map. Finally, click on a state to open the **Properties Panel** of the States layer, remove the layer's **Fill** and set its **Stroke** to white.
+
+<Video src="/add-states.mp4" />
+
+With that, we've arrived at a perfect replication of the original D3 map. Better yet, `cartokit` has been updating our program on every change, ensuring the code and the UI stay in sync. Let's get that code out of `cartokit` and running in our own development environment.

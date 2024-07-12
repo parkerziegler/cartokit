@@ -1,0 +1,121 @@
+---
+title: 'Step 4: Running the program'
+description: 'Learn how to run cartokit-generated programs in a web browser.'
+---
+
+import { Code, Tabs, TabItem, Steps } from '@astrojs/starlight/components';
+
+import Video from '../../../components/Video.astro';
+
+export const diff = `
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
++    <link
++      href="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.css"
++      rel="stylesheet"
++    />
++    <style>
++      body {
++        margin: 0;
++        padding: 0;
++      }
++
++      #map {
++        position: absolute;
++        top: 0;
++        bottom: 0;
++        width: 100%;
++      }
++    </style>
+  </head>
+  <body>
+-    <div id="app"></div>
++    <div id="map"></div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
+`;
+
+export const mapboxAccessTokenDiff = `
+ import mapboxgl from "mapbox-gl";
+ 
+- mapboxgl.accessToken = "<YOUR_MAPBOX_ACCESS_TOKEN>";
++ mapboxgl.accessToken =
++   "pk.eyJ1IjoicGFya2VyemllZ2xlciIsImEiOiJjbG5tYm01Mm0yNWQ2Mm9wZTMzbXVmMW5hIn0.BNtWKuymyJJh-eEWoGuhCg";
+ 
+ const map = new mapboxgl.Map({
+   container: "map",
+`;
+
+<p class="text-xl tracking-wide text-gray-700 dark:text-gray-200">
+  `cartokit` compiles your map into a Mapbox GL JS program in real-time, making
+  it easy to transfer the code to your development environment.
+</p>
+
+A core goal of `cartokit` is to provide access to your map's code at all phases of the design process. There is no separate "Export" workflow here; the program is always available under the **Program** tab in the **Editor**.
+
+Additionally, we strive to make `cartokit` programs runnable without modification. In order to do that, we make some assumptions about the environment in which they're run.
+
+1. We assume you're using [JavaScript modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) (also called ECMAScript modules or ES modules), such that [`import`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) statements are valid.
+2. We assume you're using a bundler or build system, such as [Webpack](https://webpack.js.org/), [Rollup](https://rollupjs.org/), [Vite](https://vitejs.dev/), or [esbuild](https://esbuild.github.io/) such that "bare" `import` statements like `import mapboxgl from 'mapbox-gl';` are resolved correctly.
+
+For this tutorial, we'll use Vite's `vanilla` template to create a new vanilla JS project using the Vite build system. You can follow the instructions on [scaffolding a Vite project](https://vitejs.dev/guide/#scaffolding-your-first-vite-project) to get started.
+
+Once you have your project scaffolded, take the following steps:
+
+<Steps>
+1. Install `mapbox-gl` as a dependency:
+
+    <Tabs>
+      <TabItem label="npm">
+        ```sh
+        npm install mapbox-gl
+        ```
+      </TabItem>
+      <TabItem label="pnpm">
+        ```sh
+        pnpm add mapbox-gl
+        ```
+      </TabItem>
+      <TabItem label="yarn">
+        ```sh
+        yarn add mapbox-gl
+        ```
+      </TabItem>
+    </Tabs>
+
+2.  Apply the following diff to the root `index.html` file:
+
+    <Code code={diff} lang="html" title="index.html" useDiffSyntax />
+
+3.  Copy the program from the **Program** tab in the **Editor** and paste it into `src/main.js`.
+
+    <Video src="/copy-program.mp4" />
+
+4.  Replace `"<YOUR_MAPBOX_ACCESS_TOKEN>"` in the program with your own [Mapbox access token](https://docs.mapbox.com/help/getting-started/access-tokens/).
+
+    <Code
+      code={mapboxAccessTokenDiff}
+      lang="javascript"
+      title="src/main.js"
+      useDiffSyntax
+    />
+
+5.  Run your `dev` command and navigate to `http://localhost:5173` in your browser. You should see your map running in a web browser.
+
+    <Tabs>
+      <TabItem label="npm">```sh npm run dev ```</TabItem>
+      <TabItem label="pnpm">```sh pnpm dev ```</TabItem>
+      <TabItem label="yarn">```sh yarn dev ```</TabItem>
+    </Tabs>
+
+    <Video src="/run-dev.mp4" />
+
+</Steps>
+
+That's it! With just a few code modifications, we've got our `cartokit`-generated program running in our own local development environment. Notice that we wrote none of the core mapping code ourselves; `cartokit` did all the heavy lifting for us!
+
+### Next steps
+
+Congratulations on making your first map with `cartokit`! For more specific questions on functionality, check out our [Guides](/docs/guides). Can't find what you're looking for or want to leave us some feedback? Let us know on [GitHub](https://github.com/parkerziegler/cartokit/issues) or [X](https://x.com/parker_ziegler). We can't wait to see what you build, and happy mapping 🗺!

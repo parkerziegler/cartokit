@@ -1,0 +1,101 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import CallToAction from '@astrojs/starlight/components/CallToAction.astro';
+import DarkLogo from './DarkLogo.astro';
+import Logo from './Logo.astro';
+
+const { data } = Astro.props.entry;
+const { tagline, actions = [] } = data.hero || {};
+---
+
+<div class="hero">
+  <video autoplay loop muted class="rounded shadow-xl max-w-full">
+    <source src="/cartokit.mp4" type="video/mp4" />
+  </video>
+  <div class="flex stack">
+    <div class="flex copy">
+      <Logo />
+      <DarkLogo />
+      {tagline && <div class="tagline" set:html={tagline} />}
+    </div>
+    {
+      actions.length > 0 && (
+        <div class="flex actions">
+          {actions.map(({ text, ...attrs }) => (
+            <CallToAction {...attrs} set:html={text} />
+          ))}
+        </div>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .hero {
+    @apply grid items-center gap-4 pb-4;
+  }
+
+  .stack {
+    @apply flex-col text-center;
+    gap: clamp(1.5rem, calc(1.5rem + 1vw), 2rem);
+  }
+
+  .copy {
+    @apply flex-col items-center gap-4;
+  }
+
+  .copy > * {
+    max-width: 50ch;
+  }
+
+  h1 {
+    @apply font-semibold;
+    font-size: clamp(
+      var(--sl-text-3xl),
+      calc(0.25rem + 5vw),
+      var(--sl-text-6xl)
+    );
+    line-height: var(--sl-line-height-headings);
+    color: var(--sl-color-white);
+  }
+
+  .tagline {
+    @apply font-semibold;
+    font-size: clamp(
+      var(--sl-text-xl),
+      calc(0.0625rem + 2vw),
+      var(--sl-text-3xl)
+    );
+    color: var(--sl-color-gray-2);
+  }
+
+  .actions {
+    @apply flex-wrap justify-center;
+    gap: 1rem 2rem;
+  }
+
+  @media (min-width: 50rem) {
+    .hero {
+      grid-template-columns: 5fr 7fr;
+      gap: 3%;
+      padding-block: clamp(2.5rem, calc(1rem + 10vmin), 10rem);
+    }
+
+    .hero > video {
+      order: 2;
+      width: min(100%, 36rem);
+    }
+
+    .stack {
+      @apply text-start;
+    }
+
+    .copy {
+      @apply items-start;
+    }
+
+    .actions {
+      @apply justify-start;
+    }
+  }
+</style>

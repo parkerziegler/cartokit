@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+
+# Astro
+dist/
+.astro/
+
+# Environment Variables
+.env
+.env.production
+
+# Logs
+pnpm-debug.log*

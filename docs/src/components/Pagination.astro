@@ -1,0 +1,59 @@
+---
+import Icon from './Icon.astro';
+
+const { dir, labels, pagination } = Astro.props;
+const { prev, next } = pagination;
+const isRtl = dir === 'rtl';
+---
+
+<div class="pagination-links" dir={dir}>
+  {
+    prev && (
+      <a href={prev.href} rel="prev">
+        <Icon name={isRtl ? 'right-chevron' : 'left-chevron'} size="1rem" />
+        <span>
+          {labels['page.previousLink']}
+          <br />
+          <span class="link-title">{prev.label}</span>
+        </span>
+      </a>
+    )
+  }
+  {
+    next && (
+      <a href={next.href} rel="next">
+        <Icon name={isRtl ? 'left-chevron' : 'right-chevron'} size="1rem" />
+        <span>
+          {labels['page.nextLink']}
+          <br />
+          <span class="link-title">{next.label}</span>
+        </span>
+      </a>
+    )
+  }
+</div>
+
+<style>
+  .pagination-links {
+    @apply grid gap-4;
+    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  }
+
+  a {
+    @apply flex w-full items-center gap-2 py-2 text-sm text-gray-500 no-underline transition-opacity hover:opacity-50;
+  }
+
+  [rel='next'] {
+    @apply flex-row-reverse text-end;
+    justify-content: end;
+  }
+
+  .link-title {
+    @apply text-xl font-semibold;
+    color: var(--sl-color-white);
+  }
+
+  svg {
+    @apply shrink-0;
+  }
+</style>
