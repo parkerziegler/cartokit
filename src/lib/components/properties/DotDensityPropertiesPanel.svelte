@@ -5,7 +5,7 @@
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
   import DotControls from '$lib/components/dots/DotControls.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
-  import type { CartoKitDotDensityLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitDotDensityLayer } from '$lib/types';
 
   export let layer: CartoKitDotDensityLayer;
 </script>

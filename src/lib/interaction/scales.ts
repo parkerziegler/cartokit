@@ -2,8 +2,7 @@ import * as d3 from 'd3';
 import type { Feature } from 'geojson';
 import { ckmeans } from 'simple-statistics';
 
-import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
-import type { ColorScale } from '$lib/types/color';
+import type { CartoKitChoroplethLayer, ClassificationMethod } from '$lib/types';
 import { isPropertyNumeric } from '$lib/utils/property';
 
 /**
@@ -122,7 +121,7 @@ export function deriveJenksBreaks({
 }
 
 interface DeriveThresholdsParams<T> extends DeriveBreaksParams<T> {
-  scale: ColorScale;
+  method: ClassificationMethod;
   layer: CartoKitChoroplethLayer;
 }
 
@@ -130,21 +129,22 @@ interface DeriveThresholdsParams<T> extends DeriveBreaksParams<T> {
  * Obtain the thresholds for a given attribute of a GeoJSON FeatureCollection.
  *
  * @param params – Input parameters to compute thresholds over a GeoJSON FeatureCollection.
- * @param scale – The scale method to use.
+ * @param method – The @see{ClassificationMethod} to use.
  * @param layer – The CartoKit layer to derive thresholds from.
  * @param attribute – The data attribute to compute thresholds over.
  * @param features – The GeoJSON features of the dataset.
  * @param range – The output range of the scale.
- * @returns – The thresholds of the dataset based on the scale, attribute, features, and range supplied.
+ *
+ * @returns – The thresholds of the dataset based on the method, attribute, features, and range supplied.
  */
 export function deriveThresholds({
-  scale,
+  method,
   layer,
   attribute,
   features,
   range
 }: DeriveThresholdsParams<string>) {
-  switch (scale) {
+  switch (method) {
     case 'Quantile':
       return deriveQuantiles({ attribute, features, range });
     case 'Equal Interval':

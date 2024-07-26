@@ -95,8 +95,8 @@ test('workflow-1', async ({ page }) => {
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
 
-  // Set the layer's Map Type to Choropleth.
-  await page.locator('#map-type-select').selectOption('Choropleth');
+  // Set the layer's Layer Type to Choropleth.
+  await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's stroke to #1f2b2e.
   await page.getByTestId('stroke-color-input').fill('#1f2b2e');
@@ -130,8 +130,8 @@ test('workflow-1', async ({ page }) => {
   // Wait for the transformation to complete.
   await expect(page.getByText('Successfully transformed data.')).toBeVisible();
 
-  // Switch the Map Type to Fill.
-  await page.locator('#map-type-select').selectOption('Fill');
+  // Switch the Layer Type to Fill.
+  await page.locator('#layer-type-select').selectOption('Polygon');
 
   // Set the layer's fill to #1f2b2e.
   await page.getByTestId('fill-color-input').fill('#1f2b2e');

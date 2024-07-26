@@ -1,4 +1,4 @@
-import type { Transformation } from '$lib/types/transformation';
+import type { Transformation } from '$lib/types';
 
 export function transformGeometryToCentroids(): Transformation {
   return {

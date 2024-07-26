@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+import type { CartoKitLayer } from '$lib/types';
 import type { BasemapProvider } from '$lib/utils/basemap';
 
 export interface CartoKitIR {

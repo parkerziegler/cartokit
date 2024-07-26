@@ -123,7 +123,7 @@
     </button>
     {#if $layout.dataVisible && $selectedLayer}
       <DataTable
-        data={$selectedLayer.data.geoJSON.features}
+        data={$selectedLayer.data.geojson.features}
         tableName={$selectedLayer.displayName}
         onClose={onViewDataClose}
         class={cs(
@@ -138,7 +138,7 @@
   {/if}
 </main>
 
-<style>
+<style lang="postcss">
   :global(#map .maplibregl-ctrl-attrib.maplibregl-compact) {
     @apply transition-transform duration-[400ms] ease-out;
   }

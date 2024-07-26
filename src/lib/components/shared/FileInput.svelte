@@ -29,7 +29,7 @@
   />
 </label>
 
-<style>
+<style lang="postcss">
   .file {
     height: 38px;
   }

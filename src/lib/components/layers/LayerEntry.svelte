@@ -14,7 +14,7 @@
   import PointLegend from '$lib/components/legends/PointLegend.svelte';
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
   import { map } from '$lib/stores/map';
-  import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitLayer } from '$lib/types';
 
   export let layer: CartoKitLayer;
 
@@ -51,7 +51,7 @@
           <DotDensityIcon />
         {:else if layer.type === 'Line'}
           <LineIcon />
-        {:else if layer.type === 'Fill'}
+        {:else if layer.type === 'Polygon'}
           <FillIcon />
         {:else if layer.type === 'Choropleth'}
           <ChoroplethIcon />
@@ -80,7 +80,7 @@
     <DotDensityLegend {layer} />
   {:else if layer.type === 'Line'}
     <LineLegend {layer} />
-  {:else if layer.type === 'Fill'}
+  {:else if layer.type === 'Polygon'}
     <FillLegend {layer} />
   {:else if layer.type === 'Choropleth'}
     <ChoroplethLegend {layer} />

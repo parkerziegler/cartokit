@@ -7,7 +7,7 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitLayer } from '$lib/types';
   import { DEFAULT_STROKE } from '$lib/utils/constants';
 
   export let layer: CartoKitLayer;

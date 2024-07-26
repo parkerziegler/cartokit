@@ -145,7 +145,7 @@
   </div>
 </div>
 
-<style>
+<style lang="postcss">
   .table-name::after {
     @apply absolute left-0 w-full bg-slate-900;
     content: '';

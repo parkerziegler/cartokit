@@ -30,7 +30,7 @@
   {/if}
 </button>
 
-<style>
+<style lang="postcss">
   .loader {
     @apply relative inline-block h-4 w-4;
   }

@@ -3,25 +3,28 @@
   import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
-  import { COLOR_SCALES, type ColorScale } from '$lib/types/color';
+  import type {
+    CartoKitChoroplethLayer,
+    ClassificationMethod
+  } from '$lib/types';
+  import { CLASSIFICATION_METHODS } from '$lib/utils/classification';
 
   export let layer: CartoKitChoroplethLayer;
 
   const target = document.getElementById('map') ?? document.body;
-  let ref: Select<ColorScale>;
+  let ref: Select<ClassificationMethod>;
   let top = 0;
   let left = 0;
   let displayBreaksEditor = false;
 
-  const options = COLOR_SCALES.map((scale) => ({
+  const options = CLASSIFICATION_METHODS.map((scale) => ({
     value: scale,
     label: scale
   }));
 
-  $: selected = layer.style.fill.scale;
+  $: selected = layer.style.fill.method;
 
-  function onChange(event: CustomEvent<{ value: ColorScale }>) {
+  function onChange(event: CustomEvent<{ value: ClassificationMethod }>) {
     if (event.detail.value === 'Manual') {
       ({ top, left } = ref.getBoundingClientRect());
       displayBreaksEditor = true;
@@ -30,10 +33,10 @@
     }
 
     dispatchLayerUpdate({
-      type: 'color-scale',
+      type: 'classification-method',
       layer,
       payload: {
-        scale: event.detail.value
+        method: event.detail.value
       }
     });
   }
@@ -42,7 +45,7 @@
     displayBreaksEditor = !displayBreaksEditor;
   }
 
-  function onClick(event: CustomEvent<{ value: ColorScale }>) {
+  function onClick(event: CustomEvent<{ value: ClassificationMethod }>) {
     if (event.detail.value === 'Manual') {
       ({ top, left } = ref.getBoundingClientRect());
       toggleBreaksEditorVisibility();
@@ -54,7 +57,7 @@
   {options}
   {selected}
   title="Method"
-  id="color-scale-method-select"
+  id="classification-method-select"
   on:change={onChange}
   on:click={onClick}
   bind:this={ref}

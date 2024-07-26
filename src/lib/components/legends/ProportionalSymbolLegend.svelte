@@ -2,7 +2,7 @@
   import * as d3 from 'd3';
 
   import { deriveExtent } from '$lib/interaction/scales';
-  import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 
   export let layer: CartoKitProportionalSymbolLayer;
 
@@ -10,7 +10,7 @@
   $: sizeMax = layer.style.size.max;
   $: [min, max] = deriveExtent(
     layer.style.size.attribute,
-    layer.data.geoJSON.features
+    layer.data.geojson.features
   );
 
   const padding = { top: 4, right: 4, bottom: 4, left: 4 };

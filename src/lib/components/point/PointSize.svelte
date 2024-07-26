@@ -2,10 +2,7 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type {
-    CartoKitPointLayer,
-    CartoKitDotDensityLayer
-  } from '$lib/types/CartoKitLayer';
+  import type { CartoKitPointLayer, CartoKitDotDensityLayer } from '$lib/types';
 
   export let layer: CartoKitPointLayer | CartoKitDotDensityLayer;
 

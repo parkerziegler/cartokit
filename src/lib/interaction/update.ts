@@ -13,7 +13,7 @@ import {
   deriveSize,
   generateDotDensityPoints
 } from '$lib/interaction/geometry';
-import { transitionMapType } from '$lib/interaction/map-type';
+import { transitionLayerType } from '$lib/interaction/layer-type';
 import { deriveThresholds } from '$lib/interaction/scales';
 import { ir } from '$lib/stores/ir';
 import { map as mapStore } from '$lib/stores/map';
@@ -22,12 +22,13 @@ import type {
   CartoKitPointLayer,
   CartoKitProportionalSymbolLayer,
   CartoKitDotDensityLayer,
-  CartoKitFillLayer,
-  CartoKitChoroplethLayer
-} from '$lib/types/CartoKitLayer';
-import type { ColorScale, ColorScheme } from '$lib/types/color';
-import type { MapType } from '$lib/types/map-types';
-import type { Transformation } from '$lib/types/transformation';
+  CartoKitPolygonLayer,
+  CartoKitChoroplethLayer,
+  ClassificationMethod,
+  ColorScheme,
+  LayerType,
+  Transformation
+} from '$lib/types';
 import {
   DEFAULT_FILL,
   DEFAULT_OPACITY,
@@ -40,10 +41,10 @@ interface LayerUpdate {
   layer: CartoKitLayer;
 }
 
-interface MapTypeUpdate extends LayerUpdate {
-  type: 'map-type';
+interface LayerTypeUpdate extends LayerUpdate {
+  type: 'layer-type';
   payload: {
-    mapType: MapType;
+    layerType: LayerType;
   };
 }
 
@@ -67,7 +68,7 @@ interface FillUpdate extends LayerUpdate {
     | CartoKitPointLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer
-    | CartoKitFillLayer;
+    | CartoKitPolygonLayer;
 }
 
 interface FillOpacityUpdate extends LayerUpdate {
@@ -79,7 +80,7 @@ interface FillOpacityUpdate extends LayerUpdate {
     | CartoKitPointLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer
-    | CartoKitFillLayer
+    | CartoKitPolygonLayer
     | CartoKitChoroplethLayer;
 }
 
@@ -90,7 +91,7 @@ interface AddFillUpdate extends LayerUpdate {
     | CartoKitPointLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer
-    | CartoKitFillLayer;
+    | CartoKitPolygonLayer;
 }
 
 interface RemoveFillUpdate extends LayerUpdate {
@@ -100,7 +101,7 @@ interface RemoveFillUpdate extends LayerUpdate {
     | CartoKitPointLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer
-    | CartoKitFillLayer;
+    | CartoKitPolygonLayer;
 }
 
 interface StrokeUpdate extends LayerUpdate {
@@ -131,7 +132,7 @@ interface AddStrokeUpdate extends LayerUpdate {
     | CartoKitPointLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer
-    | CartoKitFillLayer
+    | CartoKitPolygonLayer
     | CartoKitChoroplethLayer;
 }
 
@@ -142,7 +143,7 @@ interface RemoveStrokeUpdate extends LayerUpdate {
     | CartoKitPointLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer
-    | CartoKitFillLayer
+    | CartoKitPolygonLayer
     | CartoKitChoroplethLayer;
 }
 
@@ -154,10 +155,10 @@ interface PointSizeUpdate extends LayerUpdate {
   layer: CartoKitPointLayer | CartoKitDotDensityLayer;
 }
 
-interface ColorScaleUpdate extends LayerUpdate {
-  type: 'color-scale';
+interface ClassificationMethodUpdate extends LayerUpdate {
+  type: 'classification-method';
   payload: {
-    scale: ColorScale;
+    method: ClassificationMethod;
   };
   layer: CartoKitChoroplethLayer;
 }
@@ -207,13 +208,13 @@ interface DotValueUpdate extends LayerUpdate {
 interface TransformationUpdate extends LayerUpdate {
   type: 'transformation';
   payload: {
-    geoJSON: FeatureCollection;
+    geojson: FeatureCollection;
     transformation: Transformation;
   };
 }
 
 type DispatchLayerUpdateParams =
-  | MapTypeUpdate
+  | LayerTypeUpdate
   | AttributeUpdate
   | FillUpdate
   | FillOpacityUpdate
@@ -225,7 +226,7 @@ type DispatchLayerUpdateParams =
   | AddStrokeUpdate
   | RemoveStrokeUpdate
   | PointSizeUpdate
-  | ColorScaleUpdate
+  | ClassificationMethodUpdate
   | ColorSchemeUpdate
   | ColorCountUpdate
   | ColorThresholdUpdate
@@ -241,20 +242,20 @@ type DispatchLayerUpdateParams =
  * @param layer – The CartoKit layer to update.
  * @param payload – The payload for the update.
  */
-export const dispatchLayerUpdate = ({
+export function dispatchLayerUpdate({
   type,
   layer,
   payload
-}: DispatchLayerUpdateParams): void => {
+}: DispatchLayerUpdateParams): void {
   const map = get(mapStore);
 
   switch (type) {
-    case 'map-type': {
+    case 'layer-type': {
       ir.update((ir) => {
-        ir.layers[layer.id] = transitionMapType({
+        ir.layers[layer.id] = transitionLayerType({
           map,
           layer,
-          targetMapType: payload.mapType
+          targetLayerType: payload.layerType
         });
 
         return ir;
@@ -279,19 +280,19 @@ export const dispatchLayerUpdate = ({
           case 'Dot Density': {
             lyr.style.dots.attribute = payload.attribute;
             const dotValue = deriveDotDensityStartingValue(
-              lyr.data.rawGeoJSON.features,
+              lyr.data.sourceGeojson.features,
               payload.attribute
             );
 
             const features = generateDotDensityPoints({
-              features: lyr.data.rawGeoJSON.features as Feature<
+              features: lyr.data.sourceGeojson.features as Feature<
                 Polygon | MultiPolygon
               >[],
               attribute: payload.attribute,
               value: dotValue
             });
 
-            lyr.data.geoJSON = features;
+            lyr.data.geojson = features;
             lyr.style.dots.value = dotValue;
 
             // Update the source with the new data.
@@ -314,7 +315,7 @@ export const dispatchLayerUpdate = ({
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
-          | CartoKitFillLayer;
+          | CartoKitPolygonLayer;
 
         if (lyr.style.fill) {
           lyr.style.fill.color = payload.color;
@@ -325,7 +326,7 @@ export const dispatchLayerUpdate = ({
             case 'Dot Density':
               map.setPaintProperty(layer.id, 'circle-color', payload.color);
               break;
-            case 'Fill':
+            case 'Polygon':
               map.setPaintProperty(layer.id, 'fill-color', payload.color);
               break;
           }
@@ -341,7 +342,7 @@ export const dispatchLayerUpdate = ({
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
-          | CartoKitFillLayer
+          | CartoKitPolygonLayer
           | CartoKitChoroplethLayer;
 
         if (lyr.style.fill) {
@@ -353,7 +354,7 @@ export const dispatchLayerUpdate = ({
             case 'Dot Density':
               map.setPaintProperty(layer.id, 'circle-opacity', payload.opacity);
               break;
-            case 'Fill':
+            case 'Polygon':
             case 'Choropleth':
               map.setPaintProperty(layer.id, 'fill-opacity', payload.opacity);
               break;
@@ -370,7 +371,7 @@ export const dispatchLayerUpdate = ({
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
-          | CartoKitFillLayer;
+          | CartoKitPolygonLayer;
         lyr.style.fill = {
           color: DEFAULT_FILL,
           opacity: DEFAULT_OPACITY
@@ -383,7 +384,7 @@ export const dispatchLayerUpdate = ({
             map.setPaintProperty(layer.id, 'circle-color', DEFAULT_FILL);
             map.setPaintProperty(layer.id, 'circle-opacity', DEFAULT_OPACITY);
             break;
-          case 'Fill':
+          case 'Polygon':
             map.setPaintProperty(layer.id, 'fill-color', DEFAULT_FILL);
             map.setPaintProperty(layer.id, 'fill-opacity', DEFAULT_OPACITY);
             break;
@@ -399,7 +400,7 @@ export const dispatchLayerUpdate = ({
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
-          | CartoKitFillLayer;
+          | CartoKitPolygonLayer;
         lyr.style.fill = undefined;
 
         switch (lyr.type) {
@@ -409,7 +410,7 @@ export const dispatchLayerUpdate = ({
             map.setPaintProperty(layer.id, 'circle-color', 'transparent');
             map.setPaintProperty(layer.id, 'circle-opacity', 0);
             break;
-          case 'Fill':
+          case 'Polygon':
             map.setPaintProperty(layer.id, 'fill-color', 'transparent');
             map.setPaintProperty(layer.id, 'fill-opacity', 0);
             break;
@@ -438,7 +439,7 @@ export const dispatchLayerUpdate = ({
             case 'Line':
               map.setPaintProperty(layer.id, 'line-color', payload.color);
               break;
-            case 'Fill':
+            case 'Polygon':
             case 'Choropleth':
               map.setPaintProperty(
                 `${layer.id}-stroke`,
@@ -473,7 +474,7 @@ export const dispatchLayerUpdate = ({
             case 'Line':
               map.setPaintProperty(layer.id, 'line-width', payload.strokeWidth);
               break;
-            case 'Fill':
+            case 'Polygon':
             case 'Choropleth':
               map.setPaintProperty(
                 `${layer.id}-stroke`,
@@ -508,7 +509,7 @@ export const dispatchLayerUpdate = ({
             case 'Line':
               map.setPaintProperty(layer.id, 'line-opacity', payload.opacity);
               break;
-            case 'Fill':
+            case 'Polygon':
             case 'Choropleth':
               map.setPaintProperty(
                 `${layer.id}-stroke`,
@@ -529,7 +530,7 @@ export const dispatchLayerUpdate = ({
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
-          | CartoKitFillLayer
+          | CartoKitPolygonLayer
           | CartoKitChoroplethLayer;
         // Create a default stroke.
         lyr.style.stroke = {
@@ -558,7 +559,7 @@ export const dispatchLayerUpdate = ({
               DEFAULT_STROKE_OPACITY
             );
             break;
-          case 'Fill':
+          case 'Polygon':
           case 'Choropleth':
             map.setPaintProperty(
               `${layer.id}-stroke`,
@@ -588,7 +589,7 @@ export const dispatchLayerUpdate = ({
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
-          | CartoKitFillLayer
+          | CartoKitPolygonLayer
           | CartoKitChoroplethLayer;
         lyr.style.stroke = undefined;
 
@@ -604,7 +605,7 @@ export const dispatchLayerUpdate = ({
             map.setPaintProperty(layer.id, 'circle-stroke-width', 0);
             map.setPaintProperty(layer.id, 'circle-stroke-opacity', 0);
             break;
-          case 'Fill':
+          case 'Polygon':
           case 'Choropleth':
             map.setPaintProperty(
               `${layer.id}-stroke`,
@@ -635,18 +636,18 @@ export const dispatchLayerUpdate = ({
       });
       break;
     }
-    case 'color-scale': {
+    case 'classification-method': {
       ir.update((ir) => {
         // We guarantee that layer is a CartoKitChoroplethLayer when we dispatch
         // this update. Therefore, accessing that same layer in the store by id
         // guarantees that lyr is also a CartoKitChoroplethLayer.
         const lyr = ir.layers[layer.id] as CartoKitChoroplethLayer;
-        lyr.style.fill.scale = payload.scale;
+        lyr.style.fill.method = payload.method;
         lyr.style.fill.thresholds = deriveThresholds({
-          scale: payload.scale,
+          method: payload.method,
           layer: lyr,
           attribute: lyr.style.fill.attribute,
-          features: lyr.data.geoJSON.features,
+          features: lyr.data.geojson.features,
           range: [...lyr.style.fill.scheme[lyr.style.fill.count]]
         });
 
@@ -672,10 +673,10 @@ export const dispatchLayerUpdate = ({
         const lyr = ir.layers[layer.id] as CartoKitChoroplethLayer;
         lyr.style.fill.count = payload.count;
         lyr.style.fill.thresholds = deriveThresholds({
-          scale: lyr.style.fill.scale,
+          method: lyr.style.fill.method,
           layer: lyr,
           attribute: lyr.style.fill.attribute,
-          features: lyr.data.geoJSON.features,
+          features: lyr.data.geojson.features,
           range: [...lyr.style.fill.scheme[payload.count]]
         });
 
@@ -713,19 +714,19 @@ export const dispatchLayerUpdate = ({
         const lyr = ir.layers[layer.id] as CartoKitDotDensityLayer;
         lyr.style.dots.value = payload.value;
 
-        // We always use the rawGeoJSON to generate the dot density points.
+        // We always use the sourceGeojson to generate the dot density points.
         // These _must_ be polygons to support the transition to dot density;
         // conversely, the current layer geometry will be points, which do not
         // allow us to generate a dot density.
         const features = generateDotDensityPoints({
-          features: lyr.data.rawGeoJSON.features as Feature<
+          features: lyr.data.sourceGeojson.features as Feature<
             Polygon | MultiPolygon
           >[],
           attribute: lyr.style.dots.attribute,
           value: payload.value
         });
 
-        lyr.data.geoJSON = features;
+        lyr.data.geojson = features;
         // Update the source with the new data.
         (map.getSource(layer.id) as GeoJSONSource).setData(features);
 
@@ -736,7 +737,7 @@ export const dispatchLayerUpdate = ({
     case 'transformation': {
       ir.update((ir) => {
         const lyr = ir.layers[layer.id];
-        lyr.data.geoJSON = payload.geoJSON;
+        lyr.data.geojson = payload.geojson;
 
         const transformationIndex = lyr.data.transformations.findIndex(
           (t) => t.name === payload.transformation.name
@@ -751,10 +752,10 @@ export const dispatchLayerUpdate = ({
             : [...lyr.data.transformations, payload.transformation];
 
         // Update the source with the new data.
-        (map.getSource(layer.id) as GeoJSONSource).setData(payload.geoJSON);
+        (map.getSource(layer.id) as GeoJSONSource).setData(payload.geojson);
 
         return ir;
       });
     }
   }
-};
+}

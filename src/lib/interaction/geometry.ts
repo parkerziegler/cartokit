@@ -13,7 +13,7 @@ import type {
 } from 'geojson';
 import type { ExpressionSpecification } from 'maplibre-gl';
 
-import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
+import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 
 /**
  * Derive a MapLibre GL JS expression for a proportional symbol radius scale.
@@ -27,7 +27,7 @@ export function deriveSize(
 ): ExpressionSpecification {
   const {
     data: {
-      geoJSON: { features }
+      geojson: { features }
     },
     style: {
       size: { attribute, min: rMin, max: rMax }

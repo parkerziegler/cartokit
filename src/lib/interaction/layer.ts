@@ -15,7 +15,7 @@ import {
   instrumentLineSelect,
   instrumentPolygonSelect
 } from '$lib/interaction/select';
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+import type { CartoKitLayer } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_OPACITY,
@@ -99,7 +99,7 @@ export const addLayer = (map: Map, layer: CartoKitLayer): void => {
       if (!map.getSource(`${layer.id}-outlines`)) {
         map.addSource(`${layer.id}-outlines`, {
           type: 'geojson',
-          data: layer.data.rawGeoJSON
+          data: layer.data.sourceGeojson
         });
       }
 
@@ -161,7 +161,7 @@ export const addLayer = (map: Map, layer: CartoKitLayer): void => {
       instrumentLineSelect(map, layer.id);
       break;
     }
-    case 'Fill': {
+    case 'Polygon': {
       if (layer.style.fill) {
         map.addLayer({
           id: layer.id,
@@ -247,8 +247,8 @@ export const generateCartoKitLayer = (
         displayName: options.displayName,
         type: 'Point',
         data: {
-          geoJSON: featureCollection,
-          rawGeoJSON: featureCollection,
+          geojson: featureCollection,
+          sourceGeojson: featureCollection,
           fileName: options.fileName,
           url: options.url,
           transformations: []
@@ -273,8 +273,8 @@ export const generateCartoKitLayer = (
         displayName: options.displayName,
         type: 'Line',
         data: {
-          geoJSON: featureCollection,
-          rawGeoJSON: featureCollection,
+          geojson: featureCollection,
+          sourceGeojson: featureCollection,
           fileName: options.fileName,
           url: options.url,
           transformations: []
@@ -292,10 +292,10 @@ export const generateCartoKitLayer = (
       return {
         id: uniqueId(`${kebabCase(options.displayName)}__`),
         displayName: options.displayName,
-        type: 'Fill',
+        type: 'Polygon',
         data: {
-          geoJSON: featureCollection,
-          rawGeoJSON: featureCollection,
+          geojson: featureCollection,
+          sourceGeojson: featureCollection,
           fileName: options.fileName,
           url: options.url,
           transformations: []

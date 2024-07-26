@@ -1,18 +1,18 @@
 <script lang="ts">
-  import ColorScaleMethodSelect from '$lib/components/color/ColorScaleMethodSelect.svelte';
-  import ColorScaleStepsSelect from '$lib/components/color/ColorScaleStepsSelect.svelte';
+  import ClassificationMethodSelect from '$lib/components/classification/ClassificationMethodSelect.svelte';
   import ColorSchemeSelect from '$lib/components/color/ColorSchemeSelect.svelte';
+  import ColorStepsSelect from '$lib/components/color/ColorStepsSelect.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
-  import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitChoroplethLayer } from '$lib/types';
 
   export let layer: CartoKitChoroplethLayer;
 </script>
 
 <div class="stack stack-2xs">
   <AttributeSelect {layer} selected={layer.style.fill.attribute} />
-  <ColorScaleMethodSelect {layer} />
-  <ColorScaleStepsSelect {layer} />
+  <ClassificationMethodSelect {layer} />
+  <ColorStepsSelect {layer} />
   <ColorSchemeSelect {layer} />
   <OpacityInput {layer} property="fill" />
 </div>

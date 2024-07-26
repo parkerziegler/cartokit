@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CartoKitDotDensityLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitDotDensityLayer } from '$lib/types';
 
   export let layer: CartoKitDotDensityLayer;
   $: dimension =

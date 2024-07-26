@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { CartoKitLineLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitLineLayer } from '$lib/types';
   import { pluralize } from '$lib/utils/format';
   import { getLayerGeometryType } from '$lib/utils/geojson';
 
   export let layer: CartoKitLineLayer;
-  $: geometryType = getLayerGeometryType(layer.data.geoJSON);
+  $: geometryType = getLayerGeometryType(layer.data.geojson);
 </script>
 
 <div class="stack-h stack-h-xs ml-8 items-center">
@@ -24,7 +24,7 @@
     />
   </svg>
   <span
-    >{layer.data.geoJSON.features.length}
-    {pluralize(geometryType, layer.data.geoJSON.features.length)}</span
+    >{layer.data.geojson.features.length}
+    {pluralize(geometryType, layer.data.geojson.features.length)}</span
   >
 </div>

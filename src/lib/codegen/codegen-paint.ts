@@ -1,16 +1,16 @@
 import { deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+import type { CartoKitLayer } from '$lib/types';
 import { MAPBOX_DEFAULTS } from '$lib/utils/constants';
 
 /**
  * Generate a Mapbox GL JS program fragment representing the layer's fill.
  *
- * @param layer – A CartoKit layer.
+ * @param layer – A @see{CartoKitLayer}.
  *
  * @returns – A Mapbox GL JS program fragment representing the layer's fill.
  */
-export const codegenFill = (layer: CartoKitLayer): string => {
+export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Point': {
       if (!layer.style.fill) {
@@ -85,7 +85,7 @@ export const codegenFill = (layer: CartoKitLayer): string => {
     }
     case 'Line':
       return '';
-    case 'Fill': {
+    case 'Polygon': {
       if (!layer.style.fill) {
         return '';
       }
@@ -118,15 +118,16 @@ export const codegenFill = (layer: CartoKitLayer): string => {
         .join(',\n');
     }
   }
-};
+}
 
 /**
  * Generate a Mapbox GL JS program fragment representing the layer's stroke.
  *
- * @param layer – A CartoKit layer.
+ * @param layer – A @see{CartoKitLayer}.
+ *
  * @returns – A Mapbox GL JS program fragment representing the layer's stroke.
  */
-export const codegenStroke = (layer: CartoKitLayer): string => {
+export function codegenStroke(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Point':
     case 'Proportional Symbol':
@@ -156,7 +157,7 @@ export const codegenStroke = (layer: CartoKitLayer): string => {
         .join(',\n');
     }
     case 'Line':
-    case 'Fill':
+    case 'Polygon':
     case 'Choropleth': {
       if (!layer.style.stroke) {
         return '';
@@ -183,7 +184,7 @@ export const codegenStroke = (layer: CartoKitLayer): string => {
         .join(',\n');
     }
   }
-};
+}
 
 /**
  * Return a Mapbox GL JS program fragment representing a property-value pair,
@@ -195,14 +196,14 @@ export const codegenStroke = (layer: CartoKitLayer): string => {
  *
  * @returns – A (potentially empty) Mapbox GL JS program fragment.
  */
-const withDefault = <T extends string | number>(
+function withDefault<T extends string | number>(
   mapboxProperty: string,
   cartokitValue: T,
   defaultValue: T
-): string => {
+): string {
   return cartokitValue !== defaultValue
     ? `'${mapboxProperty}': ${
         typeof cartokitValue === 'string' ? `'${cartokitValue}'` : cartokitValue
       }`
     : '';
-};
+}

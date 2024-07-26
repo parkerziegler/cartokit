@@ -16,17 +16,17 @@ import type {
   CartoKitProportionalSymbolLayer,
   CartoKitDotDensityLayer,
   CartoKitLineLayer,
-  CartoKitFillLayer,
-  CartoKitChoroplethLayer
-} from '$lib/types/CartoKitLayer';
-import type { MapType } from '$lib/types/map-types';
+  CartoKitPolygonLayer,
+  CartoKitChoroplethLayer,
+  LayerType
+} from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_OPACITY,
   DEFAULT_MAX_SIZE,
   DEFAULT_MIN_SIZE,
   DEFAULT_COUNT,
-  DEFAULT_SCALE,
+  DEFAULT_METHOD,
   DEFAULT_SCHEME,
   DEFAULT_THRESHOLDS,
   DEFAULT_RADIUS,
@@ -46,7 +46,7 @@ import {
 interface TransitionMapTypeParams {
   map: Map;
   layer: CartoKitLayer;
-  targetMapType: MapType;
+  targetLayerType: LayerType;
 }
 
 interface TransitionMapTypeReturnValue {
@@ -55,24 +55,24 @@ interface TransitionMapTypeReturnValue {
 }
 
 /**
- * Transition a layer from one map type to another. For cross-geometry transitions,
- * this will create a new layer and remove the previous layer.
+ * Transition a layer from one layer type to another. For cross-geometry trans-
+ * itions, this will create a new layer and remove the previous layer.
  *
  * @param map — The top-level MapLibre GL map instance.
  * @param layer — The CartoKitLayer to transition.
- * @param targetMapType — The map type to transition to.
+ * @param targetLayerType — The layer type to transition to.
  *
  * @returns — The transitioned CartoKitLayer.
  */
-export const transitionMapType = ({
+export function transitionLayerType({
   map,
   layer,
-  targetMapType
-}: TransitionMapTypeParams): CartoKitLayer => {
+  targetLayerType
+}: TransitionMapTypeParams): CartoKitLayer {
   let redraw = false;
   let targetLayer: CartoKitLayer;
 
-  switch (targetMapType) {
+  switch (targetLayerType) {
     case 'Point': {
       ({ redraw, targetLayer } = transitionToPoint(map, layer));
       break;
@@ -89,7 +89,7 @@ export const transitionMapType = ({
       ({ redraw, targetLayer } = transitionToLine(map, layer));
       break;
     }
-    case 'Fill': {
+    case 'Polygon': {
       ({ redraw, targetLayer } = transitionToFill(map, layer));
       break;
     }
@@ -126,7 +126,7 @@ export const transitionMapType = ({
 
     // Update the source with the new data.
     (map.getSource(layer.id) as GeoJSONSource).setData(
-      targetLayer.data.geoJSON
+      targetLayer.data.geojson
     );
 
     // Add the new layer. This function call includes instrumentation.
@@ -134,7 +134,7 @@ export const transitionMapType = ({
   }
 
   return targetLayer;
-};
+}
 
 /**
  * Generate errors with consistent messages for unsupported map type transitions.
@@ -198,7 +198,7 @@ const transitionToPoint = (
         type: 'Point',
         data: {
           ...layer.data,
-          geoJSON: deriveCentroids(layer.data.rawGeoJSON.features),
+          geojson: deriveCentroids(layer.data.sourceGeojson.features),
           transformations: [
             ...layer.data.transformations,
             transformGeometryToCentroids()
@@ -222,7 +222,7 @@ const transitionToPoint = (
         type: 'Point',
         data: {
           ...layer.data,
-          geoJSON: deriveCentroids(layer.data.geoJSON.features),
+          geojson: deriveCentroids(layer.data.geojson.features),
           transformations: [
             ...layer.data.transformations,
             transformGeometryToCentroids()
@@ -243,14 +243,14 @@ const transitionToPoint = (
         redraw: true
       };
     }
-    case 'Fill': {
+    case 'Polygon': {
       const targetLayer: CartoKitPointLayer = {
         id: layer.id,
         displayName: layer.displayName,
         type: 'Point',
         data: {
           ...layer.data,
-          geoJSON: deriveCentroids(layer.data.geoJSON.features),
+          geojson: deriveCentroids(layer.data.geojson.features),
           transformations: [
             ...layer.data.transformations,
             transformGeometryToCentroids()
@@ -275,7 +275,7 @@ const transitionToPoint = (
         type: 'Point',
         data: {
           ...layer.data,
-          geoJSON: deriveCentroids(layer.data.geoJSON.features),
+          geojson: deriveCentroids(layer.data.geojson.features),
           transformations: [
             ...layer.data.transformations,
             transformGeometryToCentroids()
@@ -312,7 +312,7 @@ const transitionToProportionalSymbol = (
   map: Map,
   layer: CartoKitLayer
 ): TransitionMapTypeReturnValue => {
-  const features = layer.data.geoJSON.features;
+  const features = layer.data.geojson.features;
 
   switch (layer.type) {
     case 'Point': {
@@ -353,7 +353,7 @@ const transitionToProportionalSymbol = (
         type: 'Proportional Symbol',
         data: {
           ...layer.data,
-          geoJSON: deriveCentroids(layer.data.rawGeoJSON.features),
+          geojson: deriveCentroids(layer.data.sourceGeojson.features),
           transformations: [
             ...layer.data.transformations,
             transformGeometryToCentroids()
@@ -382,7 +382,7 @@ const transitionToProportionalSymbol = (
         type: 'Proportional Symbol',
         data: {
           ...layer.data,
-          geoJSON: deriveCentroids(features),
+          geojson: deriveCentroids(features),
           transformations: [
             ...layer.data.transformations,
             transformGeometryToCentroids()
@@ -407,14 +407,14 @@ const transitionToProportionalSymbol = (
         redraw: true
       };
     }
-    case 'Fill': {
+    case 'Polygon': {
       const targetLayer: CartoKitProportionalSymbolLayer = {
         id: layer.id,
         displayName: layer.displayName,
         type: 'Proportional Symbol',
         data: {
           ...layer.data,
-          geoJSON: deriveCentroids(features),
+          geojson: deriveCentroids(features),
           transformations: [
             ...layer.data.transformations,
             transformGeometryToCentroids()
@@ -443,7 +443,7 @@ const transitionToProportionalSymbol = (
         type: 'Proportional Symbol',
         data: {
           ...layer.data,
-          geoJSON: deriveCentroids(features),
+          geojson: deriveCentroids(features),
           transformations: [
             ...layer.data.transformations,
             transformGeometryToCentroids()
@@ -485,13 +485,13 @@ const transitionToDotDensity = (
 ): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Point': {
-      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
       if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
         generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
       }
 
-      const features = layer.data.rawGeoJSON.features as Feature<
+      const features = layer.data.sourceGeojson.features as Feature<
         Polygon | MultiPolygon
       >[];
       const attribute = selectNumericAttribute(features);
@@ -503,7 +503,7 @@ const transitionToDotDensity = (
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geoJSON: generateDotDensityPoints({
+          geojson: generateDotDensityPoints({
             features,
             attribute,
             value: dotValue
@@ -530,13 +530,13 @@ const transitionToDotDensity = (
       };
     }
     case 'Proportional Symbol': {
-      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
       if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
         generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
       }
 
-      const features = layer.data.rawGeoJSON.features as Feature<
+      const features = layer.data.sourceGeojson.features as Feature<
         Polygon | MultiPolygon
       >[];
       const attribute = layer.style.size.attribute;
@@ -551,7 +551,7 @@ const transitionToDotDensity = (
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geoJSON: generateDotDensityPoints({
+          geojson: generateDotDensityPoints({
             features,
             attribute,
             value: dotValue
@@ -583,7 +583,7 @@ const transitionToDotDensity = (
         redraw: false
       };
     case 'Line': {
-      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
       const error = generateUnsupportedTransitionError(
         rawGeometryType,
         'Polygon'
@@ -591,8 +591,8 @@ const transitionToDotDensity = (
 
       throw error;
     }
-    case 'Fill': {
-      const features = layer.data.geoJSON.features as Feature<
+    case 'Polygon': {
+      const features = layer.data.geojson.features as Feature<
         Polygon | MultiPolygon
       >[];
       const attribute = selectNumericAttribute(features);
@@ -604,7 +604,7 @@ const transitionToDotDensity = (
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geoJSON: generateDotDensityPoints({
+          geojson: generateDotDensityPoints({
             features,
             attribute,
             value: dotValue
@@ -631,7 +631,7 @@ const transitionToDotDensity = (
       };
     }
     case 'Choropleth': {
-      const features = layer.data.geoJSON.features as Feature<
+      const features = layer.data.geojson.features as Feature<
         Polygon | MultiPolygon
       >[];
       const attribute = layer.style.fill.attribute;
@@ -643,7 +643,7 @@ const transitionToDotDensity = (
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geoJSON: generateDotDensityPoints({
+          geojson: generateDotDensityPoints({
             features,
             attribute,
             value: dotValue
@@ -697,7 +697,7 @@ const transitionToLine = (
       };
     case 'Point':
     case 'Proportional Symbol': {
-      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
       if (
         rawGeometryType !== 'LineString' &&
@@ -716,7 +716,7 @@ const transitionToLine = (
         type: 'Line',
         data: {
           ...layer.data,
-          geoJSON: layer.data.rawGeoJSON
+          geojson: layer.data.sourceGeojson
         },
         style: {
           stroke: layer.style.stroke ?? {
@@ -733,9 +733,9 @@ const transitionToLine = (
       };
     }
     case 'Dot Density':
-    case 'Fill':
+    case 'Polygon':
     case 'Choropleth': {
-      const geometryType = getLayerGeometryType(layer.data.geoJSON);
+      const geometryType = getLayerGeometryType(layer.data.geojson);
       const error = generateUnsupportedTransitionError(
         geometryType,
         'LineString'
@@ -752,7 +752,7 @@ const transitionToLine = (
  * @param map — The top-level MapLibre GL map instance.
  * @param layer — The CartoKit layer to transition.
  *
- * @returns — The transitioned CartoKitFillLayer.
+ * @returns — The transitioned CartoKitPolygonLayer.
  */
 const transitionToFill = (
   map: Map,
@@ -760,19 +760,19 @@ const transitionToFill = (
 ): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Point': {
-      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
       if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
         generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
       }
 
-      const targetLayer: CartoKitFillLayer = {
+      const targetLayer: CartoKitPolygonLayer = {
         id: layer.id,
         displayName: layer.displayName,
-        type: 'Fill',
+        type: 'Polygon',
         data: {
           ...layer.data,
-          geoJSON: layer.data.rawGeoJSON
+          geojson: layer.data.sourceGeojson
         },
         style: {
           fill: layer.style.fill,
@@ -786,19 +786,19 @@ const transitionToFill = (
       };
     }
     case 'Proportional Symbol': {
-      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
       if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
         generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
       }
 
-      const targetLayer: CartoKitFillLayer = {
+      const targetLayer: CartoKitPolygonLayer = {
         id: layer.id,
         displayName: layer.displayName,
-        type: 'Fill',
+        type: 'Polygon',
         data: {
           ...layer.data,
-          geoJSON: layer.data.rawGeoJSON
+          geojson: layer.data.sourceGeojson
         },
         style: {
           fill: layer.style.fill,
@@ -812,13 +812,13 @@ const transitionToFill = (
       };
     }
     case 'Dot Density': {
-      const targetLayer: CartoKitFillLayer = {
+      const targetLayer: CartoKitPolygonLayer = {
         id: layer.id,
         displayName: layer.displayName,
-        type: 'Fill',
+        type: 'Polygon',
         data: {
           ...layer.data,
-          geoJSON: layer.data.rawGeoJSON
+          geojson: layer.data.sourceGeojson
         },
         style: {
           fill: layer.style.fill,
@@ -832,7 +832,7 @@ const transitionToFill = (
       };
     }
     case 'Line': {
-      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
       const error = generateUnsupportedTransitionError(
         rawGeometryType,
         'Polygon'
@@ -840,7 +840,7 @@ const transitionToFill = (
 
       throw error;
     }
-    case 'Fill':
+    case 'Polygon':
       return {
         targetLayer: layer,
         redraw: false
@@ -849,10 +849,10 @@ const transitionToFill = (
       const colors = layer.style.fill.scheme[layer.style.fill.count];
       const color = colors.at(-1) ?? randomColor();
 
-      const targetLayer: CartoKitFillLayer = {
+      const targetLayer: CartoKitPolygonLayer = {
         id: layer.id,
         displayName: layer.displayName,
-        type: 'Fill',
+        type: 'Polygon',
         data: layer.data,
         style: {
           fill: {
@@ -889,13 +889,13 @@ const transitionToChoropleth = (
 ): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Point': {
-      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
       if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
         generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
       }
 
-      const attribute = selectNumericAttribute(layer.data.geoJSON.features);
+      const attribute = selectNumericAttribute(layer.data.geojson.features);
 
       const targetLayer: CartoKitChoroplethLayer = {
         id: layer.id,
@@ -903,17 +903,17 @@ const transitionToChoropleth = (
         type: 'Choropleth',
         data: {
           ...layer.data,
-          geoJSON: layer.data.rawGeoJSON
+          geojson: layer.data.sourceGeojson
         },
         style: {
           fill: {
             attribute,
-            scale: DEFAULT_SCALE,
+            method: DEFAULT_METHOD,
             scheme: DEFAULT_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               attribute,
-              layer.data.geoJSON.features
+              layer.data.geojson.features
             ),
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
@@ -927,7 +927,7 @@ const transitionToChoropleth = (
       };
     }
     case 'Proportional Symbol': {
-      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
       if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
         generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
@@ -939,17 +939,17 @@ const transitionToChoropleth = (
         type: 'Choropleth',
         data: {
           ...layer.data,
-          geoJSON: layer.data.rawGeoJSON
+          geojson: layer.data.sourceGeojson
         },
         style: {
           fill: {
             attribute: layer.style.size.attribute,
-            scale: DEFAULT_SCALE,
+            method: DEFAULT_METHOD,
             scheme: DEFAULT_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               layer.style.size.attribute,
-              layer.data.geoJSON.features
+              layer.data.geojson.features
             ),
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
@@ -969,17 +969,17 @@ const transitionToChoropleth = (
         type: 'Choropleth',
         data: {
           ...layer.data,
-          geoJSON: layer.data.rawGeoJSON
+          geojson: layer.data.sourceGeojson
         },
         style: {
           fill: {
             attribute: layer.style.dots.attribute,
-            scale: DEFAULT_SCALE,
+            method: DEFAULT_METHOD,
             scheme: DEFAULT_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               layer.style.dots.attribute,
-              layer.data.geoJSON.features
+              layer.data.geojson.features
             ),
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
@@ -993,7 +993,7 @@ const transitionToChoropleth = (
       };
     }
     case 'Line': {
-      const rawGeometryType = getLayerGeometryType(layer.data.rawGeoJSON);
+      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
       const error = generateUnsupportedTransitionError(
         rawGeometryType,
         'Polygon'
@@ -1001,8 +1001,8 @@ const transitionToChoropleth = (
 
       throw error;
     }
-    case 'Fill': {
-      const attribute = selectNumericAttribute(layer.data.geoJSON.features);
+    case 'Polygon': {
+      const attribute = selectNumericAttribute(layer.data.geojson.features);
 
       const targetLayer: CartoKitChoroplethLayer = {
         id: layer.id,
@@ -1012,12 +1012,12 @@ const transitionToChoropleth = (
         style: {
           fill: {
             attribute,
-            scale: DEFAULT_SCALE,
+            method: DEFAULT_METHOD,
             scheme: DEFAULT_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               attribute,
-              layer.data.geoJSON.features
+              layer.data.geojson.features
             ),
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
