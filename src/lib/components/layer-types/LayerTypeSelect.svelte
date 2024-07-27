@@ -6,6 +6,7 @@
   import { geometryToLayerTypes } from '$lib/utils/layer';
 
   export let layer: CartoKitLayer;
+
   $: geometryType = getLayerGeometryType(layer.data.sourceGeojson);
   $: options =
     geometryToLayerTypes.get(geometryType)?.map((layerType) => ({

@@ -139,18 +139,18 @@ export function transitionLayerType({
 /**
  * Generate errors with consistent messages for unsupported map type transitions.
  *
- * @param rawGeometryType – The geometry type of the original layer.
+ * @param sourceGeometryType – The geometry type of the original layer.
  * @param targetGeometryType – The geometry type of the target layer being
  * transitioned to.
  *
  * @returns – never—program execution halts.
  */
 const generateUnsupportedTransitionError = (
-  rawGeometryType: Geometry['type'],
+  sourceGeometryType: Geometry['type'],
   targetGeometryType: Geometry['type']
 ): Error => {
   throw new Error(
-    `Unsupported geometry transition. Transition initiated from ${rawGeometryType} to ${targetGeometryType}, but no ${targetGeometryType} features are present in the original data.`
+    `Unsupported geometry transition. Transition initiated from ${sourceGeometryType} to ${targetGeometryType}, but no ${targetGeometryType} features are present in the original data.`
   );
 };
 
@@ -158,7 +158,7 @@ const generateUnsupportedTransitionError = (
  * Transition a layer to a point layer.
  *
  * @param map — The top-level MapLibre GL map instance.
- * @param layer — The CartoKit layer to transition.
+ * @param layer — The @see{CartoKitLayer} to transition.
  *
  * @returns — The transitioned CartoKitPointLayer.
  */
@@ -304,7 +304,7 @@ const transitionToPoint = (
 /**
  * Transition a layer to a proportional symbol layer.
  *
- * @param layer — The CartoKit layer to transition.
+ * @param layer — The @see{CartoKitLayer} to transition.
  *
  * @returns – The transitioned CartoKitProportionalSymbolLayer.
  */
@@ -476,7 +476,7 @@ const transitionToProportionalSymbol = (
 /**
  * Transition a layer to a dot density layer.
  *
- * @param layer — The CartoKit layer to transition.
+ * @param layer — The @see{CartoKitLayer} to transition.
  *
  * @returns – The transitioned CartoKitDotDensityLayer.
  */
@@ -485,10 +485,13 @@ const transitionToDotDensity = (
 ): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Point': {
-      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
-      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
-        generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
+      if (
+        sourceGeometryType !== 'Polygon' &&
+        sourceGeometryType !== 'MultiPolygon'
+      ) {
+        generateUnsupportedTransitionError(sourceGeometryType, 'Polygon');
       }
 
       const features = layer.data.sourceGeojson.features as Feature<
@@ -530,10 +533,13 @@ const transitionToDotDensity = (
       };
     }
     case 'Proportional Symbol': {
-      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
-      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
-        generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
+      if (
+        sourceGeometryType !== 'Polygon' &&
+        sourceGeometryType !== 'MultiPolygon'
+      ) {
+        generateUnsupportedTransitionError(sourceGeometryType, 'Polygon');
       }
 
       const features = layer.data.sourceGeojson.features as Feature<
@@ -583,9 +589,9 @@ const transitionToDotDensity = (
         redraw: false
       };
     case 'Line': {
-      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
       const error = generateUnsupportedTransitionError(
-        rawGeometryType,
+        sourceGeometryType,
         'Polygon'
       );
 
@@ -681,7 +687,7 @@ const transitionToDotDensity = (
  * Transition a layer to a line layer.
  *
  * @param map – The top-level MapLibre GL map instance.
- * @param layer – The CartoKit layer to transition.
+ * @param layer – The @see{CartoKitLayer} to transition.
  *
  * @returns – The transitioned CartoKitLineLayer.
  */
@@ -697,14 +703,14 @@ const transitionToLine = (
       };
     case 'Point':
     case 'Proportional Symbol': {
-      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
       if (
-        rawGeometryType !== 'LineString' &&
-        rawGeometryType !== 'MultiLineString'
+        sourceGeometryType !== 'LineString' &&
+        sourceGeometryType !== 'MultiLineString'
       ) {
         const error = generateUnsupportedTransitionError(
-          rawGeometryType,
+          sourceGeometryType,
           'LineString'
         );
         throw error;
@@ -750,7 +756,7 @@ const transitionToLine = (
  * Transition a layer to a polygon fill layer.
  *
  * @param map — The top-level MapLibre GL map instance.
- * @param layer — The CartoKit layer to transition.
+ * @param layer — The @see{CartoKitLayer} to transition.
  *
  * @returns — The transitioned CartoKitPolygonLayer.
  */
@@ -760,10 +766,13 @@ const transitionToFill = (
 ): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Point': {
-      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
-      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
-        generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
+      if (
+        sourceGeometryType !== 'Polygon' &&
+        sourceGeometryType !== 'MultiPolygon'
+      ) {
+        generateUnsupportedTransitionError(sourceGeometryType, 'Polygon');
       }
 
       const targetLayer: CartoKitPolygonLayer = {
@@ -786,10 +795,13 @@ const transitionToFill = (
       };
     }
     case 'Proportional Symbol': {
-      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
-      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
-        generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
+      if (
+        sourceGeometryType !== 'Polygon' &&
+        sourceGeometryType !== 'MultiPolygon'
+      ) {
+        generateUnsupportedTransitionError(sourceGeometryType, 'Polygon');
       }
 
       const targetLayer: CartoKitPolygonLayer = {
@@ -832,9 +844,9 @@ const transitionToFill = (
       };
     }
     case 'Line': {
-      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
       const error = generateUnsupportedTransitionError(
-        rawGeometryType,
+        sourceGeometryType,
         'Polygon'
       );
 
@@ -879,7 +891,7 @@ const transitionToFill = (
  * Transition a layer to a choropleth layer.
  *
  * @param map — The top-level MapLibre GL map instance.
- * @param layer — The CartoKit layer to transition.
+ * @param layer — The @see{CartoKitLayer} to transition.
  *
  * @returns – The transitioned CartoKitChoroplethLayer.
  */
@@ -889,10 +901,13 @@ const transitionToChoropleth = (
 ): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Point': {
-      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
-      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
-        generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
+      if (
+        sourceGeometryType !== 'Polygon' &&
+        sourceGeometryType !== 'MultiPolygon'
+      ) {
+        generateUnsupportedTransitionError(sourceGeometryType, 'Polygon');
       }
 
       const attribute = selectNumericAttribute(layer.data.geojson.features);
@@ -927,10 +942,13 @@ const transitionToChoropleth = (
       };
     }
     case 'Proportional Symbol': {
-      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
 
-      if (rawGeometryType !== 'Polygon' && rawGeometryType !== 'MultiPolygon') {
-        generateUnsupportedTransitionError(rawGeometryType, 'Polygon');
+      if (
+        sourceGeometryType !== 'Polygon' &&
+        sourceGeometryType !== 'MultiPolygon'
+      ) {
+        generateUnsupportedTransitionError(sourceGeometryType, 'Polygon');
       }
 
       const targetLayer: CartoKitChoroplethLayer = {
@@ -993,9 +1011,9 @@ const transitionToChoropleth = (
       };
     }
     case 'Line': {
-      const rawGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
       const error = generateUnsupportedTransitionError(
-        rawGeometryType,
+        sourceGeometryType,
         'Polygon'
       );
 

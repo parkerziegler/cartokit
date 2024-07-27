@@ -16,6 +16,8 @@
 
   export let layer: CartoKitChoroplethLayer;
 
+  $: colors = layer.style.fill.scheme[layer.style.fill.count];
+
   let showOptions = false;
   let offsetHeight = 0;
   let x = 0;
@@ -81,9 +83,7 @@
       bind:offsetHeight
       bind:this={trigger}
     >
-      <ColorSchemeList
-        colors={layer.style.fill.scheme[layer.style.fill.count]}
-      />
+      <ColorSchemeList {colors} />
     </button>
     {#if showOptions}
       <Portal
@@ -101,18 +101,14 @@
                 class="first-scheme px-4 py-2 hover:bg-slate-600"
                 bind:this={firstScheme}
               >
-                <ColorSchemeList
-                  colors={layer.style.fill.scheme[layer.style.fill.count]}
-                />
+                <ColorSchemeList {colors} />
               </button>
             {:else}
               <button
                 on:click={() => onSchemeSelect(scheme)}
                 class="px-4 py-2 hover:bg-slate-600"
               >
-                <ColorSchemeList
-                  colors={layer.style.fill.scheme[layer.style.fill.count]}
-                />
+                <ColorSchemeList {colors} />
               </button>
             {/if}
           {/each}

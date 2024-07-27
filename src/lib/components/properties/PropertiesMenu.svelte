@@ -3,7 +3,7 @@
   import maplibregl from 'maplibre-gl';
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
-  import MapTypeSelect from '$lib/components/layer-types/LayerTypeSelect.svelte';
+  import LayerTypeSelect from '$lib/components/layer-types/LayerTypeSelect.svelte';
   import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
   import DotDensityPropertiesPanel from '$lib/components/properties/DotDensityPropertiesPanel.svelte';
   import DownloadData from '$lib/components/properties/DownloadData.svelte';
@@ -60,7 +60,7 @@
     </div>
   </MenuTitle>
   <MenuItem title="Layer Type">
-    <MapTypeSelect {layer} />
+    <LayerTypeSelect {layer} />
   </MenuItem>
   {#if layer.type === 'Point'}
     <PointPropertiesPanel {layer} />

@@ -239,7 +239,7 @@ type DispatchLayerUpdateParams =
  *
  * @param params – Required parameters for the layer update.
  * @param type – The type of update to dispatch.
- * @param layer – The CartoKit layer to update.
+ * @param layer – The @see{CartoKitLayer} to update.
  * @param payload – The payload for the update.
  */
 export function dispatchLayerUpdate({

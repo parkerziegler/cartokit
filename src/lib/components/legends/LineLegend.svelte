@@ -4,6 +4,7 @@
   import { getLayerGeometryType } from '$lib/utils/geojson';
 
   export let layer: CartoKitLineLayer;
+
   $: geometryType = getLayerGeometryType(layer.data.geojson);
 </script>
 

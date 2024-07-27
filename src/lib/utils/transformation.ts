@@ -4,9 +4,9 @@ export function transformGeometryToCentroids(): Transformation {
   return {
     name: 'transformGeometryToCentroids',
     definition: `
-    function transformGeometryToCentroids(geoJSON) {
+    function transformGeometryToCentroids(geojson) {
       return turf.featureCollection(
-        geoJSON.features.map((feature) =>
+        geojson.features.map((feature) =>
           turf.feature(turf.centroid(feature).geometry, feature.properties)
         )
       );
@@ -22,8 +22,8 @@ export function transformDotDensity(
   return {
     name: 'transformDotDensity',
     definition: `
-    function transformDotDensity(geoJSON) {
-      const dots = geoJSON.features.flatMap((feature) => {
+    function transformDotDensity(geojson) {
+      const dots = geojson.features.flatMap((feature) => {
         const numPoints = Math.floor(
           feature.properties['${attribute}'] / ${dotValue}
         );

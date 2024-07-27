@@ -119,10 +119,10 @@ test('workflow-1', async ({ page }) => {
   await page.getByTestId('transformation-editor').press('ControlOrMeta+A');
   await page.getByTestId('transformation-editor').press('Backspace');
   await page.getByTestId('transformation-editor')
-    .pressSequentially(`function transformGeoJSON(geoJSON) {
-  geoJSON.features.reverse();
+    .pressSequentially(`function transformGeojson(geojson) {
+  geojson.features.reverse();
   
-  return geoJSON;`);
+  return geojson;`);
 
   // Execute the transformation.
   await page.getByTestId('run-transformation-button').click();

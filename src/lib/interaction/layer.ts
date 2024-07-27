@@ -26,10 +26,10 @@ import {
 import { getLayerGeometryType } from '$lib/utils/geojson';
 
 /**
- * Add a CartoKit layer to the map.
+ * Add a @see{CartoKitLayer} to the map.
  *
  * @param map – The top-level MapLibre GL map instance.
- * @param layer – The CartoKit layer to add to the map.
+ * @param layer – The @see{CartoKitLayer} to add to the map.
  */
 export const addLayer = (map: Map, layer: CartoKitLayer): void => {
   switch (layer.type) {

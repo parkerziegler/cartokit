@@ -37,14 +37,11 @@ export function decimalToPercent(decimal: number): number {
  * Reverse a color scheme.
  *
  * @param scheme – The color scheme to reverse.
+ *
  * @returns – The reversed color scheme.
  */
 export function reverseColorScheme(scheme: ColorScheme): ColorScheme {
-  if (Array.isArray(scheme)) {
-    return scheme.map((indexedScheme) => [...indexedScheme].reverse());
-  }
-
-  return scheme;
+  return scheme.map((indexedScheme) => [...indexedScheme].reverse());
 }
 
 export const COLOR_SCHEMES = [

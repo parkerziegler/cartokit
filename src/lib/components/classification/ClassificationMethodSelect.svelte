@@ -22,8 +22,6 @@
     label: scale
   }));
 
-  $: selected = layer.style.fill.method;
-
   function onChange(event: CustomEvent<{ value: ClassificationMethod }>) {
     if (event.detail.value === 'Manual') {
       ({ top, left } = ref.getBoundingClientRect());
@@ -55,7 +53,7 @@
 
 <Select
   {options}
-  {selected}
+  selected={layer.style.fill.method}
   title="Method"
   id="classification-method-select"
   on:change={onChange}

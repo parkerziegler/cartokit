@@ -6,28 +6,28 @@ import { isPropertyNumeric } from '$lib/utils/property';
 /**
  * Normalize an arbitrary GeoJSON object to a FeatureCollection.
  *
- * @param geoJSON - The GeoJSON object to normalize.
+ * @param geojson - The GeoJSON object to normalize.
  * @returns – A GeoJSON FeatureCollection.
  */
 export function normalizeGeoJSONToFeatureCollection(
-  geoJSON: GeoJSON
+  geojson: GeoJSON
 ): FeatureCollection {
-  switch (geoJSON.type) {
+  switch (geojson.type) {
     case 'Point':
     case 'MultiPoint':
     case 'LineString':
     case 'MultiLineString':
     case 'Polygon':
     case 'MultiPolygon':
-      return featureCollection([feature(geoJSON)]);
+      return featureCollection([feature(geojson)]);
     case 'GeometryCollection':
       return featureCollection(
-        geoJSON.geometries.map((geometry) => feature(geometry))
+        geojson.geometries.map((geometry) => feature(geometry))
       );
     case 'Feature':
-      return featureCollection([geoJSON]);
+      return featureCollection([geojson]);
     case 'FeatureCollection':
-      return geoJSON;
+      return geojson;
   }
 }
 

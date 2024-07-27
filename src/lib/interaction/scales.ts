@@ -130,7 +130,7 @@ interface DeriveThresholdsParams<T> extends DeriveBreaksParams<T> {
  *
  * @param params – Input parameters to compute thresholds over a GeoJSON FeatureCollection.
  * @param method – The @see{ClassificationMethod} to use.
- * @param layer – The CartoKit layer to derive thresholds from.
+ * @param layer – The @see{CartoKitLayer} to derive thresholds from.
  * @param attribute – The data attribute to compute thresholds over.
  * @param features – The GeoJSON features of the dataset.
  * @param range – The output range of the scale.

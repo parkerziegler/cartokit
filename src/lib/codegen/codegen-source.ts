@@ -2,7 +2,7 @@ import { codegenTransformations } from '$lib/codegen/codegen-transformations';
 import type { CartoKitLayer } from '$lib/types';
 
 /**
- * Generate the data source for a CartoKit layer.
+ * Generate the data source for a @see{CartoKitLayer}.
  *
  * @param layer – A @see{CartoKitLayer}.
  * @param uploadTable – The symbol table tracking file uploads.

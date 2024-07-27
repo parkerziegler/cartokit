@@ -33,8 +33,8 @@
   let error = '';
   let success = false;
   let timeoutId: number | undefined;
-  const doc = `function transformGeoJSON(geoJSON) {
-  return geoJSON;
+  const doc = `function transformGeojson(geojson) {
+  return geojson;
 }`;
 
   // Preview editor state.

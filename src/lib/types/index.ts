@@ -180,7 +180,7 @@ export interface CartoKitDotDensityLayer extends Layer {
 }
 
 /**
- * Represents a CartoKit layer. The CartoKitLayer type is a union of all
+ * Represents a layer in cartokit. The CartoKitLayer type is a union of all
  * possible layer types.
  */
 export type CartoKitLayer =
