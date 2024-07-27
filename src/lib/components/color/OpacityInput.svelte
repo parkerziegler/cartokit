@@ -11,7 +11,7 @@
   $: opacity = decimalToPercent(
     layer.type === 'Line'
       ? layer.style.stroke.opacity
-      : layer.style[property]?.opacity ?? DEFAULT_OPACITY
+      : (layer.style[property]?.opacity ?? DEFAULT_OPACITY)
   );
 
   function validateOpacity(event: Event) {
