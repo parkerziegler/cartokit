@@ -17,7 +17,7 @@
   function onChange(event: CustomEvent<{ value: LayerType }>) {
     dispatchLayerUpdate({
       type: 'layer-type',
-      layer,
+      layerId: layer.id,
       payload: { layerType: event.detail.value }
     });
   }

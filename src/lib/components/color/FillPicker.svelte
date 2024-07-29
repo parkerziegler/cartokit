@@ -6,24 +6,16 @@
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type {
-    CartoKitPolygonLayer,
-    CartoKitPointLayer,
-    CartoKitProportionalSymbolLayer,
-    CartoKitDotDensityLayer
-  } from '$lib/types';
+  import type { ConstantStyle } from '$lib/types';
   import { DEFAULT_FILL } from '$lib/utils/constants';
 
-  export let layer:
-    | CartoKitPointLayer
-    | CartoKitPolygonLayer
-    | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer;
+  export let layerId: string;
+  export let fill: ConstantStyle;
 
   function dispatchFillUpdate(color: string) {
     dispatchLayerUpdate({
       type: 'fill',
-      layer,
+      layerId,
       payload: {
         color
       }
@@ -40,23 +32,21 @@
   }
 </script>
 
-{#if layer.style.fill}
-  <div class="color-picker stack stack-2xs" transition:slide>
-    <div class="flex items-center">
-      <FieldLabel fieldId="fill-color">Color</FieldLabel>
-      <input
-        type="color"
-        id="fill-color"
-        class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
-        value={d3.color(layer.style.fill.color)?.formatHex() ?? DEFAULT_FILL}
-        on:input={onFillInput}
-      />
-      <HexInput
-        hex={d3.color(layer.style.fill.color)?.formatHex() ?? DEFAULT_FILL}
-        testId="fill-color-input"
-        onHexChange={onFillHexChange}
-      />
-    </div>
-    <OpacityInput {layer} property="fill" />
+<div class="color-picker stack stack-2xs" transition:slide>
+  <div class="flex items-center">
+    <FieldLabel fieldId="fill-color">Color</FieldLabel>
+    <input
+      type="color"
+      id="fill-color"
+      class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
+      value={d3.color(fill.color)?.formatHex() ?? DEFAULT_FILL}
+      on:input={onFillInput}
+    />
+    <HexInput
+      hex={d3.color(fill.color)?.formatHex() ?? DEFAULT_FILL}
+      testId="fill-color-input"
+      onHexChange={onFillHexChange}
+    />
   </div>
-{/if}
+  <OpacityInput {layerId} property="fill" style={fill} />
+</div>

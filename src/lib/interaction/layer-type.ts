@@ -27,7 +27,7 @@ import {
   DEFAULT_MIN_SIZE,
   DEFAULT_COUNT,
   DEFAULT_METHOD,
-  DEFAULT_SCHEME,
+  DEFAULT_NUMERIC_SCHEME,
   DEFAULT_THRESHOLDS,
   DEFAULT_RADIUS,
   DEFAULT_STROKE,
@@ -35,7 +35,7 @@ import {
 } from '$lib/utils/constants';
 import {
   getLayerGeometryType,
-  selectNumericAttribute
+  selectQuantitativeAttribute
 } from '$lib/utils/geojson';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
 import {
@@ -162,10 +162,10 @@ const generateUnsupportedTransitionError = (
  *
  * @returns — The transitioned CartoKitPointLayer.
  */
-const transitionToPoint = (
+function transitionToPoint(
   map: Map,
   layer: CartoKitLayer
-): TransitionMapTypeReturnValue => {
+): TransitionMapTypeReturnValue {
   switch (layer.type) {
     case 'Point':
       return {
@@ -284,9 +284,7 @@ const transitionToPoint = (
         style: {
           size: DEFAULT_RADIUS,
           fill: {
-            color:
-              layer.style.fill.scheme[layer.style.fill.count].at(-1) ??
-              randomColor(),
+            color: randomColor(),
             opacity: layer.style.fill.opacity
           },
           stroke: layer.style.stroke
@@ -299,7 +297,7 @@ const transitionToPoint = (
       };
     }
   }
-};
+}
 
 /**
  * Transition a layer to a proportional symbol layer.
@@ -323,7 +321,7 @@ const transitionToProportionalSymbol = (
         data: layer.data,
         style: {
           size: {
-            attribute: selectNumericAttribute(features),
+            attribute: selectQuantitativeAttribute(features),
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
@@ -390,7 +388,7 @@ const transitionToProportionalSymbol = (
         },
         style: {
           size: {
-            attribute: selectNumericAttribute(features),
+            attribute: selectQuantitativeAttribute(features),
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
@@ -422,7 +420,7 @@ const transitionToProportionalSymbol = (
         },
         style: {
           size: {
-            attribute: selectNumericAttribute(features),
+            attribute: selectQuantitativeAttribute(features),
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
@@ -456,9 +454,7 @@ const transitionToProportionalSymbol = (
             max: DEFAULT_MAX_SIZE
           },
           fill: {
-            color:
-              layer.style.fill.scheme[layer.style.fill.count].at(-1) ??
-              randomColor(),
+            color: randomColor(),
             opacity: layer.style.fill.opacity
           },
           stroke: layer.style.stroke
@@ -497,7 +493,7 @@ const transitionToDotDensity = (
       const features = layer.data.sourceGeojson.features as Feature<
         Polygon | MultiPolygon
       >[];
-      const attribute = selectNumericAttribute(features);
+      const attribute = selectQuantitativeAttribute(features);
       const dotValue = deriveDotDensityStartingValue(features, attribute);
 
       const targetLayer: CartoKitDotDensityLayer = {
@@ -601,7 +597,7 @@ const transitionToDotDensity = (
       const features = layer.data.geojson.features as Feature<
         Polygon | MultiPolygon
       >[];
-      const attribute = selectNumericAttribute(features);
+      const attribute = selectQuantitativeAttribute(features);
       const dotValue = deriveDotDensityStartingValue(features, attribute);
 
       const targetLayer: CartoKitDotDensityLayer = {
@@ -666,9 +662,7 @@ const transitionToDotDensity = (
             value: dotValue
           },
           fill: {
-            color:
-              layer.style.fill.scheme[layer.style.fill.count].at(-1) ??
-              randomColor(),
+            color: randomColor(),
             opacity: layer.style.fill.opacity
           },
           stroke: layer.style.stroke
@@ -858,8 +852,7 @@ const transitionToFill = (
         redraw: false
       };
     case 'Choropleth': {
-      const colors = layer.style.fill.scheme[layer.style.fill.count];
-      const color = colors.at(-1) ?? randomColor();
+      const color = randomColor();
 
       const targetLayer: CartoKitPolygonLayer = {
         id: layer.id,
@@ -895,10 +888,10 @@ const transitionToFill = (
  *
  * @returns – The transitioned CartoKitChoroplethLayer.
  */
-const transitionToChoropleth = (
+function transitionToChoropleth(
   map: Map,
   layer: CartoKitLayer
-): TransitionMapTypeReturnValue => {
+): TransitionMapTypeReturnValue {
   switch (layer.type) {
     case 'Point': {
       const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
@@ -910,7 +903,9 @@ const transitionToChoropleth = (
         generateUnsupportedTransitionError(sourceGeometryType, 'Polygon');
       }
 
-      const attribute = selectNumericAttribute(layer.data.geojson.features);
+      const attribute = selectQuantitativeAttribute(
+        layer.data.geojson.features
+      );
 
       const targetLayer: CartoKitChoroplethLayer = {
         id: layer.id,
@@ -922,9 +917,10 @@ const transitionToChoropleth = (
         },
         style: {
           fill: {
+            type: 'Quantitative',
             attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_SCHEME,
+            scheme: DEFAULT_NUMERIC_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               attribute,
@@ -961,9 +957,10 @@ const transitionToChoropleth = (
         },
         style: {
           fill: {
+            type: 'Quantitative',
             attribute: layer.style.size.attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_SCHEME,
+            scheme: DEFAULT_NUMERIC_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               layer.style.size.attribute,
@@ -991,9 +988,10 @@ const transitionToChoropleth = (
         },
         style: {
           fill: {
+            type: 'Quantitative',
             attribute: layer.style.dots.attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_SCHEME,
+            scheme: DEFAULT_NUMERIC_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               layer.style.dots.attribute,
@@ -1020,7 +1018,9 @@ const transitionToChoropleth = (
       throw error;
     }
     case 'Polygon': {
-      const attribute = selectNumericAttribute(layer.data.geojson.features);
+      const attribute = selectQuantitativeAttribute(
+        layer.data.geojson.features
+      );
 
       const targetLayer: CartoKitChoroplethLayer = {
         id: layer.id,
@@ -1029,9 +1029,10 @@ const transitionToChoropleth = (
         data: layer.data,
         style: {
           fill: {
+            type: 'Quantitative',
             attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_SCHEME,
+            scheme: DEFAULT_NUMERIC_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               attribute,
@@ -1068,4 +1069,4 @@ const transitionToChoropleth = (
       };
     }
   }
-};
+}

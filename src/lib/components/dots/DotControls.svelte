@@ -11,7 +11,7 @@
   function onDotValueChange(event: CustomEvent<{ value: number }>) {
     dispatchLayerUpdate({
       type: 'dot-value',
-      layer,
+      layerId: layer.id,
       payload: {
         value: event.detail.value
       }
@@ -20,8 +20,18 @@
 </script>
 
 <div class="stack stack-2xs">
-  <AttributeSelect {layer} selected={layer.style.dots.attribute} />
-  <PointSize {layer} />
+  <AttributeSelect
+    layerId={layer.id}
+    geojson={layer.data.geojson}
+    visualizationType="Quantitative"
+    selected={layer.style.dots.attribute}
+  />
+  <PointSize
+    layerId={layer.id}
+    size={layer.style.dots.size}
+    fieldId="dot-size"
+    label="Dot Size"
+  />
   <div class="stack-h stack-h-xs items-center">
     <FieldLabel fieldId="dot-value">Dot Value</FieldLabel>
     <NumberInput

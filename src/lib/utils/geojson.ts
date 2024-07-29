@@ -1,7 +1,10 @@
 import { feature, featureCollection } from '@turf/helpers';
-import type { GeoJSON, FeatureCollection, Geometry } from 'geojson';
+import type { GeoJSON, Feature, FeatureCollection, Geometry } from 'geojson';
 
-import { isPropertyNumeric } from '$lib/utils/property';
+import {
+  isPropertyCategorical,
+  isPropertyQuantitative
+} from '$lib/utils/property';
 
 /**
  * Normalize an arbitrary GeoJSON object to a FeatureCollection.
@@ -50,11 +53,12 @@ export function getLayerGeometryType(
  *
  * @param data – The GeoJSON dataset.
  *
- * @returns – The name of the first numeric attribute found in the input GeoJSON dataset.
+ * @returns – The name of the first numeric attribute found in the input GeoJSON
+ * dataset.
  */
-export function selectNumericAttribute(data: GeoJSON.Feature[]): string {
+export function selectQuantitativeAttribute(data: Feature[]): string {
   for (const property in data[0].properties) {
-    if (isPropertyNumeric(data[0].properties[property])) {
+    if (isPropertyQuantitative(data[0].properties[property])) {
       return property;
     }
   }
@@ -62,4 +66,42 @@ export function selectNumericAttribute(data: GeoJSON.Feature[]): string {
   // TODO: Catch this error and display a message prompting the user
   // to select a layer type that does not require a numeric attribute.
   throw new Error('No numeric attributes found in dataset.');
+}
+
+/**
+ * Select a categorical attribute from a GeoJSON dataset.
+ *
+ * @param data – The GeoJSON dataset.
+ *
+ * @returns – The name of the first categorical attribute found in the input
+ * GeoJSON dataset.
+ */
+export function selectCategoricalAttribute(data: Feature[]): string {
+  for (const property in data[0].properties) {
+    if (isPropertyCategorical(data[0].properties[property])) {
+      return property;
+    }
+  }
+
+  // TODO: Catch this error and display a message prompting the user
+  // to select a layer type that does not require a categorical attribute.
+  throw new Error('No cateogrical attributes found in dataset.');
+}
+
+export function enumerateAttributeCategories(
+  data: Feature[],
+  attribute: string
+): string[] {
+  const categories = new Set<string>();
+
+  for (const feature of data) {
+    if (
+      feature.properties?.[attribute] &&
+      !categories.has(feature.properties[attribute])
+    ) {
+      categories.add(feature.properties[attribute]);
+    }
+  }
+
+  return Array.from(categories);
 }

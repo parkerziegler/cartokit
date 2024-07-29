@@ -12,6 +12,12 @@
   <ColorPalette {layer} />
 </MenuItem>
 <MenuItem title="Stroke">
-  <StrokePicker {layer} />
-  <StrokeModifier {layer} slot="action" />
+  {#if layer.style.stroke}
+    <StrokePicker layerId={layer.id} stroke={layer.style.stroke} />
+  {/if}
+  <StrokeModifier
+    layerId={layer.id}
+    stroke={layer.style.stroke}
+    slot="action"
+  />
 </MenuItem>

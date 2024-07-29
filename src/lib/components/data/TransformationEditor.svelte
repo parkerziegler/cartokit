@@ -1,6 +1,7 @@
 <script lang="ts">
   import { featureCollection } from '@turf/helpers';
   import { EditorView } from 'codemirror';
+  import type { FeatureCollection } from 'geojson';
   import { onDestroy } from 'svelte';
 
   import TransformationAlert from '$lib/components/data/TransformationAlert.svelte';
@@ -13,20 +14,13 @@
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { selectedFeature } from '$lib/stores/selected-feature';
-  import type {
-    CartoKitChoroplethLayer,
-    CartoKitDotDensityLayer,
-    CartoKitProportionalSymbolLayer
-  } from '$lib/types';
   import { functionNameRe } from '$lib/utils/regex';
   import { transformationWorker } from '$lib/utils/worker';
 
   export let onClose: () => void;
   export let onClickOutside: (event: CustomEvent<MouseEvent>) => void;
-  export let layer:
-    | CartoKitChoroplethLayer
-    | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer;
+  export let layerId: string;
+  export let geojson: FeatureCollection;
 
   // Main editor state.
   let view: EditorView;
@@ -61,14 +55,14 @@
   function onClick() {
     const program = view.state.doc.toString();
 
-    transformationWorker(program, layer.data.geojson, (message) => {
+    transformationWorker(program, geojson, (message) => {
       switch (message.type) {
         case 'data': {
           const name = functionNameRe.exec(program);
 
           dispatchLayerUpdate({
             type: 'transformation',
-            layer,
+            layerId,
             payload: {
               geojson: message.data,
               transformation: {

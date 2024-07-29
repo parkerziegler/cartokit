@@ -7,9 +7,9 @@
   import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
   import DotDensityPropertiesPanel from '$lib/components/properties/DotDensityPropertiesPanel.svelte';
   import DownloadData from '$lib/components/properties/DownloadData.svelte';
-  import FillPropertiesPanel from '$lib/components/properties/FillPropertiesPanel.svelte';
   import LinePropertiesPanel from '$lib/components/properties/LinePropertiesPanel.svelte';
   import PointPropertiesPanel from '$lib/components/properties/PointPropertiesPanel.svelte';
+  import PolygonPropertiesPanel from '$lib/components/properties/PolygonPropertiesPanel.svelte';
   import ProportionalSymbolPropertiesPanel from '$lib/components/properties/ProportionalSymbolPropertiesPanel.svelte';
   import ViewData from '$lib/components/properties/ViewData.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
@@ -44,7 +44,7 @@
 
 <Menu
   id="properties"
-  class={cs('properties absolute right-4 top-4 z-10 overflow-auto', {
+  class={cs('properties absolute right-4 top-4 z-10 w-80 overflow-auto', {
     'properties--y-compact': $layout.dataVisible,
     'properties--x-compact': $layout.editorVisible
   })}
@@ -71,7 +71,7 @@
   {:else if layer.type === 'Line'}
     <LinePropertiesPanel {layer} />
   {:else if layer.type === 'Polygon'}
-    <FillPropertiesPanel {layer} />
+    <PolygonPropertiesPanel {layer} />
   {:else if layer.type === 'Choropleth'}
     <ChoroplethPropertiesPanel {layer} />
   {/if}

@@ -1,52 +1,66 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
-  import ColorSchemeList from '$lib/components/color/ColorSchemeList.svelte';
+  import ColorSchemePalette from '$lib/components/color/ColorSchemePalette.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { CartoKitChoroplethLayer, ColorScheme } from '$lib/types';
+  import type {
+    CategoricalColorScheme,
+    QuantitativeColorScheme,
+    QuantitativeStyle,
+    CategoricalStyle
+  } from '$lib/types';
   import { clickOutside } from '$lib/utils/actions';
   import {
-    reverseColorScheme,
-    COLOR_SCHEMES,
-    COLOR_SCHEMES_REV
+    reverseQuantitativeColorScheme,
+    reverseCategoricalColorScheme,
+    QUANTITATIVE_COLOR_SCHEMES,
+    QUANTITATIVE_COLOR_SCHEMES_REV,
+    CATEGORICAL_COLOR_SCHEMES,
+    CATEGORICAL_COLOR_SCHEMES_REV
   } from '$lib/utils/color';
 
-  export let layer: CartoKitChoroplethLayer;
-
-  $: colors = layer.style.fill.scheme[layer.style.fill.count];
+  export let layerId: string;
+  export let style: QuantitativeStyle | CategoricalStyle;
 
   let showOptions = false;
   let offsetHeight = 0;
   let x = 0;
   let y = 0;
-  let trigger: HTMLButtonElement;
-  let firstScheme: HTMLButtonElement;
   let schemeReversed = false;
+
+  let trigger: HTMLButtonElement;
+
+  $: colors =
+    style.type === 'Quantitative' ? style.scheme[style.count] : style.scheme;
+  $: quantitativeSchemes = schemeReversed
+    ? QUANTITATIVE_COLOR_SCHEMES_REV
+    : QUANTITATIVE_COLOR_SCHEMES;
+  $: categoricalSchemes = schemeReversed
+    ? CATEGORICAL_COLOR_SCHEMES_REV
+    : CATEGORICAL_COLOR_SCHEMES;
 
   const target = document.getElementById('map') ?? document.body;
 
-  onMount(() => {
-    ({ y } = trigger.getBoundingClientRect());
-  });
-
   function onClick() {
     showOptions = !showOptions;
-    ({ x } = trigger.getBoundingClientRect());
+    ({ x, y } = trigger.getBoundingClientRect());
   }
 
   function onClickOutside() {
     showOptions = false;
   }
 
-  function onSchemeSelect(scheme: ColorScheme) {
+  function onSchemeSelect(
+    event: CustomEvent<{
+      scheme: QuantitativeColorScheme | CategoricalColorScheme;
+    }>
+  ) {
     dispatchLayerUpdate({
       type: 'color-scheme',
-      layer,
+      layerId,
       payload: {
-        scheme
+        scheme: event.detail.scheme
       }
     });
 
@@ -56,25 +70,26 @@
   function onSchemeReverse() {
     schemeReversed = !schemeReversed;
 
+    const scheme =
+      style.type === 'Quantitative'
+        ? reverseQuantitativeColorScheme(style.scheme)
+        : reverseCategoricalColorScheme(style.scheme);
+
     dispatchLayerUpdate({
       type: 'color-scheme',
-      layer,
+      layerId,
       payload: {
-        scheme: reverseColorScheme(layer.style.fill.scheme)
+        scheme
       }
     });
-  }
-
-  $: if (showOptions && firstScheme) {
-    firstScheme.focus();
   }
 </script>
 
 <div class="stack-h stack-h-xs items-center">
-  <FieldLabel fieldId="color-scheme">Color Scheme</FieldLabel>
+  <FieldLabel fieldId="color-scheme">Scheme</FieldLabel>
   <div
     id="color-scheme"
-    class="flex items-center border border-transparent p-2 focus-within:border-slate-600 hover:border-slate-600"
+    class="flex grow items-center border border-transparent p-2 focus-within:border-slate-600 hover:border-slate-600"
   >
     <button
       on:click={onClick}
@@ -82,8 +97,13 @@
       on:clickoutside={onClickOutside}
       bind:offsetHeight
       bind:this={trigger}
+      class="flex-1"
     >
-      <ColorSchemeList {colors} />
+      <div class="flex h-4 w-full">
+        {#each colors as color}
+          <span style="background-color: {color};" class="flex-1" />
+        {/each}
+      </div>
     </button>
     {#if showOptions}
       <Portal
@@ -92,26 +112,27 @@
         style="top: {offsetHeight + y + 10}px; left: {x}px;"
       >
         <ul
-          class="flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 py-2 shadow-lg"
+          class="flex max-h-44 w-56 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 py-2 shadow-lg"
         >
-          {#each schemeReversed ? COLOR_SCHEMES_REV : COLOR_SCHEMES as scheme, i}
-            {#if i === 0}
-              <button
-                on:click={() => onSchemeSelect(scheme)}
-                class="first-scheme px-4 py-2 hover:bg-slate-600"
-                bind:this={firstScheme}
-              >
-                <ColorSchemeList colors={scheme[layer.style.fill.count]} />
-              </button>
-            {:else}
-              <button
-                on:click={() => onSchemeSelect(scheme)}
-                class="px-4 py-2 hover:bg-slate-600"
-              >
-                <ColorSchemeList colors={scheme[layer.style.fill.count]} />
-              </button>
-            {/if}
-          {/each}
+          {#if style.type === 'Quantitative'}
+            {#each quantitativeSchemes as scheme}
+              <ColorSchemePalette
+                colors={scheme[style.count]}
+                {scheme}
+                active={scheme === style.scheme}
+                on:click={onSchemeSelect}
+              />
+            {/each}
+          {:else}
+            {#each categoricalSchemes as scheme}
+              <ColorSchemePalette
+                colors={scheme}
+                {scheme}
+                active={scheme === style.scheme}
+                on:click={onSchemeSelect}
+              />
+            {/each}
+          {/if}
         </ul>
       </Portal>
     {/if}
@@ -120,10 +141,3 @@
     ><ReverseIcon /></button
   >
 </div>
-
-<style>
-  .first-scheme:focus {
-    outline: 5px auto Highlight;
-    outline: 5px auto -webkit-focus-ring-color;
-  }
-</style>

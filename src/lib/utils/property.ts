@@ -7,8 +7,20 @@ import isFinite from 'lodash.isfinite';
  *
  * @param property – The property to check.
  *
- * @returns – a Boolean value indicating whether the property is finite and numeric.
+ * @returns – A Boolean value indicating whether the property is finite and numeric.
  */
-export function isPropertyNumeric(property: unknown): property is number {
+export function isPropertyQuantitative(property: unknown): property is number {
   return isFinite(property);
+}
+
+/**
+ * Determine if a GeoJSON property is categorical. We assume any string property
+ * is categorical.
+ *
+ * @param property — The property to check.
+ *
+ * @returns — A Boolean value indicating whether the property is a string.
+ */
+export function isPropertyCategorical(property: unknown): property is string {
+  return typeof property === 'string';
 }

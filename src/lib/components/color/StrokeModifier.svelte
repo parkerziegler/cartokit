@@ -2,25 +2,15 @@
   import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type {
-    CartoKitPointLayer,
-    CartoKitProportionalSymbolLayer,
-    CartoKitDotDensityLayer,
-    CartoKitPolygonLayer,
-    CartoKitChoroplethLayer
-  } from '$lib/types';
+  import type { ConstantStyle } from '$lib/types';
 
-  export let layer:
-    | CartoKitPointLayer
-    | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer
-    | CartoKitPolygonLayer
-    | CartoKitChoroplethLayer;
+  export let layerId: string;
+  export let stroke: ConstantStyle | undefined;
 
   function onRemoveStroke() {
     dispatchLayerUpdate({
       type: 'remove-stroke',
-      layer,
+      layerId,
       payload: {}
     });
   }
@@ -28,13 +18,13 @@
   function onAddStroke() {
     dispatchLayerUpdate({
       type: 'add-stroke',
-      layer,
+      layerId,
       payload: {}
     });
   }
 </script>
 
-{#if layer.style.stroke}
+{#if stroke}
   <button on:click={onRemoveStroke} data-testid="remove-stroke-button">
     <MinusIcon />
   </button>

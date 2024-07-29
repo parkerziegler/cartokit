@@ -1,15 +1,34 @@
-<script>
+<script lang="ts">
   import Select from '$lib/components/shared/Select.svelte';
+  import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import type { VisualizationType } from '$lib/types';
 
-  const options = ['Categories', 'Range'].map((option) => ({
-    value: option,
-    label: option
+  export let layerId: string;
+  export let type: VisualizationType;
+
+  const options = [
+    { label: 'Range', value: 'Quantitative' },
+    { label: 'Categories', value: 'Categorical' }
+  ].map(({ label, value }) => ({
+    value,
+    label
   }));
+
+  function onChange(event: CustomEvent<{ value: VisualizationType }>) {
+    dispatchLayerUpdate({
+      type: 'fill-visualization',
+      layerId,
+      payload: {
+        type: event.detail.value
+      }
+    });
+  }
 </script>
 
 <Select
   title="Style by"
   {options}
-  selected="Categories"
+  selected={type}
   id="color-style-by-select"
+  on:change={onChange}
 />

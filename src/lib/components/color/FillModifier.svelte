@@ -2,23 +2,15 @@
   import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type {
-    CartoKitPolygonLayer,
-    CartoKitPointLayer,
-    CartoKitProportionalSymbolLayer,
-    CartoKitDotDensityLayer
-  } from '$lib/types';
+  import type { ConstantStyle } from '$lib/types';
 
-  export let layer:
-    | CartoKitPointLayer
-    | CartoKitPolygonLayer
-    | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer;
+  export let layerId: string;
+  export let fill: ConstantStyle | undefined;
 
   function onRemoveFill() {
     dispatchLayerUpdate({
       type: 'remove-fill',
-      layer,
+      layerId,
       payload: {}
     });
   }
@@ -26,13 +18,13 @@
   function onAddFill() {
     dispatchLayerUpdate({
       type: 'add-fill',
-      layer,
+      layerId,
       payload: {}
     });
   }
 </script>
 
-{#if layer.style.fill}
+{#if fill}
   <button on:click={onRemoveFill}>
     <MinusIcon />
   </button>

@@ -1,6 +1,9 @@
 import * as d3 from 'd3';
 
-import type { ColorScheme } from '$lib/types';
+import type {
+  CategoricalColorScheme,
+  QuantitativeColorScheme
+} from '$lib/types';
 
 /**
  * Generate a random color in hexademical format.
@@ -34,17 +37,32 @@ export function decimalToPercent(decimal: number): number {
 }
 
 /**
- * Reverse a color scheme.
+ * Reverse a numeric color scheme.
  *
- * @param scheme – The color scheme to reverse.
+ * @param scheme – The numeric color scheme to reverse.
  *
- * @returns – The reversed color scheme.
+ * @returns – The reversed numeric color scheme.
  */
-export function reverseColorScheme(scheme: ColorScheme): ColorScheme {
+export function reverseQuantitativeColorScheme(
+  scheme: QuantitativeColorScheme
+): QuantitativeColorScheme {
   return scheme.map((indexedScheme) => [...indexedScheme].reverse());
 }
 
-export const COLOR_SCHEMES = [
+/**
+ * Reverse a categorical color scheme.
+ *
+ * @param scheme – The categorical color scheme to reverse.
+ *
+ * @returns – The reversed categorical color scheme.
+ */
+export function reverseCategoricalColorScheme(
+  scheme: CategoricalColorScheme
+): CategoricalColorScheme {
+  return [...scheme].reverse();
+}
+
+export const QUANTITATIVE_COLOR_SCHEMES = [
   // Sequential schemes.
   d3.schemeBlues,
   d3.schemeGreens,
@@ -75,4 +93,23 @@ export const COLOR_SCHEMES = [
   d3.schemeRdYlGn,
   d3.schemeSpectral
 ];
-export const COLOR_SCHEMES_REV = COLOR_SCHEMES.map(reverseColorScheme);
+export const QUANTITATIVE_COLOR_SCHEMES_REV = QUANTITATIVE_COLOR_SCHEMES.map(
+  reverseQuantitativeColorScheme
+);
+
+export const CATEGORICAL_COLOR_SCHEMES: CategoricalColorScheme[] = [
+  d3.schemeCategory10,
+  d3.schemeAccent,
+  d3.schemeDark2,
+  d3.schemeObservable10,
+  d3.schemePaired,
+  d3.schemePastel1,
+  d3.schemePastel2,
+  d3.schemeSet1,
+  d3.schemeSet2,
+  d3.schemeSet3,
+  d3.schemeTableau10
+];
+export const CATEGORICAL_COLOR_SCHEMES_REV = CATEGORICAL_COLOR_SCHEMES.map(
+  reverseCategoricalColorScheme
+);

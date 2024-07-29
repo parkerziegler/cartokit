@@ -1,22 +1,22 @@
 <script lang="ts">
+  import type { Feature } from 'geojson';
+
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { deriveExtent } from '$lib/interaction/scales';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { CartoKitChoroplethLayer } from '$lib/types';
+  import type { QuantitativeStyle } from '$lib/types';
   import { clickOutside } from '$lib/utils/actions';
 
-  export let layer: CartoKitChoroplethLayer;
+  export let layerId: string;
+  export let style: QuantitativeStyle;
+  export let features: Feature[];
   export let toggleBreaksEditorVisibility: () => void;
 
-  $: count = layer.style.fill.count;
-  $: colors = layer.style.fill.scheme[count];
-  $: [min, max] = deriveExtent(
-    layer.style.fill.attribute,
-    layer.data.geojson.features
-  );
-  $: thresholds = layer.style.fill.thresholds;
+  $: colors = style.scheme[style.count];
+  $: [min, max] = deriveExtent(style.attribute, features);
+  $: thresholds = style.thresholds;
 
   function onThresholdChange(i: number) {
     return function handleThresholdChange(
@@ -24,7 +24,7 @@
     ) {
       dispatchLayerUpdate({
         type: 'color-threshold',
-        layer,
+        layerId,
         payload: {
           index: i,
           threshold: event.detail.value

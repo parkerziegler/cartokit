@@ -6,14 +6,12 @@
   import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 
   export let layer: CartoKitProportionalSymbolLayer;
-  $: min = layer.style.size.min;
-  $: max = layer.style.size.max;
 
   function onSizeChange(field: 'min' | 'max') {
     return function handleSizeChange(event: CustomEvent<{ value: number }>) {
       dispatchLayerUpdate({
         type: 'size',
-        layer,
+        layerId: layer.id,
         payload: {
           [field]: event.detail.value
         }
@@ -23,13 +21,18 @@
 </script>
 
 <div class="stack stack-2xs">
-  <AttributeSelect {layer} selected={layer.style.size.attribute} />
+  <AttributeSelect
+    layerId={layer.id}
+    geojson={layer.data.geojson}
+    visualizationType="Quantitative"
+    selected={layer.style.size.attribute}
+  />
   <div class="stack-h stack-h-xs items-center">
     <FieldLabel fieldId="min">Min</FieldLabel>
     <NumberInput
       id="min"
       min={1}
-      value={min}
+      value={layer.style.size.min}
       on:change={onSizeChange('min')}
       class="w-10"
     />
@@ -39,7 +42,7 @@
     <NumberInput
       id="max"
       min={1}
-      value={max}
+      value={layer.style.size.max}
       on:change={onSizeChange('max')}
       class="w-10"
     />
