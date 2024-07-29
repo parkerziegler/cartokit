@@ -3,7 +3,7 @@
 
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitChoroplethLayer } from '$lib/types';
 
   export let layer: CartoKitChoroplethLayer;
 
@@ -27,6 +27,6 @@
   {options}
   selected={layer.style.fill.count}
   title="Steps"
-  id="color-stops-select"
+  id="color-steps-select"
   on:change={onChange}
 />

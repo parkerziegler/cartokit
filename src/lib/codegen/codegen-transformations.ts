@@ -1,12 +1,22 @@
 import camelCase from 'lodash.camelcase';
 
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+import type { CartoKitLayer } from '$lib/types';
 
 interface TransformationProgramFragment {
   transformation: string;
   data: string;
 }
 
+/**
+ * Generate a transformation program fragment for all transformations applied
+ * to a @see{CartoKitLayer}.
+ *
+ * @param layer - A @see{CartoKitLayer}.
+ * @param uploadTable - The symbol table tracking file uploads.
+ *
+ * @returns - A transformation program fragment, containing both the transform-
+ * ation function definition and call site.
+ */
 export function codegenTransformations(
   layer: CartoKitLayer,
   uploadTable: Map<string, string>

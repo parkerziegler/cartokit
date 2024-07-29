@@ -21,7 +21,7 @@ type AddSourceOptions =
     };
 
 /**
- * Load a source for a CartoKit layer.
+ * Load a source for a @see{CartoKitLayer}.
  *
  * @param map – The top-level MapLibre GL map instance.
  * @param options – The options for the source.
@@ -60,10 +60,10 @@ function loadSource(
 }
 
 /**
- * Add a source for a CartoKit layer to the map.
+ * Add a source for a @see{CartoKitLayer} to the map.
  *
  * @param map – The top-level MapLibre GL map instance.
- * @param layer – The CartoKit layer.
+ * @param layer – The @see{CartoKitLayer}.
  */
 export function addSource(map: Map, options: AddSourceOptions) {
   if (options.kind === 'api') {

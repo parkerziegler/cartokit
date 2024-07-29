@@ -158,8 +158,8 @@ test('workflow-5', async ({ page }) => {
   // Ensure the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
 
-  // Set the layer's Map Type to Choropleth.
-  await page.locator('#map-type-select').selectOption('Choropleth');
+  // Set the layer's Layer Type to Choropleth.
+  await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Remove the layer's stroke.
   await page.getByTestId('remove-stroke-button').click();
@@ -168,10 +168,10 @@ test('workflow-5', async ({ page }) => {
   await page.locator('#attribute-select').selectOption('abd_trend');
 
   // Set the layer's Steps to 8.
-  await page.locator('#color-stops-select').selectOption('8');
+  await page.locator('#color-steps-select').selectOption('8');
 
   // Set the layer's Method to Manual.
-  await page.locator('#color-scale-method-select').selectOption('Manual');
+  await page.locator('#classification-method-select').selectOption('Manual');
 
   // Set the layer's Breaks to -30, -20, -10, 0, 10, 20, 30.
   await page.locator('.breaks-grid > input').first().fill('-30');

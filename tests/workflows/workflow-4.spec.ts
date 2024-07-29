@@ -109,18 +109,18 @@ test('workflow-4', async ({ page }) => {
   // Remove the layer's stroke.
   await page.getByTestId('remove-stroke-button').click();
 
-  // Switch the layer's Map Type to Choropleth.
-  await page.locator('#map-type-select').selectOption('Choropleth');
+  // Switch the layer's Layer Type to Choropleth.
+  await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's Steps to 8.
-  await page.locator('#color-stops-select').selectOption('8');
+  await page.locator('#color-steps-select').selectOption('8');
 
   // Set the layer's Color Scheme to RdYlBu.
   await page.locator('#color-scheme').getByRole('button').click();
   await page.locator('button:nth-child(25)').click();
 
   // Set the layer's Method to Manual.
-  await page.locator('#color-scale-method-select').selectOption('Manual');
+  await page.locator('#classification-method-select').selectOption('Manual');
 
   // Set the layer's Breaks to 614.791, 973.836, 1228.582, 1426.178, 1587.626,
   // 1724.178, 1842.373.

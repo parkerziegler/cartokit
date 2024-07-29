@@ -1,10 +1,11 @@
 <script lang="ts">
-  import type { CartoKitPointLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitPointLayer } from '$lib/types';
   import { pluralize } from '$lib/utils/format';
   import { getLayerGeometryType } from '$lib/utils/geojson';
 
   export let layer: CartoKitPointLayer;
-  $: geometryType = getLayerGeometryType(layer.data.geoJSON);
+
+  $: geometryType = getLayerGeometryType(layer.data.geojson);
   $: dimension = layer.style.size * 2 + (layer.style.stroke?.width ?? 0) * 2;
 </script>
 
@@ -26,7 +27,7 @@
     />
   </svg>
   <span
-    >{layer.data.geoJSON.features.length}
-    {pluralize(geometryType, layer.data.geoJSON.features.length)}</span
+    >{layer.data.geojson.features.length}
+    {pluralize(geometryType, layer.data.geojson.features.length)}</span
   >
 </div>

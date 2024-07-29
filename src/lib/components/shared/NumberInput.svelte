@@ -35,7 +35,7 @@
   )}
 />
 
-<style>
+<style lang="postcss">
   input:disabled {
     @apply text-slate-400;
   }

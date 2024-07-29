@@ -3,7 +3,7 @@
   import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
-  import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitChoroplethLayer } from '$lib/types';
 
   export let layer: CartoKitChoroplethLayer;
 </script>

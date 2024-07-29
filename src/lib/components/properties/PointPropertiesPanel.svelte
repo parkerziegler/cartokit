@@ -5,7 +5,7 @@
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
   import PointSize from '$lib/components/point/PointSize.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
-  import type { CartoKitPointLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitPointLayer } from '$lib/types';
 
   export let layer: CartoKitPointLayer;
 </script>

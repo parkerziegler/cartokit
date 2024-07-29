@@ -3,7 +3,7 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 
   export let layer: CartoKitProportionalSymbolLayer;
   $: min = layer.style.size.min;

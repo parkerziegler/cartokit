@@ -6,15 +6,15 @@
     CartoKitPointLayer,
     CartoKitProportionalSymbolLayer,
     CartoKitDotDensityLayer,
-    CartoKitFillLayer,
+    CartoKitPolygonLayer,
     CartoKitChoroplethLayer
-  } from '$lib/types/CartoKitLayer';
+  } from '$lib/types';
 
   export let layer:
     | CartoKitPointLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer
-    | CartoKitFillLayer
+    | CartoKitPolygonLayer
     | CartoKitChoroplethLayer;
 
   function onRemoveStroke() {

@@ -3,15 +3,15 @@
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type {
-    CartoKitFillLayer,
+    CartoKitPolygonLayer,
     CartoKitPointLayer,
     CartoKitProportionalSymbolLayer,
     CartoKitDotDensityLayer
-  } from '$lib/types/CartoKitLayer';
+  } from '$lib/types';
 
   export let layer:
     | CartoKitPointLayer
-    | CartoKitFillLayer
+    | CartoKitPolygonLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer;
 

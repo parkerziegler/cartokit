@@ -1,7 +1,7 @@
 <script lang="ts">
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitLayer } from '$lib/types';
   import { percentToDecimal, decimalToPercent } from '$lib/utils/color';
   import { DEFAULT_OPACITY } from '$lib/utils/constants';
 

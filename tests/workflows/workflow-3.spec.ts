@@ -159,14 +159,14 @@ test('workflow-3', async ({ page }) => {
   // Remove the layer's stroke.
   await page.getByTestId('remove-stroke-button').click();
 
-  // Switch the layer's Map Type to Choropleth.
-  await page.locator('#map-type-select').selectOption('Choropleth');
+  // Switch the layer's Layer Type to Choropleth.
+  await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's Attribute to 'decadal_rate'.
   await page.locator('#attribute-select').selectOption('decadal_rate');
 
   // Set the layer's Method to Manual.
-  await page.locator('#color-scale-method-select').selectOption('Manual');
+  await page.locator('#classification-method-select').selectOption('Manual');
 
   // Set the layer's Breaks to -0.5, 0, 0.5, 1.
   await page.locator('.breaks-grid > input').first().fill('-0.5');

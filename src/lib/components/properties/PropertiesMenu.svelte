@@ -3,7 +3,7 @@
   import maplibregl from 'maplibre-gl';
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
-  import MapTypeSelect from '$lib/components/map-types/MapTypeSelect.svelte';
+  import LayerTypeSelect from '$lib/components/layer-types/LayerTypeSelect.svelte';
   import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
   import DotDensityPropertiesPanel from '$lib/components/properties/DotDensityPropertiesPanel.svelte';
   import DownloadData from '$lib/components/properties/DownloadData.svelte';
@@ -17,7 +17,7 @@
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
   import { layout } from '$lib/stores/layout';
   import { selectedFeature } from '$lib/stores/selected-feature';
-  import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitLayer } from '$lib/types';
 
   export let map: maplibregl.Map;
   export let layer: CartoKitLayer;
@@ -59,8 +59,8 @@
       <DownloadData {layer} />
     </div>
   </MenuTitle>
-  <MenuItem title="Map Type">
-    <MapTypeSelect {layer} />
+  <MenuItem title="Layer Type">
+    <LayerTypeSelect {layer} />
   </MenuItem>
   {#if layer.type === 'Point'}
     <PointPropertiesPanel {layer} />
@@ -70,7 +70,7 @@
     <DotDensityPropertiesPanel {layer} />
   {:else if layer.type === 'Line'}
     <LinePropertiesPanel {layer} />
-  {:else if layer.type === 'Fill'}
+  {:else if layer.type === 'Polygon'}
     <FillPropertiesPanel {layer} />
   {:else if layer.type === 'Choropleth'}
     <ChoroplethPropertiesPanel {layer} />

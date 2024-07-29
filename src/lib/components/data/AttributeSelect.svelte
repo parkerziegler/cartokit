@@ -8,7 +8,7 @@
     CartoKitChoroplethLayer,
     CartoKitProportionalSymbolLayer,
     CartoKitDotDensityLayer
-  } from '$lib/types/CartoKitLayer';
+  } from '$lib/types';
   import { isPropertyNumeric } from '$lib/utils/property';
 
   export let selected: string;
@@ -24,14 +24,14 @@
   let attributeEditorVisible = false;
 
   $: properties = Object.keys(
-    layer.data.geoJSON.features[0]?.properties ?? {}
+    layer.data.geojson.features[0]?.properties ?? {}
   ).filter((prop) => {
     switch (layer.type) {
       case 'Choropleth':
       case 'Proportional Symbol':
       case 'Dot Density':
         return isPropertyNumeric(
-          layer.data.geoJSON.features[0].properties?.[prop]
+          layer.data.geojson.features[0].properties?.[prop]
         );
     }
   });

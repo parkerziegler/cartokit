@@ -1,11 +1,11 @@
 import type { ExpressionSpecification } from 'maplibre-gl';
 
-import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
+import type { CartoKitChoroplethLayer } from '$lib/types';
 
 /**
  * Derive a MapLibre GL JS expression for a choropleth color scale.
  *
- * @param layer – The CartoKit layer to derive a color scale for.
+ * @param layer – The @see{CartoKitChoroplethLayer} to derive a color scale for.
  *
  * @returns A MapLibre GL JS expression for a choropleth color scale.
  */

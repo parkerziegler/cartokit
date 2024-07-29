@@ -44,7 +44,7 @@
   </div>
 </div>
 
-<style>
+<style lang="postcss">
   .active {
     @apply border-b-slate-400 font-semibold text-white;
   }

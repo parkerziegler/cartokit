@@ -1,14 +1,14 @@
 import { codegenFill, codegenStroke } from '$lib/codegen/codegen-paint';
-import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+import type { CartoKitLayer } from '$lib/types';
 
 /**
  * Generate a Mapbox GL JS program fragment for a CartoKitLayer.
  *
- * @param layer – A CartoKit layer.
+ * @param layer – A @see{CartoKitLayer}.
  *
  * @returns – A Mapbox GL JS program fragment.
  */
-export const codegenLayer = (layer: CartoKitLayer): string => {
+export function codegenLayer(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Point':
     case 'Proportional Symbol':
@@ -41,7 +41,7 @@ export const codegenLayer = (layer: CartoKitLayer): string => {
         });
       `;
     }
-    case 'Fill': {
+    case 'Polygon': {
       let fillLayer = '';
       let strokeLayer = '';
 
@@ -91,4 +91,4 @@ export const codegenLayer = (layer: CartoKitLayer): string => {
       return [fillLayer, strokeLayer].filter(Boolean).join('\n\n');
     }
   }
-};
+}

@@ -2,12 +2,12 @@
   import kebabCase from 'lodash.kebabcase';
 
   import DownloadIcon from '$lib/components/icons/DownloadIcon.svelte';
-  import type { CartoKitLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitLayer } from '$lib/types';
 
   export let layer: CartoKitLayer;
 
   function onClick() {
-    const blob = new Blob([JSON.stringify(layer.data.geoJSON, null, 2)], {
+    const blob = new Blob([JSON.stringify(layer.data.geojson, null, 2)], {
       type: 'application/json'
     });
     const url = URL.createObjectURL(blob);

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { deriveExtent, deriveThresholds } from '$lib/interaction/scales';
-  import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitChoroplethLayer } from '$lib/types';
 
   export let layer: CartoKitChoroplethLayer;
   let stops: number[] = [];
@@ -13,13 +13,13 @@
 
   $: [min, max] = deriveExtent(
     layer.style.fill.attribute,
-    layer.data.geoJSON.features
+    layer.data.geojson.features
   );
   $: stops = deriveThresholds({
-    scale: layer.style.fill.scale,
+    method: layer.style.fill.method,
     layer,
     attribute: layer.style.fill.attribute,
-    features: layer.data.geoJSON.features,
+    features: layer.data.geojson.features,
     range: colors
   });
 </script>

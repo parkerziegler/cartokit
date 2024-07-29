@@ -17,7 +17,7 @@
     CartoKitChoroplethLayer,
     CartoKitDotDensityLayer,
     CartoKitProportionalSymbolLayer
-  } from '$lib/types/CartoKitLayer';
+  } from '$lib/types';
   import { functionNameRe } from '$lib/utils/regex';
   import { transformationWorker } from '$lib/utils/worker';
 
@@ -33,8 +33,8 @@
   let error = '';
   let success = false;
   let timeoutId: number | undefined;
-  const doc = `function transformGeoJSON(geoJSON) {
-  return geoJSON;
+  const doc = `function transformGeojson(geojson) {
+  return geojson;
 }`;
 
   // Preview editor state.
@@ -61,7 +61,7 @@
   function onClick() {
     const program = view.state.doc.toString();
 
-    transformationWorker(program, layer.data.geoJSON, (message) => {
+    transformationWorker(program, layer.data.geojson, (message) => {
       switch (message.type) {
         case 'data': {
           const name = functionNameRe.exec(program);
@@ -70,7 +70,7 @@
             type: 'transformation',
             layer,
             payload: {
-              geoJSON: message.data,
+              geojson: message.data,
               transformation: {
                 name: name ? name[1] : 'anonymous',
                 definition: program,

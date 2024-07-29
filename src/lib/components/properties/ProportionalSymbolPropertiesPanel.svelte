@@ -5,7 +5,7 @@
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import SizeControls from '$lib/components/size/SizeControls.svelte';
-  import type { CartoKitProportionalSymbolLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 
   export let layer: CartoKitProportionalSymbolLayer;
 </script>

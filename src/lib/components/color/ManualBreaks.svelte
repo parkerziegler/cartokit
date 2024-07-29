@@ -4,7 +4,7 @@
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { deriveExtent } from '$lib/interaction/scales';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitChoroplethLayer } from '$lib/types';
   import { clickOutside } from '$lib/utils/actions';
 
   export let layer: CartoKitChoroplethLayer;
@@ -14,7 +14,7 @@
   $: colors = layer.style.fill.scheme[count];
   $: [min, max] = deriveExtent(
     layer.style.fill.attribute,
-    layer.data.geoJSON.features
+    layer.data.geojson.features
   );
   $: thresholds = layer.style.fill.thresholds;
 

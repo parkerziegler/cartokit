@@ -6,19 +6,17 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { CartoKitChoroplethLayer } from '$lib/types/CartoKitLayer';
+  import type { CartoKitChoroplethLayer, ColorScheme } from '$lib/types';
+  import { clickOutside } from '$lib/utils/actions';
   import {
-    type ColorScheme,
+    reverseColorScheme,
     COLOR_SCHEMES,
     COLOR_SCHEMES_REV
-  } from '$lib/types/color';
-  import { clickOutside } from '$lib/utils/actions';
-  import { reverseColorScheme } from '$lib/utils/color';
+  } from '$lib/utils/color';
 
   export let layer: CartoKitChoroplethLayer;
 
-  $: count = layer.style.fill.count;
-  $: colors = layer.style.fill.scheme[count];
+  $: colors = layer.style.fill.scheme[layer.style.fill.count];
 
   let showOptions = false;
   let offsetHeight = 0;
@@ -103,14 +101,14 @@
                 class="first-scheme px-4 py-2 hover:bg-slate-600"
                 bind:this={firstScheme}
               >
-                <ColorSchemeList colors={scheme[count]} />
+                <ColorSchemeList {colors} />
               </button>
             {:else}
               <button
                 on:click={() => onSchemeSelect(scheme)}
                 class="px-4 py-2 hover:bg-slate-600"
               >
-                <ColorSchemeList colors={scheme[count]} />
+                <ColorSchemeList {colors} />
               </button>
             {/if}
           {/each}

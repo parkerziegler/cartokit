@@ -7,16 +7,16 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type {
-    CartoKitFillLayer,
+    CartoKitPolygonLayer,
     CartoKitPointLayer,
     CartoKitProportionalSymbolLayer,
     CartoKitDotDensityLayer
-  } from '$lib/types/CartoKitLayer';
+  } from '$lib/types';
   import { DEFAULT_FILL } from '$lib/utils/constants';
 
   export let layer:
     | CartoKitPointLayer
-    | CartoKitFillLayer
+    | CartoKitPolygonLayer
     | CartoKitProportionalSymbolLayer
     | CartoKitDotDensityLayer;
 
