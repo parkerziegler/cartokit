@@ -19,7 +19,7 @@ export function randomColor(): string {
 /**
  * Convert a percent to a decimal.
  *
- * @param percent – The input percent, e.g., 100.
+ * @param {number} percent – The input percent, e.g., 100.
  * @returns – The decimal value of the percent between 0 and 1.
  */
 export function percentToDecimal(percent: number): number {
@@ -29,7 +29,7 @@ export function percentToDecimal(percent: number): number {
 /**
  * Convert a decimal to a percent string.
  *
- * @param decimal – The input decimal value between 0 and 1, e.g., 0.5.
+ * @param {number} decimal – The input decimal value between 0 and 1, e.g., 0.5.
  * @returns – The formatted percent string.
  */
 export function decimalToPercent(decimal: number): number {
@@ -39,8 +39,7 @@ export function decimalToPercent(decimal: number): number {
 /**
  * Reverse a quantitative color scheme.
  *
- * @param scheme – The quantitative color scheme to reverse.
- *
+ * @param {QuantitativeColorScheme} scheme – The quantitative color scheme to reverse.
  * @returns – The reversed quantitative color scheme.
  */
 export function reverseQuantitativeColorScheme(
@@ -52,8 +51,7 @@ export function reverseQuantitativeColorScheme(
 /**
  * Reverse a categorical color scheme.
  *
- * @param scheme – The categorical color scheme to reverse.
- *
+ * @param  {CategoricalColorScheme} scheme – The categorical color scheme to reverse.
  * @returns – The reversed categorical color scheme.
  */
 export function reverseCategoricalColorScheme(
