@@ -101,14 +101,14 @@
                 class="first-scheme px-4 py-2 hover:bg-slate-600"
                 bind:this={firstScheme}
               >
-                <ColorSchemeList {colors} />
+                <ColorSchemeList colors={scheme[layer.style.fill.count]} />
               </button>
             {:else}
               <button
                 on:click={() => onSchemeSelect(scheme)}
                 class="px-4 py-2 hover:bg-slate-600"
               >
-                <ColorSchemeList {colors} />
+                <ColorSchemeList colors={scheme[layer.style.fill.count]} />
               </button>
             {/if}
           {/each}
