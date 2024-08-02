@@ -180,7 +180,7 @@ test('workflow-3', async ({ page }) => {
 
   // Set the layer's Color Scheme to RdYlBu.
   await page.locator('#color-scheme').getByRole('button').click();
-  await page.locator('button:nth-child(25)').click();
+  await page.locator('li:nth-child(25)').getByRole('button').click();
 
   // Reverse the layer's Color Scheme.
   await page.getByTestId('color-scheme-reverse-button').click();

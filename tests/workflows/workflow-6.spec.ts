@@ -99,7 +99,7 @@ test('workflow-6', async ({ page }) => {
 
   // Switch the layer's Color Scheme to PRGn.
   await page.locator('#color-scheme').getByRole('button').click();
-  await page.locator('button:nth-child(20)').click();
+  await page.locator('li:nth-child(20)').getByRole('button').click();
 
   // Reverse the color scheme.
   await page.getByTestId('color-scheme-reverse-button').click();

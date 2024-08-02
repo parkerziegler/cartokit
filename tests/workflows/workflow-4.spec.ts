@@ -117,7 +117,7 @@ test('workflow-4', async ({ page }) => {
 
   // Set the layer's Color Scheme to RdYlBu.
   await page.locator('#color-scheme').getByRole('button').click();
-  await page.locator('button:nth-child(25)').click();
+  await page.locator('li:nth-child(25)').getByRole('button').click();
 
   // Set the layer's Method to Manual.
   await page.locator('#classification-method-select').selectOption('Manual');

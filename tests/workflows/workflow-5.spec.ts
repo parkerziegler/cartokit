@@ -191,9 +191,7 @@ test('workflow-5', async ({ page }) => {
 
   // Set the layer's Color Scheme to RdBu.
   await page.locator('#color-scheme').getByRole('button').click();
-  await page.locator('button:nth-child(23)').click();
-  await page.locator('#color-scheme').click();
-  await page.locator('button:nth-child(23)').click();
+  await page.locator('li:nth-child(23)').getByRole('button').click();
 
   // Click on a page location that will trigger deselection of both layers.
   await page.locator('#map').click({
