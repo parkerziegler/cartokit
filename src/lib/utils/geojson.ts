@@ -10,8 +10,8 @@ import {
  * Normalize a GeoJSON Geometry, GeometryCollection, or Feature to a GeoJSON
  * FeatureCollection.
  *
- * @param {Object} geojson - The GeoJSON object to normalize.
- * @returns {Object} – A GeoJSON FeatureCollection.
+ * @param {GeoJSON} geojson - The GeoJSON object to normalize.
+ * @returns {FeatureCollection} – A GeoJSON FeatureCollection.
  */
 export function normalizeGeoJSONToFeatureCollection(
   geojson: GeoJSON
@@ -38,8 +38,8 @@ export function normalizeGeoJSONToFeatureCollection(
 /**
  * Get the Geometry type of a FeatureCollection.
  *
- * @param {Object} featureCollection - The FeatureCollection to inspect.
- * @returns {Object} – The Geometry type of the FeatureCollection.
+ * @param {FeatureCollection} featureCollection - The FeatureCollection to inspect.
+ * @returns {Geometry['type']} – The Geometry type of the FeatureCollection.
  */
 export function getFeatureCollectionGeometryType(
   featureCollection: FeatureCollection
@@ -52,7 +52,7 @@ export function getFeatureCollectionGeometryType(
 /**
  * Select the first quantitative attribute from a GeoJSON FeatureCollection.
  *
- * @param {Object[]} features– The Features of a GeoJSON FeatureCollection.
+ * @param {Feature[]} features– The Features of a GeoJSON FeatureCollection.
  * @returns {string} – The name of the first quantitative attribute found in the
  * GeoJSON FeatureCollection.
  */
@@ -71,8 +71,8 @@ export function selectQuantitativeAttribute(features: Feature[]): string {
 /**
  * Select the first categorical attribute from a GeoJSON FeatureCollection.
  *
- * @param {Object[]} features – The Features of a GeoJSON FeatureCollection.
- * @returns – The name of the first categorical attribute found in the GeoJSON
+ * @param {Feature[]} features – The Features of a GeoJSON FeatureCollection.
+ * @returns {string} – The name of the first categorical attribute found in the GeoJSON
  * FeatureCollection.
  */
 export function selectCategoricalAttribute(features: Feature[]): string {
