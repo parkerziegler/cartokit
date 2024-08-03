@@ -25,11 +25,12 @@
 
   let showOptions = false;
   let offsetHeight = 0;
+  let offsetWidth = 0;
   let x = 0;
   let y = 0;
   let schemeReversed = false;
 
-  let trigger: HTMLButtonElement;
+  let trigger: HTMLDivElement;
 
   $: colors =
     style.type === 'Quantitative' ? style.scheme[style.count] : style.scheme;
@@ -90,13 +91,14 @@
   <div
     id="color-scheme"
     class="flex grow items-center border border-transparent p-2 focus-within:border-slate-600 hover:border-slate-600"
+    bind:this={trigger}
+    bind:offsetHeight
+    bind:offsetWidth
   >
     <button
       on:click={onClick}
       use:clickOutside
       on:clickoutside={onClickOutside}
-      bind:offsetHeight
-      bind:this={trigger}
       class="flex-1"
     >
       <div class="flex h-4 w-full">
@@ -109,10 +111,12 @@
       <Portal
         {target}
         class="absolute z-10"
-        style="top: {offsetHeight + y + 10}px; left: {x}px;"
+        style="top: {offsetHeight +
+          y +
+          4}px; left: {x}px; width: {offsetWidth}px;"
       >
         <ul
-          class="flex max-h-44 w-56 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 py-2 shadow-lg"
+          class="flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 shadow-lg"
         >
           {#if style.type === 'Quantitative'}
             {#each quantitativeSchemes as scheme}

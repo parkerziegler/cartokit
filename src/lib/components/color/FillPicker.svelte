@@ -6,11 +6,11 @@
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { ConstantStyle } from '$lib/types';
+  import type { ConstantFill } from '$lib/types';
   import { DEFAULT_FILL } from '$lib/utils/constants';
 
   export let layerId: string;
-  export let fill: ConstantStyle;
+  export let fill: ConstantFill;
 
   function dispatchFillUpdate(color: string) {
     dispatchLayerUpdate({

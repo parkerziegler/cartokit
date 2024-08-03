@@ -2,7 +2,7 @@
   import ClassificationMethodSelect from '$lib/components/classification/ClassificationMethodSelect.svelte';
   import ColorSchemeSelect from '$lib/components/color/ColorSchemeSelect.svelte';
   import ColorStepsSelect from '$lib/components/color/ColorStepsSelect.svelte';
-  import ColorTypeSelect from '$lib/components/color/ColorTypeSelect.svelte';
+  import ColorVisualizationTypeSelect from '$lib/components/color/ColorVisualizationTypeSelect.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
   import type { CartoKitChoroplethLayer } from '$lib/types';
@@ -11,7 +11,10 @@
 </script>
 
 <div class="stack stack-2xs">
-  <ColorTypeSelect layerId={layer.id} type={layer.style.fill.type} />
+  <ColorVisualizationTypeSelect
+    layerId={layer.id}
+    visualizationType={layer.style.fill.type}
+  />
   <AttributeSelect
     layerId={layer.id}
     geojson={layer.data.geojson}

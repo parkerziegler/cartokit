@@ -36,7 +36,7 @@ import type {
 import {
   DEFAULT_FILL,
   DEFAULT_OPACITY,
-  DEFAULT_NUMERIC_SCHEME,
+  DEFAULT_QUANTITATIVE_SCHEME,
   DEFAULT_STROKE,
   DEFAULT_STROKE_OPACITY,
   DEFAULT_STROKE_WIDTH,
@@ -775,7 +775,7 @@ export function dispatchLayerUpdate({
               type: payload.type,
               attribute: attribute,
               method: 'Quantile',
-              scheme: DEFAULT_NUMERIC_SCHEME,
+              scheme: DEFAULT_QUANTITATIVE_SCHEME,
               count: DEFAULT_COUNT,
               thresholds: DEFAULT_THRESHOLDS(
                 attribute,

@@ -27,7 +27,7 @@ import {
   DEFAULT_MIN_SIZE,
   DEFAULT_COUNT,
   DEFAULT_METHOD,
-  DEFAULT_NUMERIC_SCHEME,
+  DEFAULT_QUANTITATIVE_SCHEME,
   DEFAULT_THRESHOLDS,
   DEFAULT_RADIUS,
   DEFAULT_STROKE,
@@ -920,7 +920,7 @@ function transitionToChoropleth(
             type: 'Quantitative',
             attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_NUMERIC_SCHEME,
+            scheme: DEFAULT_QUANTITATIVE_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               attribute,
@@ -960,7 +960,7 @@ function transitionToChoropleth(
             type: 'Quantitative',
             attribute: layer.style.size.attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_NUMERIC_SCHEME,
+            scheme: DEFAULT_QUANTITATIVE_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               layer.style.size.attribute,
@@ -991,7 +991,7 @@ function transitionToChoropleth(
             type: 'Quantitative',
             attribute: layer.style.dots.attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_NUMERIC_SCHEME,
+            scheme: DEFAULT_QUANTITATIVE_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               layer.style.dots.attribute,
@@ -1032,7 +1032,7 @@ function transitionToChoropleth(
             type: 'Quantitative',
             attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_NUMERIC_SCHEME,
+            scheme: DEFAULT_QUANTITATIVE_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               attribute,

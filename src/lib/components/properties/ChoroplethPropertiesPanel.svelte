@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ColorPalette from '$lib/components/color/ColorPalette.svelte';
+  import ColorControls from '$lib/components/color/ColorControls.svelte';
   import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
@@ -9,7 +9,7 @@
 </script>
 
 <MenuItem title="Fill">
-  <ColorPalette {layer} />
+  <ColorControls {layer} />
 </MenuItem>
 <MenuItem title="Stroke">
   {#if layer.style.stroke}

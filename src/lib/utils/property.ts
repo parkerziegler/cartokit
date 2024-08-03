@@ -1,13 +1,13 @@
 import isFinite from 'lodash.isfinite';
 
 /**
- * Determine if a GeoJSON property is numeric. We exclude `NaN` and `Infinity` as
+ * Determine if a GeoJSON property is quantitative. We exclude `NaN` and `Infinity` as
  * valid because it's extremely unlikely for these values to have practical uses
  * in GeoJSON datasets.
  *
  * @param property – The property to check.
  *
- * @returns – A Boolean value indicating whether the property is finite and numeric.
+ * @returns – A Boolean value indicating whether the property is finite and quantitative.
  */
 export function isPropertyQuantitative(property: unknown): property is number {
   return isFinite(property);

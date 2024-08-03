@@ -53,7 +53,7 @@
       </svg>
     </button>
     <div
-      class="breaks-grid grid gap-x-2 gap-y-1"
+      class="grid grid-cols-[0.75rem_1fr_1rem_1fr] gap-x-2 gap-y-1"
       use:clickOutside
       on:clickoutside={toggleBreaksEditorVisibility}
     >
@@ -72,9 +72,3 @@
     </div>
   </MenuItem>
 </Menu>
-
-<style>
-  .breaks-grid {
-    grid-template-columns: 0.75rem 1fr 1rem 1fr;
-  }
-</style>

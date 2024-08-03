@@ -37,11 +37,11 @@ export function decimalToPercent(decimal: number): number {
 }
 
 /**
- * Reverse a numeric color scheme.
+ * Reverse a quantitative color scheme.
  *
- * @param scheme – The numeric color scheme to reverse.
+ * @param scheme – The quantitative color scheme to reverse.
  *
- * @returns – The reversed numeric color scheme.
+ * @returns – The reversed quantitative color scheme.
  */
 export function reverseQuantitativeColorScheme(
   scheme: QuantitativeColorScheme
@@ -101,7 +101,10 @@ export const CATEGORICAL_COLOR_SCHEMES: CategoricalColorScheme[] = [
   d3.schemeCategory10,
   d3.schemeAccent,
   d3.schemeDark2,
+  /* eslint-disable import/namespace */
+  // @ts-expect-error – d3.schemeObservable10 not yet added to @types/d3
   d3.schemeObservable10,
+  /* eslint-enable import/namespace */
   d3.schemePaired,
   d3.schemePastel1,
   d3.schemePastel2,

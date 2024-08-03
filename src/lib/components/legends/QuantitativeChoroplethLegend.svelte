@@ -2,10 +2,10 @@
   import type { Feature } from 'geojson';
 
   import { deriveExtent, deriveThresholds } from '$lib/interaction/scales';
-  import type { CartoKitChoroplethLayer, QuantitativeFill } from '$lib/types';
+  import type { ConstantStroke, QuantitativeFill } from '$lib/types';
 
   export let fill: QuantitativeFill;
-  export let stroke: CartoKitChoroplethLayer['style']['stroke'];
+  export let stroke: ConstantStroke | undefined;
   export let features: Feature[];
 
   let stops: number[] = [];

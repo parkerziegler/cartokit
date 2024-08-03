@@ -11,7 +11,6 @@
   export let active: boolean;
 
   let ref: HTMLButtonElement;
-
   const dispatch = createEventDispatcher();
 
   function onClick() {
@@ -27,7 +26,7 @@
 <li class="flex">
   <button
     on:click={onClick}
-    class="scheme flex-1 px-4 py-2 hover:bg-slate-600"
+    class="scheme flex-1 p-2 hover:bg-slate-600"
     bind:this={ref}
   >
     <div class="flex h-4 w-full">

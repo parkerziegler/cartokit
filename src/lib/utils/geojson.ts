@@ -49,12 +49,12 @@ export function getLayerGeometryType(
 }
 
 /**
- * Select a numeric attribute from a GeoJSON dataset.
+ * Select a quantitative attribute from a GeoJSON dataset.
  *
  * @param data – The GeoJSON dataset.
  *
- * @returns – The name of the first numeric attribute found in the input GeoJSON
- * dataset.
+ * @returns – The name of the first quantitative attribute found in the input
+ * GeoJSON dataset.
  */
 export function selectQuantitativeAttribute(data: Feature[]): string {
   for (const property in data[0].properties) {
@@ -64,8 +64,8 @@ export function selectQuantitativeAttribute(data: Feature[]): string {
   }
 
   // TODO: Catch this error and display a message prompting the user
-  // to select a layer type that does not require a numeric attribute.
-  throw new Error('No numeric attributes found in dataset.');
+  // to select a layer type that does not require a quantitative attribute.
+  throw new Error('No quantitative attributes found in dataset.');
 }
 
 /**

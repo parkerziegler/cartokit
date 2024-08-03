@@ -4,7 +4,7 @@
   import type { VisualizationType } from '$lib/types';
 
   export let layerId: string;
-  export let type: VisualizationType;
+  export let visualizationType: VisualizationType;
 
   const options = [
     { label: 'Range', value: 'Quantitative' },
@@ -28,7 +28,7 @@
 <Select
   title="Style by"
   {options}
-  selected={type}
+  selected={visualizationType}
   id="color-style-by-select"
   on:change={onChange}
 />

@@ -60,7 +60,9 @@ export function deriveColorScale(
       return [
         'match',
         ['get', layer.style.fill.attribute],
-        ...stops,
+        stops[0],
+        stops[1],
+        ...stops.slice(2),
         DEFAULT_FILL
       ];
     }

@@ -10,12 +10,12 @@ export type ClassificationMethod =
   | 'Manual';
 
 /**
- * Represents a numberic color scheme.
+ * Represents a quantitative D3 color scheme.
  */
 export type QuantitativeColorScheme = readonly (readonly string[])[];
 
 /**
- * Represents a categorical color scheme.
+ * Represents a categorical D3 color scheme.
  */
 export type CategoricalColorScheme = readonly string[];
 
@@ -34,6 +34,9 @@ export type LayerType =
   | 'Proportional Symbol'
   | 'Dot Density';
 
+/**
+ * Represents the visualization type for a given channel.
+ */
 export type VisualizationType = 'Quantitative' | 'Categorical';
 
 /**
@@ -156,7 +159,7 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
 /**
  * Represents a Choropleth layer in cartokit. Choropleth layers map a data value
  * to the color of a region using a classification method. Classification can be
- * either numeric or categorical.
+ * either quantitative or categorical.
  *
  * @property {'Choropleth'} type - The type of the layer, 'Choropleth'.
  * @property {Object} style - The style of the layer.
@@ -199,15 +202,32 @@ export type CartoKitLayer =
   | CartoKitDotDensityLayer;
 
 /**
- * Represents a constant fill style object. A constant fill applies a uniform
- * color and opacity to all features in a layer.
+ * Represents a constant style object. A constant style applies a uniform color
+ * and opacity to all features in a layer.
  *
- * @property {string} color - The fill color.
- * @property {number} opacity - The fill opacity.
+ * @property {string} color - The style's color.
+ * @property {number} opacity - The style's opacity.
  */
 export interface ConstantStyle {
   color: string;
   opacity: number;
+}
+
+/**
+ * An alias for ConstantStyle. Should be used when typing a fill style.
+ */
+export type ConstantFill = ConstantStyle;
+
+/**
+ * Represents a constant stroke style object. A constant stroke applies a uni-
+ * form color, opacity, and stroke-width to all features in a layer.
+ *
+ * @property {string} color - The style's stroke color.
+ * @property {number} opacity - The style's stroke opacity.
+ * @property {number} width - The style's stroke width.
+ */
+export interface ConstantStroke extends ConstantStyle {
+  width: number;
 }
 
 /**
@@ -231,18 +251,6 @@ export interface CategoricalStyle {
 export type CategoricalFill = CategoricalStyle;
 
 /**
- * Represents a constant stroke style object. A constant stroke applies a uni-
- * form color, width, and opacity to all features in a layer.
- *
- * @property {string} color - The stroke color.
- * @property {number} width - The stroke width.
- * @property {number} opacity - The stroke opacity.
- */
-export interface ConstantStroke extends ConstantStyle {
-  width: number;
-}
-
-/**
  * Represents a proportional symbol size style object. A proportional symbol
  * size style object specifies the attribute of the GeoJSON data to map to the
  * size of each point, bounded by minimum and maximum values.
@@ -259,7 +267,7 @@ interface ProportionalSymbolSize {
 }
 
 /**
- * Represents a quantitative style object. A quantitative stlye object specifies
+ * Represents a quantitative style object. A quantitative style object specifies
  * a classification method to bin continuous numerical data into a discrete set
  * of thresholds. Each feature of the map is colored according to the "bin" it
  * falls into.
