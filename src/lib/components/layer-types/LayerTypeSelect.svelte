@@ -2,12 +2,12 @@
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { CartoKitLayer, LayerType } from '$lib/types';
-  import { getLayerGeometryType } from '$lib/utils/geojson';
+  import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
   import { geometryToLayerTypes } from '$lib/utils/layer';
 
   export let layer: CartoKitLayer;
 
-  $: geometryType = getLayerGeometryType(layer.data.sourceGeojson);
+  $: geometryType = getFeatureCollectionGeometryType(layer.data.sourceGeojson);
   $: options =
     geometryToLayerTypes.get(geometryType)?.map((layerType) => ({
       value: layerType,

@@ -16,10 +16,10 @@
 
   function onChange(event: CustomEvent<{ value: VisualizationType }>) {
     dispatchLayerUpdate({
-      type: 'fill-visualization',
+      type: 'visualization-type',
       layerId,
       payload: {
-        type: event.detail.value
+        visualizationType: event.detail.value
       }
     });
   }

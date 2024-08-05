@@ -34,7 +34,7 @@ import {
   DEFAULT_STROKE_WIDTH
 } from '$lib/utils/constants';
 import {
-  getLayerGeometryType,
+  getFeatureCollectionGeometryType,
   selectQuantitativeAttribute
 } from '$lib/utils/geojson';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
@@ -481,7 +481,9 @@ const transitionToDotDensity = (
 ): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Point': {
-      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getFeatureCollectionGeometryType(
+        layer.data.sourceGeojson
+      );
 
       if (
         sourceGeometryType !== 'Polygon' &&
@@ -529,7 +531,9 @@ const transitionToDotDensity = (
       };
     }
     case 'Proportional Symbol': {
-      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getFeatureCollectionGeometryType(
+        layer.data.sourceGeojson
+      );
 
       if (
         sourceGeometryType !== 'Polygon' &&
@@ -585,7 +589,9 @@ const transitionToDotDensity = (
         redraw: false
       };
     case 'Line': {
-      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getFeatureCollectionGeometryType(
+        layer.data.sourceGeojson
+      );
       const error = generateUnsupportedTransitionError(
         sourceGeometryType,
         'Polygon'
@@ -697,7 +703,9 @@ const transitionToLine = (
       };
     case 'Point':
     case 'Proportional Symbol': {
-      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getFeatureCollectionGeometryType(
+        layer.data.sourceGeojson
+      );
 
       if (
         sourceGeometryType !== 'LineString' &&
@@ -735,7 +743,7 @@ const transitionToLine = (
     case 'Dot Density':
     case 'Polygon':
     case 'Choropleth': {
-      const geometryType = getLayerGeometryType(layer.data.geojson);
+      const geometryType = getFeatureCollectionGeometryType(layer.data.geojson);
       const error = generateUnsupportedTransitionError(
         geometryType,
         'LineString'
@@ -760,7 +768,9 @@ const transitionToFill = (
 ): TransitionMapTypeReturnValue => {
   switch (layer.type) {
     case 'Point': {
-      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getFeatureCollectionGeometryType(
+        layer.data.sourceGeojson
+      );
 
       if (
         sourceGeometryType !== 'Polygon' &&
@@ -789,7 +799,9 @@ const transitionToFill = (
       };
     }
     case 'Proportional Symbol': {
-      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getFeatureCollectionGeometryType(
+        layer.data.sourceGeojson
+      );
 
       if (
         sourceGeometryType !== 'Polygon' &&
@@ -838,7 +850,9 @@ const transitionToFill = (
       };
     }
     case 'Line': {
-      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getFeatureCollectionGeometryType(
+        layer.data.sourceGeojson
+      );
       const error = generateUnsupportedTransitionError(
         sourceGeometryType,
         'Polygon'
@@ -894,7 +908,9 @@ function transitionToChoropleth(
 ): TransitionMapTypeReturnValue {
   switch (layer.type) {
     case 'Point': {
-      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getFeatureCollectionGeometryType(
+        layer.data.sourceGeojson
+      );
 
       if (
         sourceGeometryType !== 'Polygon' &&
@@ -938,7 +954,9 @@ function transitionToChoropleth(
       };
     }
     case 'Proportional Symbol': {
-      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getFeatureCollectionGeometryType(
+        layer.data.sourceGeojson
+      );
 
       if (
         sourceGeometryType !== 'Polygon' &&
@@ -1009,7 +1027,9 @@ function transitionToChoropleth(
       };
     }
     case 'Line': {
-      const sourceGeometryType = getLayerGeometryType(layer.data.sourceGeojson);
+      const sourceGeometryType = getFeatureCollectionGeometryType(
+        layer.data.sourceGeojson
+      );
       const error = generateUnsupportedTransitionError(
         sourceGeometryType,
         'Polygon'

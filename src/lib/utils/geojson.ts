@@ -7,10 +7,11 @@ import {
 } from '$lib/utils/property';
 
 /**
- * Normalize an arbitrary GeoJSON object to a FeatureCollection.
+ * Normalize a GeoJSON Geometry, GeometryCollection, or Feature to a GeoJSON
+ * FeatureCollection.
  *
- * @param geojson - The GeoJSON object to normalize.
- * @returns – A GeoJSON FeatureCollection.
+ * @param {Object} geojson - The GeoJSON object to normalize.
+ * @returns {Object} – A GeoJSON FeatureCollection.
  */
 export function normalizeGeoJSONToFeatureCollection(
   geojson: GeoJSON
@@ -35,12 +36,12 @@ export function normalizeGeoJSONToFeatureCollection(
 }
 
 /**
- * Get the Geometry type of the layer by reading its first Feature.
+ * Get the Geometry type of a FeatureCollection.
  *
- * @param featureCollection - The FeatureCollection to inspect.
- * @returns – The type of the first Feature in the FeatureCollection.
+ * @param {Object} featureCollection - The FeatureCollection to inspect.
+ * @returns {Object} – The Geometry type of the FeatureCollection.
  */
-export function getLayerGeometryType(
+export function getFeatureCollectionGeometryType(
   featureCollection: FeatureCollection
 ): Geometry['type'] {
   return (
@@ -49,16 +50,15 @@ export function getLayerGeometryType(
 }
 
 /**
- * Select a quantitative attribute from a GeoJSON dataset.
+ * Select the first quantitative attribute from a GeoJSON FeatureCollection.
  *
- * @param data – The GeoJSON dataset.
- *
- * @returns – The name of the first quantitative attribute found in the input
- * GeoJSON dataset.
+ * @param {Object[]} features– The Features of a GeoJSON FeatureCollection.
+ * @returns {string} – The name of the first quantitative attribute found in the
+ * GeoJSON FeatureCollection.
  */
-export function selectQuantitativeAttribute(data: Feature[]): string {
-  for (const property in data[0].properties) {
-    if (isPropertyQuantitative(data[0].properties[property])) {
+export function selectQuantitativeAttribute(features: Feature[]): string {
+  for (const property in features[0].properties) {
+    if (isPropertyQuantitative(features[0].properties[property])) {
       return property;
     }
   }
@@ -69,16 +69,15 @@ export function selectQuantitativeAttribute(data: Feature[]): string {
 }
 
 /**
- * Select a categorical attribute from a GeoJSON dataset.
+ * Select the first categorical attribute from a GeoJSON FeatureCollection.
  *
- * @param data – The GeoJSON dataset.
- *
- * @returns – The name of the first categorical attribute found in the input
- * GeoJSON dataset.
+ * @param {Object[]} features – The Features of a GeoJSON FeatureCollection.
+ * @returns – The name of the first categorical attribute found in the GeoJSON
+ * FeatureCollection.
  */
-export function selectCategoricalAttribute(data: Feature[]): string {
-  for (const property in data[0].properties) {
-    if (isPropertyCategorical(data[0].properties[property])) {
+export function selectCategoricalAttribute(features: Feature[]): string {
+  for (const property in features[0].properties) {
+    if (isPropertyCategorical(features[0].properties[property])) {
       return property;
     }
   }
@@ -88,13 +87,20 @@ export function selectCategoricalAttribute(data: Feature[]): string {
   throw new Error('No cateogrical attributes found in dataset.');
 }
 
+/**
+ * Enumerate the categories of a given attribute in a GeoJSON FeatureCollection.
+ *
+ * @param {Object[]} features – The GeoJSON dataset.
+ * @param {string} attribute – The attribute to probe for categories.
+ * @returns {string[]} – The categories of the attribute.
+ */
 export function enumerateAttributeCategories(
-  data: Feature[],
+  features: Feature[],
   attribute: string
 ): string[] {
   const categories = new Set<string>();
 
-  for (const feature of data) {
+  for (const feature of features) {
     if (
       feature.properties?.[attribute] &&
       !categories.has(feature.properties[attribute])

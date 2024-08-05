@@ -16,7 +16,6 @@
 
   $: colors = style.scheme[style.count];
   $: [min, max] = deriveExtent(style.attribute, features);
-  $: thresholds = style.thresholds;
 
   function onThresholdChange(i: number) {
     return function handleThresholdChange(
@@ -57,15 +56,15 @@
       use:clickOutside
       on:clickoutside={toggleBreaksEditorVisibility}
     >
-      {#each [min, ...thresholds] as threshold, i}
+      {#each [min, ...style.thresholds] as threshold, i}
         <span class="h-6 self-center" style="background-color: {colors[i]};" />
         <span class="self-center">{threshold.toFixed(2)}</span>
         <span class="self-center">to</span>
         <NumberInput
-          value={thresholds[i] ?? max}
+          value={style.thresholds[i] ?? max}
           step={0.01}
           class="self-center p-1"
-          disabled={i === thresholds.length}
+          disabled={i === style.thresholds.length}
           on:change={onThresholdChange(i)}
         />
       {/each}

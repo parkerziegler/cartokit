@@ -23,7 +23,7 @@ import {
   DEFAULT_STROKE_OPACITY,
   DEFAULT_STROKE_WIDTH
 } from '$lib/utils/constants';
-import { getLayerGeometryType } from '$lib/utils/geojson';
+import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
 
 /**
  * Add a @see{CartoKitLayer} to the map.
@@ -236,7 +236,7 @@ export const generateCartoKitLayer = (
   featureCollection: FeatureCollection,
   options: { displayName: string; url?: string; fileName?: string }
 ): CartoKitLayer => {
-  const geometryType = getLayerGeometryType(featureCollection);
+  const geometryType = getFeatureCollectionGeometryType(featureCollection);
   const color = randomColor();
 
   switch (geometryType) {

@@ -2,10 +2,10 @@
   import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { ConstantStyle } from '$lib/types';
+  import type { ConstantFill } from '$lib/types';
 
   export let layerId: string;
-  export let fill: ConstantStyle | undefined;
+  export let fill: ConstantFill | undefined;
 
   function onRemoveFill() {
     dispatchLayerUpdate({

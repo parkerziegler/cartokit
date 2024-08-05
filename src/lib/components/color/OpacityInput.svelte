@@ -30,19 +30,11 @@
   }
 
   function onOpacityChange(opacity: number) {
-    if (property === 'fill') {
-      dispatchLayerUpdate({
-        type: 'fill-opacity',
-        layerId,
-        payload: { opacity }
-      });
-    } else {
-      dispatchLayerUpdate({
-        type: 'stroke-opacity',
-        layerId,
-        payload: { opacity }
-      });
-    }
+    dispatchLayerUpdate({
+      type: `${property}-opacity`,
+      layerId,
+      payload: { opacity }
+    });
   }
 </script>
 

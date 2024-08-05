@@ -183,9 +183,9 @@ interface TransformationUpdate extends LayerUpdate {
 }
 
 interface FillVisualizationUpdate extends LayerUpdate {
-  type: 'fill-visualization';
+  type: 'visualization-type';
   payload: {
-    type: VisualizationType;
+    visualizationType: VisualizationType;
   };
 }
 
@@ -742,20 +742,20 @@ export function dispatchLayerUpdate({
       });
       break;
     }
-    case 'fill-visualization': {
+    case 'visualization-type': {
       ir.update((ir) => {
         const lyr = ir.layers[layerId] as CartoKitChoroplethLayer;
 
         let fill: QuantitativeFill | CategoricalFill;
 
-        switch (payload.type) {
+        switch (payload.visualizationType) {
           case 'Categorical': {
             const attribute = selectCategoricalAttribute(
               lyr.data.geojson.features
             );
 
             fill = {
-              type: payload.type,
+              type: payload.visualizationType,
               attribute,
               categories: enumerateAttributeCategories(
                 lyr.data.geojson.features,
@@ -772,7 +772,7 @@ export function dispatchLayerUpdate({
             );
 
             fill = {
-              type: payload.type,
+              type: payload.visualizationType,
               attribute: attribute,
               method: 'Quantile',
               scheme: DEFAULT_QUANTITATIVE_SCHEME,

@@ -8,9 +8,7 @@
   export let stroke: ConstantStroke | undefined;
   export let features: Feature[];
 
-  let stops: number[] = [];
   $: colors = fill.scheme[fill.count] as string[];
-
   $: [min, max] = deriveExtent(fill.attribute, features);
   $: stops = deriveThresholds({
     method: fill.method,

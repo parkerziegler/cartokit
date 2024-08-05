@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { CartoKitPointLayer } from '$lib/types';
   import { pluralize } from '$lib/utils/format';
-  import { getLayerGeometryType } from '$lib/utils/geojson';
+  import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
 
   export let layer: CartoKitPointLayer;
 
-  $: geometryType = getLayerGeometryType(layer.data.geojson);
+  $: geometryType = getFeatureCollectionGeometryType(layer.data.geojson);
   $: dimension = layer.style.size * 2 + (layer.style.stroke?.width ?? 0) * 2;
 </script>
 
