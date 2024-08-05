@@ -231,11 +231,11 @@ export function dispatchLayerUpdate({
       ir.update((ir) => {
         const layer = ir.layers[layerId];
 
-        ir.layers[layer.id] = transitionLayerType({
+        ir.layers[layer.id] = transitionLayerType(
           map,
           layer,
-          targetLayerType: payload.layerType
-        });
+          payload.layerType
+        );
 
         return ir;
       });

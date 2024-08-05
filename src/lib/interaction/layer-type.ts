@@ -43,12 +43,6 @@ import {
   transformGeometryToCentroids
 } from '$lib/utils/transformation';
 
-interface TransitionMapTypeParams {
-  map: Map;
-  layer: CartoKitLayer;
-  targetLayerType: LayerType;
-}
-
 interface TransitionMapTypeReturnValue {
   targetLayer: CartoKitLayer;
   redraw: boolean;
@@ -58,17 +52,16 @@ interface TransitionMapTypeReturnValue {
  * Transition a layer from one layer type to another. For cross-geometry trans-
  * itions, this will create a new layer and remove the previous layer.
  *
- * @param map — The top-level MapLibre GL map instance.
- * @param layer — The CartoKitLayer to transition.
- * @param targetLayerType — The layer type to transition to.
- *
+ * @param {Map} map — The top-level MapLibre GL map instance.
+ * @param {CartoKitLayer} layer — The CartoKitLayer to transition.
+ * @param {string} targetLayerType — The layer type to transition to.
  * @returns — The transitioned CartoKitLayer.
  */
-export function transitionLayerType({
-  map,
-  layer,
-  targetLayerType
-}: TransitionMapTypeParams): CartoKitLayer {
+export function transitionLayerType(
+  map: Map,
+  layer: CartoKitLayer,
+  targetLayerType: LayerType
+): CartoKitLayer {
   let redraw = false;
   let targetLayer: CartoKitLayer;
 
@@ -86,11 +79,11 @@ export function transitionLayerType({
       break;
     }
     case 'Line': {
-      ({ redraw, targetLayer } = transitionToLine(map, layer));
+      ({ redraw, targetLayer } = transitionToLine(layer));
       break;
     }
     case 'Polygon': {
-      ({ redraw, targetLayer } = transitionToFill(map, layer));
+      ({ redraw, targetLayer } = transitionToPolygon(map, layer));
       break;
     }
     case 'Choropleth': {
@@ -139,28 +132,27 @@ export function transitionLayerType({
 /**
  * Generate errors with consistent messages for unsupported map type transitions.
  *
- * @param sourceGeometryType – The geometry type of the original layer.
- * @param targetGeometryType – The geometry type of the target layer being
+ * @param {Geometry} sourceGeometryType – The geometry type of the original layer.
+ * @param {Geometry} targetGeometryType – The geometry type of the target layer being
  * transitioned to.
- *
- * @returns – never—program execution halts.
  */
-const generateUnsupportedTransitionError = (
+function generateUnsupportedTransitionError(
   sourceGeometryType: Geometry['type'],
   targetGeometryType: Geometry['type']
-): Error => {
+): Error {
   throw new Error(
     `Unsupported geometry transition. Transition initiated from ${sourceGeometryType} to ${targetGeometryType}, but no ${targetGeometryType} features are present in the original data.`
   );
-};
+}
 
 /**
- * Transition a layer to a point layer.
+ * Transition a @see{CartoKitLayer} to a @see{CartoKitPointLayer}.
  *
- * @param map — The top-level MapLibre GL map instance.
- * @param layer — The @see{CartoKitLayer} to transition.
- *
- * @returns — The transitioned CartoKitPointLayer.
+ * @param {Map} map — The top-level MapLibre GL map instance.
+ * @param {CartoKitLayer} layer — The @see{CartoKitLayer} to transition.
+ * @returns {TransitionMapTypeReturnValue} — The transitioned
+ * @see{CartoKitPointLayer} and a Boolean flag indicating whether the layer
+ * needs to be redrawn.
  */
 function transitionToPoint(
   map: Map,
@@ -300,16 +292,18 @@ function transitionToPoint(
 }
 
 /**
- * Transition a layer to a proportional symbol layer.
+ * Transition a @see{CartoKitLayer} to a @see{CartoKitProportionalSymbolLayer}.
  *
- * @param layer — The @see{CartoKitLayer} to transition.
- *
- * @returns – The transitioned CartoKitProportionalSymbolLayer.
+ * @param {Map} map — The top-level MapLibre GL map instance.
+ * @param {CartoKitLayer} layer — The @see{CartoKitLayer} to transition.
+ * @returns {TransitionMapTypeReturnValue} — The transitioned
+ * @see{CartoKitProportionalSymbolLayer} and a Boolean flag indicating whether
+ * the layer needs to be redrawn.
  */
-const transitionToProportionalSymbol = (
+function transitionToProportionalSymbol(
   map: Map,
   layer: CartoKitLayer
-): TransitionMapTypeReturnValue => {
+): TransitionMapTypeReturnValue {
   const features = layer.data.geojson.features;
 
   switch (layer.type) {
@@ -467,18 +461,19 @@ const transitionToProportionalSymbol = (
       };
     }
   }
-};
+}
 
 /**
- * Transition a layer to a dot density layer.
+ * Transition a @see{CartoKitLayer} to a @see{CartoKitDotDensityLayer}.
  *
- * @param layer — The @see{CartoKitLayer} to transition.
- *
- * @returns – The transitioned CartoKitDotDensityLayer.
+ * @param {CartoKitLayer} layer — The @see{CartoKitLayer} to transition.
+ * @returns {TransitionMapTypeReturnValue} — The transitioned
+ * @see{CartoKitDotDensityLayer} and a Boolean flag indicating whether the layer
+ * needs to be redrawn.
  */
-const transitionToDotDensity = (
+function transitionToDotDensity(
   layer: CartoKitLayer
-): TransitionMapTypeReturnValue => {
+): TransitionMapTypeReturnValue {
   switch (layer.type) {
     case 'Point': {
       const sourceGeometryType = getFeatureCollectionGeometryType(
@@ -681,20 +676,17 @@ const transitionToDotDensity = (
       };
     }
   }
-};
+}
 
 /**
- * Transition a layer to a line layer.
+ * Transition a @see{CartoKitLayer} to a @see{CartoKitLineLayer}.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param layer – The @see{CartoKitLayer} to transition.
- *
- * @returns – The transitioned CartoKitLineLayer.
+ * @param {CartoKitLayer} layer — The @see{CartoKitLayer} to transition.
+ * @returns {TransitionMapTypeReturnValue} — The transitioned
+ * @see{CartoKitLineLayer} and a Boolean flag indicating whether the layer needs
+ * to be redrawn.
  */
-const transitionToLine = (
-  _map: Map,
-  layer: CartoKitLayer
-): TransitionMapTypeReturnValue => {
+function transitionToLine(layer: CartoKitLayer): TransitionMapTypeReturnValue {
   switch (layer.type) {
     case 'Line':
       return {
@@ -752,20 +744,21 @@ const transitionToLine = (
       throw error;
     }
   }
-};
+}
 
 /**
- * Transition a layer to a polygon fill layer.
+ * Transition a @see{CartoKitLayer} to a @see{CartoKitPolygonLayer}.
  *
- * @param map — The top-level MapLibre GL map instance.
- * @param layer — The @see{CartoKitLayer} to transition.
- *
- * @returns — The transitioned CartoKitPolygonLayer.
+ * @param {Map} map — The top-level MapLibre GL map instance.
+ * @param {CartoKitLayer} layer — The @see{CartoKitLayer} to transition.
+ * @returns {TransitionMapTypeReturnValue} — The transitioned
+ * @see{CartoKitPolygonLayer} and a Boolean flag indicating whether the layer
+ * needs to be redrawn.
  */
-const transitionToFill = (
+function transitionToPolygon(
   map: Map,
   layer: CartoKitLayer
-): TransitionMapTypeReturnValue => {
+): TransitionMapTypeReturnValue {
   switch (layer.type) {
     case 'Point': {
       const sourceGeometryType = getFeatureCollectionGeometryType(
@@ -892,15 +885,16 @@ const transitionToFill = (
       };
     }
   }
-};
+}
 
 /**
- * Transition a layer to a choropleth layer.
+ * Transition a @see{CartoKitLayer} to a @see{CartoKitChoroplethLayer}.
  *
- * @param map — The top-level MapLibre GL map instance.
- * @param layer — The @see{CartoKitLayer} to transition.
- *
- * @returns – The transitioned CartoKitChoroplethLayer.
+ * @param {Map} map — The top-level MapLibre GL map instance.
+ * @param {CartoKitLayer} layer — The @see{CartoKitLayer} to transition.
+ * @returns {TransitionMapTypeReturnValue} — The transitioned
+ * @see{CartoKitChoroplethLayer} and a Boolean flag indicating whether
+ * the layer needs to be redrawn.
  */
 function transitionToChoropleth(
   map: Map,
@@ -1071,7 +1065,7 @@ function transitionToChoropleth(
         deriveColorScale(targetLayer)
       );
 
-      // If the Fill layer we're transitioning from had no fill, set the opacity
+      // If the Polygon layer we're transitioning from had no fill, set the opacity
       // to the default to ensure the fill is visible.
       if (!layer.style.fill?.opacity) {
         map.setPaintProperty(layer.id, 'fill-opacity', DEFAULT_OPACITY);
