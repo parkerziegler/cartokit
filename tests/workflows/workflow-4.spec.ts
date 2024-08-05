@@ -124,20 +124,76 @@ test('workflow-4', async ({ page }) => {
 
   // Set the layer's Breaks to 614.791, 973.836, 1228.582, 1426.178, 1587.626,
   // 1724.178, 1842.373.
-  await page.locator('.breaks-grid > input').first().fill('614.791');
-  await page.locator('.breaks-grid > input').first().press('Enter');
-  await page.locator('.breaks-grid > input').nth(1).fill('973.836');
-  await page.locator('.breaks-grid > input').nth(1).press('Enter');
-  await page.locator('.breaks-grid > input').nth(2).fill('1228.582');
-  await page.locator('.breaks-grid > input').nth(2).press('Enter');
-  await page.locator('.breaks-grid > input').nth(3).fill('1426.178');
-  await page.locator('.breaks-grid > input').nth(3).press('Enter');
-  await page.locator('.breaks-grid > input').nth(4).fill('1587.626');
-  await page.locator('.breaks-grid > input').nth(4).press('Enter');
-  await page.locator('.breaks-grid > input').nth(5).fill('1724.178');
-  await page.locator('.breaks-grid > input').nth(5).press('Enter');
-  await page.locator('.breaks-grid > input').nth(6).fill('1842.373');
-  await page.locator('.breaks-grid > input').nth(6).press('Enter');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .first()
+    .fill('614.791');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .first()
+    .press('Enter');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(1)
+    .fill('973.836');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(1)
+    .press('Enter');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(2)
+    .fill('1228.582');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(2)
+    .press('Enter');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(3)
+    .fill('1426.178');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(3)
+    .press('Enter');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(4)
+    .fill('1587.626');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(4)
+    .press('Enter');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(5)
+    .fill('1724.178');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(5)
+    .press('Enter');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(6)
+    .fill('1842.373');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(6)
+    .press('Enter');
 
   // Deselect the layer.
   await page.locator('#map').click({

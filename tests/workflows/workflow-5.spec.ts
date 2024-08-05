@@ -174,20 +174,48 @@ test('workflow-5', async ({ page }) => {
   await page.locator('#classification-method-select').selectOption('Manual');
 
   // Set the layer's Breaks to -30, -20, -10, 0, 10, 20, 30.
-  await page.locator('.breaks-grid > input').first().fill('-30');
-  await page.locator('.breaks-grid > input').first().press('Enter');
-  await page.locator('.breaks-grid > input').nth(1).fill('-20');
-  await page.locator('.breaks-grid > input').nth(1).press('Enter');
-  await page.locator('.breaks-grid > input').nth(2).fill('-10');
-  await page.locator('.breaks-grid > input').nth(2).press('Enter');
-  await page.locator('.breaks-grid > input').nth(3).fill('0');
-  await page.locator('.breaks-grid > input').nth(3).press('Enter');
-  await page.locator('.breaks-grid > input').nth(4).fill('10');
-  await page.locator('.breaks-grid > input').nth(4).press('Enter');
-  await page.locator('.breaks-grid > input').nth(5).fill('20');
-  await page.locator('.breaks-grid > input').nth(5).press('Enter');
-  await page.locator('.breaks-grid > input').nth(6).fill('30');
-  await page.locator('.breaks-grid > input').nth(6).press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').first().fill('-30');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .first()
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(1).fill('-20');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(1)
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(2).fill('-10');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(2)
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(3).fill('0');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(3)
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(4).fill('10');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(4)
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(5).fill('20');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(5)
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(6).fill('30');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(6)
+    .press('Enter');
 
   // Set the layer's Color Scheme to RdBu.
   await page.locator('#color-scheme').getByRole('button').click();

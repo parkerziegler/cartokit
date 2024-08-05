@@ -55,6 +55,7 @@
       class="grid grid-cols-[0.75rem_1fr_1rem_1fr] gap-x-2 gap-y-1"
       use:clickOutside
       on:clickoutside={toggleBreaksEditorVisibility}
+      data-testid="breaks-editor"
     >
       {#each [min, ...style.thresholds] as threshold, i}
         <span class="h-6 self-center" style="background-color: {colors[i]};" />

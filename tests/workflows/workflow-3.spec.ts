@@ -169,14 +169,30 @@ test('workflow-3', async ({ page }) => {
   await page.locator('#classification-method-select').selectOption('Manual');
 
   // Set the layer's Breaks to -0.5, 0, 0.5, 1.
-  await page.locator('.breaks-grid > input').first().fill('-0.5');
-  await page.locator('.breaks-grid > input').first().press('Enter');
-  await page.locator('.breaks-grid > input').nth(1).fill('0');
-  await page.locator('.breaks-grid > input').nth(1).press('Enter');
-  await page.locator('.breaks-grid > input').nth(2).fill('0.5');
-  await page.locator('.breaks-grid > input').nth(2).press('Enter');
-  await page.locator('.breaks-grid > input').nth(3).fill('1');
-  await page.locator('.breaks-grid > input').nth(3).press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').first().fill('-0.5');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .first()
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(1).fill('0');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(1)
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(2).fill('0.5');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(2)
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(3).fill('1');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(3)
+    .press('Enter');
 
   // Set the layer's Color Scheme to RdYlBu.
   await page.locator('#color-scheme').getByRole('button').click();
