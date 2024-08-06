@@ -4,14 +4,17 @@
 
   export let fill: CategoricalFill;
   export let stroke: ConstantStroke | undefined;
+
+  $: entries =
+    fill.scheme.length < fill.categories.length
+      ? fill.categories.slice(0, fill.scheme.length).concat('Other')
+      : fill.categories;
 </script>
 
 <div class="stack stack-xs ml-8 text-white">
   <p>{fill.attribute}</p>
   <ul>
-    {#each fill.categories
-      .slice(0, fill.scheme.length)
-      .concat('Other') as category, i}
+    {#each entries as category, i}
       <li class="stack-h stack-h-xs">
         <svg viewBox="0 0 32 16" width="32" height="16">
           <rect
