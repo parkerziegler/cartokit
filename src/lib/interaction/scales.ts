@@ -2,8 +2,8 @@ import * as d3 from 'd3';
 import type { Feature } from 'geojson';
 import { ckmeans } from 'simple-statistics';
 
-import type { CartoKitChoroplethLayer, ClassificationMethod } from '$lib/types';
-import { isPropertyNumeric } from '$lib/utils/property';
+import type { ClassificationMethod } from '$lib/types';
+import { isPropertyQuantitative } from '$lib/utils/property';
 
 /**
  * Derive the extent for a given attribute of a GeoJSON FeatureCollection.
@@ -19,7 +19,7 @@ export function deriveExtent(
   const [min, max] = d3.extent(
     features
       .map((feature) => feature.properties?.[attribute])
-      .filter(isPropertyNumeric)
+      .filter(isPropertyQuantitative)
   );
   const data: [number, number] =
     typeof min === 'undefined' || typeof max === 'undefined'
@@ -29,10 +29,10 @@ export function deriveExtent(
   return data;
 }
 
-interface DeriveBreaksParams<T> {
+interface DeriveBreaksParams {
   attribute: string;
   features: Feature[];
-  range: T[];
+  range: string[];
 }
 
 /**
@@ -45,18 +45,22 @@ interface DeriveBreaksParams<T> {
  *
  * @returns – The quantiles of the dataset.
  */
-export function deriveQuantiles<T>({
+export function deriveQuantiles({
   attribute,
   features,
   range
-}: DeriveBreaksParams<T>): number[] {
+}: DeriveBreaksParams): number[] {
   // For a quantile scale, use the entirety of the data as the domain.
   const data = features
     .map((feature) => feature.properties?.[attribute])
-    .filter(isPropertyNumeric);
+    .filter(isPropertyQuantitative);
 
   // Derive quantiles.
-  const quantiles = d3.scaleQuantile<T>().domain(data).range(range).quantiles();
+  const quantiles = d3
+    .scaleQuantile<string>()
+    .domain(data)
+    .range(range)
+    .quantiles();
 
   return quantiles;
 }
@@ -75,7 +79,7 @@ export function deriveEqualIntervals({
   attribute,
   features,
   range
-}: DeriveBreaksParams<string>): number[] {
+}: DeriveBreaksParams): number[] {
   // For a quantize scale, use the extent of the data as the domain.
   const [min, max] = deriveExtent(attribute, features);
 
@@ -103,11 +107,11 @@ export function deriveJenksBreaks({
   attribute,
   features,
   range
-}: DeriveBreaksParams<string>): number[] {
+}: DeriveBreaksParams): number[] {
   // For a Jenks scale, use the entirety of the data as the domain.
   const data = features
     .map((feature) => feature.properties?.[attribute])
-    .filter(isPropertyNumeric);
+    .filter(isPropertyQuantitative);
 
   // Derive Jenks breaks using ckmeans clustering.
   const breaks = ckmeans(data, range.length).map(
@@ -120,9 +124,9 @@ export function deriveJenksBreaks({
   return breaks;
 }
 
-interface DeriveThresholdsParams<T> extends DeriveBreaksParams<T> {
+interface DeriveThresholdsParams extends DeriveBreaksParams {
   method: ClassificationMethod;
-  layer: CartoKitChoroplethLayer;
+  thresholds: number[];
 }
 
 /**
@@ -130,20 +134,20 @@ interface DeriveThresholdsParams<T> extends DeriveBreaksParams<T> {
  *
  * @param params – Input parameters to compute thresholds over a GeoJSON FeatureCollection.
  * @param method – The @see{ClassificationMethod} to use.
- * @param layer – The @see{CartoKitLayer} to derive thresholds from.
  * @param attribute – The data attribute to compute thresholds over.
  * @param features – The GeoJSON features of the dataset.
  * @param range – The output range of the scale.
+ * @param thresholds – The thresholds of the dataset, if supplied manually.
  *
  * @returns – The thresholds of the dataset based on the method, attribute, features, and range supplied.
  */
 export function deriveThresholds({
   method,
-  layer,
   attribute,
   features,
-  range
-}: DeriveThresholdsParams<string>) {
+  range,
+  thresholds
+}: DeriveThresholdsParams): number[] {
   switch (method) {
     case 'Quantile':
       return deriveQuantiles({ attribute, features, range });
@@ -152,6 +156,6 @@ export function deriveThresholds({
     case 'Jenks':
       return deriveJenksBreaks({ attribute, features, range });
     case 'Manual':
-      return layer.style.fill.thresholds;
+      return thresholds;
   }
 }

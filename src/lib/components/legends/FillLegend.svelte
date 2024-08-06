@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { CartoKitPolygonLayer } from '$lib/types';
   import { pluralize } from '$lib/utils/format';
-  import { getLayerGeometryType } from '$lib/utils/geojson';
+  import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
 
   export let layer: CartoKitPolygonLayer;
 
-  $: geometryType = getLayerGeometryType(layer.data.geojson);
+  $: geometryType = getFeatureCollectionGeometryType(layer.data.geojson);
 </script>
 
 <div class="stack-h stack-h-xs ml-8 items-center">

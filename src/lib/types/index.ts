@@ -10,9 +10,14 @@ export type ClassificationMethod =
   | 'Manual';
 
 /**
- * Represents a discrete color scheme.
+ * Represents a quantitative D3 color scheme.
  */
-export type ColorScheme = readonly (readonly string[])[];
+export type QuantitativeColorScheme = readonly (readonly string[])[];
+
+/**
+ * Represents a categorical D3 color scheme.
+ */
+export type CategoricalColorScheme = readonly string[];
 
 /**
  * Represents the cartographic form of a layer.
@@ -30,14 +35,20 @@ export type LayerType =
   | 'Dot Density';
 
 /**
+ * Represents the visualization type for a given channel.
+ */
+export type VisualizationType = 'Quantitative' | 'Categorical';
+
+/**
  * Represents a transformation—either internal or user-defined—applied to a
  * layer.
  *
  * @property {string} name - The function name of the transformation.
  * @property {string} definition - The function body of the transformation.
- * @property {'geometric' | 'statistical'} type - The type of the transformation,
- * either geometric or statistical. This information is used by our code gener-
- * ation algorithm to determine whether modules from Turf.js need to be loaded.
+ * @property {'geometric' | 'statistical'} type - The type of the
+ * transformation, either geometric or statistical. This information is used by
+ * our code generation algorithm to determine whether modules from Turf.js need
+ * to be loaded.
  */
 export interface Transformation {
   name: string;
@@ -50,14 +61,16 @@ export interface Transformation {
  * two copies of a layer's GeoJSON data in memory:
  *
  *   1. The source GeoJSON at the time of layer creation. All accumulated trans-
- *      formations are executed against this copy to produce the current GeoJSON.
+ *      formations are executed against this copy to produce the current
+ *      GeoJSON.
  *   2. The current GeoJSON of the layer, used for display.
  *
- * @property url - The URL of the data source, if fetched from a remote server.
- * @property fileName - The name of the data source's file on disk, if loaded
- * locally.
- * @property geojson - The current GeoJSON of the layer.
- * @property sourceGeojson - The source GeoJSON of the layer.
+ * @property {string} url - The URL of the data source, if fetched from a remote
+ * server.
+ * @property {string} fileName - The name of the data source's file on disk, if
+ * loaded locally.
+ * @property {Object} geojson - The current GeoJSON of the layer.
+ * @property {Object} sourceGeojson - The source GeoJSON of the layer.
  */
 interface LayerData {
   url?: string;
@@ -74,7 +87,8 @@ interface LayerData {
  * @property {string} id - A globally unique identifier for the layer.
  * @property {string} displayName - A user-supplied display name for the layer.
  * @property {LayerType} type - The type of the layer, @see LayerType.
- * @property {LayerData} data - The data and metadata of the layer, @see LayerData.
+ * @property {LayerData} data - The data and metadata of the layer, @see
+ * LayerData.
  */
 interface Layer {
   id: string;
@@ -94,7 +108,7 @@ export interface CartoKitPointLayer extends Layer {
   type: 'Point';
   style: {
     size: number;
-    fill?: ConstantFill;
+    fill?: ConstantStyle;
     stroke?: ConstantStroke;
   };
 }
@@ -123,7 +137,7 @@ export interface CartoKitLineLayer extends Layer {
 export interface CartoKitPolygonLayer extends Layer {
   type: 'Polygon';
   style: {
-    fill?: ConstantFill;
+    fill?: ConstantStyle;
     stroke?: ConstantStroke;
   };
 }
@@ -141,7 +155,7 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
   type: 'Proportional Symbol';
   style: {
     size: ProportionalSymbolSize;
-    fill?: ConstantFill;
+    fill?: ConstantStyle;
     stroke?: ConstantStroke;
   };
 }
@@ -149,7 +163,7 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
 /**
  * Represents a Choropleth layer in cartokit. Choropleth layers map a data value
  * to the color of a region using a classification method. Classification can be
- * either numeric or categorical.
+ * either quantitative or categorical.
  *
  * @property {'Choropleth'} type - The type of the layer, 'Choropleth'.
  * @property {Object} style - The style of the layer.
@@ -157,7 +171,7 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
 export interface CartoKitChoroplethLayer extends Layer {
   type: 'Choropleth';
   style: {
-    fill: DiscreteChoroplethFill;
+    fill: QuantitativeFill | CategoricalFill;
     stroke?: ConstantStroke;
   };
 }
@@ -174,7 +188,7 @@ export interface CartoKitDotDensityLayer extends Layer {
   type: 'Dot Density';
   style: {
     dots: DotDensityDots;
-    fill?: ConstantFill;
+    fill?: ConstantStyle;
     stroke?: ConstantStroke;
   };
 }
@@ -192,30 +206,88 @@ export type CartoKitLayer =
   | CartoKitDotDensityLayer;
 
 /**
- * Represents a constant fill style object. A constant fill applies a uniform
- * color and opacity to all features in a layer.
+ * Represents a constant style object. A constant style applies a uniform color
+ * and opacity to all features in a layer.
  *
- * @property {string} color - The fill color.
- * @property {number} opacity - The fill opacity.
+ * @property {string} color - The style's color.
+ * @property {number} opacity - The style's opacity.
  */
-interface ConstantFill {
+export interface ConstantStyle {
   color: string;
   opacity: number;
 }
 
 /**
- * Represents a constant stroke style object. A constant stroke applies a uni-
- * form color, width, and opacity to all features in a layer.
- *
- * @property {string} color - The stroke color.
- * @property {number} width - The stroke width.
- * @property {number} opacity - The stroke opacity.
+ * An alias for ConstantStyle. Should be used when typing a fill style.
  */
-interface ConstantStroke {
-  color: string;
+export type ConstantFill = ConstantStyle;
+
+/**
+ * Represents a constant stroke style object. A constant stroke applies a uni-
+ * form color, opacity, and stroke-width to all features in a layer.
+ *
+ * @property {string} color - The style's stroke color.
+ * @property {number} opacity - The style's stroke opacity.
+ * @property {number} width - The style's stroke width.
+ */
+export interface ConstantStroke extends ConstantStyle {
   width: number;
+}
+
+/**
+ * Represents a categorical style object.
+ *
+ * @property {'Categorical'} type - The type of the style object, 'Categorical'.
+ * @property {string} attribute - The attribute of the GeoJSON data to classify.
+ * @property {string[]} scheme - The color scheme to use,
+ * @see CategoricalColorScheme.
+ * @property {string[]} categories - The categorical values for the attribute.
+ * @property {number} opacity - The fill or stroke opacity.
+ */
+export interface CategoricalStyle {
+  type: 'Categorical';
+  attribute: string;
+  categories: string[];
+  scheme: CategoricalColorScheme;
   opacity: number;
 }
+
+/**
+ * An alias for CategoricalStyle. Should be used when typing a fill style.
+ */
+export type CategoricalFill = CategoricalStyle;
+
+/**
+ * Represents a quantitative style object. A quantitative style object specifies
+ * a classification method to bin continuous numerical data into a discrete set
+ * of thresholds. Each feature of the map is colored according to the "bin" it
+ * falls into.
+ *
+ * @property {'Quantitative'} type - The type of the fill style, 'Quantitative'.
+ * @property {string} attribute - The attribute of the GeoJSON data to classify.
+ * @property {string} method - The classification method to use, @see
+ * ClassificationMethod.
+ * @property {string[][]} scheme - The color scheme to use, @see
+ * QuantitativeColorScheme.
+ * @property {number} count - The number of thresholds.
+ * @property {number[]} thresholds - The thresholds generated by the classifi-
+ * cation method from the data.
+ * @property {number} opacity - The fill or stroke opacity.
+ */
+export interface QuantitativeStyle {
+  type: 'Quantitative';
+  attribute: string;
+  method: ClassificationMethod;
+  scheme: QuantitativeColorScheme;
+  count: number;
+  thresholds: number[];
+  opacity: number;
+}
+
+/**
+ * An alias for QuantitativeStyle. Should be used when typing a fill style.
+ */
+export type QuantitativeFill = QuantitativeStyle;
 
 /**
  * Represents a proportional symbol size style object. A proportional symbol
@@ -234,30 +306,6 @@ interface ProportionalSymbolSize {
 }
 
 /**
- * Represents a discrete choropleth fill style object. A discrete choropleth
- * fill applies a classification method to continuous numeric data to generate a
- * discrete set of thresholds. Each feature of the map is colored according to
- * the "bin" it falls into.
- *
- * @property {string} attribute - The attribute of the GeoJSON data to classify.
- * @property {ClassificationMethod} method - The classification method to use,
- * @see ClassificationMethod.
- * @property {ColorScheme} scheme - The color scheme to use, @see ColorScheme.
- * @property {number} count - The number of thresholds.
- * @property {number[]} thresholds - The thresholds generated by the classifi-
- * cation method from the data.
- * @property {number} opacity - The fill opacity.
- */
-interface DiscreteChoroplethFill {
-  attribute: string;
-  method: ClassificationMethod;
-  scheme: ColorScheme;
-  count: number;
-  thresholds: number[];
-  opacity: number;
-}
-
-/**
  * Represents a dot density dot style object. A dot density dot style object
  * specifies the attribute of the GeoJSON data to divide by the dot value of the
  * layer to produce a discrete number of dots. The size of the dots is constant.
@@ -268,7 +316,7 @@ interface DiscreteChoroplethFill {
  * @property {number} value - The dot value, representing the ratio of source
  * data units to number of dots.
  */
-interface DotDensityDots {
+export interface DotDensityDots {
   attribute: string;
   size: number;
   value: number;

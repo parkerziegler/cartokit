@@ -1,21 +1,21 @@
 <script lang="ts">
+  import type { FeatureCollection } from 'geojson';
+
   import TransformationEditor from '$lib/components/data/TransformationEditor.svelte';
   import GearIcon from '$lib/components/icons/GearIcon.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type {
-    CartoKitChoroplethLayer,
-    CartoKitProportionalSymbolLayer,
-    CartoKitDotDensityLayer
-  } from '$lib/types';
-  import { isPropertyNumeric } from '$lib/utils/property';
+  import type { VisualizationType } from '$lib/types';
+  import {
+    isPropertyCategorical,
+    isPropertyQuantitative
+  } from '$lib/utils/property';
 
   export let selected: string;
-  export let layer:
-    | CartoKitChoroplethLayer
-    | CartoKitProportionalSymbolLayer
-    | CartoKitDotDensityLayer;
+  export let layerId: string;
+  export let visualizationType: VisualizationType;
+  export let geojson: FeatureCollection;
 
   const target = document.getElementById('map') ?? document.body;
   let editor: TransformationEditor;
@@ -23,18 +23,12 @@
   let left = 0;
   let attributeEditorVisible = false;
 
-  $: properties = Object.keys(
-    layer.data.geojson.features[0]?.properties ?? {}
-  ).filter((prop) => {
-    switch (layer.type) {
-      case 'Choropleth':
-      case 'Proportional Symbol':
-      case 'Dot Density':
-        return isPropertyNumeric(
-          layer.data.geojson.features[0].properties?.[prop]
-        );
-    }
-  });
+  $: properties = Object.keys(geojson.features[0]?.properties ?? {}).filter(
+    (prop) =>
+      visualizationType === 'Quantitative'
+        ? isPropertyQuantitative(geojson.features[0].properties?.[prop])
+        : isPropertyCategorical(geojson.features[0].properties?.[prop])
+  );
   $: options = properties.map((attribute) => ({
     value: attribute,
     label: attribute
@@ -45,7 +39,7 @@
 
     dispatchLayerUpdate({
       type: 'attribute',
-      layer,
+      layerId,
       payload: {
         attribute
       }
@@ -100,7 +94,8 @@
     <TransformationEditor
       onClose={onCloseComputedAttribute}
       {onClickOutside}
-      {layer}
+      {layerId}
+      {geojson}
       bind:this={editor}
     />
   </Portal>

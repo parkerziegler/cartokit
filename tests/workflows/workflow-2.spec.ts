@@ -171,7 +171,7 @@ test('workflow-2', async ({ page }) => {
 
   // Switch the layer's Color Scheme to PRGn.
   await page.locator('#color-scheme').getByRole('button').click();
-  await page.locator('button:nth-child(20)').click();
+  await page.locator('li:nth-child(20)').getByRole('button').click();
 
   // Reverse the layer's Color Scheme.
   await page.getByTestId('color-scheme-reverse-button').click();
@@ -180,16 +180,36 @@ test('workflow-2', async ({ page }) => {
   await page.locator('#classification-method-select').selectOption('Manual');
 
   // Set the layer's Breaks to -21, -14, -7, 0, 7.
-  await page.locator('.breaks-grid > input').first().fill('-21');
-  await page.locator('.breaks-grid > input').first().press('Enter');
-  await page.locator('.breaks-grid > input').nth(1).fill('-14');
-  await page.locator('.breaks-grid > input').nth(1).press('Enter');
-  await page.locator('.breaks-grid > input').nth(2).fill('-7');
-  await page.locator('.breaks-grid > input').nth(2).press('Enter');
-  await page.locator('.breaks-grid > input').nth(3).fill('0');
-  await page.locator('.breaks-grid > input').nth(3).press('Enter');
-  await page.locator('.breaks-grid > input').nth(4).fill('7');
-  await page.locator('.breaks-grid > input').nth(4).press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').first().fill('-21');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .first()
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(1).fill('-14');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(1)
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(2).fill('-7');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(2)
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(3).fill('0');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(3)
+    .press('Enter');
+  await page.getByTestId('breaks-editor').locator('input').nth(4).fill('7');
+  await page
+    .getByTestId('breaks-editor')
+    .locator('input')
+    .nth(4)
+    .press('Enter');
 
   // Set the layer's fill-opacity to 100%.
   await page.locator('#fill-opacity-input').fill('100');

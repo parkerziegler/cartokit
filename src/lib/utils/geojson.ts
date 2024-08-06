@@ -1,13 +1,17 @@
 import { feature, featureCollection } from '@turf/helpers';
-import type { GeoJSON, FeatureCollection, Geometry } from 'geojson';
+import type { GeoJSON, Feature, FeatureCollection, Geometry } from 'geojson';
 
-import { isPropertyNumeric } from '$lib/utils/property';
+import {
+  isPropertyCategorical,
+  isPropertyQuantitative
+} from '$lib/utils/property';
 
 /**
- * Normalize an arbitrary GeoJSON object to a FeatureCollection.
+ * Normalize a GeoJSON Geometry, GeometryCollection, or Feature to a GeoJSON
+ * FeatureCollection.
  *
- * @param geojson - The GeoJSON object to normalize.
- * @returns – A GeoJSON FeatureCollection.
+ * @param {GeoJSON} geojson - The GeoJSON object to normalize.
+ * @returns {FeatureCollection} – A GeoJSON FeatureCollection.
  */
 export function normalizeGeoJSONToFeatureCollection(
   geojson: GeoJSON
@@ -32,12 +36,12 @@ export function normalizeGeoJSONToFeatureCollection(
 }
 
 /**
- * Get the Geometry type of the layer by reading its first Feature.
+ * Get the Geometry type of a FeatureCollection.
  *
- * @param featureCollection - The FeatureCollection to inspect.
- * @returns – The type of the first Feature in the FeatureCollection.
+ * @param {FeatureCollection} featureCollection - The FeatureCollection to inspect.
+ * @returns {Geometry['type']} – The Geometry type of the FeatureCollection.
  */
-export function getLayerGeometryType(
+export function getFeatureCollectionGeometryType(
   featureCollection: FeatureCollection
 ): Geometry['type'] {
   return (
@@ -46,20 +50,64 @@ export function getLayerGeometryType(
 }
 
 /**
- * Select a numeric attribute from a GeoJSON dataset.
+ * Select the first quantitative attribute from a GeoJSON FeatureCollection.
  *
- * @param data – The GeoJSON dataset.
- *
- * @returns – The name of the first numeric attribute found in the input GeoJSON dataset.
+ * @param {Feature[]} features– The Features of a GeoJSON FeatureCollection.
+ * @returns {string} – The name of the first quantitative attribute found in the
+ * GeoJSON FeatureCollection.
  */
-export function selectNumericAttribute(data: GeoJSON.Feature[]): string {
-  for (const property in data[0].properties) {
-    if (isPropertyNumeric(data[0].properties[property])) {
+export function selectQuantitativeAttribute(features: Feature[]): string {
+  for (const property in features[0].properties) {
+    if (isPropertyQuantitative(features[0].properties[property])) {
       return property;
     }
   }
 
   // TODO: Catch this error and display a message prompting the user
-  // to select a layer type that does not require a numeric attribute.
-  throw new Error('No numeric attributes found in dataset.');
+  // to select a layer type that does not require a quantitative attribute.
+  throw new Error('No quantitative attributes found in dataset.');
+}
+
+/**
+ * Select the first categorical attribute from a GeoJSON FeatureCollection.
+ *
+ * @param {Feature[]} features – The Features of a GeoJSON FeatureCollection.
+ * @returns {string} – The name of the first categorical attribute found in the GeoJSON
+ * FeatureCollection.
+ */
+export function selectCategoricalAttribute(features: Feature[]): string {
+  for (const property in features[0].properties) {
+    if (isPropertyCategorical(features[0].properties[property])) {
+      return property;
+    }
+  }
+
+  // TODO: Catch this error and display a message prompting the user
+  // to select a layer type that does not require a categorical attribute.
+  throw new Error('No cateogrical attributes found in dataset.');
+}
+
+/**
+ * Enumerate the categories of a given attribute in a GeoJSON FeatureCollection.
+ *
+ * @param {Object[]} features – The GeoJSON dataset.
+ * @param {string} attribute – The attribute to probe for categories.
+ * @returns {string[]} – The categories of the attribute.
+ */
+export function enumerateAttributeCategories(
+  features: Feature[],
+  attribute: string
+): string[] {
+  const categories = new Set<string>();
+
+  for (const feature of features) {
+    if (
+      feature.properties?.[attribute] &&
+      !categories.has(feature.properties[attribute])
+    ) {
+      categories.add(feature.properties[attribute]);
+    }
+  }
+
+  return Array.from(categories);
 }

@@ -2,28 +2,21 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { CartoKitPointLayer, CartoKitDotDensityLayer } from '$lib/types';
 
-  export let layer: CartoKitPointLayer | CartoKitDotDensityLayer;
+  export let layerId: string;
+  export let size: number;
+  export let label: string;
+  export let fieldId: string;
 
   function onPointSizeChange(event: CustomEvent<{ value: number }>): void {
     dispatchLayerUpdate({
       type: 'point-size',
-      layer,
+      layerId,
       payload: {
         size: event.detail.value
       }
     });
   }
-
-  $: ({ size, fieldId, label } =
-    layer.type === 'Point'
-      ? { size: layer.style.size, fieldId: 'point-size', label: 'Point Size' }
-      : {
-          size: layer.style.dots.size,
-          fieldId: 'dot-size',
-          label: 'Dot Size'
-        });
 </script>
 
 <div class="stack-h stack-h-xs items-center">

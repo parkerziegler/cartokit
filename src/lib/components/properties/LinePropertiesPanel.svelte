@@ -7,5 +7,5 @@
 </script>
 
 <MenuItem title="Stroke">
-  <StrokePicker {layer} />
+  <StrokePicker layerId={layer.id} stroke={layer.style.stroke} />
 </MenuItem>

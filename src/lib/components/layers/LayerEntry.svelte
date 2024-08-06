@@ -7,12 +7,13 @@
   import LineIcon from '$lib/components/icons/LineIcon.svelte';
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
-  import ChoroplethLegend from '$lib/components/legends/ChoroplethLegend.svelte';
+  import CategoricalChoroplethLegend from '$lib/components/legends/CategoricalChoroplethLegend.svelte';
   import DotDensityLegend from '$lib/components/legends/DotDensityLegend.svelte';
   import FillLegend from '$lib/components/legends/FillLegend.svelte';
   import LineLegend from '$lib/components/legends/LineLegend.svelte';
   import PointLegend from '$lib/components/legends/PointLegend.svelte';
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
+  import QuantitativeChoroplethLegend from '$lib/components/legends/QuantitativeChoroplethLegend.svelte';
   import { map } from '$lib/stores/map';
   import type { CartoKitLayer } from '$lib/types';
 
@@ -83,6 +84,17 @@
   {:else if layer.type === 'Polygon'}
     <FillLegend {layer} />
   {:else if layer.type === 'Choropleth'}
-    <ChoroplethLegend {layer} />
+    {#if layer.style.fill.type === 'Quantitative'}
+      <QuantitativeChoroplethLegend
+        fill={layer.style.fill}
+        stroke={layer.style.stroke}
+        features={layer.data.geojson.features}
+      />
+    {:else}
+      <CategoricalChoroplethLegend
+        fill={layer.style.fill}
+        stroke={layer.style.stroke}
+      />
+    {/if}
   {/if}
 </li>
