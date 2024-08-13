@@ -78,6 +78,7 @@
     id="attribute-select"
     title="Attribute"
     on:change={onChange}
+    class="w-[80%] truncate"
   />
   <button
     bind:this={trigger}

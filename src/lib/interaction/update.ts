@@ -278,10 +278,27 @@ export function dispatchLayerUpdate({
             (map.getSource(layerId) as GeoJSONSource).setData(features);
             break;
           }
-          case 'Choropleth':
+          case 'Choropleth': {
             lyr.style.fill.attribute = payload.attribute;
+
+            if (lyr.style.fill.type === 'Quantitative') {
+              lyr.style.fill.thresholds = deriveThresholds({
+                method: lyr.style.fill.method,
+                attribute: payload.attribute,
+                features: lyr.data.geojson.features,
+                range: lyr.style.fill.scheme[lyr.style.fill.count] as string[],
+                thresholds: lyr.style.fill.thresholds
+              });
+            } else {
+              lyr.style.fill.categories = enumerateAttributeCategories(
+                lyr.data.geojson.features,
+                payload.attribute
+              );
+            }
+
             map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
             break;
+          }
         }
 
         return ir;
