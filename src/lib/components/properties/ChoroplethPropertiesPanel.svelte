@@ -9,7 +9,12 @@
 </script>
 
 <MenuItem title="Fill">
-  <ColorControls {layer} />
+  <ColorControls
+    layerId={layer.id}
+    layerType="Choropleth"
+    geojson={layer.data.geojson}
+    fill={layer.style.fill}
+  />
 </MenuItem>
 <MenuItem title="Stroke">
   {#if layer.style.stroke}

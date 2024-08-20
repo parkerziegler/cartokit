@@ -1,20 +1,10 @@
-import type {
-  FeatureCollection,
-  Feature,
-  Polygon,
-  MultiPolygon
-} from 'geojson';
+import type { FeatureCollection } from 'geojson';
 import type { GeoJSONSource } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
+import { updateLayerChannel } from '$lib/interaction/channel';
 import { deriveColorScale } from '$lib/interaction/color';
-import {
-  deriveDotDensityStartingValue,
-  deriveSize,
-  generateDotDensityPoints
-} from '$lib/interaction/geometry';
 import { transitionLayerType } from '$lib/interaction/layer-type';
-import { deriveThresholds } from '$lib/interaction/scales';
 import { ir } from '$lib/stores/ir';
 import { map as mapStore } from '$lib/stores/map';
 import type {
@@ -31,7 +21,9 @@ import type {
   VisualizationType,
   QuantitativeFill,
   CategoricalFill,
-  CategoricalColorScheme
+  CategoricalColorScheme,
+  ConstantFill,
+  Channel
 } from '$lib/types';
 import {
   DEFAULT_FILL,
@@ -65,6 +57,7 @@ interface AttributeUpdate extends LayerUpdate {
   type: 'attribute';
   payload: {
     attribute: string;
+    channel: Channel;
   };
 }
 
@@ -243,63 +236,19 @@ export function dispatchLayerUpdate({
     }
     case 'attribute': {
       ir.update((ir) => {
-        // We guarantee that layer is a CartoKitLayer with an attribute when we dispatch
-        // this update. Therefore, accessing that same layer in the store by id
-        // guarantees that lyr has an attribute property.
         const lyr = ir.layers[layerId] as
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
           | CartoKitChoroplethLayer;
 
-        switch (lyr.type) {
-          case 'Proportional Symbol':
-            lyr.style.size.attribute = payload.attribute;
-            map.setPaintProperty(lyr.id, 'circle-radius', deriveSize(lyr));
-            break;
-          case 'Dot Density': {
-            lyr.style.dots.attribute = payload.attribute;
-            const dotValue = deriveDotDensityStartingValue(
-              lyr.data.sourceGeojson.features,
-              payload.attribute
-            );
+        // @ts-expect-error – payload.channel may not be defined on all layers;
+        // for example, the size channel is only defined on a
+        // CartoKitProportionalSymbolLayer. However, the UI only renders the
+        // component that dispatches this update for valid channels on a given
+        // layer type.
+        lyr.style[payload.channel].attribute = payload.attribute;
 
-            const features = generateDotDensityPoints({
-              features: lyr.data.sourceGeojson.features as Feature<
-                Polygon | MultiPolygon
-              >[],
-              attribute: payload.attribute,
-              value: dotValue
-            });
-
-            lyr.data.geojson = features;
-            lyr.style.dots.value = dotValue;
-
-            // Update the source with the new data.
-            (map.getSource(layerId) as GeoJSONSource).setData(features);
-            break;
-          }
-          case 'Choropleth': {
-            lyr.style.fill.attribute = payload.attribute;
-
-            if (lyr.style.fill.type === 'Quantitative') {
-              lyr.style.fill.thresholds = deriveThresholds({
-                method: lyr.style.fill.method,
-                attribute: payload.attribute,
-                features: lyr.data.geojson.features,
-                range: lyr.style.fill.scheme[lyr.style.fill.count] as string[],
-                thresholds: lyr.style.fill.thresholds
-              });
-            } else {
-              lyr.style.fill.categories = enumerateAttributeCategories(
-                lyr.data.geojson.features,
-                payload.attribute
-              );
-            }
-
-            map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
-            break;
-          }
-        }
+        updateLayerChannel(map, lyr, payload.channel);
 
         return ir;
       });
@@ -313,7 +262,7 @@ export function dispatchLayerUpdate({
           | CartoKitDotDensityLayer
           | CartoKitPolygonLayer;
 
-        if (lyr.style.fill) {
+        if (lyr.style.fill?.type === 'Constant') {
           lyr.style.fill.color = payload.color;
 
           switch (lyr.type) {
@@ -369,6 +318,7 @@ export function dispatchLayerUpdate({
           | CartoKitDotDensityLayer
           | CartoKitPolygonLayer;
         lyr.style.fill = {
+          type: 'Constant',
           color: DEFAULT_FILL,
           opacity: DEFAULT_OPACITY
         };
@@ -530,6 +480,7 @@ export function dispatchLayerUpdate({
           | CartoKitChoroplethLayer;
         // Create a default stroke.
         lyr.style.stroke = {
+          type: 'Constant',
           color: DEFAULT_STROKE,
           width: DEFAULT_STROKE_WIDTH,
           opacity: DEFAULT_STROKE_OPACITY
@@ -630,22 +581,18 @@ export function dispatchLayerUpdate({
     }
     case 'classification-method': {
       ir.update((ir) => {
-        // We guarantee that layer is a CartoKitChoroplethLayer when we dispatch
-        // this update. Therefore, accessing that same layer in the store by id
-        // guarantees that lyr is also a CartoKitChoroplethLayer.
-        const lyr = ir.layers[layerId] as CartoKitChoroplethLayer;
+        const lyr = ir.layers[layerId] as
+          | CartoKitChoroplethLayer
+          | CartoKitProportionalSymbolLayer;
 
-        if (lyr.style.fill.type === 'Quantitative') {
-          lyr.style.fill.method = payload.method;
-          lyr.style.fill.thresholds = deriveThresholds({
-            method: payload.method,
-            attribute: lyr.style.fill.attribute,
-            features: lyr.data.geojson.features,
-            range: [...lyr.style.fill.scheme[lyr.style.fill.count]],
-            thresholds: lyr.style.fill.thresholds
-          });
+        switch (lyr.style.fill?.type) {
+          case 'Quantitative':
+            lyr.style.fill.method = payload.method;
 
-          map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+            updateLayerChannel(map, lyr, 'fill');
+            break;
+          default:
+            break;
         }
 
         return ir;
@@ -654,10 +601,20 @@ export function dispatchLayerUpdate({
     }
     case 'color-scheme': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitChoroplethLayer;
-        lyr.style.fill.scheme = payload.scheme;
+        const lyr = ir.layers[layerId] as
+          | CartoKitChoroplethLayer
+          | CartoKitProportionalSymbolLayer;
 
-        map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+        switch (lyr.style.fill?.type) {
+          case 'Quantitative':
+          case 'Categorical':
+            lyr.style.fill.scheme = payload.scheme;
+
+            updateLayerChannel(map, lyr, 'fill');
+            break;
+          default:
+            break;
+        }
 
         return ir;
       });
@@ -665,19 +622,18 @@ export function dispatchLayerUpdate({
     }
     case 'color-count': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitChoroplethLayer;
+        const lyr = ir.layers[layerId] as
+          | CartoKitChoroplethLayer
+          | CartoKitProportionalSymbolLayer;
 
-        if (lyr.style.fill.type === 'Quantitative') {
-          lyr.style.fill.count = payload.count;
-          lyr.style.fill.thresholds = deriveThresholds({
-            method: lyr.style.fill.method,
-            attribute: lyr.style.fill.attribute,
-            features: lyr.data.geojson.features,
-            range: [...lyr.style.fill.scheme[payload.count]],
-            thresholds: lyr.style.fill.thresholds
-          });
+        switch (lyr.style.fill?.type) {
+          case 'Quantitative':
+            lyr.style.fill.count = payload.count;
 
-          map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+            updateLayerChannel(map, lyr, 'fill');
+            break;
+          default:
+            break;
         }
 
         return ir;
@@ -686,12 +642,18 @@ export function dispatchLayerUpdate({
     }
     case 'color-threshold': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitChoroplethLayer;
+        const lyr = ir.layers[layerId] as
+          | CartoKitChoroplethLayer
+          | CartoKitProportionalSymbolLayer;
 
-        if (lyr.style.fill.type === 'Quantitative') {
-          lyr.style.fill.thresholds[payload.index] = payload.threshold;
+        switch (lyr.style.fill?.type) {
+          case 'Quantitative':
+            lyr.style.fill.thresholds[payload.index] = payload.threshold;
 
-          map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+            updateLayerChannel(map, lyr, 'fill');
+            break;
+          default:
+            break;
         }
 
         return ir;
@@ -704,7 +666,7 @@ export function dispatchLayerUpdate({
         lyr.style.size.min = payload.min ?? lyr.style.size.min;
         lyr.style.size.max = payload.max ?? lyr.style.size.max;
 
-        map.setPaintProperty(layerId, 'circle-radius', deriveSize(lyr));
+        updateLayerChannel(map, lyr, 'size');
 
         return ir;
       });
@@ -715,21 +677,7 @@ export function dispatchLayerUpdate({
         const lyr = ir.layers[layerId] as CartoKitDotDensityLayer;
         lyr.style.dots.value = payload.value;
 
-        // We always use the sourceGeojson to generate the dot density points.
-        // These _must_ be polygons to support the transition to dot density;
-        // conversely, the current layer geometry will be points, which do not
-        // allow us to generate a dot density.
-        const features = generateDotDensityPoints({
-          features: lyr.data.sourceGeojson.features as Feature<
-            Polygon | MultiPolygon
-          >[],
-          attribute: lyr.style.dots.attribute,
-          value: payload.value
-        });
-
-        lyr.data.geojson = features;
-        // Update the source with the new data.
-        (map.getSource(layerId) as GeoJSONSource).setData(features);
+        updateLayerChannel(map, lyr, 'dots');
 
         return ir;
       });
@@ -761,9 +709,11 @@ export function dispatchLayerUpdate({
     }
     case 'visualization-type': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitChoroplethLayer;
+        const lyr = ir.layers[layerId] as
+          | CartoKitChoroplethLayer
+          | CartoKitProportionalSymbolLayer;
 
-        let fill: QuantitativeFill | CategoricalFill;
+        let fill: QuantitativeFill | CategoricalFill | ConstantFill;
 
         switch (payload.visualizationType) {
           case 'Categorical': {
@@ -779,7 +729,7 @@ export function dispatchLayerUpdate({
                 attribute
               ),
               scheme: DEFAULT_CATEGORICAL_SCHEME,
-              opacity: lyr.style.fill.opacity
+              opacity: lyr.style.fill?.opacity ?? DEFAULT_OPACITY
             };
             break;
           }
@@ -798,14 +748,26 @@ export function dispatchLayerUpdate({
                 attribute,
                 lyr.data.geojson.features
               ),
-              opacity: lyr.style.fill.opacity
+              opacity: lyr.style.fill?.opacity ?? DEFAULT_OPACITY
             };
             break;
           }
+          case 'Constant':
+            fill = {
+              type: payload.visualizationType,
+              color: DEFAULT_FILL,
+              opacity: DEFAULT_OPACITY
+            };
+            break;
         }
 
         lyr.style.fill = fill;
-        map.setPaintProperty(lyr.id, 'fill-color', deriveColorScale(lyr));
+
+        map.setPaintProperty(
+          lyr.id,
+          lyr.type === 'Choropleth' ? 'fill-color' : 'circle-color',
+          deriveColorScale(fill)
+        );
 
         return ir;
       });

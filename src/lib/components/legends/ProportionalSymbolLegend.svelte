@@ -1,6 +1,8 @@
 <script lang="ts">
   import * as d3 from 'd3';
 
+  import CategoricalLegend from '$lib/components/legends/CategoricalLegend.svelte';
+  import QuantitativeLegend from '$lib/components/legends/QuantitativeLegend.svelte';
   import { deriveExtent } from '$lib/interaction/scales';
   import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 
@@ -13,66 +15,53 @@
     layer.data.geojson.features
   );
 
-  const padding = { top: 4, right: 4, bottom: 4, left: 4 };
-  // Dynamically compute the label width based on the max value.
-  $: labelWidth = max.toFixed(2).length * 9;
-
   $: scale = d3.scaleLinear([sizeMin, sizeMax], [min, max]);
-  $: intervals = [
+  $: circles = [
+    {
+      size: sizeMax / 3,
+      value: scale(sizeMax / 3)
+    },
     {
       size: (sizeMax * 2) / 3,
       value: scale((sizeMax * 2) / 3)
     },
-    { size: sizeMax / 3, value: scale(sizeMax / 3) }
+    {
+      size: sizeMax,
+      value: scale(sizeMax)
+    }
   ];
+  $: style =
+    layer.style.fill?.type === 'Constant'
+      ? `background-color: ${layer.style.fill.color}${layer.style.fill.opacity === 1 ? '' : layer.style.fill.opacity * 100}; border-color: ${layer.style.stroke?.color ?? 'transparent'};`
+      : '';
 </script>
 
 <div class="stack stack-xs ml-8">
-  <span
-    style="margin-left: {sizeMax * 2 + padding.left * 2 + padding.right * 2}px;"
-    >{layer.style.size.attribute}</span
-  >
-  <svg
-    viewBox="0 0 {sizeMax * 2 +
-      padding.left +
-      padding.right +
-      labelWidth} {sizeMax * 2 + padding.top + padding.bottom}"
-    height={sizeMax * 2 + padding.top + padding.bottom}
-    width={sizeMax * 2 + padding.left + padding.right + labelWidth}
-  >
-    <circle
-      r={sizeMax}
-      cx={sizeMax + padding.left}
-      cy={sizeMax + padding.top}
-      fill={layer.style.fill?.color ?? 'none'}
-      fill-opacity={layer.style.fill?.opacity ?? 0}
-      stroke={layer.style.stroke?.color ?? 'none'}
-      stroke-width={layer.style.stroke?.width ?? 0}
-      stroke-opacity={layer.style.stroke?.opacity ?? 0}
-    />
-    <text
-      x={sizeMax * 2 + padding.left * 2 + padding.right * 2}
-      y={12}
-      fill="#ffffff"
-      font-size="0.625rem">{max.toFixed(2)}</text
-    >
-    {#each intervals as interval}
-      <circle
-        r={interval.size}
-        cx={sizeMax + padding.left}
-        cy={sizeMax * 2 - interval.size + padding.top}
-        fill={layer.style.fill?.color ?? 'none'}
-        fill-opacity={layer.style.fill?.opacity ?? 0}
-        stroke={layer.style.stroke?.color ?? 'none'}
-        stroke-width={layer.style.stroke?.width ?? 0}
-        stroke-opacity={layer.style.stroke?.opacity ?? 0}
-      />
-      <text
-        x={sizeMax * 2 + padding.left * 2 + padding.right * 2}
-        y={sizeMax * 2 - interval.size * 2 + padding.top + 6}
-        fill="#ffffff"
-        font-size="0.625rem">{interval.value.toFixed(2)}</text
-      >
+  <span class="text-xs font-semibold">{layer.style.size.attribute} →</span>
+  <div class="stack-h stack-h-xs">
+    {#each circles as circle}
+      <div class="stack stack-xs items-center">
+        <span class="text-3xs">{circle.value.toFixed(2)}</span>
+        <div
+          class="bg-primary rounded-full border border-white"
+          style="width: {2 * circle.size}px; height: {2 *
+            circle.size}px;{style}"
+        ></div>
+      </div>
     {/each}
-  </svg>
+  </div>
+  {#if layer.style.fill?.type === 'Categorical'}
+    <CategoricalLegend
+      fill={layer.style.fill}
+      stroke={layer.style.stroke}
+      layerType="Proportional Symbol"
+    />
+  {:else if layer.style.fill?.type === 'Quantitative'}
+    <QuantitativeLegend
+      fill={layer.style.fill}
+      stroke={layer.style.stroke}
+      features={layer.data.geojson.features}
+      layerType="Proportional Symbol"
+    />
+  {/if}
 </div>

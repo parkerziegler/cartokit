@@ -170,6 +170,11 @@ function transitionToPoint(
         type: 'Point',
         style: {
           ...layer.style,
+          fill: {
+            type: 'Constant',
+            color: randomColor(),
+            opacity: DEFAULT_OPACITY
+          },
           size: DEFAULT_RADIUS
         }
       };
@@ -223,6 +228,7 @@ function transitionToPoint(
         style: {
           size: DEFAULT_RADIUS,
           fill: {
+            type: 'Constant',
             color: randomColor(),
             opacity: DEFAULT_OPACITY
           },
@@ -276,6 +282,7 @@ function transitionToPoint(
         style: {
           size: DEFAULT_RADIUS,
           fill: {
+            type: 'Constant',
             color: randomColor(),
             opacity: layer.style.fill.opacity
           },
@@ -387,6 +394,7 @@ function transitionToProportionalSymbol(
             max: DEFAULT_MAX_SIZE
           },
           fill: {
+            type: 'Constant',
             color: randomColor(),
             opacity: DEFAULT_OPACITY
           },
@@ -448,6 +456,7 @@ function transitionToProportionalSymbol(
             max: DEFAULT_MAX_SIZE
           },
           fill: {
+            type: 'Constant',
             color: randomColor(),
             opacity: layer.style.fill.opacity
           },
@@ -499,11 +508,7 @@ function transitionToDotDensity(
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geojson: generateDotDensityPoints({
-            features,
-            attribute,
-            value: dotValue
-          }),
+          geojson: generateDotDensityPoints(features, attribute, dotValue),
           transformations: [
             ...layer.data.transformations,
             transformDotDensity(attribute, dotValue)
@@ -552,11 +557,7 @@ function transitionToDotDensity(
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geojson: generateDotDensityPoints({
-            features,
-            attribute,
-            value: dotValue
-          }),
+          geojson: generateDotDensityPoints(features, attribute, dotValue),
           transformations: [
             ...layer.data.transformations,
             transformDotDensity(attribute, dotValue)
@@ -568,7 +569,11 @@ function transitionToDotDensity(
             size: 1,
             value: dotValue
           },
-          fill: layer.style.fill,
+          fill: {
+            type: 'Constant',
+            color: randomColor(),
+            opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
+          },
           stroke: layer.style.stroke
         }
       };
@@ -607,11 +612,7 @@ function transitionToDotDensity(
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geojson: generateDotDensityPoints({
-            features,
-            attribute,
-            value: dotValue
-          }),
+          geojson: generateDotDensityPoints(features, attribute, dotValue),
           transformations: [
             ...layer.data.transformations,
             transformDotDensity(attribute, dotValue)
@@ -646,11 +647,7 @@ function transitionToDotDensity(
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geojson: generateDotDensityPoints({
-            features,
-            attribute,
-            value: dotValue
-          }),
+          geojson: generateDotDensityPoints(features, attribute, dotValue),
           transformations: [
             ...layer.data.transformations,
             transformDotDensity(attribute, dotValue)
@@ -663,6 +660,7 @@ function transitionToDotDensity(
             value: dotValue
           },
           fill: {
+            type: 'Constant',
             color: randomColor(),
             opacity: layer.style.fill.opacity
           },
@@ -720,6 +718,7 @@ function transitionToLine(layer: CartoKitLayer): TransitionMapTypeReturnValue {
         },
         style: {
           stroke: layer.style.stroke ?? {
+            type: 'Constant',
             color: DEFAULT_STROKE,
             width: DEFAULT_STROKE_WIDTH,
             opacity: DEFAULT_OPACITY
@@ -812,7 +811,11 @@ function transitionToPolygon(
           geojson: layer.data.sourceGeojson
         },
         style: {
-          fill: layer.style.fill,
+          fill: {
+            type: 'Constant',
+            color: randomColor(),
+            opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
+          },
           stroke: layer.style.stroke
         }
       };
@@ -868,6 +871,7 @@ function transitionToPolygon(
         data: layer.data,
         style: {
           fill: {
+            type: 'Constant',
             color,
             opacity: layer.style.fill.opacity
           },
@@ -1062,7 +1066,7 @@ function transitionToChoropleth(
       map.setPaintProperty(
         layer.id,
         'fill-color',
-        deriveColorScale(targetLayer)
+        deriveColorScale(targetLayer.style.fill)
       );
 
       // If the Polygon layer we're transitioning from had no fill, set the opacity

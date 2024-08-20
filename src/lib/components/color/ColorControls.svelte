@@ -1,34 +1,58 @@
 <script lang="ts">
+  import type { FeatureCollection } from 'geojson';
+
   import ClassificationMethodSelect from '$lib/components/classification/ClassificationMethodSelect.svelte';
   import ColorSchemeSelect from '$lib/components/color/ColorSchemeSelect.svelte';
   import ColorStepsSelect from '$lib/components/color/ColorStepsSelect.svelte';
   import ColorVisualizationTypeSelect from '$lib/components/color/ColorVisualizationTypeSelect.svelte';
+  import FillPicker from '$lib/components/color/FillPicker.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
-  import type { CartoKitChoroplethLayer } from '$lib/types';
+  import type {
+    CategoricalFill,
+    ConstantFill,
+    QuantitativeFill
+  } from '$lib/types';
 
-  export let layer: CartoKitChoroplethLayer;
+  export let layerId: string;
+  export let layerType: 'Choropleth' | 'Proportional Symbol';
+  export let geojson: FeatureCollection;
+  export let fill: QuantitativeFill | CategoricalFill | ConstantFill;
 </script>
 
 <div class="stack stack-2xs">
   <ColorVisualizationTypeSelect
-    layerId={layer.id}
-    visualizationType={layer.style.fill.type}
+    {layerId}
+    {layerType}
+    visualizationType={fill.type}
   />
-  <AttributeSelect
-    layerId={layer.id}
-    geojson={layer.data.geojson}
-    visualizationType={layer.style.fill.type}
-    selected={layer.style.fill.attribute}
-  />
-  {#if layer.style.fill.type === 'Quantitative'}
-    <ClassificationMethodSelect
-      layerId={layer.id}
-      style={layer.style.fill}
-      features={layer.data.geojson.features}
+  {#if fill.type === 'Constant'}
+    <FillPicker {layerId} {fill} />
+  {:else if fill.type === 'Categorical'}
+    <AttributeSelect
+      {layerId}
+      {geojson}
+      visualizationType={fill.type}
+      selected={fill.attribute}
+      channel="fill"
     />
-    <ColorStepsSelect layerId={layer.id} style={layer.style.fill} />
+    <ColorSchemeSelect {layerId} style={fill} />
+    <OpacityInput {layerId} property="fill" style={fill} />
+  {:else if fill.type === 'Quantitative'}
+    <AttributeSelect
+      {layerId}
+      {geojson}
+      visualizationType={fill.type}
+      selected={fill.attribute}
+      channel="fill"
+    />
+    <ClassificationMethodSelect
+      {layerId}
+      style={fill}
+      features={geojson.features}
+    />
+    <ColorStepsSelect {layerId} style={fill} />
+    <ColorSchemeSelect {layerId} style={fill} />
+    <OpacityInput {layerId} property="fill" style={fill} />
   {/if}
-  <ColorSchemeSelect layerId={layer.id} style={layer.style.fill} />
-  <OpacityInput layerId={layer.id} property="fill" style={layer.style.fill} />
 </div>

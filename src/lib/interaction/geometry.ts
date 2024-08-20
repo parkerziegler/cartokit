@@ -64,26 +64,20 @@ export function deriveCentroids(features: Feature[]): FeatureCollection {
   );
 }
 
-interface GenerateDotDensityPointsParams {
-  features: Feature<Polygon | MultiPolygon>[];
-  attribute: string;
-  value: number;
-}
-
 /**
  * Generate dots for a dot density layer.
  *
- * @param features – The polygon features within which to generate dots.
- * @param attribute – The attribute being visualized.
- * @param value – The dot value of the dot density layer.
- *
- * @returns – A FeatureCollection of dots.
+ * @param {Feature<Polygon | MultiPolygon>[]} features – The polygon features
+ * within which to generate dots.
+ * @param {string} attribute – The attribute being visualized.
+ * @param {number} value – The dot value of the dot density layer.
+ * @returns {FeatureCollection<Point>} – A FeatureCollection of dots.
  */
-export function generateDotDensityPoints({
-  features,
-  attribute,
-  value
-}: GenerateDotDensityPointsParams): FeatureCollection<Point> {
+export function generateDotDensityPoints(
+  features: Feature<Polygon | MultiPolygon>[],
+  attribute: string,
+  value: number
+): FeatureCollection<Point> {
   return featureCollection(
     features.flatMap(({ geometry, properties }) => {
       const numPoints = Math.floor(properties?.[attribute] / value) ?? 0;

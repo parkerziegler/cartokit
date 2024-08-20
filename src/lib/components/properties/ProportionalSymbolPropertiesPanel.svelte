@@ -1,6 +1,6 @@
 <script lang="ts">
+  import ColorControls from '$lib/components/color/ColorControls.svelte';
   import FillModifier from '$lib/components/color/FillModifier.svelte';
-  import FillPicker from '$lib/components/color/FillPicker.svelte';
   import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
@@ -15,7 +15,12 @@
 </MenuItem>
 <MenuItem title="Fill">
   {#if layer.style.fill}
-    <FillPicker layerId={layer.id} fill={layer.style.fill} />
+    <ColorControls
+      layerId={layer.id}
+      layerType="Proportional Symbol"
+      geojson={layer.data.geojson}
+      fill={layer.style.fill}
+    />
   {/if}
   <FillModifier layerId={layer.id} fill={layer.style.fill} slot="action" />
 </MenuItem>
