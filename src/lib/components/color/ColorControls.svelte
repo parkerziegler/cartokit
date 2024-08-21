@@ -15,7 +15,7 @@
   } from '$lib/types';
 
   export let layerId: string;
-  export let layerType: 'Choropleth' | 'Proportional Symbol';
+  export let layerType: 'Choropleth' | 'Proportional Symbol' | 'Point';
   export let geojson: FeatureCollection;
   export let fill: QuantitativeFill | CategoricalFill | ConstantFill;
 </script>
@@ -37,7 +37,6 @@
       channel="fill"
     />
     <ColorSchemeSelect {layerId} style={fill} />
-    <OpacityInput {layerId} property="fill" style={fill} />
   {:else if fill.type === 'Quantitative'}
     <AttributeSelect
       {layerId}
@@ -53,6 +52,6 @@
     />
     <ColorStepsSelect {layerId} style={fill} />
     <ColorSchemeSelect {layerId} style={fill} />
-    <OpacityInput {layerId} property="fill" style={fill} />
   {/if}
+  <OpacityInput {layerId} property="fill" style={fill} />
 </div>

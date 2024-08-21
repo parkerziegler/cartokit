@@ -237,6 +237,7 @@ export function dispatchLayerUpdate({
     case 'attribute': {
       ir.update((ir) => {
         const lyr = ir.layers[layerId] as
+          | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
           | CartoKitChoroplethLayer;
@@ -582,6 +583,7 @@ export function dispatchLayerUpdate({
     case 'classification-method': {
       ir.update((ir) => {
         const lyr = ir.layers[layerId] as
+          | CartoKitPointLayer
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer;
 
@@ -602,6 +604,7 @@ export function dispatchLayerUpdate({
     case 'color-scheme': {
       ir.update((ir) => {
         const lyr = ir.layers[layerId] as
+          | CartoKitPointLayer
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer;
 
@@ -623,6 +626,7 @@ export function dispatchLayerUpdate({
     case 'color-count': {
       ir.update((ir) => {
         const lyr = ir.layers[layerId] as
+          | CartoKitPointLayer
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer;
 
@@ -643,6 +647,7 @@ export function dispatchLayerUpdate({
     case 'color-threshold': {
       ir.update((ir) => {
         const lyr = ir.layers[layerId] as
+          | CartoKitPointLayer
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer;
 

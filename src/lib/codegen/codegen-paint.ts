@@ -18,11 +18,7 @@ export function codegenFill(layer: CartoKitLayer): string {
       }
 
       return [
-        withDefault(
-          'circle-color',
-          layer.style.fill.color,
-          MAPBOX_DEFAULTS['circle-color']
-        ),
+        `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
         withDefault(
           'circle-radius',
           layer.style.size,
@@ -120,7 +116,8 @@ export function codegenFill(layer: CartoKitLayer): string {
  * Generate a Mapbox GL JS program fragment representing the layer's stroke.
  *
  * @param {CartoKitLayer} layer – A @see{CartoKitLayer}.
- * @returns – A Mapbox GL JS program fragment representing the layer's stroke.
+ * @returns {string} – A Mapbox GL JS program fragment representing the layer's
+ * stroke.
  */
 export function codegenStroke(layer: CartoKitLayer): string {
   switch (layer.type) {

@@ -520,7 +520,11 @@ function transitionToDotDensity(
             size: 1,
             value: dotValue
           },
-          fill: layer.style.fill,
+          fill: {
+            type: 'Constant',
+            color: randomColor(),
+            opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
+          },
           stroke: layer.style.stroke
         }
       };
@@ -780,7 +784,11 @@ function transitionToPolygon(
           geojson: layer.data.sourceGeojson
         },
         style: {
-          fill: layer.style.fill,
+          fill: {
+            type: 'Constant',
+            color: randomColor(),
+            opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
+          },
           stroke: layer.style.stroke
         }
       };

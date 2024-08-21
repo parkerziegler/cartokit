@@ -113,7 +113,7 @@ export interface CartoKitPointLayer extends Layer {
   type: 'Point';
   style: {
     size: number;
-    fill?: ConstantStyle;
+    fill?: ConstantFill | QuantitativeFill | CategoricalFill;
     stroke?: ConstantStroke;
   };
 }

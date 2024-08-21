@@ -28,15 +28,15 @@ import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
 /**
  * Add a @see{CartoKitLayer} to the map.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param layer – The @see{CartoKitLayer} to add to the map.
+ * @param {Map} map – The top-level MapLibre GL map instance.
+ * @param {CartoKitLayer} layer – The @see{CartoKitLayer} to add to the map.
  */
-export const addLayer = (map: Map, layer: CartoKitLayer): void => {
+export function addLayer(map: Map, layer: CartoKitLayer): void {
   switch (layer.type) {
     case 'Point': {
       const fillProperties = layer.style.fill
         ? {
-            'circle-color': layer.style.fill.color,
+            'circle-color': deriveColorScale(layer.style.fill),
             'circle-opacity': layer.style.fill.opacity
           }
         : {};
@@ -222,7 +222,7 @@ export const addLayer = (map: Map, layer: CartoKitLayer): void => {
       break;
     }
   }
-};
+}
 
 /**
  * Generate a CartoKitLayer for a given GeoJSON dataset, using the dataset's

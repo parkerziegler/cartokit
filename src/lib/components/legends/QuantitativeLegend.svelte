@@ -19,8 +19,8 @@
     <ul class="stack stack-xs mt-3">
       {#each colors as color}
         <li class="stack stack-xs stack-h stack-h-xs">
-          <svg viewBox="0 0 16 16" width="16" height="16">
-            {#if layerType === 'Choropleth'}
+          {#if layerType === 'Choropleth'}
+            <svg viewBox="0 0 32 16" width="32" height="16">
               <rect
                 x="0"
                 y="0"
@@ -32,7 +32,9 @@
                 stroke-width={stroke?.width ?? '0'}
                 stroke-opacity={stroke?.opacity ?? '0'}
               />
-            {:else if layerType === 'Proportional Symbol'}
+            </svg>
+          {:else if layerType === 'Proportional Symbol' || layerType === 'Point'}
+            <svg viewBox="0 0 16 16" width="16" height="16">
               <circle
                 r="7"
                 cx="8"
@@ -43,8 +45,8 @@
                 stroke-width={stroke?.width ?? '0'}
                 stroke-opacity={stroke?.opacity ?? '0'}
               />
-            {/if}
-          </svg>
+            </svg>
+          {/if}
         </li>
       {/each}
     </ul>

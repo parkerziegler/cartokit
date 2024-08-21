@@ -10,10 +10,11 @@ import {
 import { deriveThresholds } from '$lib/interaction/scales';
 import type {
   CartoKitLayer,
-  CartoKitProportionalSymbolLayer,
   CartoKitChoroplethLayer,
-  Channel,
-  CartoKitDotDensityLayer
+  CartoKitDotDensityLayer,
+  CartoKitProportionalSymbolLayer,
+  CartoKitPointLayer,
+  Channel
 } from '$lib/types';
 import { enumerateAttributeCategories } from '$lib/utils/geojson';
 
@@ -38,6 +39,9 @@ export function updateLayerChannel(
       break;
     case 'Dot Density':
       updateDotDensityChannel(map, layer, channel);
+      break;
+    case 'Point':
+      updatePointChannel(map, layer, channel);
       break;
     default:
       break;
@@ -107,6 +111,26 @@ function updateDotDensityChannel(
 }
 
 /**
+ * Update a visualization channel for a @see{CartoKitPointLayer}.
+ *
+ * @param {Map} map – The MapLibre GL JS map instance.
+ * @param {CartoKitPointLayer} layer – The layer to update.
+ * @param {Channel} channel – The visualization channel to update.
+ */
+function updatePointChannel(
+  map: Map,
+  layer: CartoKitPointLayer,
+  channel: Channel
+) {
+  switch (channel) {
+    case 'fill':
+      return updateFillChannel(map, layer);
+    default:
+      break;
+  }
+}
+
+/**
  * Update the size channel for a @see{CartoKitProportionalSymbolLayer}.
  *
  * @param {Map} map – The MapLibre GL JS map instance.
@@ -130,10 +154,12 @@ function updateSizeChannel(
  */
 function updateFillChannel(
   map: Map,
-  layer: CartoKitProportionalSymbolLayer | CartoKitChoroplethLayer
+  layer:
+    | CartoKitProportionalSymbolLayer
+    | CartoKitChoroplethLayer
+    | CartoKitPointLayer
 ): void {
-  const property =
-    layer.type === 'Proportional Symbol' ? 'circle-color' : 'fill-color';
+  const property = layer.type === 'Choropleth' ? 'fill-color' : 'circle-color';
 
   if (layer.style.fill) {
     switch (layer.style.fill.type) {

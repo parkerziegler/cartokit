@@ -1,6 +1,7 @@
 <script lang="ts">
   import FillModifier from '$lib/components/color/FillModifier.svelte';
   import FillPicker from '$lib/components/color/FillPicker.svelte';
+  import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
@@ -12,6 +13,7 @@
 <MenuItem title="Fill">
   {#if layer.style.fill}
     <FillPicker layerId={layer.id} fill={layer.style.fill} />
+    <OpacityInput layerId={layer.id} property="fill" style={layer.style.fill} />
   {/if}
   <FillModifier layerId={layer.id} fill={layer.style.fill} slot="action" />
 </MenuItem>
