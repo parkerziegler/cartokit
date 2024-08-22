@@ -114,3 +114,16 @@ export const CATEGORICAL_COLOR_SCHEMES: CategoricalColorScheme[] = [
 export const CATEGORICAL_COLOR_SCHEMES_REV = CATEGORICAL_COLOR_SCHEMES.map(
   reverseCategoricalColorScheme
 );
+
+/**
+ * Generate a hexademical color with an alpha channel.
+ *
+ * @param {string} hex – The hexademical color.
+ * @param {number} opacity – The opacity value, between 0 and 1.
+ * @returns {string} – An eight-character hexademical color string.
+ */
+export function hexWithOpacity(hex: string, opacity: number): string {
+  const opacityHex = Math.round(opacity * 255).toString(16);
+
+  return `${hex}${opacityHex}`;
+}

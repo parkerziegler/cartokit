@@ -5,6 +5,7 @@
   import QuantitativeLegend from '$lib/components/legends/QuantitativeLegend.svelte';
   import { deriveExtent } from '$lib/interaction/scales';
   import type { CartoKitProportionalSymbolLayer } from '$lib/types';
+  import { hexWithOpacity } from '$lib/utils/color';
 
   export let layer: CartoKitProportionalSymbolLayer;
 
@@ -32,7 +33,7 @@
   ];
   $: style =
     layer.style.fill?.type === 'Constant'
-      ? `background-color: ${layer.style.fill.color}${layer.style.fill.opacity === 1 ? '' : layer.style.fill.opacity * 100}; border-color: ${layer.style.stroke?.color ?? 'transparent'};`
+      ? `background-color: ${hexWithOpacity(layer.style.fill.color, layer.style.fill.opacity)}; border-color: ${layer.style.stroke ? hexWithOpacity(layer.style.stroke.color, layer.style.stroke.opacity) : 'transparent'}; border-width: ${layer.style.stroke?.width ?? 0}px;`
       : '';
 </script>
 
