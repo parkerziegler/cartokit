@@ -3,7 +3,6 @@ import type { GeoJSONSource } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { updateLayerChannel } from '$lib/interaction/channel';
-import { deriveColorScale } from '$lib/interaction/color';
 import { transitionLayerType } from '$lib/interaction/layer-type';
 import { ir } from '$lib/stores/ir';
 import { map as mapStore } from '$lib/stores/map';
@@ -767,12 +766,7 @@ export function dispatchLayerUpdate({
         }
 
         lyr.style.fill = fill;
-
-        map.setPaintProperty(
-          lyr.id,
-          lyr.type === 'Choropleth' ? 'fill-color' : 'circle-color',
-          deriveColorScale(fill)
-        );
+        updateLayerChannel(map, lyr, 'fill');
 
         return ir;
       });

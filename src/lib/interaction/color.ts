@@ -10,9 +10,10 @@ import { DEFAULT_FILL } from '$lib/utils/constants';
 /**
  * Derive a MapLibre GL JS expression for a choropleth color scale.
  *
- * @param layer – The @see{CartoKitChoroplethLayer} to derive a color scale for.
- *
- * @returns A MapLibre GL JS expression for a choropleth color scale.
+ * @param {ConstantStyle | CategoricalStyle | QuantitativeStyle} style – The
+ * style from which to derive the color scale.
+ * @returns {ExpressionSpecification | string} — A MapLibre GL JS expression for
+ * a color scale.
  */
 export function deriveColorScale(
   style: ConstantStyle | CategoricalStyle | QuantitativeStyle

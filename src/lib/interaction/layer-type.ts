@@ -173,7 +173,7 @@ function transitionToPoint(
           fill: {
             type: 'Constant',
             color: randomColor(),
-            opacity: DEFAULT_OPACITY
+            opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
           size: DEFAULT_RADIUS
         }
