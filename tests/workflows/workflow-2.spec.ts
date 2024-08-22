@@ -164,7 +164,7 @@ test('workflow-2', async ({ page }) => {
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's Attribute to 'trend'.
-  await page.locator('#attribute-select').selectOption('trend');
+  await page.locator('#fill-attribute-select').selectOption('trend');
 
   // Set the layer's Steps to 6.
   await page.locator('#color-steps-select').selectOption('6');

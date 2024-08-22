@@ -3,13 +3,14 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type {
     CategoricalStyle,
+    Channel,
     ConstantStyle,
     QuantitativeStyle
   } from '$lib/types';
   import { percentToDecimal, decimalToPercent } from '$lib/utils/color';
 
   export let layerId: string;
-  export let property: 'fill' | 'stroke';
+  export let channel: Exclude<Channel, 'size' | 'dots'>;
   export let style: QuantitativeStyle | CategoricalStyle | ConstantStyle;
 
   $: opacity = decimalToPercent(style.opacity);
@@ -31,7 +32,7 @@
 
   function onOpacityChange(opacity: number) {
     dispatchLayerUpdate({
-      type: `${property}-opacity`,
+      type: `${channel}-opacity`,
       layerId,
       payload: { opacity }
     });
@@ -39,9 +40,9 @@
 </script>
 
 <div class="stack-h stack-h-xs items-center">
-  <FieldLabel fieldId="{property}-opacity-input">Opacity</FieldLabel>
+  <FieldLabel fieldId="{channel}-opacity-input">Opacity</FieldLabel>
   <input
-    id="{property}-opacity-input"
+    id="{channel}-opacity-input"
     size="4"
     class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
     value="{opacity}%"

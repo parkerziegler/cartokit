@@ -165,7 +165,7 @@ test('workflow-5', async ({ page }) => {
   await page.getByTestId('remove-stroke-button').click();
 
   // Set the layer's Attribute to abd_trend.
-  await page.locator('#attribute-select').selectOption('abd_trend');
+  await page.locator('#fill-attribute-select').selectOption('abd_trend');
 
   // Set the layer's Steps to 8.
   await page.locator('#color-steps-select').selectOption('8');

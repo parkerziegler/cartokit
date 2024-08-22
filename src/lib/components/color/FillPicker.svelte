@@ -3,7 +3,6 @@
   import { slide } from 'svelte/transition';
 
   import HexInput from '$lib/components/color/HexInput.svelte';
-  import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { ConstantFill } from '$lib/types';
@@ -48,5 +47,4 @@
       onHexChange={onFillHexChange}
     />
   </div>
-  <OpacityInput {layerId} property="fill" style={fill} />
 </div>

@@ -1,31 +1,32 @@
 import type { ExpressionSpecification } from 'maplibre-gl';
 
-import type { CartoKitChoroplethLayer } from '$lib/types';
+import type {
+  ConstantStyle,
+  CategoricalStyle,
+  QuantitativeStyle
+} from '$lib/types';
 import { DEFAULT_FILL } from '$lib/utils/constants';
 
 /**
  * Derive a MapLibre GL JS expression for a choropleth color scale.
  *
- * @param layer – The @see{CartoKitChoroplethLayer} to derive a color scale for.
- *
- * @returns A MapLibre GL JS expression for a choropleth color scale.
+ * @param {ConstantStyle | CategoricalStyle | QuantitativeStyle} style – The
+ * style from which to derive the color scale.
+ * @returns {ExpressionSpecification | string} — A MapLibre GL JS expression for
+ * a color scale.
  */
 export function deriveColorScale(
-  layer: CartoKitChoroplethLayer
-): ExpressionSpecification {
-  switch (layer.style.fill.type) {
+  style: ConstantStyle | CategoricalStyle | QuantitativeStyle
+): ExpressionSpecification | string {
+  switch (style.type) {
     case 'Quantitative': {
-      const {
-        style: {
-          fill: { scheme, count, thresholds }
-        }
-      } = layer;
+      const { scheme, count, attribute, thresholds } = style;
 
       const colors = scheme[count] as string[];
 
       const prelude: ExpressionSpecification = [
         'step',
-        ['get', layer.style.fill.attribute],
+        ['get', attribute],
         colors[0]
       ];
       const stops = colors.reduce<(string | number)[]>(
@@ -37,11 +38,7 @@ export function deriveColorScale(
       return [...prelude, ...stops];
     }
     case 'Categorical': {
-      const {
-        style: {
-          fill: { categories, scheme }
-        }
-      } = layer;
+      const { categories, scheme, attribute } = style;
 
       let stops: string[] = [];
 
@@ -59,12 +56,14 @@ export function deriveColorScale(
 
       return [
         'match',
-        ['get', layer.style.fill.attribute],
+        ['get', attribute],
         stops[0],
         stops[1],
         ...stops.slice(2),
         DEFAULT_FILL
       ];
     }
+    case 'Constant':
+      return style.color;
   }
 }

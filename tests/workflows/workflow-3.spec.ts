@@ -163,7 +163,7 @@ test('workflow-3', async ({ page }) => {
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's Attribute to 'decadal_rate'.
-  await page.locator('#attribute-select').selectOption('decadal_rate');
+  await page.locator('#fill-attribute-select').selectOption('decadal_rate');
 
   // Set the layer's Method to Manual.
   await page.locator('#classification-method-select').selectOption('Manual');

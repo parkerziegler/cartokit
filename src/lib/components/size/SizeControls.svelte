@@ -26,6 +26,7 @@
     geojson={layer.data.geojson}
     visualizationType="Quantitative"
     selected={layer.style.size.attribute}
+    channel="size"
   />
   <div class="stack-h stack-h-xs items-center">
     <FieldLabel fieldId="min">Min</FieldLabel>

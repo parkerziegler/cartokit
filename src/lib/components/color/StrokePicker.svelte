@@ -3,7 +3,6 @@
   import { slide } from 'svelte/transition';
 
   import HexInput from '$lib/components/color/HexInput.svelte';
-  import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
@@ -70,5 +69,4 @@
       class="w-10"
     />
   </div>
-  <OpacityInput {layerId} style={stroke} property="stroke" />
 </div>

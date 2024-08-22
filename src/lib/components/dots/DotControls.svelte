@@ -25,6 +25,7 @@
     geojson={layer.data.geojson}
     visualizationType="Quantitative"
     selected={layer.style.dots.attribute}
+    channel="dots"
   />
   <PointSize
     layerId={layer.id}

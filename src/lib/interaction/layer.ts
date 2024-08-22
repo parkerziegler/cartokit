@@ -28,15 +28,15 @@ import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
 /**
  * Add a @see{CartoKitLayer} to the map.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param layer – The @see{CartoKitLayer} to add to the map.
+ * @param {Map} map – The top-level MapLibre GL map instance.
+ * @param {CartoKitLayer} layer – The @see{CartoKitLayer} to add to the map.
  */
-export const addLayer = (map: Map, layer: CartoKitLayer): void => {
+export function addLayer(map: Map, layer: CartoKitLayer): void {
   switch (layer.type) {
     case 'Point': {
       const fillProperties = layer.style.fill
         ? {
-            'circle-color': layer.style.fill.color,
+            'circle-color': deriveColorScale(layer.style.fill),
             'circle-opacity': layer.style.fill.opacity
           }
         : {};
@@ -66,7 +66,7 @@ export const addLayer = (map: Map, layer: CartoKitLayer): void => {
     case 'Proportional Symbol': {
       const fillProperties = layer.style.fill
         ? {
-            'circle-color': layer.style.fill.color,
+            'circle-color': deriveColorScale(layer.style.fill),
             'circle-opacity': layer.style.fill.opacity
           }
         : {};
@@ -198,7 +198,7 @@ export const addLayer = (map: Map, layer: CartoKitLayer): void => {
         source: layer.id,
         type: 'fill',
         paint: {
-          'fill-color': deriveColorScale(layer),
+          'fill-color': deriveColorScale(layer.style.fill),
           'fill-opacity': layer.style.fill.opacity
         }
       });
@@ -222,20 +222,20 @@ export const addLayer = (map: Map, layer: CartoKitLayer): void => {
       break;
     }
   }
-};
+}
 
 /**
  * Generate a CartoKitLayer for a given GeoJSON dataset, using the dataset's
  * Geometry type to select the appropriate member from the CartoKitLayer union.
  *
- * @param featureCollection – The GeoJSON FeatureCollection associated with the
- * layer.
+ * @param {FeatureCollection} featureCollection – The GeoJSON FeatureCollection
+ * associated with the layer.
  * @returns – A default CartoKitLayer appropriate for the input geometry type.
  */
-export const generateCartoKitLayer = (
+export function generateCartoKitLayer(
   featureCollection: FeatureCollection,
   options: { displayName: string; url?: string; fileName?: string }
-): CartoKitLayer => {
+): CartoKitLayer {
   const geometryType = getFeatureCollectionGeometryType(featureCollection);
   const color = randomColor();
 
@@ -256,10 +256,12 @@ export const generateCartoKitLayer = (
         style: {
           size: DEFAULT_RADIUS,
           fill: {
+            type: 'Constant',
             color,
             opacity: DEFAULT_OPACITY
           },
           stroke: {
+            type: 'Constant',
             color,
             width: DEFAULT_STROKE_WIDTH,
             opacity: DEFAULT_STROKE_OPACITY
@@ -281,6 +283,7 @@ export const generateCartoKitLayer = (
         },
         style: {
           stroke: {
+            type: 'Constant',
             color,
             width: DEFAULT_STROKE_WIDTH,
             opacity: DEFAULT_STROKE_OPACITY
@@ -302,10 +305,12 @@ export const generateCartoKitLayer = (
         },
         style: {
           fill: {
+            type: 'Constant',
             color,
             opacity: DEFAULT_OPACITY
           },
           stroke: {
+            type: 'Constant',
             color,
             width: DEFAULT_STROKE_WIDTH,
             opacity: DEFAULT_STROKE_OPACITY
@@ -315,4 +320,4 @@ export const generateCartoKitLayer = (
     case 'GeometryCollection':
       throw new Error('GeometryCollection not supported.');
   }
-};
+}

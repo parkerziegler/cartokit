@@ -35,9 +35,14 @@ export type LayerType =
   | 'Dot Density';
 
 /**
+ * Represents the encoding channels of a layer.
+ */
+export type Channel = 'fill' | 'stroke' | 'size' | 'dots';
+
+/**
  * Represents the visualization type for a given channel.
  */
-export type VisualizationType = 'Quantitative' | 'Categorical';
+export type VisualizationType = 'Quantitative' | 'Categorical' | 'Constant';
 
 /**
  * Represents a transformation—either internal or user-defined—applied to a
@@ -108,7 +113,7 @@ export interface CartoKitPointLayer extends Layer {
   type: 'Point';
   style: {
     size: number;
-    fill?: ConstantStyle;
+    fill?: ConstantFill | QuantitativeFill | CategoricalFill;
     stroke?: ConstantStroke;
   };
 }
@@ -155,7 +160,7 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
   type: 'Proportional Symbol';
   style: {
     size: ProportionalSymbolSize;
-    fill?: ConstantStyle;
+    fill?: QuantitativeFill | CategoricalFill | ConstantFill;
     stroke?: ConstantStroke;
   };
 }
@@ -213,6 +218,7 @@ export type CartoKitLayer =
  * @property {number} opacity - The style's opacity.
  */
 export interface ConstantStyle {
+  type: 'Constant';
   color: string;
   opacity: number;
 }

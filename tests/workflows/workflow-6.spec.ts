@@ -95,7 +95,7 @@ test('workflow-6', async ({ page }) => {
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's Attribute to 'years_2080_2099'.
-  await page.locator('#attribute-select').selectOption('years_2080_2099');
+  await page.locator('#fill-attribute-select').selectOption('years_2080_2099');
 
   // Switch the layer's Color Scheme to PRGn.
   await page.locator('#color-scheme').getByRole('button').click();

@@ -6,7 +6,7 @@
   import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import type { VisualizationType } from '$lib/types';
+  import type { Channel, VisualizationType } from '$lib/types';
   import {
     isPropertyCategorical,
     isPropertyQuantitative
@@ -16,6 +16,7 @@
   export let layerId: string;
   export let visualizationType: VisualizationType;
   export let geojson: FeatureCollection;
+  export let channel: Channel;
 
   const target = document.getElementById('map') ?? document.body;
   let editor: TransformationEditor;
@@ -41,7 +42,8 @@
       type: 'attribute',
       layerId,
       payload: {
-        attribute
+        attribute,
+        channel
       }
     });
   }
@@ -75,7 +77,7 @@
   <Select
     {options}
     {selected}
-    id="attribute-select"
+    id="{channel}-attribute-select"
     title="Attribute"
     on:change={onChange}
     class="w-[80%] truncate"
