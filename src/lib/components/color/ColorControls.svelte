@@ -53,5 +53,5 @@
     <ColorStepsSelect {layerId} style={fill} />
     <ColorSchemeSelect {layerId} style={fill} />
   {/if}
-  <OpacityInput {layerId} property="fill" style={fill} />
+  <OpacityInput {layerId} channel="fill" style={fill} />
 </div>

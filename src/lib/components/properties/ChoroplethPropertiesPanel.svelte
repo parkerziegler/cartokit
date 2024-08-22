@@ -1,5 +1,6 @@
 <script lang="ts">
   import ColorControls from '$lib/components/color/ColorControls.svelte';
+  import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
@@ -19,6 +20,11 @@
 <MenuItem title="Stroke">
   {#if layer.style.stroke}
     <StrokePicker layerId={layer.id} stroke={layer.style.stroke} />
+    <OpacityInput
+      layerId={layer.id}
+      channel="stroke"
+      style={layer.style.stroke}
+    />
   {/if}
   <StrokeModifier
     layerId={layer.id}

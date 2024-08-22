@@ -13,13 +13,18 @@
 <MenuItem title="Fill">
   {#if layer.style.fill}
     <FillPicker layerId={layer.id} fill={layer.style.fill} />
-    <OpacityInput layerId={layer.id} property="fill" style={layer.style.fill} />
+    <OpacityInput layerId={layer.id} channel="fill" style={layer.style.fill} />
   {/if}
   <FillModifier layerId={layer.id} fill={layer.style.fill} slot="action" />
 </MenuItem>
 <MenuItem title="Stroke">
   {#if layer.style.stroke}
     <StrokePicker layerId={layer.id} stroke={layer.style.stroke} />
+    <OpacityInput
+      layerId={layer.id}
+      channel="stroke"
+      style={layer.style.stroke}
+    />
   {/if}
   <StrokeModifier
     layerId={layer.id}
