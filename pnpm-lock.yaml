@@ -155,7 +155,7 @@ importers:
         version: 3.4.10
       tslib:
         specifier: ^2.4.1
-        version: 2.6.3
+        version: 2.7.0
       typescript:
         specifier: ^5.0.0
         version: 5.5.4
@@ -2742,8 +2742,8 @@ packages:
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
 
-  tslib@2.6.3:
-    resolution: {integrity: sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==}
+  tslib@2.7.0:
+    resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -3366,7 +3366,7 @@ snapshots:
       '@turf/helpers': 7.1.0
       '@turf/meta': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@turf/boolean-point-in-polygon@7.1.0':
     dependencies:
@@ -3374,25 +3374,25 @@ snapshots:
       '@turf/invariant': 7.1.0
       '@types/geojson': 7946.0.14
       point-in-polygon-hao: 1.1.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@turf/centroid@7.1.0':
     dependencies:
       '@turf/helpers': 7.1.0
       '@turf/meta': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@turf/helpers@7.1.0':
     dependencies:
       '@types/geojson': 7946.0.14
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@turf/invariant@7.1.0':
     dependencies:
       '@turf/helpers': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@turf/meta@7.1.0':
     dependencies:
@@ -3403,7 +3403,7 @@ snapshots:
     dependencies:
       '@turf/helpers': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@types/cookie@0.6.0': {}
 
@@ -5597,7 +5597,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tslib@2.6.3: {}
+  tslib@2.7.0: {}
 
   type-check@0.4.0:
     dependencies:
