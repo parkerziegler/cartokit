@@ -1,4 +1,4 @@
-import type { Map } from 'maplibre-gl';
+import * as Comlink from 'comlink';
 import * as prettier from 'prettier';
 import babel from 'prettier/plugins/babel';
 // eslint-disable-next-line import/default
@@ -10,13 +10,11 @@ import type { CartoKitIR } from '$lib/stores/ir';
 /**
  * Generate a Mapbox GL JS program from the CartoKit IR.
  *
- * @param map – The MapLibre GL JS map instance.
  * @param ir – The CartoKit IR.
- *
  * @returns – A Mapbox GL JS program.
  */
-export async function codegen(map: Map, ir: CartoKitIR): Promise<string> {
-  const program = codegenImports(map, ir);
+export async function codegen(ir: CartoKitIR): Promise<string> {
+  const program = codegenImports(ir);
   const formatted = await prettier.format(program, {
     parser: 'babel',
     plugins: [babel, estree]
@@ -24,3 +22,5 @@ export async function codegen(map: Map, ir: CartoKitIR): Promise<string> {
 
   return formatted;
 }
+
+Comlink.expose(codegen);
