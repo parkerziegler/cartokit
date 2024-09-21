@@ -1,6 +1,6 @@
-// eslint-disable-next-line import/no-unresolved
-import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
 import type { CartoKitIR } from '$lib/stores/ir';
+
+const allAfterEqualRegex = /=.+$/;
 
 /**
  * Generate a Mapbox GL JS program fragment for the map instance's style property.
@@ -12,7 +12,7 @@ import type { CartoKitIR } from '$lib/stores/ir';
  */
 export function codegenMapStyle(ir: CartoKitIR): string {
   return `'${ir.basemap.url.replace(
-    PUBLIC_MAPTILER_API_KEY,
-    '<YOUR_MAPTILER_API_KEY>'
+    allAfterEqualRegex,
+    '=<YOUR_MAPTILER_API_KEY>'
   )}'`;
 }

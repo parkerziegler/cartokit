@@ -1,5 +1,6 @@
 <script lang="ts">
   import cs from 'classnames';
+  import * as Comlink from 'comlink';
   import maplibregl from 'maplibre-gl';
   import { onMount } from 'svelte';
 
@@ -14,7 +15,7 @@
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
-  import { ir } from '$lib/stores/ir';
+  import { ir, type CartoKitIR } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import { map as mapStore } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
@@ -22,6 +23,9 @@
   export let data: PageData;
 
   let map: maplibregl.Map;
+  let codegenWorker: Worker;
+  let codegen: ((ir: CartoKitIR) => Promise<string>) | null;
+  let program = '';
 
   onMount(() => {
     // maplibre-gl is actually a CJS module, and not all module.exports may be
@@ -33,13 +37,20 @@
       center: $ir.center,
       zoom: $ir.zoom
     });
+    codegenWorker = new Worker(
+      new URL('../lib/codegen/index.ts', import.meta.url),
+      {
+        type: 'module'
+      }
+    );
+    codegen = Comlink.wrap<(ir: CartoKitIR) => Promise<string>>(codegenWorker);
 
     // Add an event listener to handle feature deselection.
     map.on('click', onFeatureLeave(map, $ir));
 
     // When the map first reaches an idle state, set it in the store.
     // This should ensure that the map's styles and data have fully loaded.
-    map.once('idle', () => {
+    map.once('idle', async () => {
       mapStore.set(map);
 
       ir.update((ir) => {
@@ -48,6 +59,14 @@
 
         return ir;
       });
+
+      try {
+        if (codegen) {
+          program = await codegen($ir);
+        }
+      } catch (err) {
+        console.error(err);
+      }
     });
 
     map.on('move', (event) => {
@@ -69,6 +88,8 @@
 
     return () => {
       map.remove();
+      codegenWorker.terminate();
+      codegen = null;
     };
   });
 
@@ -86,6 +107,16 @@
 
       return layout;
     });
+  }
+
+  $: if (codegen) {
+    codegen($ir)
+      .then((code) => {
+        program = code;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 </script>
 
@@ -134,7 +165,7 @@
     {/if}
   </div>
   {#if $layout.editorVisible}
-    <Editor />
+    <Editor {program} />
   {/if}
 </main>
 

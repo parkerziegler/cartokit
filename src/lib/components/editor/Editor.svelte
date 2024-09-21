@@ -4,14 +4,17 @@
   import Program from '$lib/components/editor/Program.svelte';
   import Tabs, { type Tab } from '$lib/components/shared/Tabs.svelte';
 
+  export let program: string;
+
   let activeIndex: number;
 
-  const tabs: Tab[] = [
+  $: tabs = [
     {
       name: 'Program',
-      content: Program
+      content: Program,
+      props: { program }
     }
-  ];
+  ] as Tab<{ program: string }>[];
 </script>
 
 <div
