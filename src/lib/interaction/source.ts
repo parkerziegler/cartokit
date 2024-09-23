@@ -1,8 +1,11 @@
+import * as Comlink from 'comlink';
 import type { FeatureCollection } from 'geojson';
 import type { Map, MapSourceDataEvent } from 'maplibre-gl';
 
 import { addLayer, generateCartoKitLayer } from '$lib/interaction/layer';
+import { catalog } from '$lib/stores/catalog';
 import { ir } from '$lib/stores/ir';
+import type { CartoKitLayer, Catalog } from '$lib/types';
 import { sourceWorker } from '$lib/utils/worker';
 
 type AddSourceOptions =
@@ -27,7 +30,7 @@ type AddSourceOptions =
  * @param options – The options for the source.
  * @param data – The GeoJSON data for the source.
  */
-function loadSource(
+async function loadSource(
   map: Map,
   options: AddSourceOptions,
   data: FeatureCollection
@@ -54,6 +57,18 @@ function loadSource(
     ir.layers[layer.id] = layer;
 
     return ir;
+  });
+
+  const catalogWorker = new Worker(
+    new URL('$lib/utils/catalog.ts', import.meta.url),
+    { type: 'module' }
+  );
+  const buildCatalog =
+    Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
+  const catalogUpdate = await buildCatalog(layer);
+
+  catalog.update((catalog) => {
+    return { ...catalog, ...catalogUpdate };
   });
 
   addLayer(map, layer);

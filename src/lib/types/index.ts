@@ -327,3 +327,18 @@ export interface DotDensityDots {
   size: number;
   value: number;
 }
+
+/**
+ * Represents a catalog mapping layers to pre-computed classification statistics.
+ */
+export type Catalog = Record<
+  CartoKitLayer['id'],
+  Record<
+    string,
+    {
+      Quantile: { domain: number[] };
+      'Equal Interval': { domain: [number, number] };
+      Jenks: Record<number, { breaks: number[] }>;
+    }
+  >
+>;

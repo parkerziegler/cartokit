@@ -216,6 +216,7 @@ export function dispatchLayerUpdate({
   layerId,
   payload
 }: DispatchLayerUpdateParams): void {
+  performance.mark('update-start');
   const map = get(mapStore);
 
   switch (type) {
@@ -748,10 +749,7 @@ export function dispatchLayerUpdate({
               method: 'Quantile',
               scheme: DEFAULT_QUANTITATIVE_SCHEME,
               count: DEFAULT_COUNT,
-              thresholds: DEFAULT_THRESHOLDS(
-                attribute,
-                lyr.data.geojson.features
-              ),
+              thresholds: DEFAULT_THRESHOLDS(lyr.id, attribute),
               opacity: lyr.style.fill?.opacity ?? DEFAULT_OPACITY
             };
             break;
@@ -772,4 +770,12 @@ export function dispatchLayerUpdate({
       });
     }
   }
+
+  performance.mark('update-end');
+  const { duration } = performance.measure(
+    'update',
+    'update-start',
+    'update-end'
+  );
+  console.log(`Update took ${duration}ms`);
 }

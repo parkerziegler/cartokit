@@ -1,7 +1,8 @@
 import * as d3 from 'd3';
 import type { Feature } from 'geojson';
-import { ckmeans } from 'simple-statistics';
+import { get } from 'svelte/store';
 
+import { catalog } from '$lib/stores/catalog';
 import type { ClassificationMethod } from '$lib/types';
 import { isPropertyQuantitative } from '$lib/utils/property';
 
@@ -30,8 +31,8 @@ export function deriveExtent(
 }
 
 interface DeriveBreaksParams {
+  layerId: string;
   attribute: string;
-  features: Feature[];
   range: string[];
 }
 
@@ -39,26 +40,24 @@ interface DeriveBreaksParams {
  * Derive quantiles for a given attribute of a GeoJSON FeatureCollection.
  *
  * @param params — Input parameters to compute quantiles over a GeoJSON FeatureCollection.
+ * @param layerId – The ID of visualized layer.
  * @param attribute – The data attribute to compute quantiles over.
- * @param features – The GeoJSON features of the dataset.
  * @param range – The output range of the quantile scale.
  *
  * @returns – The quantiles of the dataset.
  */
-export function deriveQuantiles({
+function deriveQuantiles({
+  layerId,
   attribute,
-  features,
   range
 }: DeriveBreaksParams): number[] {
-  // For a quantile scale, use the entirety of the data as the domain.
-  const data = features
-    .map((feature) => feature.properties?.[attribute])
-    .filter(isPropertyQuantitative);
+  const ctlg = get(catalog);
+  const domain = ctlg[layerId][attribute]['Quantile'].domain;
 
   // Derive quantiles.
   const quantiles = d3
     .scaleQuantile<string>()
-    .domain(data)
+    .domain(domain)
     .range(range)
     .quantiles();
 
@@ -69,24 +68,24 @@ export function deriveQuantiles({
  * Derive equal interval thresholds for a given attribute of a GeoJSON FeatureCollection.
  *
  * @param params — Input parameters to compute equal interval thresholds over a GeoJSON FeatureCollection.
+ * @param layerId – The ID of visualized layer.
  * @param attribute – The data attribute to compute equal interval thresholds over.
- * @param features – The GeoJSON features of the dataset.
  * @param range – The output range of the equal interval (quantize) scale.
  *
  * @returns – The equal interval thresholds of the dataset.
  */
-export function deriveEqualIntervals({
+function deriveEqualIntervals({
+  layerId,
   attribute,
-  features,
   range
 }: DeriveBreaksParams): number[] {
-  // For a quantize scale, use the extent of the data as the domain.
-  const [min, max] = deriveExtent(attribute, features);
+  const ctlg = get(catalog);
+  const domain = ctlg[layerId][attribute]['Equal Interval'].domain;
 
   // Derive ticks.
   const ticks = d3
     .scaleQuantize<string>()
-    .domain([min, max])
+    .domain(domain)
     .range(range)
     .thresholds();
 
@@ -97,31 +96,20 @@ export function deriveEqualIntervals({
  * Derive Jenks natural breaks for a given attribute of a GeoJSON FeatureCollection.
  *
  * @param params — Input parameters to compute Jenks natural breaks over a GeoJSON FeatureCollection.
+ * @param layerId – The ID of visualized layer.
  * @param attribute – The data attribute to compute Jenks natural breaks over.
- * @param features – The GeoJSON features of the dataset.
  * @param range – The output range of the Jenks scale.
  *
  * @returns – The Jenks natural breaks of the dataset.
  */
-export function deriveJenksBreaks({
+function deriveJenksBreaks({
+  layerId,
   attribute,
-  features,
   range
 }: DeriveBreaksParams): number[] {
-  // For a Jenks scale, use the entirety of the data as the domain.
-  const data = features
-    .map((feature) => feature.properties?.[attribute])
-    .filter(isPropertyQuantitative);
+  const ctlg = get(catalog);
 
-  // Derive Jenks breaks using ckmeans clustering.
-  const breaks = ckmeans(data, range.length).map(
-    (cluster) => cluster[cluster.length - 1]
-  );
-
-  // Remove the last break—this corresponds to the max.
-  breaks.pop();
-
-  return breaks;
+  return ctlg[layerId][attribute]['Jenks'][range.length].breaks;
 }
 
 interface DeriveThresholdsParams extends DeriveBreaksParams {
@@ -134,8 +122,8 @@ interface DeriveThresholdsParams extends DeriveBreaksParams {
  *
  * @param params – Input parameters to compute thresholds over a GeoJSON FeatureCollection.
  * @param method – The @see{ClassificationMethod} to use.
- * @param attribute – The data attribute to compute thresholds over.
- * @param features – The GeoJSON features of the dataset.
+ * @param layerId – The ID of visualized layer.
+ * @param attribute – The data attribute to compute thresholds over.layerId,
  * @param range – The output range of the scale.
  * @param thresholds – The thresholds of the dataset, if supplied manually.
  *
@@ -143,18 +131,18 @@ interface DeriveThresholdsParams extends DeriveBreaksParams {
  */
 export function deriveThresholds({
   method,
+  layerId,
   attribute,
-  features,
   range,
   thresholds
 }: DeriveThresholdsParams): number[] {
   switch (method) {
     case 'Quantile':
-      return deriveQuantiles({ attribute, features, range });
+      return deriveQuantiles({ layerId, attribute, range });
     case 'Equal Interval':
-      return deriveEqualIntervals({ attribute, features, range });
+      return deriveEqualIntervals({ layerId, attribute, range });
     case 'Jenks':
-      return deriveJenksBreaks({ attribute, features, range });
+      return deriveJenksBreaks({ layerId, attribute, range });
     case 'Manual':
       return thresholds;
   }
