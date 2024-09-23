@@ -65,6 +65,9 @@ importers:
       lodash.orderby:
         specifier: ^4.6.0
         version: 4.6.0
+      lodash.set:
+        specifier: ^4.3.2
+        version: 4.3.2
       lodash.uniqueid:
         specifier: ^4.0.1
         version: 4.0.1
@@ -108,6 +111,9 @@ importers:
       '@types/lodash.orderby':
         specifier: ^4.6.7
         version: 4.6.9
+      '@types/lodash.set':
+        specifier: ^4.3.9
+        version: 4.3.9
       '@types/lodash.uniqueid':
         specifier: ^4.0.7
         version: 4.0.9
@@ -868,6 +874,9 @@ packages:
 
   '@types/lodash.orderby@4.6.9':
     resolution: {integrity: sha512-T9o2wkIJOmxXwVTPTmwJ59W6eTi2FseiLR369fxszG649Po/xe9vqFNhf/MtnvT5jrbDiyWKxPFPZbpSVK0SVQ==}
+
+  '@types/lodash.set@4.3.9':
+    resolution: {integrity: sha512-KOxyNkZpbaggVmqbpr82N2tDVTx05/3/j0f50Es1prxrWB0XYf9p3QNxqcbWb7P1Q9wlvsUSlCFnwlPCIJ46PQ==}
 
   '@types/lodash.uniqueid@4.0.9':
     resolution: {integrity: sha512-SEzkJBS8t+tqAUnSmyqbuWqxKU+Z/Xu2cgPtD+Ik0l+M7L2q7So9VoN2rQ8H0mmL87lJ00ykxal8oB54QRet6g==}
@@ -2015,6 +2024,9 @@ packages:
 
   lodash.orderby@4.6.0:
     resolution: {integrity: sha512-T0rZxKmghOOf5YPnn8EY5iLYeWCpZq8G41FfqoVHH5QDTAFaghJRmAdLiadEDq+ztgM2q5PjA+Z1fOwGrLgmtg==}
+
+  lodash.set@4.3.2:
+    resolution: {integrity: sha512-4hNPN5jlm/N/HLMCO43v8BXKq9Z7QdAGc/VGrRD61w8gN9g/6jF9A4L1pbUgBLCffi0w9VsXfTOij5x8iTyFvg==}
 
   lodash.uniqueid@4.0.1:
     resolution: {integrity: sha512-GQQWaIeGlL6DIIr06kj1j6sSmBxyNMwI8kaX9aKpHR/XsMTiaXDVPNPAkiboOTK9OJpTJF/dXT3xYoFQnj386Q==}
@@ -3505,6 +3517,10 @@ snapshots:
     dependencies:
       '@types/lodash': 4.17.7
 
+  '@types/lodash.set@4.3.9':
+    dependencies:
+      '@types/lodash': 4.17.7
+
   '@types/lodash.uniqueid@4.0.9':
     dependencies:
       '@types/lodash': 4.17.7
@@ -4836,6 +4852,8 @@ snapshots:
   lodash.merge@4.6.2: {}
 
   lodash.orderby@4.6.0: {}
+
+  lodash.set@4.3.2: {}
 
   lodash.uniqueid@4.0.1: {}
 

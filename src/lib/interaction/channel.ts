@@ -174,8 +174,8 @@ function updateFillChannel(
       case 'Quantitative':
         layer.style.fill.thresholds = deriveThresholds({
           method: layer.style.fill.method,
+          layerId: layer.id,
           attribute: layer.style.fill.attribute,
-          features: layer.data.geojson.features,
           range: layer.style.fill.scheme[layer.style.fill.count] as string[],
           thresholds: layer.style.fill.thresholds
         });
