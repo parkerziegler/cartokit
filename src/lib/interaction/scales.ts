@@ -40,7 +40,7 @@ interface DeriveBreaksParams {
  * Derive quantiles for a given attribute of a GeoJSON FeatureCollection.
  *
  * @param params — Input parameters to compute quantiles over a GeoJSON FeatureCollection.
- * @param layerId – The ID of visualized layer.
+ * @param layerId – The ID of the visualized layer.
  * @param attribute – The data attribute to compute quantiles over.
  * @param range – The output range of the quantile scale.
  *
@@ -68,7 +68,7 @@ function deriveQuantiles({
  * Derive equal interval thresholds for a given attribute of a GeoJSON FeatureCollection.
  *
  * @param params — Input parameters to compute equal interval thresholds over a GeoJSON FeatureCollection.
- * @param layerId – The ID of visualized layer.
+ * @param layerId – The ID of the visualized layer.
  * @param attribute – The data attribute to compute equal interval thresholds over.
  * @param range – The output range of the equal interval (quantize) scale.
  *
@@ -96,7 +96,7 @@ function deriveEqualIntervals({
  * Derive Jenks natural breaks for a given attribute of a GeoJSON FeatureCollection.
  *
  * @param params — Input parameters to compute Jenks natural breaks over a GeoJSON FeatureCollection.
- * @param layerId – The ID of visualized layer.
+ * @param layerId – The ID of the visualized layer.
  * @param attribute – The data attribute to compute Jenks natural breaks over.
  * @param range – The output range of the Jenks scale.
  *
@@ -122,7 +122,7 @@ interface DeriveThresholdsParams extends DeriveBreaksParams {
  *
  * @param params – Input parameters to compute thresholds over a GeoJSON FeatureCollection.
  * @param method – The @see{ClassificationMethod} to use.
- * @param layerId – The ID of visualized layer.
+ * @param layerId – The ID of the visualized layer.
  * @param attribute – The data attribute to compute thresholds over.layerId,
  * @param range – The output range of the scale.
  * @param thresholds – The thresholds of the dataset, if supplied manually.

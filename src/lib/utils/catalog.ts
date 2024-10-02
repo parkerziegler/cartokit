@@ -31,6 +31,12 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
         }
         case 'Jenks': {
           d3.range(3, 10).forEach((k) => {
+            // If we have too few features for the number of classes, do not
+            // add an entry to the catalog.
+            if (domain.length < k) {
+              return;
+            }
+
             // Derive Jenks breaks using ckmeans clustering.
             const breaks = ckmeans(domain, k).map(
               (cluster) => cluster[cluster.length - 1]
