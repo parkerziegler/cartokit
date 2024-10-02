@@ -944,10 +944,7 @@ function transitionToChoropleth(
             method: DEFAULT_METHOD,
             scheme: DEFAULT_QUANTITATIVE_SCHEME,
             count: DEFAULT_COUNT,
-            thresholds: DEFAULT_THRESHOLDS(
-              attribute,
-              layer.data.geojson.features
-            ),
+            thresholds: DEFAULT_THRESHOLDS(layer.id, attribute),
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
           stroke: layer.style.stroke
@@ -987,8 +984,8 @@ function transitionToChoropleth(
             scheme: DEFAULT_QUANTITATIVE_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
-              layer.style.size.attribute,
-              layer.data.geojson.features
+              layer.id,
+              layer.style.size.attribute
             ),
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
@@ -1018,8 +1015,8 @@ function transitionToChoropleth(
             scheme: DEFAULT_QUANTITATIVE_SCHEME,
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
-              layer.style.dots.attribute,
-              layer.data.geojson.features
+              layer.id,
+              layer.style.dots.attribute
             ),
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
@@ -1060,10 +1057,7 @@ function transitionToChoropleth(
             method: DEFAULT_METHOD,
             scheme: DEFAULT_QUANTITATIVE_SCHEME,
             count: DEFAULT_COUNT,
-            thresholds: DEFAULT_THRESHOLDS(
-              attribute,
-              layer.data.geojson.features
-            ),
+            thresholds: DEFAULT_THRESHOLDS(layer.id, attribute),
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
           stroke: layer.style.stroke

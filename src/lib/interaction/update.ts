@@ -748,10 +748,7 @@ export function dispatchLayerUpdate({
               method: 'Quantile',
               scheme: DEFAULT_QUANTITATIVE_SCHEME,
               count: DEFAULT_COUNT,
-              thresholds: DEFAULT_THRESHOLDS(
-                attribute,
-                lyr.data.geojson.features
-              ),
+              thresholds: DEFAULT_THRESHOLDS(lyr.id, attribute),
               opacity: lyr.style.fill?.opacity ?? DEFAULT_OPACITY
             };
             break;

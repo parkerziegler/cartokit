@@ -38,7 +38,7 @@
       zoom: $ir.zoom
     });
     codegenWorker = new Worker(
-      new URL('../lib/codegen/index.ts', import.meta.url),
+      new URL('$lib/codegen/index.ts', import.meta.url),
       {
         type: 'module'
       }

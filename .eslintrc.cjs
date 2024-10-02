@@ -41,7 +41,18 @@ module.exports = {
     }
   },
   rules: {
-    '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '_' }],
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        args: 'all',
+        argsIgnorePattern: '^_',
+        caughtErrors: 'all',
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        ignoreRestSiblings: true
+      }
+    ],
     '@typescript-eslint/switch-exhaustiveness-check': 'error',
     'import/newline-after-import': 2,
     'import/order': [
