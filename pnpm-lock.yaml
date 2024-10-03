@@ -143,7 +143,7 @@ importers:
         version: 2.30.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
       eslint-plugin-svelte:
         specifier: ^2.32.4
-        version: 2.44.0(eslint@8.57.1)(svelte@4.2.19)
+        version: 2.44.1(eslint@8.57.1)(svelte@4.2.19)
       postcss:
         specifier: ^8.4.21
         version: 8.4.47
@@ -1536,8 +1536,8 @@ packages:
       '@typescript-eslint/parser':
         optional: true
 
-  eslint-plugin-svelte@2.44.0:
-    resolution: {integrity: sha512-wav4MOs02vBb1WjvTCYItwJCxMkuk2Z4p+K/eyjL0N/z7ahXLP+0LtQQjiKc2ezuif7GnZLbD1F3o1VHzSvdVg==}
+  eslint-plugin-svelte@2.44.1:
+    resolution: {integrity: sha512-w6wkoJPw1FJKFtM/2oln21rlu5+HTd2CSkkzhm32A+trNoW2EYQqTQAbDTU6k2GI/6Vh64rBHYQejqEgDld7fw==}
     engines: {node: ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^7.0.0 || ^8.0.0-0 || ^9.0.0-0
@@ -4345,7 +4345,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-svelte@2.44.0(eslint@8.57.1)(svelte@4.2.19):
+  eslint-plugin-svelte@2.44.1(eslint@8.57.1)(svelte@4.2.19):
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.57.1)
       '@jridgewell/sourcemap-codec': 1.5.0
