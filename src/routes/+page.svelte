@@ -19,12 +19,13 @@
   import { layout } from '$lib/stores/layout';
   import { map as mapStore } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
+  import type { VercelEnv } from '$lib/types';
 
   export let data: PageData;
 
   let map: maplibregl.Map;
   let codegenWorker: Worker;
-  let codegen: ((ir: CartoKitIR) => Promise<string>) | null;
+  let codegen: ((ir: CartoKitIR, env: VercelEnv) => Promise<string>) | null;
   let program = '';
 
   onMount(() => {
@@ -62,7 +63,7 @@
 
       try {
         if (codegen) {
-          program = await codegen($ir);
+          program = await codegen($ir, data.env);
         }
       } catch (err) {
         console.error(err);
@@ -110,7 +111,7 @@
   }
 
   $: if (codegen) {
-    codegen($ir)
+    codegen($ir, data.env)
       .then((code) => {
         program = code;
       })

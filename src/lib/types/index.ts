@@ -342,3 +342,23 @@ export type Catalog = Record<
     }
   >
 >;
+
+/**
+ * Represents a performance metric.
+ *
+ * @property {'codegen' | 'reconciliation'} kind - The kind of performance
+ * metric, either 'codegen' or 'reconciliation'.
+ * @property {number} duration - The duration of the performance metric in ms.
+ * @property {number} timestamp - The timestamp of the performance metric.
+ *
+ */
+export interface PerformanceMetric {
+  kind: 'codegen' | 'reconciliation';
+  duration: number;
+  timestamp: number;
+}
+
+/**
+ * Represents the environment for a Vercel deployment.
+ */
+export type VercelEnv = 'development' | 'preview' | 'production';
