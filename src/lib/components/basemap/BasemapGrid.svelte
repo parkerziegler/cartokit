@@ -4,12 +4,8 @@
 
   import CustomTiles from '$lib/components/basemap/CustomTiles.svelte';
   import { ir } from '$lib/stores/ir';
-  import {
-    BASEMAPS,
-    TILE_URLS,
-    type Basemap,
-    type BasemapProvider
-  } from '$lib/utils/basemap';
+  import type { Basemap, BasemapProvider } from '$lib/types';
+  import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
   import { switchBasemapWithPreservedLayers } from '$lib/utils/maplibre';
 
   export let provider: BasemapProvider;

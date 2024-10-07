@@ -62,6 +62,13 @@ test.afterAll(() => {
  * at that location in geographic space from 1981-2023.
  */
 test('workflow-2', async ({ page }) => {
+  // Identify the playwright test for application code.
+  await page.addInitScript(() => {
+    (
+      window as unknown as Window & { playwrightWorkflowId: string }
+    ).playwrightWorkflowId = 'workflow-2';
+  });
+
   // Mark workflow tests as slow.
   test.slow();
 

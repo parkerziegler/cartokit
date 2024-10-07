@@ -1,10 +1,13 @@
 import * as Comlink from 'comlink';
 
-import type { PerformanceMetric } from '$lib/types';
+import type { CartoKitMetric } from '$lib/types';
 
-let metrics: PerformanceMetric[] = [];
+let metrics: CartoKitMetric[] = [];
 let isProcessing = false;
 
+/**
+ * Flush the existing queue of @see{CartoKitMetric}s to the server.
+ */
 async function flushMetrics() {
   if (isProcessing || metrics.length === 0) {
     return;
@@ -29,10 +32,15 @@ async function flushMetrics() {
   }
 }
 
-function capturePerformance(metric: PerformanceMetric) {
+setInterval(flushMetrics, 10000);
+
+/**
+ * Capture a performance metric by pushing it to the metrics queue.
+ *
+ * @param metric – A @see{CartoKitMetric} to capture.
+ */
+function captureMetric(metric: CartoKitMetric) {
   metrics.push(metric);
 }
 
-setInterval(flushMetrics, 10000);
-
-Comlink.expose(capturePerformance);
+Comlink.expose(captureMetric);

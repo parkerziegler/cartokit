@@ -10,7 +10,7 @@ import {
   R2_SECRET_ACCESS_KEY
   // eslint-disable-next-line import/no-unresolved
 } from '$env/static/private';
-import type { PerformanceMetric } from '$lib/types';
+import type { CartoKitMetric } from '$lib/types';
 
 const client = new S3Client({
   endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -21,28 +21,65 @@ const client = new S3Client({
   }
 });
 
+/**
+ * Capture cartokit metrics and store them in S3 (Cloudflare R2).
+ *
+ * @param params – The request parameters.
+ * @param params.request – The request, containing the metrics to store.
+ * @returns – A 204 No Content response.
+ */
 export async function POST({ request }): Promise<Response> {
-  const metrics = await request.json();
+  const metrics = (await request.json()) as CartoKitMetric[];
+  const codegenMetrics = metrics.filter((metric) => metric.kind === 'codegen');
+  const reconciliationMetrics = metrics.filter(
+    (metric) => metric.kind === 'reconciliation'
+  );
+
   const existingCodegenMetrics = await fetchExistingMetrics('codegen');
-  const Body = JSON.stringify(existingCodegenMetrics.concat(metrics), null, 2);
+  const existingReconciliationMetrics =
+    await fetchExistingMetrics('reconciliation');
 
   await client.send(
     new PutObjectCommand({
       Bucket: 'cartokit',
       Key: 'codegen.json',
-      Body,
+      Body: JSON.stringify(
+        existingCodegenMetrics.concat(codegenMetrics),
+        null,
+        2
+      ),
       ContentType: 'application/json'
     })
   );
 
-  return new Response('Metrics updated.', {
-    status: 200
+  await client.send(
+    new PutObjectCommand({
+      Bucket: 'cartokit',
+      Key: 'reconciliation.json',
+      Body: JSON.stringify(
+        existingReconciliationMetrics.concat(reconciliationMetrics),
+        null,
+        2
+      ),
+      ContentType: 'application/json'
+    })
+  );
+
+  return new Response(null, {
+    status: 204
   });
 }
 
+/**
+ * Fetch existing metrics from S3.
+ *
+ * @param kind – The kind of metric to fetch (e.g., "codegen", "reconciliation",
+ * etc.).
+ * @returns – An array of existing metrics for the requested metric kind.
+ */
 async function fetchExistingMetrics(
-  kind: PerformanceMetric['kind']
-): Promise<PerformanceMetric[]> {
+  kind: CartoKitMetric['kind']
+): Promise<CartoKitMetric[]> {
   try {
     const command = new GetObjectCommand({
       Bucket: 'cartokit',

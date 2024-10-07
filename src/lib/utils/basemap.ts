@@ -14,12 +14,7 @@ import StadiaMapsOutdoors from '$lib/assets/basemaps/stadia-maps/outdoors.png';
 import StamenTerrain from '$lib/assets/basemaps/stamen/terrain.png';
 import StamenTonerLite from '$lib/assets/basemaps/stamen/toner-lite.png';
 import StamenToner from '$lib/assets/basemaps/stamen/toner.png';
-
-export interface Basemap {
-  title: string;
-  tileId: string;
-  src: string;
-}
+import type { Basemap, BasemapProvider } from '$lib/types';
 
 const STAMEN_BASEMAPS: Basemap[] = [
   { title: 'Toner', tileId: 'stamen_toner', src: StamenToner },
@@ -80,14 +75,12 @@ const MAPTILER_BASEMAPS: Basemap[] = [
   }
 ];
 
-export const BASEMAPS = {
+export const BASEMAPS: Record<BasemapProvider, Basemap[]> = {
   Stamen: STAMEN_BASEMAPS,
   'Stadia Maps': STADIA_MAPS_BASEMAPS,
   MapTiler: MAPTILER_BASEMAPS,
   Custom: []
 };
-
-export type BasemapProvider = keyof typeof BASEMAPS;
 
 export const TILE_URLS = {
   Stamen: (tileId: string) =>

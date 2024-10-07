@@ -1,4 +1,4 @@
-import camelCase from 'lodash.camelcase';
+import { camelCase } from 'lodash-es';
 
 import type { CartoKitLayer } from '$lib/types';
 

@@ -2,7 +2,7 @@ import { isFetchGeoJSONRequired } from '$lib/codegen/codegen-fns';
 import { codegenLayer } from '$lib/codegen/codegen-layer';
 import { codegenMapStyle } from '$lib/codegen/codegen-map-style';
 import { codegenSource } from '$lib/codegen/codegen-source';
-import type { CartoKitIR } from '$lib/stores/ir';
+import type { CartoKitIR } from '$lib/types';
 
 /**
  * Generate a Mapbox GL JS program fragment for layer sources, layer renders,

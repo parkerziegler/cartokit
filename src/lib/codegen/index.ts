@@ -5,22 +5,32 @@ import babel from 'prettier/plugins/babel';
 import estree from 'prettier/plugins/estree';
 
 import { codegenImports } from '$lib/codegen/codegen-imports';
-import type { CartoKitIR } from '$lib/stores/ir';
-import type { PerformanceMetric, VercelEnv } from '$lib/types';
+import type { CartoKitIR, CartoKitMetric, VercelEnv } from '$lib/types';
 
 const performanceWorker = new Worker(
   new URL('$lib/utils/performance.ts', import.meta.url),
   { type: 'module' }
 );
+const captureMetric =
+  Comlink.wrap<(metric: CartoKitMetric) => void>(performanceWorker);
+
+const newlineRegex = /\r\n|\r|\n/;
 
 /**
  * Generate a Mapbox GL JS program from the CartoKit IR.
  *
  * @param ir – The CartoKit IR.
+ * @param vercelEnv – The Vercel environment.
+ * @param playwrightWorkflowId – The Playwright workflow ID for capturing per-
+ * formance metrics, if defined.
  * @returns – A Mapbox GL JS program.
  */
-export async function codegen(ir: CartoKitIR, env: VercelEnv): Promise<string> {
-  if (env !== 'development') {
+export async function codegen(
+  ir: CartoKitIR,
+  vercelEnv: VercelEnv,
+  playwrightWorkflowId = 'production'
+): Promise<string> {
+  if (vercelEnv !== 'development') {
     performance.mark('codegen-start');
   }
 
@@ -30,7 +40,7 @@ export async function codegen(ir: CartoKitIR, env: VercelEnv): Promise<string> {
     plugins: [babel, estree]
   });
 
-  if (env !== 'development') {
+  if (vercelEnv !== 'development') {
     performance.mark('codegen-end');
     const { duration } = performance.measure(
       'codegen',
@@ -38,12 +48,12 @@ export async function codegen(ir: CartoKitIR, env: VercelEnv): Promise<string> {
       'codegen-end'
     );
 
-    const capturePerformance =
-      Comlink.wrap<(metric: PerformanceMetric) => void>(performanceWorker);
-    capturePerformance({
+    captureMetric({
       kind: 'codegen',
       duration,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      playwrightWorkflowId: playwrightWorkflowId ?? 'production',
+      loc: formatted.split(newlineRegex).length
     });
   }
 

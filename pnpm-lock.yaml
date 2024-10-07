@@ -56,24 +56,9 @@ importers:
       d3:
         specifier: ^7.8.2
         version: 7.9.0
-      lodash.camelcase:
-        specifier: ^4.3.0
-        version: 4.3.0
-      lodash.isfinite:
-        specifier: ^3.3.2
-        version: 3.3.2
-      lodash.kebabcase:
-        specifier: ^4.1.1
-        version: 4.1.1
-      lodash.orderby:
-        specifier: ^4.6.0
-        version: 4.6.0
-      lodash.set:
-        specifier: ^4.3.2
-        version: 4.3.2
-      lodash.uniqueid:
-        specifier: ^4.0.1
-        version: 4.0.1
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       maplibre-gl:
         specifier: ^4.0.0
         version: 4.7.1
@@ -102,24 +87,9 @@ importers:
       '@types/geojson':
         specifier: ^7946.0.10
         version: 7946.0.14
-      '@types/lodash.camelcase':
-        specifier: ^4.3.7
-        version: 4.3.9
-      '@types/lodash.isfinite':
-        specifier: ^3.3.7
-        version: 3.3.9
-      '@types/lodash.kebabcase':
-        specifier: ^4.1.7
-        version: 4.1.9
-      '@types/lodash.orderby':
-        specifier: ^4.6.7
-        version: 4.6.9
-      '@types/lodash.set':
-        specifier: ^4.3.9
-        version: 4.3.9
-      '@types/lodash.uniqueid':
-        specifier: ^4.0.7
-        version: 4.0.9
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/node':
         specifier: ^20.12.11
         version: 20.16.10
@@ -1232,23 +1202,8 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
-  '@types/lodash.camelcase@4.3.9':
-    resolution: {integrity: sha512-ys9/hGBfsKxzmFI8hckII40V0ASQ83UM2pxfQRghHAwekhH4/jWtjz/3/9YDy7ZpUd/H0k2STSqmPR28dnj7Zg==}
-
-  '@types/lodash.isfinite@3.3.9':
-    resolution: {integrity: sha512-LFaIkC1X2u06ZJpOZhyPYbltIESAwPWg/jIUr95WIC6g+iSE40Bh+VCeh87O2rb7XYqw39FcgdFA07UXgtMeNA==}
-
-  '@types/lodash.kebabcase@4.1.9':
-    resolution: {integrity: sha512-kPrrmcVOhSsjAVRovN0lRfrbuidfg0wYsrQa5IYuoQO1fpHHGSme66oyiYA/5eQPVl8Z95OA3HG0+d2SvYC85w==}
-
-  '@types/lodash.orderby@4.6.9':
-    resolution: {integrity: sha512-T9o2wkIJOmxXwVTPTmwJ59W6eTi2FseiLR369fxszG649Po/xe9vqFNhf/MtnvT5jrbDiyWKxPFPZbpSVK0SVQ==}
-
-  '@types/lodash.set@4.3.9':
-    resolution: {integrity: sha512-KOxyNkZpbaggVmqbpr82N2tDVTx05/3/j0f50Es1prxrWB0XYf9p3QNxqcbWb7P1Q9wlvsUSlCFnwlPCIJ46PQ==}
-
-  '@types/lodash.uniqueid@4.0.9':
-    resolution: {integrity: sha512-SEzkJBS8t+tqAUnSmyqbuWqxKU+Z/Xu2cgPtD+Ik0l+M7L2q7So9VoN2rQ8H0mmL87lJ00ykxal8oB54QRet6g==}
+  '@types/lodash-es@4.17.12':
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
 
   '@types/lodash@4.17.10':
     resolution: {integrity: sha512-YpS0zzoduEhuOWjAotS6A5AVCva7X4lVlYLF0FYHAY9sdraBfnatttHItlWeZdGhuEkf+OzMNg2ZYAx8t+52uQ==}
@@ -2391,26 +2346,11 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
-  lodash.camelcase@4.3.0:
-    resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
-
-  lodash.isfinite@3.3.2:
-    resolution: {integrity: sha512-7FGG40uhC8Mm633uKW1r58aElFlBlxCrg9JfSi3P6aYiWmfiWF0PgMd86ZUsxE5GwWPdHoS2+48bwTh2VPkIQA==}
-
-  lodash.kebabcase@4.1.1:
-    resolution: {integrity: sha512-N8XRTIMMqqDgSy4VLKPnJ/+hpGZN+PHQiJnSenYqPaVV/NCqEogTnAdZLQiGKhxX+JCs8waWq2t1XHWKOmlY8g==}
+  lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
-
-  lodash.orderby@4.6.0:
-    resolution: {integrity: sha512-T0rZxKmghOOf5YPnn8EY5iLYeWCpZq8G41FfqoVHH5QDTAFaghJRmAdLiadEDq+ztgM2q5PjA+Z1fOwGrLgmtg==}
-
-  lodash.set@4.3.2:
-    resolution: {integrity: sha512-4hNPN5jlm/N/HLMCO43v8BXKq9Z7QdAGc/VGrRD61w8gN9g/6jF9A4L1pbUgBLCffi0w9VsXfTOij5x8iTyFvg==}
-
-  lodash.uniqueid@4.0.1:
-    resolution: {integrity: sha512-GQQWaIeGlL6DIIr06kj1j6sSmBxyNMwI8kaX9aKpHR/XsMTiaXDVPNPAkiboOTK9OJpTJF/dXT3xYoFQnj386Q==}
 
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
@@ -3893,27 +3833,7 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
-  '@types/lodash.camelcase@4.3.9':
-    dependencies:
-      '@types/lodash': 4.17.10
-
-  '@types/lodash.isfinite@3.3.9':
-    dependencies:
-      '@types/lodash': 4.17.10
-
-  '@types/lodash.kebabcase@4.1.9':
-    dependencies:
-      '@types/lodash': 4.17.10
-
-  '@types/lodash.orderby@4.6.9':
-    dependencies:
-      '@types/lodash': 4.17.10
-
-  '@types/lodash.set@4.3.9':
-    dependencies:
-      '@types/lodash': 4.17.10
-
-  '@types/lodash.uniqueid@4.0.9':
+  '@types/lodash-es@4.17.12':
     dependencies:
       '@types/lodash': 4.17.10
 
@@ -5246,19 +5166,9 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  lodash.camelcase@4.3.0: {}
-
-  lodash.isfinite@3.3.2: {}
-
-  lodash.kebabcase@4.1.1: {}
+  lodash-es@4.17.21: {}
 
   lodash.merge@4.6.2: {}
-
-  lodash.orderby@4.6.0: {}
-
-  lodash.set@4.3.2: {}
-
-  lodash.uniqueid@4.0.1: {}
 
   lru-cache@10.4.3: {}
 

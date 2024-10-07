@@ -15,17 +15,24 @@
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
-  import { ir, type CartoKitIR } from '$lib/stores/ir';
+  import { env as envStore } from '$lib/stores/env';
+  import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import { map as mapStore } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
-  import type { VercelEnv } from '$lib/types';
+  import type { CartoKitIR, VercelEnv } from '$lib/types';
 
   export let data: PageData;
 
   let map: maplibregl.Map;
   let codegenWorker: Worker;
-  let codegen: ((ir: CartoKitIR, env: VercelEnv) => Promise<string>) | null;
+  let codegen:
+    | ((
+        ir: CartoKitIR,
+        vercelEnv: VercelEnv,
+        playwrightWorkflowId?: string
+      ) => Promise<string>)
+    | null;
   let program = '';
 
   onMount(() => {
@@ -44,7 +51,15 @@
         type: 'module'
       }
     );
-    codegen = Comlink.wrap<(ir: CartoKitIR) => Promise<string>>(codegenWorker);
+    codegen =
+      Comlink.wrap<
+        (
+          ir: CartoKitIR,
+          vercelEnv: VercelEnv,
+          playwrightWorkflowId?: string
+        ) => Promise<string>
+      >(codegenWorker);
+    envStore.set(data.env);
 
     // Add an event listener to handle feature deselection.
     map.on('click', onFeatureLeave(map, $ir));
@@ -60,14 +75,6 @@
 
         return ir;
       });
-
-      try {
-        if (codegen) {
-          program = await codegen($ir, data.env);
-        }
-      } catch (err) {
-        console.error(err);
-      }
     });
 
     map.on('move', (event) => {
@@ -111,7 +118,12 @@
   }
 
   $: if (codegen) {
-    codegen($ir, data.env)
+    codegen(
+      $ir,
+      data.env,
+      (window as unknown as Window & { playwrightWorkflowId: string })
+        .playwrightWorkflowId
+    )
       .then((code) => {
         program = code;
       })
