@@ -17,7 +17,7 @@ async function flushMetrics() {
   const batch = metrics.slice();
 
   try {
-    fetch('/performance', {
+    fetch('/api/performance', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
