@@ -16,6 +16,13 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * https://academic.oup.com/qje/article/137/4/2037/6571943
  */
 test('workflow-6', async ({ page }) => {
+  // Identify the playwright test for application code.
+  await page.addInitScript(() => {
+    (
+      window as unknown as Window & { playwrightWorkflowId: string }
+    ).playwrightWorkflowId = 'workflow-6';
+  });
+
   // Mark workflow tests as slow.
   test.slow();
 

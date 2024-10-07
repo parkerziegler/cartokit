@@ -17,6 +17,13 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * nental United States from 2012-2022.
  */
 test('workflow-5', async ({ page }) => {
+  // Identify the playwright test for application code.
+  await page.addInitScript(() => {
+    (
+      window as unknown as Window & { playwrightWorkflowId: string }
+    ).playwrightWorkflowId = 'workflow-5';
+  });
+
   // Mark workflow tests as slow.
   test.slow();
 

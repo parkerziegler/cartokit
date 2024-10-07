@@ -1,4 +1,4 @@
-import type { CartoKitIR } from '$lib/stores/ir';
+import type { CartoKitIR } from '$lib/types';
 
 const allAfterEqualRegex = /=.+$/;
 

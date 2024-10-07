@@ -1,6 +1,6 @@
 import * as Comlink from 'comlink';
 import * as d3 from 'd3';
-import set from 'lodash.set';
+import { set } from 'lodash-es';
 import { ckmeans } from 'simple-statistics';
 
 import type { CartoKitLayer, Catalog } from '$lib/types';

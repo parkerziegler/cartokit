@@ -1,9 +1,11 @@
+import * as Comlink from 'comlink';
 import type { FeatureCollection } from 'geojson';
 import type { GeoJSONSource } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { updateLayerChannel } from '$lib/interaction/channel';
 import { transitionLayerType } from '$lib/interaction/layer-type';
+import { env as envStore } from '$lib/stores/env';
 import { ir } from '$lib/stores/ir';
 import { map as mapStore } from '$lib/stores/map';
 import type {
@@ -22,7 +24,8 @@ import type {
   CategoricalFill,
   CategoricalColorScheme,
   ConstantFill,
-  Channel
+  Channel,
+  CartoKitMetric
 } from '$lib/types';
 import {
   DEFAULT_FILL,
@@ -217,7 +220,11 @@ export function dispatchLayerUpdate({
   payload
 }: DispatchLayerUpdateParams): void {
   const map = get(mapStore);
+  const env = get(envStore);
 
+  if (env !== 'development') {
+    performance.mark('reconciliation-start');
+  }
   switch (type) {
     case 'layer-type': {
       ir.update((ir) => {
@@ -768,5 +775,34 @@ export function dispatchLayerUpdate({
         return ir;
       });
     }
+  }
+
+  if (env !== 'development') {
+    performance.mark('reconciliation-end');
+    const { duration } = performance.measure(
+      'reconciliation',
+      'reconciliation-start',
+      'reconciliation-end'
+    );
+    const performanceWorker = new Worker(
+      new URL('$lib/utils/performance.ts', import.meta.url),
+      { type: 'module' }
+    );
+    const captureMetric =
+      Comlink.wrap<(metric: CartoKitMetric) => void>(performanceWorker);
+
+    captureMetric({
+      kind: 'reconciliation',
+      duration,
+      timestamp: Date.now(),
+      playwrightWorkflowId:
+        (window as Window & { playwrightWorkflowId?: string })
+          .playwrightWorkflowId ?? 'production',
+      update: type,
+      payload:
+        type === 'transformation'
+          ? { transformation: payload.transformation }
+          : payload
+    });
   }
 }

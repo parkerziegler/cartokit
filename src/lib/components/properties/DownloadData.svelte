@@ -1,5 +1,5 @@
 <script lang="ts">
-  import kebabCase from 'lodash.kebabcase';
+  import { kebabCase } from 'lodash-es';
 
   import DownloadIcon from '$lib/components/icons/DownloadIcon.svelte';
   import type { CartoKitLayer } from '$lib/types';

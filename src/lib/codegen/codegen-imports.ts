@@ -1,8 +1,8 @@
-import camelCase from 'lodash.camelcase';
+import { camelCase } from 'lodash-es';
 
 import { codegenFns } from '$lib/codegen/codegen-fns';
 import { codegenMap } from '$lib/codegen/codegen-map';
-import type { CartoKitIR } from '$lib/stores/ir';
+import type { CartoKitIR } from '$lib/types';
 
 /**
  * Generate a program fragment for all library and data source imports.
@@ -29,7 +29,7 @@ export function codegenImports(ir: CartoKitIR) {
 
   const imports = `import mapboxgl from 'mapbox-gl';
   ${isTurfRequired(ir) ? "import * as turf from '@turf/turf';\n" : ''}
-  ${isLodashFlowRequired(ir) ? "import flow from 'lodash.flow';\n" : ''}
+  ${isLodashFlowRequired(ir) ? "import { flow } from 'lodash';\n" : ''}
   ${fileImports}
 
   mapboxgl.accessToken = '<YOUR_MAPBOX_ACCESS_TOKEN>'`;
@@ -60,10 +60,10 @@ function isTurfRequired({ layers }: CartoKitIR): boolean {
 }
 
 /**
- * Determine whether lodash.flow is required for chaining transformations.
+ * Determine whether lodash/flow is required for chaining transformations.
  *
  * @param ir – The CartoKit IR.
- * @returns - A Boolean value indicating whether lodash.flow is required.
+ * @returns - A Boolean value indicating whether lodash/flow is required.
  */
 function isLodashFlowRequired({ layers }: CartoKitIR): boolean {
   return Object.values(layers).some(

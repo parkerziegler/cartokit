@@ -1,4 +1,4 @@
-import isFinite from 'lodash.isfinite';
+import { isFinite } from 'lodash-es';
 
 /**
  * Determine if a GeoJSON property is quantitative. We exclude `NaN` and

@@ -17,6 +17,13 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * iles (i.e., 10%-90% coverage).
  */
 test('workflow-1', async ({ page }) => {
+  // Identify the playwright test for application code.
+  await page.addInitScript(() => {
+    (
+      window as unknown as Window & { playwrightWorkflowId: string }
+    ).playwrightWorkflowId = 'workflow-1';
+  });
+
   // Mark workflow tests as slow.
   test.slow();
 

@@ -329,6 +329,43 @@ export interface DotDensityDots {
 }
 
 /**
+ * Represents a basemap in cartokit.
+ *
+ * @property {string} title - The name of the basemap, set by the tile provider.
+ * @property {string} tileId - The tile ID of the basemap, set by the tile pro-
+ * vider.
+ * @property {string} src - The source for the basemap thumbnail.
+ */
+export interface Basemap {
+  title: string;
+  tileId: string;
+  src: string;
+}
+
+/**
+ * Represents the set of possible basemap providers in cartokit.
+ */
+export type BasemapProvider = 'Stamen' | 'Stadia Maps' | 'MapTiler' | 'Custom';
+
+/**
+ * Represents the cartokit IR.
+ *
+ * @property center - The current center coordinates of the map.
+ * @property zoom - The current zoom level of the map.
+ * @property basemap - The current basemap of the map.
+ * @property layers - The current layers of the map.
+ */
+export interface CartoKitIR {
+  center: [number, number];
+  zoom: number;
+  basemap: {
+    url: string;
+    provider: BasemapProvider;
+  };
+  layers: Record<string, CartoKitLayer>;
+}
+
+/**
  * Represents a catalog mapping layers to pre-computed classification statistics.
  */
 export type Catalog = Record<
@@ -342,3 +379,59 @@ export type Catalog = Record<
     }
   >
 >;
+
+/**
+ * Represents a performance metric.
+ *
+ * @property {'codegen' | 'reconciliation'} kind - The kind of performance
+ * metric, either 'codegen' or 'reconciliation'.
+ * @property {number} duration - The duration of the performance metric in ms.
+ * @property {number} timestamp - The timestamp of the performance metric.
+ * @property {string} playwrightWorkflowId - The Playwright workflow ID, if def-
+ * ined.
+ */
+interface PerformanceMetric {
+  kind: 'codegen' | 'reconciliation';
+  duration: number;
+  timestamp: number;
+  playwrightWorkflowId: string;
+}
+
+/**
+ * Represents a codegen performance metric.
+ *
+ * @extends PerfMetric
+ * @property {'codegen'} kind - The kind of performance metric, 'codegen'.
+ * @property {number} loc - The number of lines of code generated.
+ */
+interface CodegenPerformanceMetric extends PerformanceMetric {
+  kind: 'codegen';
+  loc: number;
+}
+
+/**
+ * Represents a reconciliation performance metric.
+ *
+ * @extends PerfMetric
+ * @property {'reconciliation'} kind - The kind of performance metric, 'recon-
+ * ciliation'.
+ * @property {string} update - The name of the reconciliation update.
+ * @property {Object} payload - The payload of the reconciliation update.
+ */
+interface ReconciliationPerformanceMetric extends PerformanceMetric {
+  kind: 'reconciliation';
+  update: string;
+  payload: Record<string, unknown>;
+}
+
+/**
+ * Represents a tracked metric in cartokit.
+ */
+export type CartoKitMetric =
+  | CodegenPerformanceMetric
+  | ReconciliationPerformanceMetric;
+
+/**
+ * Represents the environment for a Vercel deployment.
+ */
+export type VercelEnv = 'development' | 'preview' | 'production';

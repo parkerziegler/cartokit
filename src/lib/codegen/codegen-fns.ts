@@ -1,4 +1,4 @@
-import type { CartoKitIR } from '$lib/stores/ir';
+import type { CartoKitIR } from '$lib/types';
 
 /**
  * Generate top-level reusable functions within the JS module.

@@ -3,7 +3,7 @@
 <script lang="ts">
   import cs from 'classnames';
   import type { Feature } from 'geojson';
-  import orderBy from 'lodash.orderby';
+  import { orderBy } from 'lodash-es';
   /* eslint-disable import/no-duplicates */
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';

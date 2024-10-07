@@ -1,17 +1,6 @@
 import { writable } from 'svelte/store';
 
-import type { CartoKitLayer } from '$lib/types';
-import type { BasemapProvider } from '$lib/utils/basemap';
-
-export interface CartoKitIR {
-  center: [number, number];
-  zoom: number;
-  basemap: {
-    url: string;
-    provider: BasemapProvider;
-  };
-  layers: Record<string, CartoKitLayer>;
-}
+import type { CartoKitIR } from '$lib/types';
 
 export const ir = writable<CartoKitIR>({
   center: [-98.35, 39.5],

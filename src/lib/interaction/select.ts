@@ -1,10 +1,10 @@
 import type { Map, MapLayerMouseEvent, MapMouseEvent } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
-import type { CartoKitIR } from '$lib/stores/ir';
 import { layout } from '$lib/stores/layout';
 import { listeners } from '$lib/stores/listeners';
 import { selectedFeature } from '$lib/stores/selected-feature';
+import type { CartoKitIR } from '$lib/types';
 
 /**
  * Add a selection indicator to a feature in a point layer.
