@@ -24,7 +24,6 @@ jobs:
         run: pnpm exec playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
         env:
           PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.environment == 'production' && 'https://alpha.cartokit.dev/' || github.event.deployment_status.target_url }}
-          GITHUB_ENV: ${{ github.event.deployment_status.environment }}
       - name: Upload blob report to GitHub Actions Artifacts
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

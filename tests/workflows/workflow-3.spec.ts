@@ -79,7 +79,7 @@ test('workflow-3', async ({ page }) => {
   await page.goto('/');
   console.log(process.env);
 
-  if (process.env.GITHUB_ENV === 'Preview') {
+  if (page.url().includes('vercel.app')) {
     // In Preview Vercel environments, ensure <vercel-live-feedback> does not
     // intercept pointer events.
     await page.locator('vercel-live-feedback').waitFor({ state: 'attached' });
