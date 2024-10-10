@@ -31,7 +31,7 @@ test('workflow-6', async ({ page }) => {
     'https://cartokit-zetq-65nem620w-parker-zieglers-projects.vercel.app/'
   );
 
-  if (process.env.VERCEL_ENV === 'Preview') {
+  if (process.env.GITHUB_ENV === 'Preview') {
     // In Preview Vercel environments, ensure <vercel-live-feedback> does not
     // intercept pointer events.
     await page
