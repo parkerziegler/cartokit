@@ -29,6 +29,7 @@ test('workflow-1', async ({ page }) => {
 
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
+  console.log(process.env);
 
   if (process.env.GITHUB_ENV === 'Preview') {
     // In Preview Vercel environments, ensure <vercel-live-feedback> does not
@@ -37,6 +38,7 @@ test('workflow-1', async ({ page }) => {
     await page.locator('vercel-live-feedback').evaluate((element) => {
       element.style.pointerEvents = 'none';
       element.style.zIndex = '-1';
+      element.style.display = 'none';
     });
   }
 
