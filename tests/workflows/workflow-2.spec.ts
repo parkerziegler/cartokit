@@ -74,7 +74,6 @@ test('workflow-2', async ({ page }) => {
 
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
-  console.log(process.env);
 
   if (page.url().includes('vercel.app')) {
     // In Preview Vercel environments, ensure <vercel-live-feedback> does not
