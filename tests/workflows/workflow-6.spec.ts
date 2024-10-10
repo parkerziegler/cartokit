@@ -27,7 +27,17 @@ test('workflow-6', async ({ page }) => {
   test.slow();
 
   // Navigate to cartokit, running on a local development server.
-  await page.goto('/');
+  await page.goto(
+    'https://cartokit-zetq-65nem620w-parker-zieglers-projects.vercel.app/'
+  );
+
+  if (process.env.VERCEL_ENV === 'preview') {
+    // In Preview Vercel environments, ensure <vercel-live-feedback> does not
+    // intercept pointer events.
+    await page
+      .locator('vercel-live-feedback')
+      .evaluate((element) => (element.style.pointerEvents = 'none'));
+  }
 
   // Wait for the Open Editor button and Add Layer button to become enabled. These
   // are proxies for the map reaching an idle state.
