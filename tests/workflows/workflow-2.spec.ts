@@ -75,7 +75,7 @@ test('workflow-2', async ({ page }) => {
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
 
-  if (process.env.VERCEL_ENV === 'preview') {
+  if (process.env.VERCEL_ENV === 'Preview') {
     // In Preview Vercel environments, ensure <vercel-live-feedback> does not
     // intercept pointer events.
     await page
