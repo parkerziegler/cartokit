@@ -33,9 +33,11 @@ test('workflow-1', async ({ page }) => {
   if (process.env.GITHUB_ENV === 'Preview') {
     // In Preview Vercel environments, ensure <vercel-live-feedback> does not
     // intercept pointer events.
-    await page
-      .locator('vercel-live-feedback')
-      .evaluate((element) => (element.style.pointerEvents = 'none'));
+    await page.locator('vercel-live-feedback').waitFor({ state: 'attached' });
+    await page.locator('vercel-live-feedback').evaluate((element) => {
+      element.style.pointerEvents = 'none';
+      element.style.zIndex = '-1';
+    });
   }
 
   // Wait for the Open Editor button and Add Layer button to become enabled. These
