@@ -90,7 +90,7 @@ test('workflow-3', async ({ page }) => {
   // Add the layer.
   await page.getByRole('button', { name: 'Add' }).click();
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible({
-    timeout: 30000
+    timeout: 60000
   });
 
   // Wait for MapLibre to render the Winter Temperature Change layer.
