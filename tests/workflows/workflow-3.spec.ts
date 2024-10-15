@@ -1,58 +1,4 @@
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-import * as stream from 'node:stream';
-import * as url from 'node:url';
-import * as zlib from 'node:zlib';
-
 import { test, expect } from '@playwright/test';
-
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-
-test.beforeAll(() => {
-  // Unzip the Winter Temperature Change GeoJSON file.
-  const unzip = zlib.createUnzip();
-  const input = fs.createReadStream(
-    path.join(
-      __dirname,
-      '../data/workflow-3/wapo-winter-temperature-change.json.gz'
-    )
-  );
-  const output = fs.createWriteStream(
-    path.join(
-      __dirname,
-      '../data/workflow-3/wapo-winter-temperature-change.json'
-    )
-  );
-
-  stream.pipeline(input, unzip, output, (error) => {
-    if (error) {
-      throw error;
-    }
-  });
-});
-
-test.afterAll(() => {
-  if (
-    fs.existsSync(
-      path.join(
-        __dirname,
-        '../data/workflow-3/wapo-winter-temperature-change.json'
-      )
-    )
-  ) {
-    fs.rm(
-      path.join(
-        __dirname,
-        '../data/workflow-3/wapo-winter-temperature-change.json'
-      ),
-      (error) => {
-        if (error) {
-          throw error;
-        }
-      }
-    );
-  }
-});
 
 /**
  * Workflow 3. https://www.washingtonpost.com/climate-environment/interactive/2024/winter-temperature-warming-city-data-climate-change/
@@ -131,18 +77,11 @@ test('workflow-3', async ({ page }) => {
   await page.getByTestId('add-layer-button').click();
   await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
-  // Select the From File tab.
-  await page.getByRole('button', { name: 'From File' }).waitFor();
-  await page.getByRole('button', { name: 'From File' }).click();
-
-  // Upload the Winter Temperature Change GeoJSON file.
+  // Add the API endpoint for the Winter Temperature Change GeoJSON file.
   await page
-    .locator('#from-file-input')
-    .setInputFiles(
-      path.join(
-        __dirname,
-        '../data/workflow-3/wapo-winter-temperature-change.json'
-      )
+    .locator('#from-endpoint-input')
+    .fill(
+      'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-winter-temperature-change.json'
     );
 
   // Specify the layer's Display Name.
