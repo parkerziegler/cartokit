@@ -67,7 +67,7 @@ importers:
         version: 3.3.3
       simple-statistics:
         specifier: ^7.8.3
-        version: 7.8.5
+        version: 7.8.7
     devDependencies:
       '@playwright/test':
         specifier: ^1.44.0
@@ -2863,8 +2863,8 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
-  simple-statistics@7.8.5:
-    resolution: {integrity: sha512-yw4aOnkvPLbL80zamrEKznAnk5cIIkjEcx/z0aQl+m/YKMmVufrnWgWJWRspqZtwh+ElZXRhJ0MtnUjFUQV5Ow==}
+  simple-statistics@7.8.7:
+    resolution: {integrity: sha512-ed5FwTNYvkMTfbCai1U+r3symP+lIPKWCqKdudpN4NFNMn9RtDlFtSyAQhCp4oPH0YBjWu/qnW+5q5ZkPB3uHQ==}
 
   sirv@3.0.0:
     resolution: {integrity: sha512-BPwJGUeDaDCHihkORDchNyyTvWFhcusy1XMmhEVTQTwGeybFbp8YEmB+njbPnth1FibULBSBVwCQni25XlCUDg==}
@@ -6452,7 +6452,7 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
-  simple-statistics@7.8.5: {}
+  simple-statistics@7.8.7: {}
 
   sirv@3.0.0:
     dependencies:
