@@ -1,6 +1,5 @@
 <script lang="ts">
   import cs from 'classnames';
-  import * as Comlink from 'comlink';
   import maplibregl from 'maplibre-gl';
   import { onMount } from 'svelte';
 
@@ -15,25 +14,14 @@
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
-  import { env as envStore } from '$lib/stores/env';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import { map as mapStore } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
-  import type { CartoKitIR, VercelEnv } from '$lib/types';
 
   export let data: PageData;
 
   let map: maplibregl.Map;
-  let codegenWorker: Worker;
-  let codegen:
-    | ((
-        ir: CartoKitIR,
-        vercelEnv: VercelEnv,
-        playwrightWorkflowId?: string
-      ) => Promise<string>)
-    | null;
-  let program = '';
 
   onMount(() => {
     // maplibre-gl is actually a CJS module, and not all module.exports may be
@@ -45,28 +33,13 @@
       center: $ir.center,
       zoom: $ir.zoom
     });
-    codegenWorker = new Worker(
-      new URL('$lib/codegen/index.ts', import.meta.url),
-      {
-        type: 'module'
-      }
-    );
-    codegen =
-      Comlink.wrap<
-        (
-          ir: CartoKitIR,
-          vercelEnv: VercelEnv,
-          playwrightWorkflowId?: string
-        ) => Promise<string>
-      >(codegenWorker);
-    envStore.set(data.env);
 
     // Add an event listener to handle feature deselection.
     map.on('click', onFeatureLeave(map, $ir));
 
     // When the map first reaches an idle state, set it in the store.
     // This should ensure that the map's styles and data have fully loaded.
-    map.once('idle', async () => {
+    map.once('idle', () => {
       mapStore.set(map);
 
       ir.update((ir) => {
@@ -96,8 +69,6 @@
 
     return () => {
       map.remove();
-      codegenWorker.terminate();
-      codegen = null;
     };
   });
 
@@ -115,21 +86,6 @@
 
       return layout;
     });
-  }
-
-  $: if (codegen) {
-    codegen(
-      $ir,
-      data.env,
-      (window as unknown as Window & { playwrightWorkflowId: string })
-        .playwrightWorkflowId
-    )
-      .then((code) => {
-        program = code;
-      })
-      .catch((err) => {
-        console.error(err);
-      });
   }
 </script>
 
@@ -178,7 +134,7 @@
     {/if}
   </div>
   {#if $layout.editorVisible}
-    <Editor {program} />
+    <Editor />
   {/if}
 </main>
 
