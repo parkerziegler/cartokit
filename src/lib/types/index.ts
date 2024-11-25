@@ -379,3 +379,8 @@ export type Catalog = Record<
     }
   >
 >;
+
+/**
+ * Represents the set of identifiers for code generation backends.
+ */
+export type CartoKitBackend = 'mapbox' | 'maplibre';

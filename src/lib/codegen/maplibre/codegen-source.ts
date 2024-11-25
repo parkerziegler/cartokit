@@ -1,13 +1,14 @@
-import { codegenTransformations } from '$lib/codegen/codegen-transformations';
+import { codegenTransformations } from '$lib/codegen/maplibre/codegen-transformations';
 import type { CartoKitLayer } from '$lib/types';
 
 /**
- * Generate the data source for a @see{CartoKitLayer}.
+ * Generate code to add a data source for a @see{CartoKitLayer} to a MapLibre GL
+ * JS map.
  *
  * @param layer – A @see{CartoKitLayer}.
  * @param uploadTable – The symbol table tracking file uploads.
- *
- * @returns – A Mapbox GL JS program fragment.
+ * @returns – A JavaScript program fragment containing code to add a data source
+ * for a @see{CartoKitLayer} to a MapLibre GL JS map.
  */
 export function codegenSource(
   layer: CartoKitLayer,

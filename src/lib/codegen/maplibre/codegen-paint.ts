@@ -1,14 +1,27 @@
 import { deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
 import type { CartoKitLayer } from '$lib/types';
-import { MAPBOX_DEFAULTS } from '$lib/utils/constants';
+
+const MAPLIBRE_DEFAULTS = {
+  'circle-radius': 5,
+  'fill-color': '#000000',
+  'line-color': '#000000',
+  'fill-opacity': 1,
+  'line-opacity': 1,
+  'line-width': 1,
+  'circle-color': '#000000',
+  'circle-opacity': 1,
+  'circle-stroke-color': '#000000',
+  'circle-stroke-width': 0,
+  'circle-stroke-opacity': 1
+};
 
 /**
- * Generate a Mapbox GL JS program fragment representing the layer's fill.
+ * Generate a MapLibre GL JS program fragment representing the layer's fill.
  *
  * @param {CartoKitLayer} layer – A @see{CartoKitLayer}.
- * @returns {string} – A Mapbox GL JS program fragment representing the layer's
- * fill.
+ * @returns {string} – A MapLibre GL JS program fragment representing the
+ * layer's fill.
  */
 export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
@@ -22,12 +35,12 @@ export function codegenFill(layer: CartoKitLayer): string {
         withDefault(
           'circle-radius',
           layer.style.size,
-          MAPBOX_DEFAULTS['circle-radius']
+          MAPLIBRE_DEFAULTS['circle-radius']
         ),
         withDefault(
           'circle-opacity',
           layer.style.fill.opacity,
-          MAPBOX_DEFAULTS['circle-opacity']
+          MAPLIBRE_DEFAULTS['circle-opacity']
         )
       ]
         .filter(Boolean)
@@ -44,7 +57,7 @@ export function codegenFill(layer: CartoKitLayer): string {
         withDefault(
           'circle-opacity',
           layer.style.fill.opacity,
-          MAPBOX_DEFAULTS['fill-opacity']
+          MAPLIBRE_DEFAULTS['fill-opacity']
         )
       ]
         .filter(Boolean)
@@ -59,17 +72,17 @@ export function codegenFill(layer: CartoKitLayer): string {
         withDefault(
           'circle-color',
           layer.style.fill.color,
-          MAPBOX_DEFAULTS['circle-color']
+          MAPLIBRE_DEFAULTS['circle-color']
         ),
         withDefault(
           'circle-radius',
           layer.style.dots.size,
-          MAPBOX_DEFAULTS['circle-radius']
+          MAPLIBRE_DEFAULTS['circle-radius']
         ),
         withDefault(
           'circle-opacity',
           layer.style.fill.opacity,
-          MAPBOX_DEFAULTS['circle-opacity']
+          MAPLIBRE_DEFAULTS['circle-opacity']
         )
       ]
         .filter(Boolean)
@@ -86,12 +99,12 @@ export function codegenFill(layer: CartoKitLayer): string {
         withDefault(
           'fill-color',
           layer.style.fill.color,
-          MAPBOX_DEFAULTS['fill-color']
+          MAPLIBRE_DEFAULTS['fill-color']
         ),
         withDefault(
           'fill-opacity',
           layer.style.fill.opacity,
-          MAPBOX_DEFAULTS['fill-opacity']
+          MAPLIBRE_DEFAULTS['fill-opacity']
         )
       ]
         .filter(Boolean)
@@ -103,7 +116,7 @@ export function codegenFill(layer: CartoKitLayer): string {
         withDefault(
           'fill-opacity',
           layer.style.fill.opacity,
-          MAPBOX_DEFAULTS['fill-opacity']
+          MAPLIBRE_DEFAULTS['fill-opacity']
         )
       ]
         .filter(Boolean)
@@ -113,11 +126,11 @@ export function codegenFill(layer: CartoKitLayer): string {
 }
 
 /**
- * Generate a Mapbox GL JS program fragment representing the layer's stroke.
+ * Generate a MapLibre GL JS program fragment representing the layer's stroke.
  *
  * @param {CartoKitLayer} layer – A @see{CartoKitLayer}.
- * @returns {string} – A Mapbox GL JS program fragment representing the layer's
- * stroke.
+ * @returns {string} – A MapLibre GL JS program fragment representing the
+ * layer's stroke.
  */
 export function codegenStroke(layer: CartoKitLayer): string {
   switch (layer.type) {
@@ -132,17 +145,17 @@ export function codegenStroke(layer: CartoKitLayer): string {
         withDefault(
           'circle-stroke-color',
           layer.style.stroke.color,
-          MAPBOX_DEFAULTS['circle-stroke-color']
+          MAPLIBRE_DEFAULTS['circle-stroke-color']
         ),
         withDefault(
           'circle-stroke-width',
           layer.style.stroke.width,
-          MAPBOX_DEFAULTS['circle-stroke-width']
+          MAPLIBRE_DEFAULTS['circle-stroke-width']
         ),
         withDefault(
           'circle-stroke-opacity',
           layer.style.stroke.opacity,
-          MAPBOX_DEFAULTS['circle-stroke-opacity']
+          MAPLIBRE_DEFAULTS['circle-stroke-opacity']
         )
       ]
         .filter(Boolean)
@@ -159,17 +172,17 @@ export function codegenStroke(layer: CartoKitLayer): string {
         withDefault(
           'line-color',
           layer.style.stroke.color,
-          MAPBOX_DEFAULTS['line-color']
+          MAPLIBRE_DEFAULTS['line-color']
         ),
         withDefault(
           'line-width',
           layer.style.stroke.width,
-          MAPBOX_DEFAULTS['line-width']
+          MAPLIBRE_DEFAULTS['line-width']
         ),
         withDefault(
           'line-opacity',
           layer.style.stroke.opacity,
-          MAPBOX_DEFAULTS['line-opacity']
+          MAPLIBRE_DEFAULTS['line-opacity']
         )
       ]
         .filter(Boolean)
@@ -179,21 +192,21 @@ export function codegenStroke(layer: CartoKitLayer): string {
 }
 
 /**
- * Return a Mapbox GL JS program fragment representing a property-value pair,
+ * Return a MapLibre GL JS program fragment representing a property-value pair,
  * unless the value is the same as the default value.
  *
- * @param {string} mapboxProperty – The Mapbox GL JS property name.
- * @param {T} cartokitValue – The value of the property in the CartoKit IR.
- * @param {T} defaultValue – The default Mapbox GL JS value for the property.
- * @returns {string} – A (potentially empty) Mapbox GL JS program fragment.
+ * @param maplibreProperty – The MapLibre GL JS property name.
+ * @param cartokitValue – The value of the property in the CartoKit IR.
+ * @param defaultValue – The default MapLibre GL JS value for the property.
+ * @returns – A (potentially empty) MapLibre GL JS program fragment.
  */
 function withDefault<T extends string | number>(
-  mapboxProperty: string,
+  maplibreProperty: string,
   cartokitValue: T,
   defaultValue: T
 ): string {
   return cartokitValue !== defaultValue
-    ? `'${mapboxProperty}': ${
+    ? `'${maplibreProperty}': ${
         typeof cartokitValue === 'string' ? `'${cartokitValue}'` : cartokitValue
       }`
     : '';
