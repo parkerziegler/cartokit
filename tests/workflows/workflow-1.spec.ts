@@ -85,7 +85,10 @@ test('workflow-1', async ({ page }) => {
   await page.getByLabel('Display Name').fill('Penumbra Paths');
 
   // Add the layer.
-  await page.getByRole('button', { name: 'Add' }).click();
+  await page
+    .getByTestId('add-layer-modal')
+    .getByRole('button', { name: 'Add' })
+    .click();
 
   // Wait for the loading indicator to disappear.
   await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
@@ -176,7 +179,10 @@ test('workflow-1', async ({ page }) => {
       path.join(__dirname, '../data/workflow-1/nyt-nasa-path-of-totality.json')
     );
   await page.getByLabel('Display Name').fill('Path of Totality');
-  await page.getByRole('button', { name: 'Add' }).click();
+  await page
+    .getByTestId('add-layer-modal')
+    .getByRole('button', { name: 'Add' })
+    .click();
 
   // Wait for the loading indicator to disappear.
   await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });

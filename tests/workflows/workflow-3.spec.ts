@@ -88,7 +88,10 @@ test('workflow-3', async ({ page }) => {
   await page.getByLabel('Display Name').fill('Winter Temperature Change');
 
   // Add the layer.
-  await page.getByRole('button', { name: 'Add' }).click();
+  await page
+    .getByTestId('add-layer-modal')
+    .getByRole('button', { name: 'Add' })
+    .click();
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible({
     timeout: 60000
   });

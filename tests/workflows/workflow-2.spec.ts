@@ -89,7 +89,10 @@ test('workflow-2', async ({ page }) => {
   await page.getByLabel('Display Name').fill('Spring Leaf Appearance');
 
   // Add the layer.
-  await page.getByRole('button', { name: 'Add' }).click();
+  await page
+    .getByTestId('add-layer-modal')
+    .getByRole('button', { name: 'Add' })
+    .click();
 
   // Wait for the loading indicator to disappear.
   await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });

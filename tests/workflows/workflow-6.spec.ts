@@ -78,7 +78,10 @@ test('workflow-6', async ({ page }) => {
   await page.getByLabel('Display Name').fill('Climate Impact Regions');
 
   // Add the layer.
-  await page.getByRole('button', { name: 'Add' }).click();
+  await page
+    .getByTestId('add-layer-modal')
+    .getByRole('button', { name: 'Add' })
+    .click();
 
   // Wait for the loading indicator to disappear.
   await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
