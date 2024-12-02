@@ -26,7 +26,7 @@ export function codegenMap(
   const isLoadAsync = isFetchGeoJSONRequired(ir);
 
   const program = `
-  const map = new maplibre.Map({
+  const map = new maplibregl.Map({
     container: 'map',
     style: ${codegenMapStyle(ir)},
     center: [${ir.center.join(', ')}],

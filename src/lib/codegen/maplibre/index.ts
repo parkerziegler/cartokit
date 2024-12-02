@@ -7,7 +7,7 @@ import { codegenImports } from '$lib/codegen/maplibre/codegen-imports';
 import type { CartoKitIR } from '$lib/types';
 
 /**
- * Generate a JavaScript program from the CartoKit IR.
+ * Generate a JavaScript program using MapLibre GL JS from the CartoKit IR.
  *
  * @param ir – The CartoKit IR.
  * @returns – A JavaScript program.
