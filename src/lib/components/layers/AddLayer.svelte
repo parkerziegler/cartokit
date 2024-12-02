@@ -28,6 +28,7 @@
   on:click={onClick}
   class="disabled:cursor-not-allowed disabled:hover:cursor-not-allowed"
   data-testid="add-layer-button"
+  aria-label="Add Layer"
   disabled={!$map}
 >
   <PlusIcon />
