@@ -16,15 +16,15 @@
 </script>
 
 <form class="stack stack-xs border-r border-r-slate-600 px-4 py-2 text-white">
-  <div class="flex items-center justify-between">
-    <div class="stack-h stack-h-xs items-center">
-      <p class="font-sans text-sm font-medium tracking-wider">Options</p>
-      <GearIcon />
-    </div>
-    <button on:click={() => (optionsExpanded = !optionsExpanded)}>
+  <button on:click={() => (optionsExpanded = !optionsExpanded)}>
+    <div class="flex items-center justify-between">
+      <div class="stack-h stack-h-xs items-center">
+        <p class="font-sans text-sm font-medium tracking-wider">Options</p>
+        <GearIcon />
+      </div>
       <ChevronIcon rotate={optionsExpanded ? 0 : 180} />
-    </button>
-  </div>
+    </div>
+  </button>
   {#if optionsExpanded}
     <fieldset
       class="stack stack-xs text-white"
@@ -35,7 +35,7 @@
         >Library</legend
       >
       {#each options as { value, icon }}
-        <label class="flex items-center text-xs">
+        <label class="flex items-center gap-2 text-xs">
           <input
             type="radio"
             name="Library"
@@ -43,7 +43,9 @@
             bind:group={$backend}
             style="color-scheme: dark;"
           />
-          <svelte:component this={icon} scale={0.75} /></label
+          <div class="h-4">
+            <svelte:component this={icon} />
+          </div></label
         >
       {/each}
     </fieldset>

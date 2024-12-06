@@ -1,14 +1,8 @@
-<script lang="ts">
-  export let scale = 1;
-</script>
-
 <svg
-  width="103"
-  height="24"
+  height="100%"
   viewBox="0 0 103 24"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
-  transform="scale({scale})"
 >
   <g clip-path="url(#clip0_641_2)">
     <mask
