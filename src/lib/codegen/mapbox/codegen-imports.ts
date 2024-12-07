@@ -1,13 +1,12 @@
 import { camelCase } from 'lodash-es';
 
-import { codegenFns } from '$lib/codegen/codegen-fns';
-import { codegenMap } from '$lib/codegen/codegen-map';
+import { codegenFns } from '$lib/codegen/mapbox/codegen-fns';
+import { codegenMap } from '$lib/codegen/mapbox/codegen-map';
 import type { CartoKitIR } from '$lib/types';
 
 /**
  * Generate a program fragment for all library and data source imports.
  *
- * @param map – The MapLibre GL JS map instance.
  * @param ir – The CartoKit IR.
  * @returns – A program fragment.
  */

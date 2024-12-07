@@ -1,4 +1,7 @@
-import { codegenFill, codegenStroke } from '$lib/codegen/codegen-paint';
+import {
+  codegenFill,
+  codegenStroke
+} from '$lib/codegen/maplibre/codegen-paint';
 import type { CartoKitLayer } from '$lib/types';
 
 /**

@@ -1,7 +1,7 @@
-import { isFetchGeoJSONRequired } from '$lib/codegen/codegen-fns';
-import { codegenLayer } from '$lib/codegen/codegen-layer';
-import { codegenMapStyle } from '$lib/codegen/codegen-map-style';
-import { codegenSource } from '$lib/codegen/codegen-source';
+import { isFetchGeoJSONRequired } from '$lib/codegen/mapbox/codegen-fns';
+import { codegenLayer } from '$lib/codegen/mapbox/codegen-layer';
+import { codegenMapStyle } from '$lib/codegen/mapbox/codegen-map-style';
+import { codegenSource } from '$lib/codegen/mapbox/codegen-source';
 import type { CartoKitIR } from '$lib/types';
 
 /**
