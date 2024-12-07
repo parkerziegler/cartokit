@@ -29,7 +29,7 @@ export function codegenImports(ir: CartoKitIR) {
 
   const imports = `import maplibregl from 'maplibre-gl';
   ${isTurfRequired(ir) ? "import * as turf from '@turf/turf';\n" : ''}
-  ${isLodashFlowRequired(ir) ? "import { flow } from 'lodash-s';\n" : ''}
+  ${isLodashFlowRequired(ir) ? "import { flow } from 'lodash-es';\n" : ''}
   ${fileImports}`;
 
   return `${imports}

@@ -28,7 +28,7 @@ export function codegenImports(ir: CartoKitIR) {
 
   const imports = `import mapboxgl from 'mapbox-gl';
   ${isTurfRequired(ir) ? "import * as turf from '@turf/turf';\n" : ''}
-  ${isLodashFlowRequired(ir) ? "import { flow } from 'lodash';\n" : ''}
+  ${isLodashFlowRequired(ir) ? "import { flow } from 'lodash-es';\n" : ''}
   ${fileImports}
 
   mapboxgl.accessToken = '<YOUR_MAPBOX_ACCESS_TOKEN>'`;
