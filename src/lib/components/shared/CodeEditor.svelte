@@ -11,7 +11,7 @@
   interface ReadonlyCodeEditorConfig {
     kind: 'readonly';
     doc: string;
-    language: 'javascript' | 'json';
+    language: 'typescript' | 'javascript' | 'json';
   }
 
   interface EditableCodeEditorConfig {
@@ -36,7 +36,9 @@
     const extensions = [
       basicSetup,
       editorTheme,
-      config.language === 'javascript' ? javascript() : json(),
+      config.language === 'json'
+        ? json()
+        : javascript({ typescript: config.language === 'typescript' }),
       syntaxHighlighting(syntaxTheme)
     ];
 

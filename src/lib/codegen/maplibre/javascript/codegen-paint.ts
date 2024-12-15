@@ -19,9 +19,8 @@ const MAPLIBRE_DEFAULTS = {
 /**
  * Generate a MapLibre GL JS program fragment representing the layer's fill.
  *
- * @param {CartoKitLayer} layer – A @see{CartoKitLayer}.
- * @returns {string} – A MapLibre GL JS program fragment representing the
- * layer's fill.
+ * @param layer – A @see{CartoKitLayer}.
+ * @returns – A MapLibre GL JS program fragment.
  */
 export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
@@ -128,9 +127,8 @@ export function codegenFill(layer: CartoKitLayer): string {
 /**
  * Generate a MapLibre GL JS program fragment representing the layer's stroke.
  *
- * @param {CartoKitLayer} layer – A @see{CartoKitLayer}.
- * @returns {string} – A MapLibre GL JS program fragment representing the
- * layer's stroke.
+ * @param layer – A @see{CartoKitLayer}.
+ * @returns – A MapLibre GL JS program fragment.
  */
 export function codegenStroke(layer: CartoKitLayer): string {
   switch (layer.type) {

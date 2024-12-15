@@ -4,13 +4,12 @@ export function transformGeometryToCentroids(): Transformation {
   return {
     name: 'transformGeometryToCentroids',
     definition: `
-    function transformGeometryToCentroids(geojson) {
       return turf.featureCollection(
         geojson.features.map((feature) =>
           turf.feature(turf.centroid(feature).geometry, feature.properties)
         )
       );
-    }`,
+    `,
     type: 'geometric'
   };
 }
@@ -22,7 +21,6 @@ export function transformDotDensity(
   return {
     name: 'transformDotDensity',
     definition: `
-    function transformDotDensity(geojson) {
       const dots = geojson.features.flatMap((feature) => {
         const numPoints = Math.floor(
           feature.properties['${attribute}'] / ${dotValue}
@@ -44,8 +42,7 @@ export function transformDotDensity(
         );
       });
 
-      return turf.featureCollection(dots);
-    }`,
+      return turf.featureCollection(dots);`,
     type: 'geometric'
   };
 }

@@ -10,13 +10,33 @@ export const program = derived<
 >([ir, backend], ([$ir, $backend], set) => {
   let module;
 
-  switch ($backend) {
-    case 'mapbox':
-      module = import('$lib/codegen/mapbox/index.js');
+  switch ($backend.library) {
+    case 'mapbox': {
+      switch ($backend.language) {
+        case 'typescript': {
+          module = import('$lib/codegen/mapbox/typescript/index.js');
+          break;
+        }
+        case 'javascript': {
+          module = import('$lib/codegen/mapbox/javascript/index.js');
+          break;
+        }
+      }
       break;
-    case 'maplibre':
-      module = import('$lib/codegen/maplibre/index.js');
+    }
+    case 'maplibre': {
+      switch ($backend.language) {
+        case 'typescript': {
+          module = import('$lib/codegen/maplibre/typescript/index.js');
+          break;
+        }
+        case 'javascript': {
+          module = import('$lib/codegen/maplibre/javascript/index.js');
+          break;
+        }
+      }
       break;
+    }
   }
 
   module
@@ -25,13 +45,13 @@ export const program = derived<
         .then(set)
         .catch((err: Error) => {
           console.error(
-            `Code generation failed for backend: ${$backend}. Error: ${err.message}`
+            `Code generation failed for backend ${$backend.language}-${$backend.library}. Error: ${err.message}`
           );
         });
     })
     .catch((err: Error) => {
       console.error(
-        `Failed to load backend: ${$backend}. Error: ${err.message}`
+        `Failed to load backend ${$backend.language}-${$backend.library}. Error: ${err.message}`
       );
     });
 });

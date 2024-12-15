@@ -3,17 +3,21 @@ import babel from 'prettier/plugins/babel';
 // eslint-disable-next-line import/default
 import estree from 'prettier/plugins/estree';
 
-import { codegenImports } from '$lib/codegen/mapbox/codegen-imports';
+import { analyzeIR } from '$lib/codegen/analysis';
+import { codegenImports } from '$lib/codegen/maplibre/javascript/codegen-imports';
 import type { CartoKitIR } from '$lib/types';
 
 /**
- * Generate a Mapbox GL JS program from the CartoKit IR.
+ * Generate a JavaScript program using MapLibre GL JS from the CartoKit IR.
  *
  * @param ir – The CartoKit IR.
- * @returns – A Mapbox GL JS program.
+ * @returns – A JavaScript program.
  */
 export async function codegen(ir: CartoKitIR): Promise<string> {
-  const program = codegenImports(ir);
+  const analysis = analyzeIR(ir, 'javascript');
+
+  const program = codegenImports(ir, analysis);
+
   const formatted = await prettier.format(program, {
     parser: 'babel',
     plugins: [babel, estree]

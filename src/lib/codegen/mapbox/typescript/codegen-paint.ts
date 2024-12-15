@@ -17,11 +17,11 @@ const MAPBOX_DEFAULTS = {
 };
 
 /**
- * Generate a Mapbox GL JS program fragment representing the layer's fill.
+ * Generate a Mapbox GL JS program fragment, in TypeScript, representing the
+ * fill of a @see{CartoKitLayer}.
  *
- * @param {CartoKitLayer} layer – A @see{CartoKitLayer}.
- * @returns {string} – A Mapbox GL JS program fragment representing the layer's
- * fill.
+ * @param layer – A @see{CartoKitLayer}.
+ * @returns – A Mapbox GL JS program fragment, in TypeScript.
  */
 export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
@@ -126,11 +126,11 @@ export function codegenFill(layer: CartoKitLayer): string {
 }
 
 /**
- * Generate a Mapbox GL JS program fragment representing the layer's stroke.
+ * Generate a Mapbox GL JS program fragment, TypeScript, representing the stroke
+ * of a @see{CartoKitLayer}.
  *
- * @param {CartoKitLayer} layer – A @see{CartoKitLayer}.
- * @returns {string} – A Mapbox GL JS program fragment representing the layer's
- * stroke.
+ * @param layer – A @see{CartoKitLayer}.
+ * @returns – A Mapbox GL JS program fragment, in TypeScript.
  */
 export function codegenStroke(layer: CartoKitLayer): string {
   switch (layer.type) {
@@ -192,13 +192,13 @@ export function codegenStroke(layer: CartoKitLayer): string {
 }
 
 /**
- * Return a Mapbox GL JS program fragment representing a property-value pair,
- * unless the value is the same as the default value.
+ * Return a Mapbox GL JS program fragment, in TypeScript, representing a prop-
+ * erty-value pair, unless the value is the same as the default value.
  *
- * @param {string} mapboxProperty – The Mapbox GL JS property name.
- * @param {T} cartokitValue – The value of the property in the CartoKit IR.
- * @param {T} defaultValue – The default Mapbox GL JS value for the property.
- * @returns {string} – A (potentially empty) Mapbox GL JS program fragment.
+ * @param mapboxProperty – The Mapbox GL JS property name.
+ * @param cartokitValue – The value of the property in the CartoKit IR.
+ * @param defaultValue – The default Mapbox GL JS value for the property.
+ * @returns – A (potentially empty) Mapbox GL JS program fragment.
  */
 function withDefault<T extends string | number>(
   mapboxProperty: string,

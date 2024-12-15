@@ -1,14 +1,13 @@
-import { codegenTransformations } from '$lib/codegen/maplibre/codegen-transformations';
+import { codegenTransformations } from '$lib/codegen/maplibre/typescript/codegen-transformations';
 import type { CartoKitLayer } from '$lib/types';
 
 /**
- * Generate code to add a data source for a @see{CartoKitLayer} to a MapLibre GL
- * JS map.
+ * Generate a MapLibre GL JS program fragment, in TypeScript, for the data source
+ * for a @see{CartoKitLayer}.
  *
  * @param layer – A @see{CartoKitLayer}.
  * @param uploadTable – The symbol table tracking file uploads.
- * @returns – A JavaScript program fragment containing code to add a data source
- * for a @see{CartoKitLayer} to a MapLibre GL JS map.
+ * @returns – A MapLibre GL JS program fragment, in TypeScript.
  */
 export function codegenSource(
   layer: CartoKitLayer,
@@ -20,8 +19,8 @@ export function codegenSource(
   ${transformation}
 
   map.addSource('${layer.id}', {
-		type: 'geojson',
-		data: ${data}
-	});
+    type: 'geojson',
+    data: ${data}
+  });
   `;
 }
