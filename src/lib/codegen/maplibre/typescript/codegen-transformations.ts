@@ -1,6 +1,6 @@
 import { camelCase } from 'lodash-es';
 
-import type { CartoKitLayer } from '$lib/types';
+import type { CartoKitLayer, Transformation } from '$lib/types';
 
 interface TransformationProgramFragment {
   transformation: string;
@@ -8,13 +8,25 @@ interface TransformationProgramFragment {
 }
 
 /**
- * Generate a transformation program fragment for all transformations applied
+ * Generate a TypeScript program fragment for a single transformation function.
+ *
+ * @param transformation – A @see{Transformation}.
+ * @returns – A TypeScript program fragment.
+ */
+function codegenTransformationFn(transformation: Transformation): string {
+  return `function ${transformation.name}(geojson: FeatureCollection): FeatureCollection {
+  ${transformation.definition}
+}`;
+}
+
+/**
+ * Generate a TypeScript program fragment for all transformations applied
  * to a @see{CartoKitLayer}.
  *
  * @param layer - A @see{CartoKitLayer}.
  * @param uploadTable - The symbol table tracking file uploads.
- * @returns - A transformation program fragment, containing both the transform-
- * ation function definition and call site.
+ * @returns - A @see{TransformationProgramFragment}, containing both the trans-
+ * formation function definition and call site.
  */
 export function codegenTransformations(
   layer: CartoKitLayer,
@@ -33,18 +45,19 @@ export function codegenTransformations(
         transformation: '',
         data: layer.data.url ? `"${layer.data.url}"` : dataIdent
       };
-    case 1:
+    case 1: {
+      const fn = codegenTransformationFn(transformations[0]);
+
       return {
         transformation: `${fetchData}
-        ${transformations[0].definition}`,
+        ${fn}`,
         data: `${transformations[0].name}(${dataIdent})`
       };
+    }
     default:
       return {
         transformation: `${fetchData}
-        ${transformations
-          .map((transformation) => transformation.definition)
-          .join('\n\n')}`,
+        ${transformations.map(codegenTransformationFn).join('\n\n')}`,
         data: `flow(${transformations
           .map((transformation) => transformation.name)
           .join(', ')})(${dataIdent})`

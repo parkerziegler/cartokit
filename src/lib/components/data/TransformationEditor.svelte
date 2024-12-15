@@ -68,7 +68,7 @@
               transformation: {
                 name: name ? name[1] : 'anonymous',
                 definition: program,
-                type: 'statistical'
+                type: 'tabular'
               }
             }
           });
