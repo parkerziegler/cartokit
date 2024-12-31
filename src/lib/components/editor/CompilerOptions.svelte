@@ -17,7 +17,7 @@
   ];
 </script>
 
-<form class="stack stack-xs border-r border-r-slate-600 px-4 py-2 text-white">
+<div class="stack stack-xs border-r border-r-slate-600 px-4 py-2 text-white">
   <button on:click={() => (optionsExpanded = !optionsExpanded)}>
     <div class="flex items-center justify-between">
       <div class="stack-h stack-h-xs items-center">
@@ -73,4 +73,4 @@
       </fieldset>
     </div>
   {/if}
-</form>
+</div>
