@@ -14,7 +14,7 @@
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { selectedFeature } from '$lib/stores/selected-feature';
-  import { functionNameRe } from '$lib/utils/regex';
+  import { parseUserDefinedTransformation } from '$lib/utils/parse';
   import { transformationWorker } from '$lib/utils/worker';
 
   export let onClose: () => void;
@@ -58,7 +58,8 @@
     transformationWorker(program, geojson, (message) => {
       switch (message.type) {
         case 'data': {
-          const name = functionNameRe.exec(program);
+          const { functionName, functionBody } =
+            parseUserDefinedTransformation(program);
 
           dispatchLayerUpdate({
             type: 'transformation',
@@ -66,8 +67,8 @@
             payload: {
               geojson: message.data,
               transformation: {
-                name: name ? name[1] : 'anonymous',
-                definition: program,
+                name: functionName,
+                definition: functionBody,
                 type: 'tabular'
               }
             }
