@@ -377,11 +377,11 @@ export type Catalog = Record<
   >
 >;
 
-/** Represents the set of library backends for code generation. */
-type CartoKitLibraryBackend = 'mapbox' | 'maplibre';
-
 /** Represents the set of language backends for code generation. */
 type CartoKitLanguageBackend = 'javascript' | 'typescript';
+
+/** Represents the set of library backends for code generation. */
+type CartoKitLibraryBackend = 'mapbox' | 'maplibre';
 
 /**
  * Represents the set of identifiers for code generation backends.

@@ -10,8 +10,8 @@ import type {
  * @param ir – The CartoKit IR.
  * @returns – A Boolean value indicating whether @turf/turf is required.
  */
-function isTurfRequired({ layers }: CartoKitIR): boolean {
-  return Object.values(layers).some(
+function isTurfRequired(ir: CartoKitIR): boolean {
+  return Object.values(ir.layers).some(
     (layer) =>
       layer.data.transformations.filter(
         (transformation) => transformation.type === 'geometric'
@@ -20,15 +20,15 @@ function isTurfRequired({ layers }: CartoKitIR): boolean {
 }
 
 /**
- * Determine whether lodash's flow function is required for chaining trans-
+ * Determine whether lodash's flow function is required for composing trans-
  * formations.
  *
  * @param ir – The CartoKit IR.
  * @returns - A Boolean value indicating whether lodash's flow function is
  * required.
  */
-function isLodashFlowRequired({ layers }: CartoKitIR): boolean {
-  return Object.values(layers).some(
+function isLodashFlowRequired(ir: CartoKitIR): boolean {
+  return Object.values(ir.layers).some(
     (layer) => layer.data.transformations.length > 1
   );
 }
@@ -41,8 +41,8 @@ function isLodashFlowRequired({ layers }: CartoKitIR): boolean {
  * @returns – A Boolean value indicting whether we need to insert a function to
  * fetch GeoJSON hosted at a remote URL.
  */
-function isFetchGeoJSONRequired({ layers }: CartoKitIR): boolean {
-  return Object.values(layers).some(
+function isFetchGeoJSONRequired(ir: CartoKitIR): boolean {
+  return Object.values(ir.layers).some(
     (layer) => layer.data.url && layer.data.transformations.length > 0
   );
 }

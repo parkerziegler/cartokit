@@ -10,7 +10,7 @@ export function codegenFns(analysis: CartoKitBackendAnalysis): string {
   const fns: string[] = [];
 
   if (analysis.isFetchGeoJSONRequired) {
-    const errorPayload =
+    const errorMessage =
       '`Failed to fetch GeoJSON at: ${url}. Original error: ${error}`';
 
     fns.push(`async function fetchGeoJSON(url: string): Promise<FeatureCollection> {
@@ -20,7 +20,7 @@ export function codegenFns(analysis: CartoKitBackendAnalysis): string {
 
         return data;
       } catch (error) {
-        throw new Error(${errorPayload});
+        throw new Error(${errorMessage});
       }
     }`);
   }
