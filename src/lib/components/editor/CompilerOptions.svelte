@@ -3,19 +3,21 @@
 
   import ChevronIcon from '$lib/components/icons/ChevronIcon.svelte';
   import GearIcon from '$lib/components/icons/GearIcon.svelte';
-  import MapboxIcon from '$lib/components/icons/MapboxIcon.svelte';
-  import MapLibreIcon from '$lib/components/icons/MapLibreIcon.svelte';
   import { backend } from '$lib/stores/backend';
 
   let optionsExpanded = false;
 
-  const options = [
-    { value: 'maplibre' as const, icon: MapLibreIcon },
-    { value: 'mapbox' as const, icon: MapboxIcon }
+  const languageBackends = [
+    { value: 'javascript' as const, name: 'JavaScript' },
+    { value: 'typescript' as const, name: 'TypeScript' }
+  ];
+  const libraryBackends = [
+    { value: 'maplibre' as const, name: 'MapLibre GL JS' },
+    { value: 'mapbox' as const, name: 'Mapbox GL JS' }
   ];
 </script>
 
-<form class="stack stack-xs border-r border-r-slate-600 px-4 py-2 text-white">
+<div class="stack stack-xs border-r border-r-slate-600 px-4 py-2 text-white">
   <button on:click={() => (optionsExpanded = !optionsExpanded)}>
     <div class="flex items-center justify-between">
       <div class="stack-h stack-h-xs items-center">
@@ -26,28 +28,49 @@
     </div>
   </button>
   {#if optionsExpanded}
-    <fieldset
-      class="stack stack-xs text-white"
-      transition:slide={{ axis: 'y', duration: 150 }}
-    >
-      <legend
-        class="font-sans text-sm text-slate-400 underline decoration-dotted underline-offset-4"
-        >Library</legend
+    <div class="flex gap-4">
+      <fieldset
+        class="stack stack-xs text-white"
+        transition:slide={{ axis: 'y', duration: 150 }}
       >
-      {#each options as { value, icon }}
-        <label class="flex items-center gap-2 text-xs">
-          <input
-            type="radio"
-            name="Library"
-            {value}
-            bind:group={$backend}
-            style="color-scheme: dark;"
-          />
-          <div class="h-4">
-            <svelte:component this={icon} />
-          </div></label
+        <legend
+          class="font-sans text-sm text-slate-400 underline decoration-dotted underline-offset-4"
+          >Language</legend
         >
-      {/each}
-    </fieldset>
+        {#each languageBackends as { value, name }}
+          <label class="flex items-center gap-2 text-xs">
+            <input
+              type="radio"
+              name="Language"
+              {value}
+              bind:group={$backend.language}
+              style="color-scheme: dark;"
+            />
+            {name}</label
+          >
+        {/each}
+      </fieldset>
+      <fieldset
+        class="stack stack-xs text-white"
+        transition:slide={{ axis: 'y', duration: 150 }}
+      >
+        <legend
+          class="font-sans text-sm text-slate-400 underline decoration-dotted underline-offset-4"
+          >Library</legend
+        >
+        {#each libraryBackends as { value, name }}
+          <label class="flex items-center gap-2 text-xs">
+            <input
+              type="radio"
+              name="Library"
+              {value}
+              bind:group={$backend.library}
+              style="color-scheme: dark;"
+            />
+            {name}</label
+          >
+        {/each}
+      </fieldset>
+    </div>
   {/if}
-</form>
+</div>

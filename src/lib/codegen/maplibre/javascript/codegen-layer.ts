@@ -1,12 +1,14 @@
-import { codegenFill, codegenStroke } from '$lib/codegen/mapbox/codegen-paint';
+import {
+  codegenFill,
+  codegenStroke
+} from '$lib/codegen/maplibre/javascript/codegen-paint';
 import type { CartoKitLayer } from '$lib/types';
 
 /**
- * Generate a Mapbox GL JS program fragment for a CartoKitLayer.
+ * Generate a MapLibre GL JS program fragment for a CartoKitLayer.
  *
  * @param layer – A @see{CartoKitLayer}.
- *
- * @returns – A Mapbox GL JS program fragment.
+ * @returns – A MapLibre GL JS program fragment.
  */
 export function codegenLayer(layer: CartoKitLayer): string {
   switch (layer.type) {
