@@ -8,7 +8,11 @@
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import type { CartoKitDotDensityLayer } from '$lib/types';
 
-  export let layer: CartoKitDotDensityLayer;
+  interface Props {
+    layer: CartoKitDotDensityLayer;
+  }
+
+  let { layer }: Props = $props();
 </script>
 
 <MenuItem title="Dots">
@@ -19,7 +23,9 @@
     <FillPicker layerId={layer.id} fill={layer.style.fill} />
     <OpacityInput layerId={layer.id} channel="fill" style={layer.style.fill} />
   {/if}
-  <FillModifier layerId={layer.id} fill={layer.style.fill} slot="action" />
+  {#snippet action()}
+    <FillModifier layerId={layer.id} fill={layer.style.fill} />
+  {/snippet}
 </MenuItem>
 <MenuItem title="Stroke">
   {#if layer.style.stroke}
@@ -30,9 +36,7 @@
       style={layer.style.stroke}
     />
   {/if}
-  <StrokeModifier
-    layerId={layer.id}
-    stroke={layer.style.stroke}
-    slot="action"
-  />
+  {#snippet action()}
+    <StrokeModifier layerId={layer.id} stroke={layer.style.stroke} />
+  {/snippet}
 </MenuItem>

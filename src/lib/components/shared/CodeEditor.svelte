@@ -24,11 +24,19 @@
 
   type CodeEditorConfig = ReadonlyCodeEditorConfig | EditableCodeEditorConfig;
 
-  export let config: CodeEditorConfig;
-  export let view: EditorView | null = null;
-  let className = '';
-  export { className as class };
-  export let testId: string | undefined = undefined;
+  interface Props {
+    config: CodeEditorConfig;
+    view?: EditorView | undefined;
+    class?: string;
+    testId?: string | undefined;
+  }
+
+  let {
+    config,
+    view = $bindable(undefined),
+    class: className = '',
+    testId = undefined
+  }: Props = $props();
 
   let editor: HTMLDivElement;
 
@@ -75,11 +83,13 @@
     };
   });
 
-  $: if (view && config.kind === 'readonly') {
-    view.dispatch({
-      changes: { from: 0, to: view.state.doc.length, insert: config.doc }
-    });
-  }
+  $effect(() => {
+    if (view && config.kind === 'readonly') {
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: config.doc }
+      });
+    }
+  });
 </script>
 
 <div
@@ -91,4 +101,4 @@
     className
   )}
   data-testid={testId || undefined}
-/>
+></div>

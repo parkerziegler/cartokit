@@ -1,5 +1,9 @@
 <script lang="ts">
-  export let rotate = 0;
+  interface Props {
+    rotate?: number;
+  }
+
+  let { rotate = 0 }: Props = $props();
 </script>
 
 <svg

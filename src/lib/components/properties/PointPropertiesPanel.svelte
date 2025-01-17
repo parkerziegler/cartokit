@@ -8,7 +8,11 @@
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import type { CartoKitPointLayer } from '$lib/types';
 
-  export let layer: CartoKitPointLayer;
+  interface Props {
+    layer: CartoKitPointLayer;
+  }
+
+  let { layer }: Props = $props();
 </script>
 
 <MenuItem title="Size">
@@ -28,7 +32,9 @@
       fill={layer.style.fill}
     />
   {/if}
-  <FillModifier layerId={layer.id} fill={layer.style.fill} slot="action" />
+  {#snippet action()}
+    <FillModifier layerId={layer.id} fill={layer.style.fill} />
+  {/snippet}
 </MenuItem>
 <MenuItem title="Stroke">
   {#if layer.style.stroke}
@@ -39,9 +45,7 @@
       style={layer.style.stroke}
     />
   {/if}
-  <StrokeModifier
-    layerId={layer.id}
-    stroke={layer.style.stroke}
-    slot="action"
-  />
+  {#snippet action()}
+    <StrokeModifier layerId={layer.id} stroke={layer.style.stroke} />
+  {/snippet}
 </MenuItem>

@@ -19,14 +19,17 @@
   import { map as mapStore } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
 
-  let map: maplibregl.Map;
+  let { data }: Props = $props();
+
+  let map = $state<maplibregl.Map>();
 
   onMount(() => {
     // maplibre-gl is actually a CJS module, and not all module.exports may be
     // supported as named exports.
-    // eslint-disable-next-line import/no-named-as-default-member
     map = new maplibregl.Map({
       container: 'map',
       style: data.basemap.url,
@@ -40,7 +43,7 @@
     // When the map first reaches an idle state, set it in the store.
     // This should ensure that the map's styles and data have fully loaded.
     map.once('idle', () => {
-      mapStore.set(map);
+      mapStore.set(map!);
 
       ir.update((ir) => {
         ir.basemap.url = data.basemap.url;
@@ -68,7 +71,7 @@
     });
 
     return () => {
-      map.remove();
+      map?.remove();
     };
   });
 
@@ -99,12 +102,14 @@
     <Menu class="min-w-xs absolute left-4 top-4 z-10 max-w-lg overflow-auto">
       <MenuTitle class="mr-4">
         Layers
-        <AddLayer slot="action" />
+        {#snippet action()}
+          <AddLayer />
+        {/snippet}
       </MenuTitle>
       <LayerPanel />
     </Menu>
     {#if $selectedLayer}
-      <PropertiesMenu {map} layer={$selectedLayer} />
+      <PropertiesMenu map={map!} layer={$selectedLayer} />
     {/if}
     <BasemapPicker />
     <button
@@ -115,7 +120,7 @@
           '-translate-x-[33.333333vw]': $layout.editorVisible
         }
       )}
-      on:click={toggleEditorVisibility}
+      onclick={toggleEditorVisibility}
       disabled={!$mapStore}
       data-testid="editor-toggle"
     >

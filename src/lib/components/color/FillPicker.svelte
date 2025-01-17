@@ -8,8 +8,12 @@
   import type { ConstantFill } from '$lib/types';
   import { DEFAULT_FILL } from '$lib/utils/constants';
 
-  export let layerId: string;
-  export let fill: ConstantFill;
+  interface Props {
+    layerId: string;
+    fill: ConstantFill;
+  }
+
+  let { layerId, fill }: Props = $props();
 
   function dispatchFillUpdate(color: string) {
     dispatchLayerUpdate({
@@ -21,9 +25,10 @@
     });
   }
 
-  function onFillInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    dispatchFillUpdate(target.value);
+  function onFillInput(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    dispatchFillUpdate(event.currentTarget.value);
   }
 
   function onFillHexChange(hex: string) {
@@ -39,7 +44,7 @@
       id="fill-color"
       class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
       value={d3.color(fill.color)?.formatHex() ?? DEFAULT_FILL}
-      on:input={onFillInput}
+      oninput={onFillInput}
     />
     <HexInput
       hex={d3.color(fill.color)?.formatHex() ?? DEFAULT_FILL}

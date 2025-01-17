@@ -1,9 +1,5 @@
 <script lang="ts" generics="T">
-  // ESLint sees the generic T as an undefined variable; flag it as a "global"
-  // to suppress the warning.
-  /* global T */
   import cs from 'classnames';
-  import { createEventDispatcher } from 'svelte';
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
 
@@ -12,62 +8,52 @@
     label: string;
   }
 
-  export let selected: T;
-  export let options: SelectOption<T>[] = [];
-  export let id;
-  export let title = '';
+  interface Props {
+    selected: T;
+    onChange: (
+      event: Event & { currentTarget: EventTarget & HTMLSelectElement }
+    ) => void;
+    onClick?: (
+      event: Event & { currentTarget: EventTarget & HTMLSelectElement }
+    ) => void;
+    id: string;
+    options?: SelectOption<T>[];
+    title?: string;
+    class?: string;
+  }
+
   let ref: HTMLSelectElement | HTMLDivElement;
 
-  let className = '';
-  export { className as class };
+  let {
+    selected,
+    onChange,
+    onClick = () => {},
+    id,
+    options = [],
+    title = '',
+    class: className = ''
+  }: Props = $props();
 
-  const dispatch = createEventDispatcher();
-
-  function onChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    dispatch('change', { value: target.value });
+  export function getBoundingClientRect() {
+    return ref.getBoundingClientRect();
   }
-
-  function onClick(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    dispatch('click', { value: target.value });
-  }
-
-  export const getBoundingClientRect = () => ref.getBoundingClientRect();
 </script>
 
-{#if title}
-  <div class="stack-h stack-h-xs items-baseline" bind:this={ref}>
+<div class="stack-h stack-h-xs items-baseline" bind:this={ref}>
+  {#if title}
     <FieldLabel fieldId={id}>
       {title}
     </FieldLabel>
-    <select
-      class={cs(
-        'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
-        className
-      )}
-      value={selected}
-      on:change={onChange}
-      on:click={onClick}
-      {id}
-    >
-      {#each options as option}
-        <option value={option.value} selected={option.value === selected}
-          >{option.label}</option
-        >
-      {/each}
-    </select>
-  </div>
-{:else}
+  {/if}
   <select
     class={cs(
       'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
       className
     )}
     value={selected}
+    onchange={onChange}
+    onclick={onClick}
     {id}
-    on:change={onChange}
-    on:click={onClick}
     bind:this={ref}
   >
     {#each options as option}
@@ -76,4 +62,4 @@
       >
     {/each}
   </select>
-{/if}
+</div>

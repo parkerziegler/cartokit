@@ -7,12 +7,16 @@
   import { ir } from '$lib/stores/ir';
   import { switchBasemapWithPreservedLayers } from '$lib/utils/maplibre';
 
-  let tileUrl = $ir.basemap.provider === 'Custom' ? $ir.basemap.url : '';
+  let tileUrl = $state(
+    $ir.basemap.provider === 'Custom' ? $ir.basemap.url : ''
+  );
 
   const closeModal = getContext<() => void>('close-modal');
 
-  function onTileUrlInput(event: CustomEvent<{ value: string }>) {
-    tileUrl = event.detail.value;
+  function onTileUrlInput(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    tileUrl = event.currentTarget.value;
   }
 
   function onSubmit() {
@@ -25,7 +29,7 @@
   <div class="stack stack-xs">
     <FieldLabel fieldId="tile-url">Tile URL</FieldLabel>
     <TextInput
-      on:input={onTileUrlInput}
+      onInput={onTileUrlInput}
       value={tileUrl}
       placeholder="(e.g., https://www.openhistoricalmap.org/map-styles/woodblock/woodblock.json)"
       id="tile-url"
@@ -33,8 +37,8 @@
     />
   </div>
   <Button
+    onClick={onSubmit}
     class="mt-2 self-end"
-    on:click={onSubmit}
     disabled={!tileUrl || tileUrl === $ir.basemap.url}>Apply</Button
   >
 </form>

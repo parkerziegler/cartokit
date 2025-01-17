@@ -4,10 +4,8 @@
   import cs from 'classnames';
   import type { Feature } from 'geojson';
   import { orderBy } from 'lodash-es';
-  /* eslint-disable import/no-duplicates */
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
-  /* eslint-enable import/no-duplicates */
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import { pluralize } from '$lib/utils/format';
@@ -97,7 +95,10 @@
 </script>
 
 <div
-  class={cs('flex flex-col overflow-hidden bg-slate-700 font-mono', className)}
+  class={cs(
+    'z-10 flex flex-col overflow-hidden bg-slate-700 font-mono',
+    className
+  )}
   transition:slide
 >
   <div class="flex justify-between px-3 py-2 text-xs text-white">
@@ -106,7 +107,7 @@
     </span>
     <div class="stack-h stack-h-sm">
       <span>{N} {pluralize('Feature', N)}</span>
-      <button on:click={onClose}>
+      <button onclick={onClose}>
         <CloseIcon />
       </button>
     </div>
@@ -114,7 +115,7 @@
   <div
     class="w-full overflow-auto border-t border-slate-400 bg-slate-900 text-2xs text-white"
     bind:this={root}
-    on:scroll={onScroll}
+    onscroll={onScroll}
   >
     <table class="w-full border-collapse">
       <thead>
@@ -124,7 +125,7 @@
               class="relative bg-slate-900 px-4 py-2 text-left font-semibold text-slate-400 hover:cursor-pointer"
               class:sort-desc={sort.col === col && sort.desc}
               class:sort-asc={sort.col === col && !sort.desc}
-              on:click={resort(col)}
+              onclick={resort(col)}
               >{col}
             </th>
           {/each}

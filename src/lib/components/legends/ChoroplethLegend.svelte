@@ -3,7 +3,11 @@
   import QuantitativeLegend from '$lib/components/legends/QuantitativeLegend.svelte';
   import type { CartoKitChoroplethLayer } from '$lib/types';
 
-  export let layer: CartoKitChoroplethLayer;
+  interface Props {
+    layer: CartoKitChoroplethLayer;
+  }
+
+  let { layer }: Props = $props();
 </script>
 
 <div class="stack stack-xs ml-8">

@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
 import MapTilerBasic from '$lib/assets/basemaps/maptiler/basic.png';
 import MapTilerDark from '$lib/assets/basemaps/maptiler/dark.png';

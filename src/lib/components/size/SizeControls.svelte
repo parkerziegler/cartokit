@@ -5,15 +5,21 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 
-  export let layer: CartoKitProportionalSymbolLayer;
+  interface Props {
+    layer: CartoKitProportionalSymbolLayer;
+  }
+
+  let { layer }: Props = $props();
 
   function onSizeChange(field: 'min' | 'max') {
-    return function handleSizeChange(event: CustomEvent<{ value: number }>) {
+    return function handleSizeChange(
+      event: Event & { currentTarget: EventTarget & HTMLInputElement }
+    ) {
       dispatchLayerUpdate({
         type: 'size',
         layerId: layer.id,
         payload: {
-          [field]: event.detail.value
+          [field]: +event.currentTarget.value
         }
       });
     };
@@ -34,7 +40,7 @@
       id="min"
       min={1}
       value={layer.style.size.min}
-      on:change={onSizeChange('min')}
+      onChange={onSizeChange('min')}
       class="w-10"
     />
   </div>
@@ -44,7 +50,7 @@
       id="max"
       min={1}
       value={layer.style.size.max}
-      on:change={onSizeChange('max')}
+      onChange={onSizeChange('max')}
       class="w-10"
     />
   </div>

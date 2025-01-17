@@ -5,27 +5,31 @@
   import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
   import { geometryToLayerTypes } from '$lib/utils/layer';
 
-  export let layer: CartoKitLayer;
+  interface Props {
+    layer: CartoKitLayer;
+  }
 
-  $: geometryType = getFeatureCollectionGeometryType(layer.data.sourceGeojson);
-  $: options =
+  let { layer }: Props = $props();
+
+  let geometryType = $derived(
+    getFeatureCollectionGeometryType(layer.data.sourceGeojson)
+  );
+  let options = $derived(
     geometryToLayerTypes.get(geometryType)?.map((layerType) => ({
       value: layerType,
       label: layerType
-    })) ?? [];
+    })) ?? []
+  );
 
-  function onChange(event: CustomEvent<{ value: LayerType }>) {
+  function onChange(
+    event: Event & { currentTarget: EventTarget & HTMLSelectElement }
+  ) {
     dispatchLayerUpdate({
       type: 'layer-type',
       layerId: layer.id,
-      payload: { layerType: event.detail.value }
+      payload: { layerType: event.currentTarget.value as LayerType }
     });
   }
 </script>
 
-<Select
-  {options}
-  selected={layer.type}
-  id="layer-type-select"
-  on:change={onChange}
-/>
+<Select {options} selected={layer.type} id="layer-type-select" {onChange} />

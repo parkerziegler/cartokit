@@ -4,7 +4,11 @@
   import DownloadIcon from '$lib/components/icons/DownloadIcon.svelte';
   import type { CartoKitLayer } from '$lib/types';
 
-  export let layer: CartoKitLayer;
+  interface Props {
+    layer: CartoKitLayer;
+  }
+
+  let { layer }: Props = $props();
 
   function onClick() {
     const blob = new Blob([JSON.stringify(layer.data.geojson, null, 2)], {
@@ -19,6 +23,6 @@
   }
 </script>
 
-<button on:click={onClick}>
+<button onclick={onClick}>
   <DownloadIcon />
 </button>

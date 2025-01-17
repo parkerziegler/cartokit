@@ -9,15 +9,20 @@
   } from '$lib/types';
   import { percentToDecimal, decimalToPercent } from '$lib/utils/color';
 
-  export let layerId: string;
-  export let channel: Exclude<Channel, 'size' | 'dots'>;
-  export let style: QuantitativeStyle | CategoricalStyle | ConstantStyle;
+  interface Props {
+    layerId: string;
+    channel: Exclude<Channel, 'size' | 'dots'>;
+    style: QuantitativeStyle | CategoricalStyle | ConstantStyle;
+  }
 
-  $: opacity = decimalToPercent(style.opacity);
+  let { layerId, channel, style }: Props = $props();
 
-  function validateOpacity(event: Event) {
-    const target = event.target as HTMLInputElement;
-    let output = target.value;
+  let opacity = $derived(decimalToPercent(style.opacity));
+
+  function validateOpacity(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    let output = event.currentTarget.value;
 
     if (output.endsWith('%')) {
       output = output.replace('%', '');
@@ -46,6 +51,6 @@
     size="4"
     class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
     value="{opacity}%"
-    on:change={validateOpacity}
+    onchange={validateOpacity}
   />
 </div>

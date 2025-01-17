@@ -3,14 +3,13 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { LayerType, VisualizationType } from '$lib/types';
 
-  export let layerId: string;
-  export let layerType: LayerType;
-  export let visualizationType: VisualizationType;
+  interface Props {
+    layerId: string;
+    layerType: LayerType;
+    visualizationType: VisualizationType;
+  }
 
-  $: options = deriveOptions(layerType).map(({ label, value }) => ({
-    value,
-    label
-  }));
+  let { layerId, layerType, visualizationType }: Props = $props();
 
   function deriveOptions(
     layerType: LayerType
@@ -28,20 +27,31 @@
           { label: 'Range', value: 'Quantitative' },
           { label: 'Categories', value: 'Categorical' }
         ];
-      default:
+      case 'Line':
+      case 'Polygon':
+      case 'Dot Density':
         return [];
     }
   }
 
-  function onChange(event: CustomEvent<{ value: VisualizationType }>) {
+  function onChange(
+    event: Event & { currentTarget: EventTarget & HTMLSelectElement }
+  ) {
     dispatchLayerUpdate({
       type: 'visualization-type',
       layerId,
       payload: {
-        visualizationType: event.detail.value
+        visualizationType: event.currentTarget.value as VisualizationType
       }
     });
   }
+
+  let options = $derived(
+    deriveOptions(layerType).map(({ label, value }) => ({
+      value,
+      label
+    }))
+  );
 </script>
 
 <Select
@@ -49,5 +59,5 @@
   {options}
   selected={visualizationType}
   id="color-style-by-select"
-  on:change={onChange}
+  {onChange}
 />

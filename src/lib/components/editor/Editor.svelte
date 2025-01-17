@@ -2,16 +2,15 @@
   import { slide } from 'svelte/transition';
 
   import Program from '$lib/components/editor/Program.svelte';
-  import Tabs, { type Tab } from '$lib/components/shared/Tabs.svelte';
+  import Tabs from '$lib/components/shared/Tabs.svelte';
 
-  let activeIndex: number;
-
-  $: tabs = [
+  const tabs = [
     {
       name: 'Program',
-      content: Program
+      content: Program,
+      props: {}
     }
-  ] as Tab<{ program: string }>[];
+  ];
 </script>
 
 <div
@@ -22,6 +21,5 @@
     {tabs}
     containerClass="flex-1 pt-2 absolute inset-0"
     bodyClass="flex flex-1 overflow-hidden !p-0"
-    bind:activeIndex
   />
 </div>

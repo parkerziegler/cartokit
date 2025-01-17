@@ -3,9 +3,15 @@
   import { pluralize } from '$lib/utils/format';
   import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
 
-  export let layer: CartoKitLineLayer;
+  interface Props {
+    layer: CartoKitLineLayer;
+  }
 
-  $: geometryType = getFeatureCollectionGeometryType(layer.data.geojson);
+  let { layer }: Props = $props();
+
+  let geometryType = $derived(
+    getFeatureCollectionGeometryType(layer.data.geojson)
+  );
 </script>
 
 <div class="stack-h stack-h-xs ml-8 items-center">

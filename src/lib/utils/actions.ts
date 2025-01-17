@@ -1,4 +1,5 @@
 import type { ActionReturn } from 'svelte/action';
+import { on } from 'svelte/events';
 
 /**
  * A Svelte action to detect clicks outside of an element.
@@ -11,7 +12,7 @@ export function clickOutside<T extends HTMLElement>(
   node: T
 ): ActionReturn<
   undefined,
-  { 'on:clickoutside': (event: CustomEvent<MouseEvent>) => void }
+  { onclickoutside: (event: CustomEvent<MouseEvent>) => void }
 > {
   function handle(event: MouseEvent) {
     if (!event.target) {
@@ -23,11 +24,11 @@ export function clickOutside<T extends HTMLElement>(
     }
   }
 
-  document.addEventListener('click', handle);
+  const remove = on(document, 'click', handle);
 
   return {
     destroy() {
-      document.removeEventListener('click', handle);
+      remove();
     }
   };
 }

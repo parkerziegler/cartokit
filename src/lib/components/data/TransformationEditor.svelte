@@ -17,43 +17,49 @@
   import { parseUserDefinedTransformation } from '$lib/utils/parse';
   import { transformationWorker } from '$lib/utils/worker';
 
-  export let onClose: () => void;
-  export let onClickOutside: (event: CustomEvent<MouseEvent>) => void;
-  export let layerId: string;
-  export let geojson: FeatureCollection;
+  interface Props {
+    onClose: () => void;
+    onClickOutside: (event: CustomEvent<MouseEvent>) => void;
+    layerId: string;
+    geojson: FeatureCollection;
+  }
+
+  let { onClose, onClickOutside, layerId, geojson }: Props = $props();
 
   // Main editor state.
-  let view: EditorView;
-  let error = '';
-  let success = false;
+  let view: EditorView | undefined = $state();
+  let error = $state('');
+  let success = $state(false);
   let timeoutId: number | undefined;
   const doc = `function transformGeojson(geojson) {
   return geojson;
 }`;
 
   // Preview editor state.
-  let previewError = '';
-  let previewDoc: string = $selectedFeature
-    ? JSON.stringify(
-        {
-          type: $selectedFeature.type,
-          properties: $selectedFeature.properties,
-          geometry: $selectedFeature.geometry
-        },
-        null,
-        2
-      )
-    : '';
+  let previewError = $state('');
+  let previewDoc: string = $state(
+    $selectedFeature
+      ? JSON.stringify(
+          {
+            type: $selectedFeature.type,
+            properties: $selectedFeature.properties,
+            geometry: $selectedFeature.geometry
+          },
+          null,
+          2
+        )
+      : ''
+  );
 
   // Console state.
-  let consoleOutput: string[] = [];
+  let consoleOutput: string[] = $state([]);
 
   export function focus() {
-    view.focus();
+    view?.focus();
   }
 
   function onClick() {
-    const program = view.state.doc.toString();
+    const program = view?.state.doc.toString() ?? '';
 
     transformationWorker(program, geojson, (message) => {
       switch (message.type) {
@@ -153,7 +159,9 @@
 
 <Menu class="relative z-10 w-96" {onClickOutside}>
   <MenuItem title="Transform Data">
-    <button on:click={onClose} slot="action"><CloseIcon /></button>
+    {#snippet action()}
+      <button onclick={onClose}><CloseIcon /></button>
+    {/snippet}
     <div class="stack stack-sm">
       <p class="font-sans">
         Use the editor below to transform your dataset using JavaScript.
@@ -176,7 +184,7 @@
       {/if}
       <Button
         class="stack-h stack-h-xs items-center self-end"
-        on:click={onClick}
+        {onClick}
         testId="run-transformation-button"
         ><span>Run</span><PlayCircle /></Button
       >
@@ -187,7 +195,9 @@
       config={{ kind: 'readonly', doc: previewDoc, language: 'json' }}
       class="-mx-4 max-h-[9.5rem] overflow-auto"
     />
-    <p slot="action" class="text-slate-400">OUTPUT</p>
+    {#snippet action()}
+      <p class="text-slate-400">OUTPUT</p>
+    {/snippet}
     {#if previewError}
       <TransformationAlert alert={{ kind: 'error', message: previewError }} />
     {/if}

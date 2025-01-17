@@ -6,14 +6,20 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { CartoKitDotDensityLayer } from '$lib/types';
 
-  export let layer: CartoKitDotDensityLayer;
+  interface Props {
+    layer: CartoKitDotDensityLayer;
+  }
 
-  function onDotValueChange(event: CustomEvent<{ value: number }>) {
+  let { layer }: Props = $props();
+
+  function onDotValueChange(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
     dispatchLayerUpdate({
       type: 'dot-value',
       layerId: layer.id,
       payload: {
-        value: event.detail.value
+        value: +event.currentTarget.value
       }
     });
   }
@@ -40,7 +46,7 @@
       min={1}
       max={Infinity}
       value={layer.style.dots.value}
-      on:change={onDotValueChange}
+      onChange={onDotValueChange}
       class="w-10"
     />
   </div>

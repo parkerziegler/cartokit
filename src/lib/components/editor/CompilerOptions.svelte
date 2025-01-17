@@ -5,7 +5,7 @@
   import GearIcon from '$lib/components/icons/GearIcon.svelte';
   import { backend } from '$lib/stores/backend';
 
-  let optionsExpanded = false;
+  let optionsExpanded = $state(false);
 
   const languageBackends = [
     { value: 'javascript' as const, name: 'JavaScript' },
@@ -18,7 +18,7 @@
 </script>
 
 <div class="stack stack-xs border-r border-r-slate-600 px-4 py-2 text-white">
-  <button on:click={() => (optionsExpanded = !optionsExpanded)}>
+  <button onclick={() => (optionsExpanded = !optionsExpanded)}>
     <div class="flex items-center justify-between">
       <div class="stack-h stack-h-xs items-center">
         <p class="font-sans text-sm font-medium tracking-wider">Options</p>

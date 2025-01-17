@@ -1,23 +1,29 @@
 <script lang="ts">
   import cs from 'classnames';
-  import { createEventDispatcher } from 'svelte';
 
-  export let id = '';
-  export let min = 0;
-  export let max = Infinity;
-  export let step = 1;
-  export let value: number;
-  export let disabled = false;
-
-  let className = '';
-  export { className as class };
-
-  const dispatch = createEventDispatcher();
-
-  function onChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    dispatch('change', { value: +target.value });
+  interface Props {
+    id?: string;
+    min?: number;
+    max?: any;
+    step?: number;
+    value: number;
+    disabled?: boolean;
+    class?: string;
+    onChange: (
+      event: Event & { currentTarget: EventTarget & HTMLInputElement }
+    ) => void;
   }
+
+  let {
+    id = '',
+    min = 0,
+    max = Infinity,
+    step = 1,
+    value,
+    disabled = false,
+    class: className = '',
+    onChange
+  }: Props = $props();
 </script>
 
 <input
@@ -28,7 +34,7 @@
   {value}
   {step}
   {disabled}
-  on:change={onChange}
+  onchange={onChange}
   class={cs(
     'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
     className

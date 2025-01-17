@@ -2,14 +2,19 @@
   import type { CategoricalFill, ConstantStroke, LayerType } from '$lib/types';
   import { DEFAULT_FILL } from '$lib/utils/constants';
 
-  export let fill: CategoricalFill;
-  export let stroke: ConstantStroke | undefined;
-  export let layerType: LayerType;
+  interface Props {
+    fill: CategoricalFill;
+    stroke: ConstantStroke | undefined;
+    layerType: LayerType;
+  }
 
-  $: entries =
+  let { fill, stroke, layerType }: Props = $props();
+
+  let entries = $derived(
     fill.scheme.length < fill.categories.length
       ? fill.categories.slice(0, fill.scheme.length).concat('Other')
-      : fill.categories;
+      : fill.categories
+  );
 </script>
 
 <div class="stack stack-xs text-white">

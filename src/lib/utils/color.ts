@@ -99,10 +99,7 @@ export const CATEGORICAL_COLOR_SCHEMES: CategoricalColorScheme[] = [
   d3.schemeCategory10,
   d3.schemeAccent,
   d3.schemeDark2,
-  /* eslint-disable import/namespace */
-  // @ts-expect-error – d3.schemeObservable10 not yet added to @types/d3
   d3.schemeObservable10,
-  /* eslint-enable import/namespace */
   d3.schemePaired,
   d3.schemePastel1,
   d3.schemePastel2,

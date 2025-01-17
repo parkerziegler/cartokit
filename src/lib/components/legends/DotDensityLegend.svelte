@@ -1,9 +1,14 @@
 <script lang="ts">
   import type { CartoKitDotDensityLayer } from '$lib/types';
 
-  export let layer: CartoKitDotDensityLayer;
-  $: dimension =
-    layer.style.dots.size * 2 + (layer.style.stroke?.width ?? 0) * 2;
+  interface Props {
+    layer: CartoKitDotDensityLayer;
+  }
+
+  let { layer }: Props = $props();
+  let dimension = $derived(
+    layer.style.dots.size * 2 + (layer.style.stroke?.width ?? 0) * 2
+  );
 </script>
 
 <div class="stack stack-xs ml-8">

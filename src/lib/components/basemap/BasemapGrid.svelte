@@ -8,10 +8,14 @@
   import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
   import { switchBasemapWithPreservedLayers } from '$lib/utils/maplibre';
 
-  export let provider: BasemapProvider;
+  interface Props {
+    provider: BasemapProvider;
+  }
+
+  let { provider }: Props = $props();
   const closeModal = getContext<() => void>('close-modal');
 
-  $: basemaps = BASEMAPS[provider];
+  const basemaps = $derived(BASEMAPS[provider]);
 
   function onSelectBasemap(tileId: Basemap['tileId']) {
     return function updateBasemap() {
@@ -35,7 +39,7 @@
             ? 'border-slate-400'
             : 'border-transparent'
         )}
-        on:click={onSelectBasemap(basemap.tileId)}
+        onclick={onSelectBasemap(basemap.tileId)}
       >
         <img
           src={basemap.src}

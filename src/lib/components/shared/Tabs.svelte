@@ -1,26 +1,30 @@
-<script context="module" lang="ts">
-  export interface Tab<Props = Record<string, unknown>> {
-    name: string;
-    content: ComponentType;
-    props?: Props;
-  }
-</script>
-
-<script lang="ts">
+<script
+  lang="ts"
+  generics="TabProps extends Record<string, any> = Record<string, any>"
+>
   import cs from 'classnames';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
-  export let tabs: Tab[] = [];
-  export let activeIndex = 0;
+  interface Tab<TabProps extends Record<string, any> = Record<string, any>> {
+    name: string;
+    content: Component<TabProps>;
+    props: TabProps;
+  }
 
-  export let containerClass = '';
-  export let bodyClass = '';
+  interface Props {
+    tabs: Tab<TabProps>[];
+    containerClass?: string;
+    bodyClass?: string;
+  }
 
-  const setActiveTab = (i: number): (() => void) => {
-    return (): void => {
+  let { tabs, containerClass = '', bodyClass = '' }: Props = $props();
+  let activeIndex = $state(0);
+
+  function onClick(i: number): () => void {
+    return function setActiveTab(): void {
       activeIndex = i;
     };
-  };
+  }
 </script>
 
 <div class={cs('stack', containerClass)}>
@@ -31,14 +35,14 @@
         class:active={activeIndex === i}
         class:inactive={activeIndex !== i}
       >
-        <button on:click={setActiveTab(i)}>{tab.name}</button>
+        <button onclick={onClick(i)}>{tab.name}</button>
       </li>
     {/each}
   </ul>
   <div class={cs('p-4', bodyClass)}>
     {#each tabs as tab, i}
       {#if activeIndex === i}
-        <svelte:component this={tab.content} {...tab.props} />
+        <tab.content {...tab.props} />
       {/if}
     {/each}
   </div>

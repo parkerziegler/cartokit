@@ -20,26 +20,31 @@
     CATEGORICAL_COLOR_SCHEMES_REV
   } from '$lib/utils/color';
 
-  export let layerId: string;
-  export let style: QuantitativeStyle | CategoricalStyle;
+  interface Props {
+    layerId: string;
+    style: QuantitativeStyle | CategoricalStyle;
+  }
 
-  let showOptions = false;
-  let offsetHeight = 0;
-  let offsetWidth = 0;
-  let x = 0;
-  let y = 0;
-  let schemeReversed = false;
+  let { layerId, style }: Props = $props();
+
+  let showOptions = $state(false);
+  let offsetHeight = $state(0);
+  let offsetWidth = $state(0);
+  let x = $state(0);
+  let y = $state(0);
+  let schemeReversed = $state(false);
 
   let trigger: HTMLDivElement;
 
-  $: colors =
-    style.type === 'Quantitative' ? style.scheme[style.count] : style.scheme;
-  $: quantitativeSchemes = schemeReversed
-    ? QUANTITATIVE_COLOR_SCHEMES_REV
-    : QUANTITATIVE_COLOR_SCHEMES;
-  $: categoricalSchemes = schemeReversed
-    ? CATEGORICAL_COLOR_SCHEMES_REV
-    : CATEGORICAL_COLOR_SCHEMES;
+  let colors = $derived(
+    style.type === 'Quantitative' ? style.scheme[style.count] : style.scheme
+  );
+  let quantitativeSchemes = $derived(
+    schemeReversed ? QUANTITATIVE_COLOR_SCHEMES_REV : QUANTITATIVE_COLOR_SCHEMES
+  );
+  let categoricalSchemes = $derived(
+    schemeReversed ? CATEGORICAL_COLOR_SCHEMES_REV : CATEGORICAL_COLOR_SCHEMES
+  );
 
   const target = document.getElementById('map') ?? document.body;
 
@@ -53,19 +58,19 @@
   }
 
   function onSchemeSelect(
-    event: CustomEvent<{
-      scheme: QuantitativeColorScheme | CategoricalColorScheme;
-    }>
+    scheme: CategoricalColorScheme | QuantitativeColorScheme
   ) {
-    dispatchLayerUpdate({
-      type: 'color-scheme',
-      layerId,
-      payload: {
-        scheme: event.detail.scheme
-      }
-    });
+    return function handleSchemeSelect() {
+      dispatchLayerUpdate({
+        type: 'color-scheme',
+        layerId,
+        payload: {
+          scheme
+        }
+      });
 
-    showOptions = false;
+      showOptions = false;
+    };
   }
 
   function onSchemeReverse() {
@@ -96,14 +101,14 @@
     bind:offsetWidth
   >
     <button
-      on:click={onClick}
+      onclick={onClick}
       use:clickOutside
-      on:clickoutside={onClickOutside}
+      onclickoutside={onClickOutside}
       class="flex-1"
     >
       <div class="flex h-4 w-full">
         {#each colors as color}
-          <span style="background-color: {color};" class="flex-1" />
+          <span style="background-color: {color};" class="flex-1"></span>
         {/each}
       </div>
     </button>
@@ -122,18 +127,16 @@
             {#each quantitativeSchemes as scheme}
               <ColorSchemePalette
                 colors={scheme[style.count]}
-                {scheme}
                 active={scheme === style.scheme}
-                on:click={onSchemeSelect}
+                onClick={onSchemeSelect(scheme)}
               />
             {/each}
           {:else}
             {#each categoricalSchemes as scheme}
               <ColorSchemePalette
                 colors={scheme}
-                {scheme}
                 active={scheme === style.scheme}
-                on:click={onSchemeSelect}
+                onClick={onSchemeSelect(scheme)}
               />
             {/each}
           {/if}
@@ -141,7 +144,7 @@
       </Portal>
     {/if}
   </div>
-  <button on:click={onSchemeReverse} data-testid="color-scheme-reverse-button"
+  <button onclick={onSchemeReverse} data-testid="color-scheme-reverse-button"
     ><ReverseIcon /></button
   >
 </div>

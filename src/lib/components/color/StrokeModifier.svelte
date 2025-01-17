@@ -4,8 +4,12 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { ConstantStroke } from '$lib/types';
 
-  export let layerId: string;
-  export let stroke: ConstantStroke | undefined;
+  interface Props {
+    layerId: string;
+    stroke?: ConstantStroke;
+  }
+
+  let { layerId, stroke }: Props = $props();
 
   function onRemoveStroke() {
     dispatchLayerUpdate({
@@ -25,11 +29,19 @@
 </script>
 
 {#if stroke}
-  <button on:click={onRemoveStroke} data-testid="remove-stroke-button">
+  <button
+    onclick={onRemoveStroke}
+    data-testid="remove-stroke-button"
+    aria-label="Remove stroke"
+  >
     <MinusIcon />
   </button>
 {:else}
-  <button on:click={onAddStroke} data-testid="add-stroke">
+  <button
+    onclick={onAddStroke}
+    data-testid="add-stroke"
+    aria-label="Add stroke"
+  >
     <PlusIcon />
   </button>
 {/if}

@@ -129,11 +129,9 @@ const addHoverListeners = (map: Map, layerId: string): void => {
 
   listeners.update((ls) => {
     const layerListeners = ls.get(layerId) ?? {
-      /* eslint-disable @typescript-eslint/no-empty-function */
       click: () => {},
       mousemove: () => {},
       mouseleave: () => {}
-      /* eslint-enable-next-line @typescript-eslint/no-empty-function */
     };
 
     return ls.set(layerId, {
