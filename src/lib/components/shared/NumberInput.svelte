@@ -9,9 +9,7 @@
     value: number;
     disabled?: boolean;
     class?: string;
-    onChange: (
-      event: Event & { currentTarget: EventTarget & HTMLInputElement }
-    ) => void;
+    onchange: (value: number) => void;
   }
 
   let {
@@ -22,8 +20,20 @@
     value,
     disabled = false,
     class: className = '',
-    onChange
+    onchange
   }: Props = $props();
+
+  function onChange(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    const value = +event.currentTarget.value;
+
+    if (Number.isNaN(value)) {
+      return;
+    }
+
+    onchange(value);
+  }
 </script>
 
 <input

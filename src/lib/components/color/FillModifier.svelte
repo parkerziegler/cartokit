@@ -10,7 +10,7 @@
 
   interface Props {
     layerId: string;
-    fill: CategoricalFill | ConstantFill | QuantitativeFill | undefined;
+    fill?: CategoricalFill | ConstantFill | QuantitativeFill;
   }
 
   let { layerId, fill }: Props = $props();

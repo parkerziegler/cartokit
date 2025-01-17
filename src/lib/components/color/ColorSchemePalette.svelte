@@ -1,13 +1,13 @@
 <script lang="ts">
+  import type { MouseEventHandler } from 'svelte/elements';
+
   interface Props {
     colors: readonly string[];
     active: boolean;
-    onClick: (
-      event: Event & { currentTarget: EventTarget & HTMLButtonElement }
-    ) => void;
+    onclickscheme: MouseEventHandler<HTMLButtonElement>;
   }
 
-  let { colors, active, onClick }: Props = $props();
+  let { colors, active, onclickscheme }: Props = $props();
 
   let ref: HTMLButtonElement;
 
@@ -21,7 +21,7 @@
 
 <li class="flex">
   <button
-    onclick={onClick}
+    onclick={onclickscheme}
     class="scheme flex-1 p-2 hover:bg-slate-600"
     bind:this={ref}
   >

@@ -34,7 +34,7 @@
     }
   }
 
-  function onChange(
+  function onVisualizationTypeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     dispatchLayerUpdate({
@@ -59,5 +59,5 @@
   {options}
   selected={visualizationType}
   id="color-style-by-select"
-  {onChange}
+  onchange={onVisualizationTypeChange}
 />

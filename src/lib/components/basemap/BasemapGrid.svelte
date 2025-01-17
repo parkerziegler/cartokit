@@ -13,9 +13,8 @@
   }
 
   let { provider }: Props = $props();
-  const closeModal = getContext<() => void>('close-modal');
 
-  const basemaps = $derived(BASEMAPS[provider]);
+  const closeModal = getContext<() => void>('close-modal');
 
   function onSelectBasemap(tileId: Basemap['tileId']) {
     return function updateBasemap() {
@@ -31,7 +30,7 @@
   <CustomTiles />
 {:else}
   <div class="grid grid-cols-3 gap-4">
-    {#each basemaps as basemap}
+    {#each BASEMAPS[provider] as basemap}
       <button
         class={cs(
           'flex flex-col rounded border p-2 transition-colors hover:border-slate-400',

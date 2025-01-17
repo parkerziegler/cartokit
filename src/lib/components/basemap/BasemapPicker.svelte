@@ -13,7 +13,7 @@
   import { BASEMAPS } from '$lib/utils/basemap';
 
   let picker: HTMLButtonElement;
-  let maps: maplibregl.Map[] = $state([]);
+  let maps = $state<maplibregl.Map[]>([]);
   let hovered = $state(false);
   let showModal = $state(false);
 
@@ -21,25 +21,22 @@
     showModal = false;
   });
 
-  const tabs = Object.keys(BASEMAPS).map((provider) => {
-    return {
-      name: provider,
-      content: BasemapGrid,
-      props: { provider } as { provider: BasemapProvider }
-    };
-  });
+  const tabs = Object.keys(BASEMAPS).map((provider) => ({
+    name: provider,
+    content: BasemapGrid,
+    props: { provider } as { provider: BasemapProvider }
+  }));
   const mapStyles = ['outdoor-v2', 'winter-v2', 'satellite'];
 
   onMount(() => {
     maps = mapStyles.map((style) => {
-      // maplibre-gl is actually a CJS module, and not all module.exports may be
-      // supported as named exports.
       const map = new maplibregl.Map({
         container: `inset-${style}`,
         style: `https://api.maptiler.com/maps/${style}/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
         center: $ir.center,
         zoom: $ir.zoom
       });
+
       map.scrollZoom.disable();
 
       return map;
@@ -52,8 +49,8 @@
     };
   });
 
-  function updateMapThumbnail(map: maplibregl.Map, node: HTMLButtonElement) {
-    const { top, left } = node.getBoundingClientRect();
+  function updateMapThumbnail(map: maplibregl.Map) {
+    const { top, left } = picker.getBoundingClientRect();
     map.setCenter($mapStore.unproject([left + 32, top + 32]));
     map.setZoom($ir.zoom);
   }
@@ -72,7 +69,7 @@
 
   $effect(() => {
     if (maps.length > 0 && $mapStore && $ir) {
-      updateMapThumbnail(maps[0], picker);
+      updateMapThumbnail(maps[0]);
     }
   });
 
@@ -81,7 +78,7 @@
   // thumbnails while two are out of view.
   $effect(() => {
     if (hovered && $mapStore && $ir) {
-      maps.slice(1).forEach((map) => updateMapThumbnail(map, picker));
+      maps.slice(1).forEach(updateMapThumbnail);
     }
   });
 </script>

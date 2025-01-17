@@ -13,25 +13,24 @@
 
   let { layer }: Props = $props();
 
-  let sizeMin = $derived(layer.style.size.min);
-  let sizeMax = $derived(layer.style.size.max);
   let [min, max] = $derived(
     deriveExtent(layer.style.size.attribute, layer.data.geojson.features)
   );
-
-  let scale = $derived(d3.scaleLinear([sizeMin, sizeMax], [min, max]));
+  let scale = $derived(
+    d3.scaleLinear([layer.style.size.min, layer.style.size.max], [min, max])
+  );
   let circles = $derived([
     {
-      size: sizeMax / 3,
-      value: scale(sizeMax / 3)
+      size: layer.style.size.max / 3,
+      value: scale(layer.style.size.max / 3)
     },
     {
-      size: (sizeMax * 2) / 3,
-      value: scale((sizeMax * 2) / 3)
+      size: (layer.style.size.max * 2) / 3,
+      value: scale((layer.style.size.max * 2) / 3)
     },
     {
-      size: sizeMax,
-      value: scale(sizeMax)
+      size: layer.style.size.max,
+      value: scale(layer.style.size.max)
     }
   ]);
   let style = $derived(

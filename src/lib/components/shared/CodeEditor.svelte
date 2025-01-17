@@ -17,8 +17,7 @@
   interface EditableCodeEditorConfig {
     kind: 'editable';
     initialDoc: string;
-    onChange: (value: string) => void;
-    onFocusChange?: (focusing: boolean) => void;
+    onchange: (value: string) => void;
     language: 'javascript' | 'json';
   }
 
@@ -26,9 +25,9 @@
 
   interface Props {
     config: CodeEditorConfig;
-    view?: EditorView | undefined;
+    view?: EditorView;
     class?: string;
-    testId?: string | undefined;
+    testId?: string;
   }
 
   let {
@@ -51,20 +50,12 @@
     ];
 
     if (config.kind === 'editable') {
-      const { onChange, onFocusChange } = config;
+      const { onchange } = config;
 
       extensions.push(
         EditorView.updateListener.of((v) => {
           if (v.docChanged) {
-            onChange(v.state.doc.toString());
-          }
-        })
-      );
-
-      extensions.push(
-        EditorView.updateListener.of((v) => {
-          if (v.focusChanged) {
-            onFocusChange?.(view?.hasFocus ?? false);
+            onchange(v.state.doc.toString());
           }
         })
       );

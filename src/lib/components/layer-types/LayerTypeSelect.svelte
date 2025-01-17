@@ -21,7 +21,7 @@
     })) ?? []
   );
 
-  function onChange(
+  function onLayerTypeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     dispatchLayerUpdate({
@@ -32,4 +32,9 @@
   }
 </script>
 
-<Select {options} selected={layer.type} id="layer-type-select" {onChange} />
+<Select
+  {options}
+  selected={layer.type}
+  id="layer-type-select"
+  onchange={onLayerTypeChange}
+/>

@@ -10,7 +10,7 @@
     QuantitativeStyle,
     CategoricalStyle
   } from '$lib/types';
-  import { clickOutside } from '$lib/utils/actions';
+  import { clickoutside } from '$lib/utils/actions';
   import {
     reverseQuantitativeColorScheme,
     reverseCategoricalColorScheme,
@@ -34,8 +34,6 @@
   let y = $state(0);
   let schemeReversed = $state(false);
 
-  let trigger: HTMLDivElement;
-
   let colors = $derived(
     style.type === 'Quantitative' ? style.scheme[style.count] : style.scheme
   );
@@ -46,18 +44,19 @@
     schemeReversed ? CATEGORICAL_COLOR_SCHEMES_REV : CATEGORICAL_COLOR_SCHEMES
   );
 
+  let trigger: HTMLDivElement;
   const target = document.getElementById('map') ?? document.body;
 
-  function onClick() {
+  function onClickCurrentScheme() {
     showOptions = !showOptions;
     ({ x, y } = trigger.getBoundingClientRect());
   }
 
-  function onClickOutside() {
+  function onClickOutsideCurrentScheme() {
     showOptions = false;
   }
 
-  function onSchemeSelect(
+  function onClickScheme(
     scheme: CategoricalColorScheme | QuantitativeColorScheme
   ) {
     return function handleSchemeSelect() {
@@ -101,9 +100,9 @@
     bind:offsetWidth
   >
     <button
-      onclick={onClick}
-      use:clickOutside
-      onclickoutside={onClickOutside}
+      onclick={onClickCurrentScheme}
+      use:clickoutside
+      onclickoutside={onClickOutsideCurrentScheme}
       class="flex-1"
     >
       <div class="flex h-4 w-full">
@@ -128,7 +127,7 @@
               <ColorSchemePalette
                 colors={scheme[style.count]}
                 active={scheme === style.scheme}
-                onClick={onSchemeSelect(scheme)}
+                onclickscheme={onClickScheme(scheme)}
               />
             {/each}
           {:else}
@@ -136,7 +135,7 @@
               <ColorSchemePalette
                 colors={scheme}
                 active={scheme === style.scheme}
-                onClick={onSchemeSelect(scheme)}
+                onclickscheme={onClickScheme(scheme)}
               />
             {/each}
           {/if}

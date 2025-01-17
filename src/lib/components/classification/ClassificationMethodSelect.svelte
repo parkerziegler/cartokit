@@ -27,7 +27,7 @@
     label: scale
   }));
 
-  function onChange(
+  function onClassificationMethodChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     if (event.currentTarget.value === 'Manual') {
@@ -50,7 +50,7 @@
     displayBreaksEditor = !displayBreaksEditor;
   }
 
-  function onClick(
+  function onClassificationMethodClick(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     if (event.currentTarget.value === 'Manual') {
@@ -65,8 +65,8 @@
   selected={style.method}
   title="Method"
   id="classification-method-select"
-  {onChange}
-  {onClick}
+  onchange={onClassificationMethodChange}
+  onclick={onClassificationMethodClick}
   bind:this={ref}
 />
 {#if displayBreaksEditor}

@@ -1,4 +1,5 @@
 import type { ActionReturn } from 'svelte/action';
+import type { MouseEventHandler } from 'svelte/elements';
 import { on } from 'svelte/events';
 
 /**
@@ -8,12 +9,9 @@ import { on } from 'svelte/events';
  * @returns – An ActionReturn object with a `destroy` method to remove the event
  * listener.
  */
-export function clickOutside<T extends HTMLElement>(
+export function clickoutside<T extends HTMLElement>(
   node: T
-): ActionReturn<
-  undefined,
-  { onclickoutside: (event: CustomEvent<MouseEvent>) => void }
-> {
+): ActionReturn<undefined, { onclickoutside: MouseEventHandler<HTMLElement> }> {
   function handle(event: MouseEvent) {
     if (!event.target) {
       return;

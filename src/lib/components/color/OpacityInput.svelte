@@ -17,8 +17,6 @@
 
   let { layerId, channel, style }: Props = $props();
 
-  let opacity = $derived(decimalToPercent(style.opacity));
-
   function validateOpacity(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
@@ -50,7 +48,7 @@
     id="{channel}-opacity-input"
     size="4"
     class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
-    value="{opacity}%"
+    value="{decimalToPercent(style.opacity)}%"
     onchange={validateOpacity}
   />
 </div>

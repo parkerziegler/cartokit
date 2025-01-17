@@ -1,11 +1,12 @@
 <script lang="ts">
   import cs from 'classnames';
+  import type { Snippet } from 'svelte';
 
   interface Props {
     class?: string;
-    action?: import('svelte').Snippet;
-    subtitle?: import('svelte').Snippet;
-    children?: import('svelte').Snippet;
+    action?: Snippet;
+    subtitle?: Snippet;
+    children: Snippet;
   }
 
   let { class: className = '', action, subtitle, children }: Props = $props();
@@ -15,7 +16,7 @@
   <div class="stack stack-xs p-4 text-white">
     <div class="flex items-center justify-between">
       <p class={cs('font-sans text-lg font-medium tracking-wider', className)}>
-        {@render children?.()}
+        {@render children()}
       </p>
       {@render action?.()}
     </div>

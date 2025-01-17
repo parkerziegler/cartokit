@@ -12,14 +12,12 @@
   let { layer }: Props = $props();
 
   function onSizeChange(field: 'min' | 'max') {
-    return function handleSizeChange(
-      event: Event & { currentTarget: EventTarget & HTMLInputElement }
-    ) {
+    return function handleSizeChange(value: number) {
       dispatchLayerUpdate({
         type: 'size',
         layerId: layer.id,
         payload: {
-          [field]: +event.currentTarget.value
+          [field]: value
         }
       });
     };
@@ -40,7 +38,7 @@
       id="min"
       min={1}
       value={layer.style.size.min}
-      onChange={onSizeChange('min')}
+      onchange={onSizeChange('min')}
       class="w-10"
     />
   </div>
@@ -50,7 +48,7 @@
       id="max"
       min={1}
       value={layer.style.size.max}
-      onChange={onSizeChange('max')}
+      onchange={onSizeChange('max')}
       class="w-10"
     />
   </div>

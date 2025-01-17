@@ -12,14 +12,12 @@
 
   let { layerId, size, label, fieldId }: Props = $props();
 
-  function onPointSizeChange(
-    event: Event & { currentTarget: EventTarget & HTMLInputElement }
-  ): void {
+  function onPointSizeChange(value: number): void {
     dispatchLayerUpdate({
       type: 'point-size',
       layerId,
       payload: {
-        size: +event.currentTarget.value
+        size: value
       }
     });
   }
@@ -32,7 +30,7 @@
     min={1}
     max={Infinity}
     value={size}
-    onChange={onPointSizeChange}
+    onchange={onPointSizeChange}
     class="w-10"
   />
 </div>

@@ -7,7 +7,7 @@
   import { deriveExtent } from '$lib/interaction/scales';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { QuantitativeStyle } from '$lib/types';
-  import { clickOutside } from '$lib/utils/actions';
+  import { clickoutside } from '$lib/utils/actions';
 
   interface Props {
     layerId: string;
@@ -19,19 +19,16 @@
   let { layerId, style, features, toggleBreaksEditorVisibility }: Props =
     $props();
 
-  let colors = $derived(style.scheme[style.count]);
   let [min, max] = $derived(deriveExtent(style.attribute, features));
 
   function onThresholdChange(i: number) {
-    return function handleThresholdChange(
-      event: Event & { currentTarget: EventTarget & HTMLInputElement }
-    ) {
+    return function handleThresholdChange(value: number) {
       dispatchLayerUpdate({
         type: 'color-threshold',
         layerId,
         payload: {
           index: i,
-          threshold: +event.currentTarget.value
+          threshold: value
         }
       });
     };
@@ -63,12 +60,14 @@
     {/snippet}
     <div
       class="grid grid-cols-[0.75rem_1fr_1rem_1fr] gap-x-2 gap-y-1"
-      use:clickOutside
+      use:clickoutside
       onclickoutside={toggleBreaksEditorVisibility}
       data-testid="breaks-editor"
     >
       {#each [min, ...style.thresholds] as threshold, i}
-        <span class="h-6 self-center" style="background-color: {colors[i]};"
+        <span
+          class="h-6 self-center"
+          style="background-color: {style.scheme[style.count][i]};"
         ></span>
         <span class="self-center">{threshold.toFixed(2)}</span>
         <span class="self-center">to</span>
@@ -77,7 +76,7 @@
           step={0.01}
           class="self-center p-1"
           disabled={i === style.thresholds.length}
-          onChange={onThresholdChange(i)}
+          onchange={onThresholdChange(i)}
         />
       {/each}
     </div>

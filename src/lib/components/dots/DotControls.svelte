@@ -12,14 +12,12 @@
 
   let { layer }: Props = $props();
 
-  function onDotValueChange(
-    event: Event & { currentTarget: EventTarget & HTMLInputElement }
-  ) {
+  function onDotValueChange(value: number) {
     dispatchLayerUpdate({
       type: 'dot-value',
       layerId: layer.id,
       payload: {
-        value: +event.currentTarget.value
+        value
       }
     });
   }
@@ -46,7 +44,7 @@
       min={1}
       max={Infinity}
       value={layer.style.dots.value}
-      onChange={onDotValueChange}
+      onchange={onDotValueChange}
       class="w-10"
     />
   </div>

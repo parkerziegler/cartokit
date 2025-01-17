@@ -1,18 +1,15 @@
 <script lang="ts" generics="T">
   import cs from 'classnames';
+  import type { ChangeEventHandler, MouseEventHandler } from 'svelte/elements';
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
 
   interface Props {
     selected: T;
-    onChange: (
-      event: Event & { currentTarget: EventTarget & HTMLSelectElement }
-    ) => void;
-    onClick?: (
-      event: Event & { currentTarget: EventTarget & HTMLSelectElement }
-    ) => void;
+    onchange: ChangeEventHandler<HTMLSelectElement>;
+    onclick?: MouseEventHandler<HTMLSelectElement>;
     id: string;
-    options?: {
+    options: {
       value: T;
       label: string;
     }[];
@@ -20,12 +17,12 @@
     class?: string;
   }
 
-  let ref: HTMLSelectElement | HTMLDivElement;
+  let ref = $state<HTMLSelectElement | HTMLDivElement>();
 
   let {
     selected,
-    onChange,
-    onClick = () => {},
+    onchange,
+    onclick = () => {},
     id,
     options = [],
     title = '',
@@ -33,25 +30,42 @@
   }: Props = $props();
 
   export function getBoundingClientRect() {
-    return ref.getBoundingClientRect();
+    return ref!.getBoundingClientRect();
   }
 </script>
 
-<div class="stack-h stack-h-xs items-baseline" bind:this={ref}>
-  {#if title}
+{#if title}
+  <div class="stack-h stack-h-xs items-baseline" bind:this={ref}>
     <FieldLabel fieldId={id}>
       {title}
     </FieldLabel>
-  {/if}
+    <select
+      class={cs(
+        'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
+        className
+      )}
+      value={selected}
+      {onchange}
+      {onclick}
+      {id}
+    >
+      {#each options as option}
+        <option value={option.value} selected={option.value === selected}
+          >{option.label}</option
+        >
+      {/each}
+    </select>
+  </div>
+{:else}
   <select
     class={cs(
       'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
       className
     )}
     value={selected}
-    onchange={onChange}
-    onclick={onClick}
     {id}
+    {onchange}
+    {onclick}
     bind:this={ref}
   >
     {#each options as option}
@@ -60,4 +74,4 @@
       >
     {/each}
   </select>
-</div>
+{/if}

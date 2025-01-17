@@ -17,7 +17,7 @@
     label: `${i + 3}`
   }));
 
-  function onChange(
+  function onColorStepsChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     dispatchLayerUpdate({
@@ -35,5 +35,5 @@
   selected={style.count}
   title="Steps"
   id="color-steps-select"
-  {onChange}
+  onchange={onColorStepsChange}
 />

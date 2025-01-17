@@ -1,11 +1,10 @@
 <script lang="ts">
   import cs from 'classnames';
   import type { Snippet } from 'svelte';
+  import type { MouseEventHandler } from 'svelte/elements';
 
   interface Props {
-    onClick?: (
-      event: Event & { currentTarget: EventTarget & HTMLButtonElement }
-    ) => void;
+    onclick?: MouseEventHandler<HTMLButtonElement>;
     class?: string;
     disabled?: boolean;
     loading?: boolean;
@@ -14,7 +13,7 @@
   }
 
   let {
-    onClick = () => {},
+    onclick = () => {},
     class: className = '',
     disabled = false,
     loading = false,
@@ -24,7 +23,7 @@
 </script>
 
 <button
-  onclick={onClick}
+  {onclick}
   disabled={disabled || loading}
   class={cs(
     'rounded border border-slate-600 px-3 py-2 text-sm text-white transition focus:border-slate-400 enabled:hover:border-slate-400 disabled:cursor-not-allowed disabled:text-slate-500',

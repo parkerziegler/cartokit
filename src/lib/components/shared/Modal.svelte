@@ -1,8 +1,8 @@
-<!-- Core implementation adapted from: https://svelte.dev/examples/modal -->
+<!-- Core implementation adapted from: https://svelte.dev/playground/modal -->
 <script lang="ts">
   import cs from 'classnames';
   import { cubicOut } from 'svelte/easing';
-  import { tweened } from 'svelte/motion';
+  import { Tween } from 'svelte/motion';
 
   let {
     showModal = $bindable(),
@@ -12,10 +12,10 @@
     header,
     children
   } = $props();
-  let dialog = $state<HTMLDialogElement>();
+  let dialog: HTMLDialogElement;
   let offsetHeight = $state(0);
 
-  let offsetHeightTween = tweened(initialHeight, {
+  let offsetHeightTween = new Tween(initialHeight, {
     duration: 150,
     easing: cubicOut
   });
@@ -27,8 +27,15 @@
       dialog.close();
     }
   });
+
+  $effect(() => {
+    if (dialog && offsetHeight) {
+      offsetHeightTween.set(offsetHeight);
+    }
+  });
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <dialog
   class={cs(
     'overflow-hidden rounded bg-slate-900 font-sans text-white',
@@ -36,8 +43,18 @@
   )}
   bind:this={dialog}
   onclose={() => (showModal = false)}
+  onclick={(e) => {
+    if (e.target === dialog) {
+      dialog.close();
+    }
+  }}
+  onkeydown={(e) => {
+    if (e.key === 'Escape') {
+      dialog.close();
+    }
+  }}
   data-testid={testId}
-  style="height: {$offsetHeightTween}px;"
+  style="height: {offsetHeightTween.current}px;"
 >
   <div bind:offsetHeight>
     <div class="flex items-center justify-between p-4">
@@ -59,7 +76,7 @@
         </svg>
       </button>
     </div>
-    {@render children?.()}
+    {@render children()}
   </div>
 </dialog>
 

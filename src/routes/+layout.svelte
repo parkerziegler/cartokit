@@ -1,10 +1,11 @@
 <script lang="ts">
   import { inject } from '@vercel/analytics';
+  import type { Snippet } from 'svelte';
 
   import 'maplibre-gl/dist/maplibre-gl.css';
   import '../app.css';
   interface Props {
-    children?: import('svelte').Snippet;
+    children: Snippet;
   }
 
   let { children }: Props = $props();
@@ -20,4 +21,4 @@
   />
 </svelte:head>
 
-{@render children?.()}
+{@render children()}

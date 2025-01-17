@@ -1,17 +1,17 @@
 <script lang="ts">
   interface Props {
     id?: string;
-    file?: File | null;
-    onChange: (file: File) => void;
+    file: File | null;
+    onfilechange: (file: File) => void;
   }
 
-  let { id = '', file = null, onChange }: Props = $props();
+  let { id = '', file = null, onfilechange }: Props = $props();
 
   let files: FileList | null = $state(null);
 
   $effect(() => {
     if (files) {
-      onChange(files[0]);
+      onfilechange(files[0]);
     }
   });
 </script>

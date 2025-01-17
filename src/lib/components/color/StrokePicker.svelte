@@ -38,14 +38,12 @@
     });
   }
 
-  function onStrokeWidthChange(
-    event: Event & { currentTarget: EventTarget & HTMLInputElement }
-  ) {
+  function onStrokeWidthChange(value: number) {
     dispatchLayerUpdate({
       type: 'stroke-width',
       layerId,
       payload: {
-        strokeWidth: +event.currentTarget.value
+        strokeWidth: value
       }
     });
   }
@@ -72,7 +70,7 @@
     <NumberInput
       id="stroke-width-input"
       value={stroke.width}
-      onChange={onStrokeWidthChange}
+      onchange={onStrokeWidthChange}
       class="w-10"
     />
   </div>

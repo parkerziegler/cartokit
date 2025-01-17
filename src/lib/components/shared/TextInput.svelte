@@ -1,17 +1,10 @@
 <script lang="ts">
   import cs from 'classnames';
+  import type { FormEventHandler } from 'svelte/elements';
 
   interface Props {
     value: string;
-    onChange?: (
-      event: Event & { currentTarget: EventTarget & HTMLInputElement }
-    ) => void;
-    onFocus?: (
-      event: Event & { currentTarget: EventTarget & HTMLInputElement }
-    ) => void;
-    onInput?: (
-      event: Event & { currentTarget: EventTarget & HTMLInputElement }
-    ) => void;
+    oninput?: FormEventHandler<HTMLInputElement>;
     placeholder?: string;
     id?: string;
     class?: string;
@@ -19,9 +12,7 @@
 
   let {
     value,
-    onChange = () => {},
-    onFocus = () => {},
-    onInput = () => {},
+    oninput = () => {},
     placeholder = '',
     id = '',
     class: className = ''
@@ -32,9 +23,7 @@
   {value}
   {placeholder}
   {id}
-  onchange={onChange}
-  onfocus={onFocus}
-  oninput={onInput}
+  {oninput}
   class={cs(
     'border border-slate-600 bg-inherit bg-slate-900 p-2 hover:border-slate-400 focus:border-slate-400',
     className

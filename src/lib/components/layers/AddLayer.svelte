@@ -37,7 +37,7 @@
   bind:showModal
   class="max-w-lg"
   testId="add-layer-modal"
-  initialHeight={327}
+  initialHeight={329}
 >
   {#snippet header()}
     <h2 class="text-xl font-semibold">Add Layer</h2>

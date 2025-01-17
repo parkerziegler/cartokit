@@ -29,7 +29,7 @@
   <div class="stack stack-xs">
     <FieldLabel fieldId="tile-url">Tile URL</FieldLabel>
     <TextInput
-      onInput={onTileUrlInput}
+      oninput={onTileUrlInput}
       value={tileUrl}
       placeholder="(e.g., https://www.openhistoricalmap.org/map-styles/woodblock/woodblock.json)"
       id="tile-url"
@@ -37,7 +37,7 @@
     />
   </div>
   <Button
-    onClick={onSubmit}
+    onclick={onSubmit}
     class="mt-2 self-end"
     disabled={!tileUrl || tileUrl === $ir.basemap.url}>Apply</Button
   >

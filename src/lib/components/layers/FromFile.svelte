@@ -66,12 +66,12 @@
 <form class="stack stack-sm" onsubmit={onSubmit}>
   <div class="stack stack-xs">
     <FieldLabel fieldId="from-file-input">File</FieldLabel>
-    <FileInput id="from-file-input" onChange={onFileUpload} {file} />
+    <FileInput id="from-file-input" onfilechange={onFileUpload} {file} />
   </div>
   <div class="stack stack-xs">
     <FieldLabel fieldId="Display Name">Display Name</FieldLabel>
     <TextInput
-      onInput={onDisplayNameInput}
+      oninput={onDisplayNameInput}
       value={displayName}
       id="Display Name"
       placeholder="(e.g., Earthquakes)"

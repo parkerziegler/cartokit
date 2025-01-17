@@ -16,15 +16,17 @@
   import { selectedFeature } from '$lib/stores/selected-feature';
   import { parseUserDefinedTransformation } from '$lib/utils/parse';
   import { transformationWorker } from '$lib/utils/worker';
+  import type { MouseEventHandler } from 'svelte/elements';
 
   interface Props {
-    onClose: () => void;
-    onClickOutside: (event: CustomEvent<MouseEvent>) => void;
+    oncloseeditor: () => void;
+    onclickoutsideeditor: MouseEventHandler<HTMLElement>;
     layerId: string;
     geojson: FeatureCollection;
   }
 
-  let { onClose, onClickOutside, layerId, geojson }: Props = $props();
+  let { oncloseeditor, onclickoutsideeditor, layerId, geojson }: Props =
+    $props();
 
   // Main editor state.
   let view: EditorView | undefined = $state();
@@ -100,7 +102,7 @@
     });
   }
 
-  function onChange(program: string) {
+  function onEditorChange(program: string) {
     if ($selectedFeature) {
       transformationWorker(
         program,
@@ -157,10 +159,10 @@
   });
 </script>
 
-<Menu class="relative z-10 w-96" {onClickOutside}>
+<Menu class="relative z-10 w-96" onclickoutsidemenu={onclickoutsideeditor}>
   <MenuItem title="Transform Data">
     {#snippet action()}
-      <button onclick={onClose}><CloseIcon /></button>
+      <button onclick={oncloseeditor}><CloseIcon /></button>
     {/snippet}
     <div class="stack stack-sm">
       <p class="font-sans">
@@ -171,7 +173,7 @@
           kind: 'editable',
           initialDoc: doc,
           language: 'javascript',
-          onChange
+          onchange: onEditorChange
         }}
         class="-mx-4 max-h-[9.5rem] overflow-auto"
         bind:view
@@ -184,7 +186,7 @@
       {/if}
       <Button
         class="stack-h stack-h-xs items-center self-end"
-        {onClick}
+        onclick={onClick}
         testId="run-transformation-button"
         ><span>Run</span><PlayCircle /></Button
       >

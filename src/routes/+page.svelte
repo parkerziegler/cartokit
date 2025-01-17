@@ -71,7 +71,7 @@
     });
 
     return () => {
-      map?.remove();
+      map!.remove();
     };
   });
 

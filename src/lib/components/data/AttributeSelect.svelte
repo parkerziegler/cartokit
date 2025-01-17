@@ -43,7 +43,7 @@
     }))
   );
 
-  function onChange(
+  function onAttributeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     dispatchLayerUpdate({
@@ -65,13 +65,13 @@
     }
   }
 
-  function onCloseComputedAttribute() {
+  function onCloseEditor() {
     attributeEditorVisible = false;
   }
 
-  function onClickOutside(event: CustomEvent<MouseEvent>) {
+  function onClickOutsideEditor(event: CustomEvent<MouseEvent>) {
     if (!trigger.contains(event.detail.target as Node)) {
-      onCloseComputedAttribute();
+      onCloseEditor();
     }
   }
 
@@ -89,7 +89,7 @@
     {selected}
     id="{channel}-attribute-select"
     title="Attribute"
-    {onChange}
+    onchange={onAttributeChange}
     class="w-[80%] truncate"
   />
   <button
@@ -105,8 +105,8 @@
     style="left: {left - 16 - 24 * 16}px;"
   >
     <TransformationEditor
-      onClose={onCloseComputedAttribute}
-      {onClickOutside}
+      oncloseeditor={onCloseEditor}
+      onclickoutsideeditor={onClickOutsideEditor}
       {layerId}
       {geojson}
       bind:this={editor}

@@ -53,7 +53,7 @@
   <div class="stack stack-xs">
     <FieldLabel fieldId="from-endpoint-input">Endpoint</FieldLabel>
     <TextInput
-      onInput={onEndpointInput}
+      oninput={onEndpointInput}
       value={endpoint}
       id="from-endpoint-input"
       class="w-full"
@@ -63,7 +63,7 @@
   <div class="stack stack-xs">
     <FieldLabel fieldId="Display Name">Display Name</FieldLabel>
     <TextInput
-      onInput={onDisplayNameInput}
+      oninput={onDisplayNameInput}
       value={displayName}
       id="Display Name"
       class="w-full"

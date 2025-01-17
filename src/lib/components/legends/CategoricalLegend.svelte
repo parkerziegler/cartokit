@@ -4,7 +4,7 @@
 
   interface Props {
     fill: CategoricalFill;
-    stroke: ConstantStroke | undefined;
+    stroke?: ConstantStroke;
     layerType: LayerType;
   }
 
