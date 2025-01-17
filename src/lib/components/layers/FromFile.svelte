@@ -15,8 +15,8 @@
   let displayName = $state('');
   let dataLoading = $state(false);
 
-  function onFileUpload(file: File) {
-    file = file;
+  function onFileUpload(f: File) {
+    file = f;
   }
 
   function onDisplayNameInput(

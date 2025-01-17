@@ -3,11 +3,6 @@
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
 
-  interface SelectOption<T> {
-    value: T;
-    label: string;
-  }
-
   interface Props {
     selected: T;
     onChange: (
@@ -17,7 +12,10 @@
       event: Event & { currentTarget: EventTarget & HTMLSelectElement }
     ) => void;
     id: string;
-    options?: SelectOption<T>[];
+    options?: {
+      value: T;
+      label: string;
+    }[];
     title?: string;
     class?: string;
   }

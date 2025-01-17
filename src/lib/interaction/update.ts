@@ -569,9 +569,12 @@ export function dispatchLayerUpdate({
         const lyr = ir.layers[layerId] as
           | CartoKitPointLayer
           | CartoKitDotDensityLayer;
-        lyr.type === 'Point'
-          ? (lyr.style.size = payload.size)
-          : (lyr.style.dots.size = payload.size);
+
+        if (lyr.type === 'Point') {
+          lyr.style.size = payload.size;
+        } else {
+          lyr.style.dots.size = payload.size;
+        }
 
         map.setPaintProperty(layerId, 'circle-radius', payload.size);
 

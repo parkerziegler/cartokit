@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import type { FeatureCollection } from 'geojson';
 
   import TransformationEditor from '$lib/components/data/TransformationEditor.svelte';

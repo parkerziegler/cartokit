@@ -10,7 +10,7 @@ import { isPropertyQuantitative } from '$lib/utils/property';
 export function buildCatalog(layer: CartoKitLayer): Catalog {
   const features = layer.data.geojson.features;
   const properties = Object.entries(features[0].properties || {})
-    .filter(([_, value]) => isPropertyQuantitative(value))
+    .filter(([, value]) => isPropertyQuantitative(value))
     .map(([key]) => key);
   const catalog: Catalog = {};
 

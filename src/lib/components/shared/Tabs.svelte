@@ -1,18 +1,16 @@
 <script
   lang="ts"
-  generics="TabProps extends Record<string, any> = Record<string, any>"
+  generics="TabProps extends Record<string, unknown> = Record<string, unknown>"
 >
   import cs from 'classnames';
   import type { Component } from 'svelte';
 
-  interface Tab<TabProps extends Record<string, any> = Record<string, any>> {
-    name: string;
-    content: Component<TabProps>;
-    props: TabProps;
-  }
-
   interface Props {
-    tabs: Tab<TabProps>[];
+    tabs: {
+      name: string;
+      content: Component<TabProps>;
+      props: TabProps;
+    }[];
     containerClass?: string;
     bodyClass?: string;
   }

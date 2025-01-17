@@ -123,11 +123,9 @@ const addSelectListeners = (map: Map, layerId: string) => {
 
   listeners.update((ls) => {
     const layerListeners = ls.get(layerId) ?? {
-      /* eslint-disable @typescript-eslint/no-empty-function */
       click: () => {},
       mousemove: () => {},
       mouseleave: () => {}
-      /* eslint-enable @typescript-eslint/no-empty-function */
     };
 
     return ls.set(layerId, {
