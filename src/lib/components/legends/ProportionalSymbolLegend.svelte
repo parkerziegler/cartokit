@@ -7,34 +7,37 @@
   import type { CartoKitProportionalSymbolLayer } from '$lib/types';
   import { hexWithOpacity } from '$lib/utils/color';
 
-  export let layer: CartoKitProportionalSymbolLayer;
+  interface Props {
+    layer: CartoKitProportionalSymbolLayer;
+  }
 
-  $: sizeMin = layer.style.size.min;
-  $: sizeMax = layer.style.size.max;
-  $: [min, max] = deriveExtent(
-    layer.style.size.attribute,
-    layer.data.geojson.features
+  let { layer }: Props = $props();
+
+  let [min, max] = $derived(
+    deriveExtent(layer.style.size.attribute, layer.data.geojson.features)
   );
-
-  $: scale = d3.scaleLinear([sizeMin, sizeMax], [min, max]);
-  $: circles = [
+  let scale = $derived(
+    d3.scaleLinear([layer.style.size.min, layer.style.size.max], [min, max])
+  );
+  let circles = $derived([
     {
-      size: sizeMax / 3,
-      value: scale(sizeMax / 3)
+      size: layer.style.size.max / 3,
+      value: scale(layer.style.size.max / 3)
     },
     {
-      size: (sizeMax * 2) / 3,
-      value: scale((sizeMax * 2) / 3)
+      size: (layer.style.size.max * 2) / 3,
+      value: scale((layer.style.size.max * 2) / 3)
     },
     {
-      size: sizeMax,
-      value: scale(sizeMax)
+      size: layer.style.size.max,
+      value: scale(layer.style.size.max)
     }
-  ];
-  $: style =
+  ]);
+  let style = $derived(
     layer.style.fill?.type === 'Constant'
       ? `background-color: ${hexWithOpacity(layer.style.fill.color, layer.style.fill.opacity)}; border-color: ${layer.style.stroke ? hexWithOpacity(layer.style.stroke.color, layer.style.stroke.opacity) : 'transparent'}; border-width: ${layer.style.stroke?.width ?? 0}px;`
-      : '';
+      : ''
+  );
 </script>
 
 <div class="stack stack-xs ml-8">

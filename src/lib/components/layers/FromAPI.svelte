@@ -9,16 +9,20 @@
 
   const closeModal = getContext<() => void>('close-modal');
 
-  let endpoint = '';
-  let displayName = '';
-  let dataLoading = false;
+  let endpoint = $state('');
+  let displayName = $state('');
+  let dataLoading = $state(false);
 
-  function onEndpointInput(event: CustomEvent<{ value: string }>) {
-    endpoint = event.detail.value;
+  function onEndpointInput(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    endpoint = event.currentTarget.value;
   }
 
-  function onDisplayNameInput(event: CustomEvent<{ value: string }>) {
-    displayName = event.detail.value;
+  function onDisplayNameInput(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    displayName = event.currentTarget.value;
   }
 
   function onSourceLoaded() {
@@ -45,11 +49,11 @@
   }
 </script>
 
-<form class="stack stack-sm" on:submit={onSubmit}>
+<form class="stack stack-sm" onsubmit={onSubmit}>
   <div class="stack stack-xs">
     <FieldLabel fieldId="from-endpoint-input">Endpoint</FieldLabel>
     <TextInput
-      on:input={onEndpointInput}
+      oninput={onEndpointInput}
       value={endpoint}
       id="from-endpoint-input"
       class="w-full"
@@ -59,7 +63,7 @@
   <div class="stack stack-xs">
     <FieldLabel fieldId="Display Name">Display Name</FieldLabel>
     <TextInput
-      on:input={onDisplayNameInput}
+      oninput={onDisplayNameInput}
       value={displayName}
       id="Display Name"
       class="w-full"

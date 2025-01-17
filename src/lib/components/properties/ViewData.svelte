@@ -11,6 +11,6 @@
   }
 </script>
 
-<button on:click={onViewDataClick}>
+<button onclick={onViewDataClick}>
   <TableIcon />
 </button>

@@ -4,7 +4,11 @@
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import type { CartoKitLineLayer } from '$lib/types';
 
-  export let layer: CartoKitLineLayer;
+  interface Props {
+    layer: CartoKitLineLayer;
+  }
+
+  let { layer }: Props = $props();
 </script>
 
 <MenuItem title="Stroke">

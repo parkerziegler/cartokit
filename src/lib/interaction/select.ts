@@ -109,7 +109,6 @@ const addSelectListeners = (map: Map, layerId: string) => {
 
       // We forcibly assign an "id" property to all GeoJSON sources using generateId:
       // https://maplibre.org/maplibre-gl-js-docs/style-spec/sources/#geojson-generateId
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       selectedFeatureId = event.features[0].id!.toString();
       map.setFeatureState(
         { source: layerId, id: selectedFeatureId },
@@ -124,11 +123,9 @@ const addSelectListeners = (map: Map, layerId: string) => {
 
   listeners.update((ls) => {
     const layerListeners = ls.get(layerId) ?? {
-      /* eslint-disable @typescript-eslint/no-empty-function */
       click: () => {},
       mousemove: () => {},
       mouseleave: () => {}
-      /* eslint-enable @typescript-eslint/no-empty-function */
     };
 
     return ls.set(layerId, {

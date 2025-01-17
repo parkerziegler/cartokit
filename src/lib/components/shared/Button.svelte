@@ -1,22 +1,29 @@
 <script lang="ts">
   import cs from 'classnames';
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
+  import type { MouseEventHandler } from 'svelte/elements';
 
-  let className = '';
-  export { className as class };
-  export let disabled = false;
-  export let loading = false;
-  export let testId: string | undefined = undefined;
-
-  const dispatch = createEventDispatcher();
-
-  function onClick() {
-    dispatch('click');
+  interface Props {
+    onclick?: MouseEventHandler<HTMLButtonElement>;
+    class?: string;
+    disabled?: boolean;
+    loading?: boolean;
+    testId?: string | undefined;
+    children: Snippet;
   }
+
+  let {
+    onclick = () => {},
+    class: className = '',
+    disabled = false,
+    loading = false,
+    testId = undefined,
+    children
+  }: Props = $props();
 </script>
 
 <button
-  on:click={onClick}
+  {onclick}
   disabled={disabled || loading}
   class={cs(
     'rounded border border-slate-600 px-3 py-2 text-sm text-white transition focus:border-slate-400 enabled:hover:border-slate-400 disabled:cursor-not-allowed disabled:text-slate-500',
@@ -24,9 +31,9 @@
   )}
   data-testid={testId}
   >{#if loading}
-    <span class="loader align-text-top" data-testid="loading-indicator" />
+    <span class="loader align-text-top" data-testid="loading-indicator"></span>
   {:else}
-    <slot />
+    {@render children?.()}
   {/if}
 </button>
 

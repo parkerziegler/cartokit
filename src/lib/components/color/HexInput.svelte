@@ -1,14 +1,19 @@
 <script lang="ts">
   import { DEFAULT_FILL } from '$lib/utils/constants';
 
-  export let hex: string;
-  export let testId: string;
-  export let onHexChange: (hex: string) => void;
+  interface Props {
+    hex: string;
+    testId: string;
+    onHexChange: (hex: string) => void;
+  }
+
+  let { hex, testId, onHexChange }: Props = $props();
   const hexPattern = /^#([0-9A-Fa-f]{3}){1,2}$/i;
 
-  function validateHex(event: Event) {
-    const target = event.target as HTMLInputElement;
-    let output = target.value;
+  function validateHex(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    let output = event.currentTarget.value;
 
     if (!output.startsWith('#')) {
       output = '#' + output;
@@ -25,7 +30,7 @@
 <input
   size="7"
   value={hex}
-  on:change={validateHex}
+  onchange={validateHex}
   class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
   data-testid={testId}
 />

@@ -1,7 +1,5 @@
-/* eslint-disable import/no-unresolved */
 import { VERCEL_ENV } from '$env/static/private';
 import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
-/* eslint-enable import/no-unresolved */
 
 export function load() {
   return {

@@ -5,12 +5,20 @@
   import { pluralize } from '$lib/utils/format';
   import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
 
-  export let layer: CartoKitPointLayer;
+  interface Props {
+    layer: CartoKitPointLayer;
+  }
 
-  $: geometryType = getFeatureCollectionGeometryType(layer.data.geojson);
-  $: dimension = layer.style.size * 2 + (layer.style.stroke?.width ?? 0) * 2;
+  let { layer }: Props = $props();
 
-  $: attrs =
+  let geometryType = $derived(
+    getFeatureCollectionGeometryType(layer.data.geojson)
+  );
+  let dimension = $derived(
+    layer.style.size * 2 + (layer.style.stroke?.width ?? 0) * 2
+  );
+
+  let attrs = $derived(
     layer.style.fill?.type === 'Constant'
       ? {
           fill: layer.style.fill.color,
@@ -25,7 +33,8 @@
           stroke: '#ffffff',
           'stroke-width': 1,
           'stroke-opacity': 1
-        };
+        }
+  );
 </script>
 
 <div class="stack stack-xs ml-8">

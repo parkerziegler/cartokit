@@ -1,12 +1,22 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
 
-  export let target: HTMLElement = document.body;
+  interface Props {
+    class: string;
+    target: HTMLElement;
+    style: string;
+    children: Snippet;
+  }
+
+  let {
+    class: className,
+    target = document.body,
+    style,
+    children
+  }: Props = $props();
+
   let ref: HTMLDivElement;
   let portal: HTMLDivElement;
-
-  let className = '';
-  export { className as class };
 
   onMount(() => {
     portal = document.createElement('div');
@@ -20,7 +30,7 @@
 </script>
 
 <div class="hidden">
-  <div bind:this={ref} class={className} style={$$props.style}>
-    <slot />
+  <div bind:this={ref} class={className} {style}>
+    {@render children()}
   </div>
 </div>

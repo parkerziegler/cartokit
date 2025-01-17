@@ -3,17 +3,21 @@
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
 
-  export let layerId: string;
-  export let size: number;
-  export let label: string;
-  export let fieldId: string;
+  interface Props {
+    layerId: string;
+    size: number;
+    label: string;
+    fieldId: string;
+  }
 
-  function onPointSizeChange(event: CustomEvent<{ value: number }>): void {
+  let { layerId, size, label, fieldId }: Props = $props();
+
+  function onPointSizeChange(value: number): void {
     dispatchLayerUpdate({
       type: 'point-size',
       layerId,
       payload: {
-        size: event.detail.value
+        size: value
       }
     });
   }
@@ -26,7 +30,7 @@
     min={1}
     max={Infinity}
     value={size}
-    on:change={onPointSizeChange}
+    onchange={onPointSizeChange}
     class="w-10"
   />
 </div>

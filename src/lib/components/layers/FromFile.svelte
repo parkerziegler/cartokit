@@ -11,16 +11,18 @@
 
   const closeModal = getContext<() => void>('close-modal');
 
-  let file: File | null = null;
-  let displayName = '';
-  let dataLoading = false;
+  let file: File | null = $state(null);
+  let displayName = $state('');
+  let dataLoading = $state(false);
 
-  function onFileUpload(event: CustomEvent<{ file: File }>) {
-    file = event.detail.file;
+  function onFileUpload(f: File) {
+    file = f;
   }
 
-  function onDisplayNameInput(event: CustomEvent<{ value: string }>) {
-    displayName = event.detail.value;
+  function onDisplayNameInput(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    displayName = event.currentTarget.value;
   }
 
   function onSourceLoaded() {
@@ -61,15 +63,15 @@
   }
 </script>
 
-<form class="stack stack-sm" on:submit={onSubmit}>
+<form class="stack stack-sm" onsubmit={onSubmit}>
   <div class="stack stack-xs">
     <FieldLabel fieldId="from-file-input">File</FieldLabel>
-    <FileInput id="from-file-input" on:change={onFileUpload} {file} />
+    <FileInput id="from-file-input" onfilechange={onFileUpload} {file} />
   </div>
   <div class="stack stack-xs">
     <FieldLabel fieldId="Display Name">Display Name</FieldLabel>
     <TextInput
-      on:input={onDisplayNameInput}
+      oninput={onDisplayNameInput}
       value={displayName}
       id="Display Name"
       placeholder="(e.g., Earthquakes)"

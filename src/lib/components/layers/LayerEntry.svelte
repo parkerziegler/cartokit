@@ -16,9 +16,13 @@
   import { map } from '$lib/stores/map';
   import type { CartoKitLayer } from '$lib/types';
 
-  export let layer: CartoKitLayer;
+  interface Props {
+    layer: CartoKitLayer;
+  }
 
-  let layerVisible = true;
+  let { layer }: Props = $props();
+
+  let layerVisible = $state(true);
 
   function toggleLayerVisibility() {
     if (layerVisible) {
@@ -63,11 +67,11 @@
       >
     </div>
     {#if layerVisible}
-      <button on:click={toggleLayerVisibility}>
+      <button onclick={toggleLayerVisibility}>
         <LayerVisibleIcon />
       </button>
     {:else}
-      <button on:click={toggleLayerVisibility}>
+      <button onclick={toggleLayerVisibility}>
         <LayerHiddenIcon />
       </button>
     {/if}

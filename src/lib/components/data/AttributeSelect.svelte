@@ -12,37 +12,45 @@
     isPropertyQuantitative
   } from '$lib/utils/property';
 
-  export let selected: string;
-  export let layerId: string;
-  export let visualizationType: VisualizationType;
-  export let geojson: FeatureCollection;
-  export let channel: Channel;
+  interface Props {
+    selected: string;
+    layerId: string;
+    visualizationType: VisualizationType;
+    geojson: FeatureCollection;
+    channel: Channel;
+  }
+
+  let { selected, layerId, visualizationType, geojson, channel }: Props =
+    $props();
 
   const target = document.getElementById('map') ?? document.body;
-  let editor: TransformationEditor;
+  let editor: TransformationEditor | undefined = $state();
   let trigger: HTMLButtonElement;
-  let left = 0;
-  let attributeEditorVisible = false;
+  let left = $state(0);
+  let attributeEditorVisible = $state(false);
 
-  $: properties = Object.keys(geojson.features[0]?.properties ?? {}).filter(
-    (prop) =>
+  let properties = $derived(
+    Object.keys(geojson.features[0]?.properties ?? {}).filter((prop) =>
       visualizationType === 'Quantitative'
         ? isPropertyQuantitative(geojson.features[0].properties?.[prop])
         : isPropertyCategorical(geojson.features[0].properties?.[prop])
+    )
   );
-  $: options = properties.map((attribute) => ({
-    value: attribute,
-    label: attribute
-  }));
+  let options = $derived(
+    properties.map((attribute) => ({
+      value: attribute,
+      label: attribute
+    }))
+  );
 
-  function onChange(event: CustomEvent<{ value: string }>) {
-    const attribute = event.detail.value;
-
+  function onAttributeChange(
+    event: Event & { currentTarget: EventTarget & HTMLSelectElement }
+  ) {
     dispatchLayerUpdate({
       type: 'attribute',
       layerId,
       payload: {
-        attribute,
+        attribute: event.currentTarget.value,
         channel
       }
     });
@@ -57,20 +65,22 @@
     }
   }
 
-  function onCloseComputedAttribute() {
+  function onCloseEditor() {
     attributeEditorVisible = false;
   }
 
-  function onClickOutside(event: CustomEvent<MouseEvent>) {
+  function onClickOutsideEditor(event: CustomEvent<MouseEvent>) {
     if (!trigger.contains(event.detail.target as Node)) {
-      onCloseComputedAttribute();
+      onCloseEditor();
     }
   }
 
   // When the editor opens, focus it.
-  $: if (editor) {
-    editor.focus();
-  }
+  $effect(() => {
+    if (editor) {
+      editor.focus();
+    }
+  });
 </script>
 
 <div class="stack-h stack-h-xs items-center">
@@ -79,12 +89,12 @@
     {selected}
     id="{channel}-attribute-select"
     title="Attribute"
-    on:change={onChange}
+    onchange={onAttributeChange}
     class="w-[80%] truncate"
   />
   <button
     bind:this={trigger}
-    on:click={onClickComputedAttribute}
+    onclick={onClickComputedAttribute}
     data-testid="open-transformation-editor-button"><GearIcon /></button
   >
 </div>
@@ -95,8 +105,8 @@
     style="left: {left - 16 - 24 * 16}px;"
   >
     <TransformationEditor
-      onClose={onCloseComputedAttribute}
-      {onClickOutside}
+      oncloseeditor={onCloseEditor}
+      onclickoutsideeditor={onClickOutsideEditor}
       {layerId}
       {geojson}
       bind:this={editor}

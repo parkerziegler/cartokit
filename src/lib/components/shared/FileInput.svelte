@@ -1,16 +1,19 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
-  export let id = '';
-  export let file: File | null = null;
-
-  let files: FileList | null = null;
-
-  const dispatch = createEventDispatcher();
-
-  $: if (files) {
-    dispatch('change', { file: files[0] });
+  interface Props {
+    id?: string;
+    file: File | null;
+    onfilechange: (file: File) => void;
   }
+
+  let { id = '', file = null, onfilechange }: Props = $props();
+
+  let files: FileList | null = $state(null);
+
+  $effect(() => {
+    if (files) {
+      onfilechange(files[0]);
+    }
+  });
 </script>
 
 <label class="file relative inline-block cursor-pointer">
@@ -26,7 +29,7 @@
     class="file-prompt"
     class:file-prompt--uploaded={file?.name}
     data-content={file?.name ?? 'Choose file...'}
-  />
+  ></span>
 </label>
 
 <style lang="postcss">

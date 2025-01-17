@@ -9,16 +9,21 @@
   import type { ConstantStroke } from '$lib/types';
   import { DEFAULT_STROKE } from '$lib/utils/constants';
 
-  export let layerId: string;
-  export let stroke: ConstantStroke;
+  interface Props {
+    layerId: string;
+    stroke: ConstantStroke;
+  }
 
-  function onStrokeInput(event: Event) {
-    const target = event.target as HTMLInputElement;
+  let { layerId, stroke }: Props = $props();
+
+  function onStrokeInput(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
     dispatchLayerUpdate({
       type: 'stroke',
       layerId,
       payload: {
-        color: target.value
+        color: event.currentTarget.value
       }
     });
   }
@@ -33,12 +38,12 @@
     });
   }
 
-  function onStrokeWidthChange(event: CustomEvent<{ value: number }>) {
+  function onStrokeWidthChange(value: number) {
     dispatchLayerUpdate({
       type: 'stroke-width',
       layerId,
       payload: {
-        strokeWidth: event.detail.value
+        strokeWidth: value
       }
     });
   }
@@ -52,7 +57,7 @@
       id="stroke-color"
       class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
       value={d3.color(stroke.color)?.formatHex() ?? DEFAULT_STROKE}
-      on:input={onStrokeInput}
+      oninput={onStrokeInput}
     />
     <HexInput
       hex={d3.color(stroke.color)?.formatHex() ?? DEFAULT_STROKE}
@@ -65,7 +70,7 @@
     <NumberInput
       id="stroke-width-input"
       value={stroke.width}
-      on:change={onStrokeWidthChange}
+      onchange={onStrokeWidthChange}
       class="w-10"
     />
   </div>

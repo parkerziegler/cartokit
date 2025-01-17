@@ -5,20 +5,26 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { QuantitativeStyle } from '$lib/types';
 
-  export let layerId: string;
-  export let style: QuantitativeStyle;
+  interface Props {
+    layerId: string;
+    style: QuantitativeStyle;
+  }
+
+  let { layerId, style }: Props = $props();
 
   const options = d3.range(3, 10).map((_, i) => ({
     value: i + 3,
     label: `${i + 3}`
   }));
 
-  function onChange(event: CustomEvent<{ value: string }>) {
+  function onColorStepsChange(
+    event: Event & { currentTarget: EventTarget & HTMLSelectElement }
+  ) {
     dispatchLayerUpdate({
       type: 'color-count',
       layerId,
       payload: {
-        count: +event.detail.value
+        count: +event.currentTarget.value
       }
     });
   }
@@ -29,5 +35,5 @@
   selected={style.count}
   title="Steps"
   id="color-steps-select"
-  on:change={onChange}
+  onchange={onColorStepsChange}
 />

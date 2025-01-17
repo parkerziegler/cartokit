@@ -19,8 +19,12 @@
   import { selectedFeature } from '$lib/stores/selected-feature';
   import type { CartoKitLayer } from '$lib/types';
 
-  export let map: maplibregl.Map;
-  export let layer: CartoKitLayer;
+  interface Props {
+    map: maplibregl.Map;
+    layer: CartoKitLayer;
+  }
+
+  let { map, layer }: Props = $props();
 
   function onPropertiesMenuClose() {
     if ($selectedFeature) {
@@ -51,13 +55,17 @@
 >
   <MenuTitle class="mr-4"
     >{layer.displayName}
-    <button on:click={onPropertiesMenuClose} slot="action">
-      <CloseIcon />
-    </button>
-    <div class="stack-h stack-h-xs" slot="subtitle">
-      <ViewData />
-      <DownloadData {layer} />
-    </div>
+    {#snippet action()}
+      <button onclick={onPropertiesMenuClose}>
+        <CloseIcon />
+      </button>
+    {/snippet}
+    {#snippet subtitle()}
+      <div class="stack-h stack-h-xs">
+        <ViewData />
+        <DownloadData {layer} />
+      </div>
+    {/snippet}
   </MenuTitle>
   <MenuItem title="Layer Type">
     <LayerTypeSelect {layer} />

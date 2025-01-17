@@ -14,10 +14,14 @@
     QuantitativeFill
   } from '$lib/types';
 
-  export let layerId: string;
-  export let layerType: 'Choropleth' | 'Proportional Symbol' | 'Point';
-  export let geojson: FeatureCollection;
-  export let fill: QuantitativeFill | CategoricalFill | ConstantFill;
+  interface Props {
+    layerId: string;
+    layerType: 'Choropleth' | 'Proportional Symbol' | 'Point';
+    geojson: FeatureCollection;
+    fill: QuantitativeFill | CategoricalFill | ConstantFill;
+  }
+
+  let { layerId, layerType, geojson, fill }: Props = $props();
 </script>
 
 <div class="stack stack-2xs">

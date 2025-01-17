@@ -9,7 +9,11 @@
     | { kind: 'success' }
     | { kind: 'warning'; message: string };
 
-  export let alert: Alert;
+  interface Props {
+    alert: Alert;
+  }
+
+  let { alert }: Props = $props();
 </script>
 
 <div class="stack stack-xs" transition:slide>

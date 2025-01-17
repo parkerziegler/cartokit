@@ -8,23 +8,29 @@
   import type { ClassificationMethod, QuantitativeStyle } from '$lib/types';
   import { CLASSIFICATION_METHODS } from '$lib/utils/classification';
 
-  export let layerId: string;
-  export let style: QuantitativeStyle;
-  export let features: Feature[];
+  interface Props {
+    layerId: string;
+    style: QuantitativeStyle;
+    features: Feature[];
+  }
+
+  let { layerId, style, features }: Props = $props();
 
   const target = document.getElementById('map') ?? document.body;
   let ref: Select<ClassificationMethod>;
-  let top = 0;
-  let left = 0;
-  let displayBreaksEditor = false;
+  let top = $state(0);
+  let left = $state(0);
+  let displayBreaksEditor = $state(false);
 
   const options = CLASSIFICATION_METHODS.map((scale) => ({
     value: scale,
     label: scale
   }));
 
-  function onChange(event: CustomEvent<{ value: ClassificationMethod }>) {
-    if (event.detail.value === 'Manual') {
+  function onClassificationMethodChange(
+    event: Event & { currentTarget: EventTarget & HTMLSelectElement }
+  ) {
+    if (event.currentTarget.value === 'Manual') {
       ({ top, left } = ref.getBoundingClientRect());
       displayBreaksEditor = true;
     } else {
@@ -35,7 +41,7 @@
       type: 'classification-method',
       layerId,
       payload: {
-        method: event.detail.value
+        method: event.currentTarget.value as ClassificationMethod
       }
     });
   }
@@ -44,8 +50,10 @@
     displayBreaksEditor = !displayBreaksEditor;
   }
 
-  function onClick(event: CustomEvent<{ value: ClassificationMethod }>) {
-    if (event.detail.value === 'Manual') {
+  function onClassificationMethodClick(
+    event: Event & { currentTarget: EventTarget & HTMLSelectElement }
+  ) {
+    if (event.currentTarget.value === 'Manual') {
       ({ top, left } = ref.getBoundingClientRect());
       toggleBreaksEditorVisibility();
     }
@@ -57,8 +65,8 @@
   selected={style.method}
   title="Method"
   id="classification-method-select"
-  on:change={onChange}
-  on:click={onClick}
+  onchange={onClassificationMethodChange}
+  onclick={onClassificationMethodClick}
   bind:this={ref}
 />
 {#if displayBreaksEditor}

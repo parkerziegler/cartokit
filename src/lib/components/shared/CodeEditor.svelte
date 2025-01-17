@@ -17,18 +17,25 @@
   interface EditableCodeEditorConfig {
     kind: 'editable';
     initialDoc: string;
-    onChange: (value: string) => void;
-    onFocusChange?: (focusing: boolean) => void;
+    onchange: (value: string) => void;
     language: 'javascript' | 'json';
   }
 
   type CodeEditorConfig = ReadonlyCodeEditorConfig | EditableCodeEditorConfig;
 
-  export let config: CodeEditorConfig;
-  export let view: EditorView | null = null;
-  let className = '';
-  export { className as class };
-  export let testId: string | undefined = undefined;
+  interface Props {
+    config: CodeEditorConfig;
+    view?: EditorView;
+    class?: string;
+    testId?: string;
+  }
+
+  let {
+    config,
+    view = $bindable(undefined),
+    class: className = '',
+    testId = undefined
+  }: Props = $props();
 
   let editor: HTMLDivElement;
 
@@ -43,20 +50,12 @@
     ];
 
     if (config.kind === 'editable') {
-      const { onChange, onFocusChange } = config;
+      const { onchange } = config;
 
       extensions.push(
         EditorView.updateListener.of((v) => {
           if (v.docChanged) {
-            onChange(v.state.doc.toString());
-          }
-        })
-      );
-
-      extensions.push(
-        EditorView.updateListener.of((v) => {
-          if (v.focusChanged) {
-            onFocusChange?.(view?.hasFocus ?? false);
+            onchange(v.state.doc.toString());
           }
         })
       );
@@ -75,11 +74,13 @@
     };
   });
 
-  $: if (view && config.kind === 'readonly') {
-    view.dispatch({
-      changes: { from: 0, to: view.state.doc.length, insert: config.doc }
-    });
-  }
+  $effect(() => {
+    if (view && config.kind === 'readonly') {
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: config.doc }
+      });
+    }
+  });
 </script>
 
 <div
@@ -91,4 +92,4 @@
     className
   )}
   data-testid={testId || undefined}
-/>
+></div>

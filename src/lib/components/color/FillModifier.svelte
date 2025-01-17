@@ -8,12 +8,12 @@
     QuantitativeFill
   } from '$lib/types';
 
-  export let layerId: string;
-  export let fill:
-    | CategoricalFill
-    | ConstantFill
-    | QuantitativeFill
-    | undefined;
+  interface Props {
+    layerId: string;
+    fill?: CategoricalFill | ConstantFill | QuantitativeFill;
+  }
+
+  let { layerId, fill }: Props = $props();
 
   function onRemoveFill() {
     dispatchLayerUpdate({
@@ -33,11 +33,11 @@
 </script>
 
 {#if fill}
-  <button on:click={onRemoveFill}>
+  <button onclick={onRemoveFill}>
     <MinusIcon />
   </button>
 {:else}
-  <button on:click={onAddFill}>
+  <button onclick={onAddFill}>
     <PlusIcon />
   </button>
 {/if}

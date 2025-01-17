@@ -1,39 +1,37 @@
 <script lang="ts" generics="T">
-  // ESLint sees the generic T as an undefined variable; flag it as a "global"
-  // to suppress the warning.
-  /* global T */
   import cs from 'classnames';
-  import { createEventDispatcher } from 'svelte';
+  import type { ChangeEventHandler, MouseEventHandler } from 'svelte/elements';
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
 
-  interface SelectOption<T> {
-    value: T;
-    label: string;
+  interface Props {
+    selected: T;
+    onchange: ChangeEventHandler<HTMLSelectElement>;
+    onclick?: MouseEventHandler<HTMLSelectElement>;
+    id: string;
+    options: {
+      value: T;
+      label: string;
+    }[];
+    title?: string;
+    class?: string;
   }
 
-  export let selected: T;
-  export let options: SelectOption<T>[] = [];
-  export let id;
-  export let title = '';
-  let ref: HTMLSelectElement | HTMLDivElement;
+  let ref = $state<HTMLSelectElement | HTMLDivElement>();
 
-  let className = '';
-  export { className as class };
+  let {
+    selected,
+    onchange,
+    onclick = () => {},
+    id,
+    options = [],
+    title = '',
+    class: className = ''
+  }: Props = $props();
 
-  const dispatch = createEventDispatcher();
-
-  function onChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    dispatch('change', { value: target.value });
+  export function getBoundingClientRect() {
+    return ref!.getBoundingClientRect();
   }
-
-  function onClick(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    dispatch('click', { value: target.value });
-  }
-
-  export const getBoundingClientRect = () => ref.getBoundingClientRect();
 </script>
 
 {#if title}
@@ -47,8 +45,8 @@
         className
       )}
       value={selected}
-      on:change={onChange}
-      on:click={onClick}
+      {onchange}
+      {onclick}
       {id}
     >
       {#each options as option}
@@ -66,8 +64,8 @@
     )}
     value={selected}
     {id}
-    on:change={onChange}
-    on:click={onClick}
+    {onchange}
+    {onclick}
     bind:this={ref}
   >
     {#each options as option}

@@ -1,26 +1,33 @@
 <script lang="ts">
   import cs from 'classnames';
+  import type { Snippet } from 'svelte';
 
-  let className = '';
-  export { className as class };
+  interface Props {
+    class?: string;
+    action?: Snippet;
+    subtitle?: Snippet;
+    children: Snippet;
+  }
+
+  let { class: className = '', action, subtitle, children }: Props = $props();
 </script>
 
-{#if $$slots.action && $$slots.subtitle}
+{#if action && subtitle}
   <div class="stack stack-xs p-4 text-white">
     <div class="flex items-center justify-between">
       <p class={cs('font-sans text-lg font-medium tracking-wider', className)}>
-        <slot />
+        {@render children()}
       </p>
-      <slot name="action" />
+      {@render action?.()}
     </div>
-    <slot name="subtitle" />
+    {@render subtitle?.()}
   </div>
-{:else if $$slots.action}
+{:else if action}
   <div class="flex items-center justify-between p-4 text-white">
     <p class={cs('font-sans text-xl font-medium tracking-wider', className)}>
-      <slot />
+      {@render children?.()}
     </p>
-    <slot name="action" />
+    {@render action?.()}
   </div>
 {:else}
   <p
@@ -29,6 +36,6 @@
       className
     )}
   >
-    <slot />
+    {@render children?.()}
   </p>
 {/if}

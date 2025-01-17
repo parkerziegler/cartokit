@@ -5,19 +5,19 @@
   import FromAPI from '$lib/components/layers/FromAPI.svelte';
   import FromFile from '$lib/components/layers/FromFile.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
-  import Tabs, { type Tab } from '$lib/components/shared/Tabs.svelte';
+  import Tabs from '$lib/components/shared/Tabs.svelte';
   import { map } from '$lib/stores/map';
 
   setContext('close-modal', () => {
     showModal = false;
   });
 
-  const tabs: Tab[] = [
-    { name: 'From API', content: FromAPI },
-    { name: 'From File', content: FromFile }
+  const tabs = [
+    { name: 'From API', content: FromAPI, props: {} },
+    { name: 'From File', content: FromFile, props: {} }
   ];
 
-  let showModal = false;
+  let showModal = $state(false);
 
   function onClick() {
     showModal = true;
@@ -25,7 +25,7 @@
 </script>
 
 <button
-  on:click={onClick}
+  onclick={onClick}
   class="disabled:cursor-not-allowed disabled:hover:cursor-not-allowed"
   data-testid="add-layer-button"
   aria-label="Add Layer"
@@ -37,8 +37,10 @@
   bind:showModal
   class="max-w-lg"
   testId="add-layer-modal"
-  initialHeight={327}
+  initialHeight={329}
 >
-  <h2 slot="header" class="text-xl font-semibold">Add Layer</h2>
-  <Tabs {tabs} slot="body" />
+  {#snippet header()}
+    <h2 class="text-xl font-semibold">Add Layer</h2>
+  {/snippet}
+  <Tabs {tabs} />
 </Modal>

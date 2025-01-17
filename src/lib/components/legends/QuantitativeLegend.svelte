@@ -4,20 +4,23 @@
   import { deriveExtent } from '$lib/interaction/scales';
   import type { ConstantStroke, LayerType, QuantitativeFill } from '$lib/types';
 
-  export let fill: QuantitativeFill;
-  export let stroke: ConstantStroke | undefined;
-  export let features: Feature[];
-  export let layerType: LayerType;
+  interface Props {
+    fill: QuantitativeFill;
+    stroke: ConstantStroke | undefined;
+    features: Feature[];
+    layerType: LayerType;
+  }
 
-  $: colors = fill.scheme[fill.count] as string[];
-  $: [min, max] = deriveExtent(fill.attribute, features);
+  let { fill, stroke, features, layerType }: Props = $props();
+
+  let [min, max] = $derived(deriveExtent(fill.attribute, features));
 </script>
 
 <div class="stack stack-xs text-white">
   <p class="font-semibold">{fill.attribute} ↓</p>
   <div class="stack-h stack-h-xs rounded-md bg-slate-900">
     <ul class="stack stack-xs mt-3">
-      {#each colors as color}
+      {#each fill.scheme[fill.count] as color}
         <li class="stack stack-xs stack-h stack-h-xs">
           {#if layerType === 'Choropleth'}
             <svg viewBox="0 0 32 16" width="32" height="16">

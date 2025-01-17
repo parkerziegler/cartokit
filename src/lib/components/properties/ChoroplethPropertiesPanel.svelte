@@ -6,7 +6,11 @@
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import type { CartoKitChoroplethLayer } from '$lib/types';
 
-  export let layer: CartoKitChoroplethLayer;
+  interface Props {
+    layer: CartoKitChoroplethLayer;
+  }
+
+  let { layer }: Props = $props();
 </script>
 
 <MenuItem title="Fill">
@@ -26,9 +30,7 @@
       style={layer.style.stroke}
     />
   {/if}
-  <StrokeModifier
-    layerId={layer.id}
-    stroke={layer.style.stroke}
-    slot="action"
-  />
+  {#snippet action()}
+    <StrokeModifier layerId={layer.id} stroke={layer.style.stroke} />
+  {/snippet}
 </MenuItem>

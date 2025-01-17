@@ -8,10 +8,13 @@
   import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
   import { switchBasemapWithPreservedLayers } from '$lib/utils/maplibre';
 
-  export let provider: BasemapProvider;
-  const closeModal = getContext<() => void>('close-modal');
+  interface Props {
+    provider: BasemapProvider;
+  }
 
-  $: basemaps = BASEMAPS[provider];
+  let { provider }: Props = $props();
+
+  const closeModal = getContext<() => void>('close-modal');
 
   function onSelectBasemap(tileId: Basemap['tileId']) {
     return function updateBasemap() {
@@ -27,7 +30,7 @@
   <CustomTiles />
 {:else}
   <div class="grid grid-cols-3 gap-4">
-    {#each basemaps as basemap}
+    {#each BASEMAPS[provider] as basemap}
       <button
         class={cs(
           'flex flex-col rounded border p-2 transition-colors hover:border-slate-400',
@@ -35,7 +38,7 @@
             ? 'border-slate-400'
             : 'border-transparent'
         )}
-        on:click={onSelectBasemap(basemap.tileId)}
+        onclick={onSelectBasemap(basemap.tileId)}
       >
         <img
           src={basemap.src}

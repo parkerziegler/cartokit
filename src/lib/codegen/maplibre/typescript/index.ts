@@ -1,5 +1,4 @@
 import * as prettier from 'prettier';
-// eslint-disable-next-line import/default
 import estree from 'prettier/plugins/estree';
 import typescript from 'prettier/plugins/typescript';
 
