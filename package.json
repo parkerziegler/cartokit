@@ -39,7 +39,7 @@
     "@playwright/test": "^1.49.1",
     "@sveltejs/adapter-vercel": "^4.0.5",
     "@sveltejs/kit": "^2.15.3",
-    "@sveltejs/vite-plugin-svelte": "^4.0.4",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@types/d3": "^7.4.3",
     "@types/geojson": "^7946.0.15",
     "@types/lodash-es": "^4.17.12",
