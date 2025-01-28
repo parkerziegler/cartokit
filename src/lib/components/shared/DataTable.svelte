@@ -10,29 +10,30 @@
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import { pluralize } from '$lib/utils/format';
 
+  interface Props {
+    data: Feature[];
+    tableName: string;
+    onClose: () => void;
+    class?: string;
+  }
+
+  let { data, tableName, onClose, class: className = '' }: Props = $props();
+
   const ROW_HEIGHT = 33;
   const rows = 7;
 
-  export let data: Feature[];
-  export let tableName: string;
-  export let onClose: () => void;
-
-  let className = '';
-  export { className as class };
-
-  $: cols = Object.keys(data[0]?.properties ?? {});
+  let cols = $derived(Object.keys(data[0]?.properties ?? {}));
   let root: HTMLDivElement;
 
-  let array: Feature[] = [];
-  let iterator: IterableIterator<Feature> = data[Symbol.iterator]();
-  $: N = data.length; // Total number of rows.
-  let n = Math.min(N, Math.floor(rows * 2)); // The number of rows displayed.
-  let sort = { col: '', desc: true };
+  let array = $state<Feature[]>([]);
+  let iterator = $state<IterableIterator<Feature>>(data[Symbol.iterator]());
+  let n = $state<number>(Math.min(data.length, Math.floor(rows * 2))); // The number of rows displayed.
+  let sort = $state<{ col: string; desc: boolean }>({ col: '', desc: true });
 
   function minlengthof(length: number) {
     length = Math.floor(length);
 
-    return Math.min(N, length);
+    return Math.min(data.length, length);
   }
 
   function materialize(data: Feature[]) {
@@ -58,11 +59,10 @@
 
       array.push(value);
     }
-    array = array;
   }
 
   function resort(col: string) {
-    return () => {
+    return function handleResort() {
       sort = {
         col,
         desc: sort.col === col ? !sort.desc : true
@@ -88,10 +88,6 @@
   onMount(() => {
     appendRows(0, n);
   });
-
-  $: if (root) {
-    materialize(data);
-  }
 </script>
 
 <div
@@ -106,7 +102,7 @@
       {tableName}
     </span>
     <div class="stack-h stack-h-sm">
-      <span>{N} {pluralize('Feature', N)}</span>
+      <span>{data.length} {pluralize('Feature', data.length)}</span>
       <button onclick={onClose}>
         <CloseIcon />
       </button>
