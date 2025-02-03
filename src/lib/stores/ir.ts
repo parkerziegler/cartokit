@@ -9,5 +9,6 @@ export const ir = writable<CartoKitIR>({
     provider: 'Stamen'
   },
   zoom: 4,
+  projection: 'mercator',
   layers: {}
 });

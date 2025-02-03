@@ -3,7 +3,7 @@
   import { onMount, setContext } from 'svelte';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
-  import BasemapGrid from '$lib/components/basemap/BasemapGrid.svelte';
+  import BasemapGrid from '$lib/components/map/BasemapGrid.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
   import { ir } from '$lib/stores/ir';
@@ -51,7 +51,7 @@
 
   function updateMapThumbnail(map: maplibregl.Map) {
     const { top, left } = picker.getBoundingClientRect();
-    map.setCenter($mapStore.unproject([left + 32, top + 32]));
+    map.setCenter($mapStore.unproject([left + 20, top + 20]));
     map.setZoom($ir.zoom);
   }
 
@@ -81,11 +81,24 @@
       maps.slice(1).forEach(updateMapThumbnail);
     }
   });
+
+  let timeoutId = $state<number | null>(null);
+
+  layout.subscribe(() => {
+    if (maps.length > 0 && $mapStore && $ir) {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+
+      timeoutId = window.setTimeout(() => {
+        updateMapThumbnail(maps[0]);
+      }, 400);
+    }
+  });
 </script>
 
 <button
-  class="group absolute bottom-4 left-4 z-10 shadow-lg transition-transform duration-[400ms] ease-out"
-  class:-translate-y-72={$layout.dataVisible}
+  class="group relative"
   bind:this={picker}
   onmouseenter={onMouseEnter}
   onmouseleave={onMouseLeave}
@@ -94,17 +107,15 @@
 >
   <div
     id="inset-{mapStyles[0]}"
-    class="z-10 h-16 w-16 cursor-pointer rounded border-2 border-white"
+    class="z-10 h-10 w-10 cursor-pointer rounded border border-white"
   ></div>
   <div
     id="inset-{mapStyles[1]}"
-    class="absolute bottom-0 h-16 w-16 rounded border-2 border-white transition-transform group-hover:-translate-y-2 group-hover:translate-x-2 group-hover:rotate-12"
-    style="position: inherit;"
+    class="absolute inset-0 h-10 w-10 rounded border border-white transition-transform group-hover:translate-x-2 group-hover:rotate-12"
   ></div>
   <div
     id="inset-{mapStyles[2]}"
-    class="absolute bottom-0 h-16 w-16 rounded border-2 border-white transition-transform group-hover:-translate-x-2 group-hover:-translate-y-2 group-hover:-rotate-12"
-    style="position: inherit;"
+    class="absolute inset-0 h-10 w-10 rounded border border-white transition-transform group-hover:-translate-x-2 group-hover:-rotate-12"
   ></div>
 </button>
 <Modal bind:showModal class="max-w-2xl" initialHeight={277}>

@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 
 import { ir as irStore } from '$lib/stores/ir';
 import { map as mapStore } from '$lib/stores/map';
-import type { BasemapProvider } from '$lib/utils/basemap';
+import type { BasemapProvider } from '$lib/types';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
 
 /**
@@ -49,7 +49,7 @@ export function switchBasemapWithPreservedLayers(
         }
       }
 
-      return { ...nextStyle, layers, sources };
+      return { ...nextStyle, layers, sources, projection: map.getProjection() };
     }
   });
 }

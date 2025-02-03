@@ -2,6 +2,7 @@ import { codegenLayer } from '$lib/codegen/maplibre/javascript/codegen-layer';
 import { codegenMapStyle } from '$lib/codegen/maplibre/javascript/codegen-map-style';
 import { codegenSource } from '$lib/codegen/maplibre/javascript/codegen-source';
 import type { CartoKitIR, CartoKitBackendAnalysis } from '$lib/types';
+import { codegenProjection } from './codegen-projection';
 
 /**
  * Generate a MapLibre GL JS program fragment for layer sources, layer renders,
@@ -17,6 +18,8 @@ export function codegenMap(
   uploadTable: Map<string, string>,
   analysis: CartoKitBackendAnalysis
 ): string {
+  const projection = codegenProjection(ir);
+
   const layerSources = Object.values(ir.layers).reduce((p, layer) => {
     return p.concat('\n\n' + codegenSource(layer, uploadTable));
   }, '');
@@ -33,6 +36,8 @@ export function codegenMap(
     center: [${ir.center.join(', ')}],
     zoom: ${ir.zoom}
   });
+
+  ${projection}
 
   map.on('load', ${isLoadAsync ? 'async ' : ''}() => {
     ${layerSources}
