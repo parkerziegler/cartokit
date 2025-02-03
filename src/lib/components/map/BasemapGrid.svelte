@@ -48,7 +48,7 @@
       />
     </div>
     <Button
-      onclick={onSelectBasemap('Custom')}
+      onclick={onSelectBasemap(tileUrl)}
       class="mt-2 self-end"
       disabled={!tileUrl || tileUrl === $ir.basemap.url}>Apply</Button
     >

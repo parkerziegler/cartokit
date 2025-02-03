@@ -1,7 +1,8 @@
 import type { CartoKitIR } from '$lib/types';
 
 /**
- * Generate a MapLibre GL JS program fragment for the map's projection.
+ * Generate a MapLibre GL JS program fragment, in TypeScript, for the map's
+ * projection.
  *
  * @param ir – The CartoKit IR.
  * @returns – A MapLibre GL JS program fragment.

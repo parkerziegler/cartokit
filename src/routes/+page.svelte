@@ -116,7 +116,6 @@
       <PropertiesMenu map={map!} layer={$selectedLayer} />
     {/if}
     <Toolbar />
-    <!-- <BasemapPicker /> -->
     <button
       class={cs(
         'absolute bottom-12 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-[400ms] ease-out disabled:cursor-not-allowed',

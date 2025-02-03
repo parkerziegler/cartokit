@@ -19,6 +19,7 @@ export function codegenMap(
   analysis: CartoKitBackendAnalysis
 ): string {
   const projection = codegenProjection(ir);
+
   const layerSources = Object.values(ir.layers).reduce((p, layer) => {
     return p.concat('\n\n' + codegenSource(layer, uploadTable));
   }, '');

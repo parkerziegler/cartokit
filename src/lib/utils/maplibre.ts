@@ -49,7 +49,7 @@ export function switchBasemapWithPreservedLayers(
         }
       }
 
-      return { ...nextStyle, layers, sources, projection: map.getProjection() };
+      return { ...nextStyle, layers, sources };
     }
   });
 }
