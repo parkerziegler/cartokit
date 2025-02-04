@@ -345,6 +345,11 @@ export interface Basemap {
 export type BasemapProvider = 'Stamen' | 'Stadia Maps' | 'MapTiler' | 'Custom';
 
 /**
+ * Represents the set of possible projections in cartokit.
+ */
+type Projection = 'mercator' | 'globe';
+
+/**
  * Represents the cartokit IR.
  *
  * @property center - The current center coordinates of the map.
@@ -359,6 +364,7 @@ export interface CartoKitIR {
     url: string;
     provider: BasemapProvider;
   };
+  projection: Projection;
   layers: Record<string, CartoKitLayer>;
 }
 

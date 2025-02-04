@@ -5,7 +5,6 @@
 
   import type { PageData } from './$types';
 
-  import BasemapPicker from '$lib/components/basemap/BasemapPicker.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
@@ -18,6 +17,7 @@
   import { layout } from '$lib/stores/layout';
   import { map as mapStore } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
+  import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
 
   interface Props {
     data: PageData;
@@ -70,6 +70,10 @@
       });
     });
 
+    map.on('style.load', () => {
+      map?.setProjection({ type: $ir.projection });
+    });
+
     return () => {
       map!.remove();
     };
@@ -111,7 +115,7 @@
     {#if $selectedLayer}
       <PropertiesMenu map={map!} layer={$selectedLayer} />
     {/if}
-    <BasemapPicker />
+    <Toolbar />
     <button
       class={cs(
         'absolute bottom-12 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-[400ms] ease-out disabled:cursor-not-allowed',

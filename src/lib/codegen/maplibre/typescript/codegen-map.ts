@@ -1,5 +1,6 @@
 import { codegenLayer } from '$lib/codegen/maplibre/typescript/codegen-layer';
 import { codegenMapStyle } from '$lib/codegen/maplibre/typescript/codegen-map-style';
+import { codegenProjection } from '$lib/codegen/maplibre/typescript/codegen-projection';
 import { codegenSource } from '$lib/codegen/maplibre/typescript/codegen-source';
 import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
 
@@ -17,6 +18,7 @@ export function codegenMap(
   uploadTable: Map<string, string>,
   analysis: CartoKitBackendAnalysis
 ): string {
+  const projection = codegenProjection(ir);
   const layerSources = Object.values(ir.layers).reduce((p, layer) => {
     return p.concat('\n\n' + codegenSource(layer, uploadTable));
   }, '');
@@ -33,6 +35,8 @@ export function codegenMap(
     center: [${ir.center.join(', ')}],
     zoom: ${ir.zoom}
   });
+
+  ${projection}
 
   map.on('load', ${isLoadAsync ? 'async ' : ''}() => {
     ${layerSources}
