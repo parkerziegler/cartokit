@@ -58,7 +58,7 @@ importers:
         version: 4.17.21
       maplibre-gl:
         specifier: ^5.0.1
-        version: 5.1.0
+        version: 5.1.1
       prettier:
         specifier: ^3.4.2
         version: 3.5.1
@@ -1751,8 +1751,8 @@ packages:
     resolution: {integrity: sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==}
     engines: {node: '>=8'}
 
-  maplibre-gl@5.1.0:
-    resolution: {integrity: sha512-6lbf7qAnqAVm1T/vJBMmRtP+g8G/O/Z52IBtWX31SbFj7sEdlrk4YugxJen8IdV/pFjLFnDOw7HiHZl5nYdVjg==}
+  maplibre-gl@5.1.1:
+    resolution: {integrity: sha512-0Z6ODzyFu/grwT6K1eIBpv6MZE4xnJD1AV+Yq1hPzOh/YCY36r9BlSaU7d7n2/HJOaoKOy0b2YF8cS4dD+iEVQ==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
   merge2@1.4.1:
@@ -4031,7 +4031,7 @@ snapshots:
     dependencies:
       semver: 6.3.1
 
-  maplibre-gl@5.1.0:
+  maplibre-gl@5.1.1:
     dependencies:
       '@mapbox/geojson-rewind': 0.5.2
       '@mapbox/jsonlint-lines-primitives': 2.0.2
