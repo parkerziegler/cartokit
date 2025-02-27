@@ -6,6 +6,7 @@
 
   interface Props {
     class?: string;
+    style?: string;
     id?: string;
     onclickoutsidemenu?: (event: CustomEvent<MouseEvent>) => void;
     children: Snippet;
@@ -13,6 +14,7 @@
 
   let {
     class: className = '',
+    style = '',
     id = '',
     onclickoutsidemenu = () => {},
     children
@@ -22,6 +24,7 @@
 <div
   {id}
   class={cs('stack-border rounded-md bg-slate-900 shadow-lg', className)}
+  {style}
   use:clickoutside
   onclickoutside={onclickoutsidemenu}
 >
