@@ -84,7 +84,7 @@
     transformationEditorVisible = false;
   }
 
-  function onClickOutsideEditor(event: CustomEvent<MouseEvent>) {
+  function onClickOutsideEditor(event: CustomEvent<{ target: HTMLElement }>) {
     if (!trigger.contains(event.detail.target as Node)) {
       onCloseEditor();
     }

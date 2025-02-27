@@ -1,17 +1,27 @@
 <!-- Core implementation adapted from: https://svelte.dev/playground/modal -->
 <script lang="ts">
   import cs from 'classnames';
+  import type { Snippet } from 'svelte';
   import { cubicOut } from 'svelte/easing';
   import { Tween } from 'svelte/motion';
 
+  interface Props {
+    showModal?: boolean;
+    initialHeight?: number;
+    class?: string;
+    testId?: string;
+    header?: Snippet;
+    children: Snippet;
+  }
+
   let {
     showModal = $bindable(),
-    initialHeight,
+    initialHeight = 0,
     class: className,
     testId = '',
     header,
     children
-  } = $props();
+  }: Props = $props();
   let dialog: HTMLDialogElement;
   let offsetHeight = $state(0);
 

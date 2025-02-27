@@ -1,6 +1,7 @@
 <script>
   import cs from 'classnames';
 
+  import Chat from '$lib/components/toolbar/Chat.svelte';
   import BasemapPicker from '$lib/components/map/BasemapPicker.svelte';
   import ProjectionPicker from '$lib/components/map/ProjectionPicker.svelte';
   import { layout } from '$lib/stores/layout';
@@ -16,6 +17,6 @@
   )}
 >
   <BasemapPicker />
-  <div class="h-10 w-[1.5px] bg-slate-600"></div>
   <ProjectionPicker />
+  <Chat />
 </div>

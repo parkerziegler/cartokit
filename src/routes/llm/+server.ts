@@ -1,0 +1,282 @@
+import { json } from '@sveltejs/kit';
+import OpenAI from 'openai';
+import { zodResponseFormat } from 'openai/helpers/zod';
+import { z } from 'zod';
+
+import { env } from '$env/dynamic/private';
+import type { RequestHandler } from './$types';
+
+const openai = new OpenAI({
+  apiKey: env.OPENAI_API_KEY ?? ''
+});
+
+export const POST = (async ({ request }) => {
+  const { prompt, layerIds } = await request.json();
+
+  const completion = await openai.beta.chat.completions.parse({
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'system',
+        content: 'Generate zero or more updates to the visualization.'
+      },
+      { role: 'user', content: prompt }
+    ],
+    response_format: zodResponseFormat(makeSchema(layerIds), 'diff')
+  });
+
+  return json(completion.choices[0].message.parsed);
+}) satisfies RequestHandler;
+
+function makeLayerIdSchema(layerIds: string[]) {
+  return layerIds.length > 1
+    ? z.union([
+        z.literal(layerIds[0]),
+        z.literal(layerIds[1]),
+        ...layerIds.slice(2).map((id) => z.literal(id))
+      ])
+    : z.literal(layerIds[0]);
+}
+
+const LayerType = z.union([
+  z.literal('Point'),
+  z.literal('Proportional Symbol'),
+  z.literal('Line'),
+  z.literal('Polygon'),
+  z.literal('Choropleth'),
+  z.literal('Dot Density')
+]);
+
+function LayerTypeUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('layer-type'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      layerType: LayerType
+    })
+  });
+}
+
+const Channel = z.union([
+  z.literal('fill'),
+  z.literal('stroke'),
+  z.literal('size'),
+  z.literal('dots')
+]);
+
+const AttributeUpdate = z.object({
+  type: z.literal('attribute'),
+  layerId: z.string(),
+  payload: z.object({
+    attribute: z.string(),
+    channel: Channel
+  })
+});
+
+function FillUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('fill'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      color: z.string()
+    })
+  });
+}
+
+function FillOpacityUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('fill-opacity'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      opacity: z.string()
+    })
+  });
+}
+
+function AddFillUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('add-fill'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({})
+  });
+}
+
+function RemoveFillUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('remove-fill'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({})
+  });
+}
+
+function StrokeUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('stroke'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      width: z.number(),
+      color: z.string()
+    })
+  });
+}
+
+function StrokeWidthUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('stroke-width'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      strokeWidth: z.number()
+    })
+  });
+}
+
+function StrokeOpacityUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('stroke-opacity'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      opacity: z.number()
+    })
+  });
+}
+
+function AddStrokeUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('add-stroke'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({})
+  });
+}
+
+function RemoveStrokeUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('remove-stroke'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({})
+  });
+}
+
+function PointSizeUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('point-size'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      size: z.number()
+    })
+  });
+}
+
+const ClassificationMethod = z.union([
+  z.literal('Quantile'),
+  z.literal('Equal Interval'),
+  z.literal('Jenks'),
+  z.literal('Manual')
+]);
+
+function ClassificationMethodUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('classification-method'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      method: ClassificationMethod
+    })
+  });
+}
+
+// const Hex = z.string().regex(/^#([0-9A-Fa-f]{3}){1,2}$/i);
+
+// const QuantitativeColorScheme = z.array(z.array(z.string()));
+
+// const CategoricalColorScheme = z.array(z.string());
+
+// const ColorSchemeUpdate = z.object({
+//   type: z.literal('color-scheme'),
+//   layerId: z.string(),
+//   payload: z.object({
+//     scheme: z.union([QuantitativeColorScheme, CategoricalColorScheme])
+//   })
+// });
+
+function ColorCountUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('color-count'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      count: z.number()
+    })
+  });
+}
+
+function ColorThresholdUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('color-threshold'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      index: z.number(),
+      threshold: z.number()
+    })
+  });
+}
+
+function SizeUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('size'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      min: z.optional(z.number()),
+      max: z.optional(z.number())
+    })
+  });
+}
+
+function DotValueUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('dots'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      value: z.number()
+    })
+  });
+}
+
+const VisualizationType = z.union([
+  z.literal('Quantitative'),
+  z.literal('Categorical'),
+  z.literal('Constant')
+]);
+
+function VisualizationTypeUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('visualization-type'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      visualizationType: VisualizationType
+    })
+  });
+}
+
+function makeSchema(layerIds: string[]) {
+  return z.object({
+    diff: z.discriminatedUnion('type', [
+      LayerTypeUpdate(layerIds),
+      AttributeUpdate,
+      FillUpdate(layerIds),
+      FillOpacityUpdate(layerIds),
+      AddFillUpdate(layerIds),
+      RemoveFillUpdate(layerIds),
+      StrokeUpdate(layerIds),
+      StrokeWidthUpdate(layerIds),
+      StrokeOpacityUpdate(layerIds),
+      AddStrokeUpdate(layerIds),
+      RemoveStrokeUpdate(layerIds),
+      PointSizeUpdate(layerIds),
+      ClassificationMethodUpdate(layerIds),
+      // ColorSchemeUpdate,
+      ColorCountUpdate(layerIds),
+      ColorThresholdUpdate(layerIds),
+      SizeUpdate(layerIds),
+      DotValueUpdate(layerIds),
+      VisualizationTypeUpdate(layerIds)
+    ])
+  });
+}
