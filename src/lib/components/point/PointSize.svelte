@@ -2,6 +2,7 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { history } from '$lib/state/history.svelte';
 
   interface Props {
     layerId: string;
@@ -13,13 +14,26 @@
   let { layerId, size, label, fieldId }: Props = $props();
 
   function onPointSizeChange(value: number): void {
-    dispatchLayerUpdate({
-      type: 'point-size',
+    const update = {
+      type: 'point-size' as const,
       layerId,
       payload: {
         size: value
       }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'point-size',
+        layerId,
+        payload: {
+          size: size
+        }
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 </script>
 

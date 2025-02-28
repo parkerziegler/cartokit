@@ -4,6 +4,7 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { history } from '$lib/state/history.svelte';
   import type { CartoKitDotDensityLayer } from '$lib/types';
 
   interface Props {
@@ -13,13 +14,26 @@
   let { layer }: Props = $props();
 
   function onDotValueChange(value: number) {
-    dispatchLayerUpdate({
-      type: 'dot-value',
+    const update = {
+      type: 'dot-value' as const,
       layerId: layer.id,
       payload: {
         value
       }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'dot-value',
+        layerId: layer.id,
+        payload: {
+          value: layer.style.dots.value
+        }
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 </script>
 

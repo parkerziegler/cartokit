@@ -7,6 +7,7 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { ClassificationMethod, QuantitativeStyle } from '$lib/types';
   import { CLASSIFICATION_METHODS } from '$lib/utils/classification';
+  import { history } from '$lib/state/history.svelte';
 
   interface Props {
     layerId: string;
@@ -37,13 +38,26 @@
       displayBreaksEditor = false;
     }
 
-    dispatchLayerUpdate({
-      type: 'classification-method',
+    const update = {
+      type: 'classification-method' as const,
       layerId,
       payload: {
         method: event.currentTarget.value as ClassificationMethod
       }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'classification-method',
+        layerId,
+        payload: {
+          method: style.method
+        }
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 
   function toggleBreaksEditorVisibility() {

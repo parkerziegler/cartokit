@@ -2,6 +2,7 @@
   import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { history } from '$lib/state/history.svelte';
   import type {
     CategoricalFill,
     ConstantFill,
@@ -16,19 +17,41 @@
   let { layerId, fill }: Props = $props();
 
   function onRemoveFill() {
-    dispatchLayerUpdate({
-      type: 'remove-fill',
+    const update = {
+      type: 'remove-fill' as const,
       layerId,
       payload: {}
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'add-fill',
+        layerId,
+        payload: {}
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 
   function onAddFill() {
-    dispatchLayerUpdate({
-      type: 'add-fill',
+    const update = {
+      type: 'add-fill' as const,
       layerId,
       payload: {}
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'remove-fill',
+        layerId,
+        payload: {}
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 </script>
 

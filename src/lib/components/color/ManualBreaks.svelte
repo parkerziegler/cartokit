@@ -8,6 +8,7 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { QuantitativeStyle } from '$lib/types';
   import { clickoutside } from '$lib/utils/actions';
+  import { history } from '$lib/state/history.svelte';
 
   interface Props {
     layerId: string;
@@ -23,14 +24,28 @@
 
   function onThresholdChange(i: number) {
     return function handleThresholdChange(value: number) {
-      dispatchLayerUpdate({
-        type: 'color-threshold',
+      const update = {
+        type: 'color-threshold' as const,
         layerId,
         payload: {
           index: i,
           threshold: value
         }
+      };
+
+      history.undo.push({
+        execute: update,
+        invert: {
+          type: 'color-threshold',
+          layerId,
+          payload: {
+            index: i,
+            threshold: style.thresholds[i]
+          }
+        }
       });
+
+      dispatchLayerUpdate(update);
     };
   }
 </script>
