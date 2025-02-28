@@ -12,12 +12,13 @@
   import DataTable from '$lib/components/shared/DataTable.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
+  import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import { map as mapStore } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
-  import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
+  import { initHistory } from '$lib/utils/history';
 
   interface Props {
     data: PageData;
@@ -74,8 +75,11 @@
       map?.setProjection({ type: $ir.projection });
     });
 
+    const destroyHistory = initHistory();
+
     return () => {
       map!.remove();
+      destroyHistory();
     };
   });
 

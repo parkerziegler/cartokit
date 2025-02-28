@@ -11,6 +11,7 @@
     isPropertyCategorical,
     isPropertyQuantitative
   } from '$lib/utils/property';
+  import { history } from '$lib/state/history.svelte';
 
   interface Props {
     selected: string;
@@ -46,14 +47,28 @@
   function onAttributeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    dispatchLayerUpdate({
-      type: 'attribute',
+    const update = {
+      type: 'attribute' as const,
       layerId,
       payload: {
         attribute: event.currentTarget.value,
         channel
       }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'attribute',
+        layerId,
+        payload: {
+          attribute: selected,
+          channel
+        }
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 
   function onClickComputedAttribute() {
@@ -69,8 +84,8 @@
     attributeEditorVisible = false;
   }
 
-  function onClickOutsideEditor(event: CustomEvent<MouseEvent>) {
-    if (!trigger.contains(event.detail.target as Node)) {
+  function onClickOutsideEditor(event: MouseEvent) {
+    if (!trigger.contains(event.target as Node)) {
       onCloseEditor();
     }
   }

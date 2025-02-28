@@ -4,6 +4,7 @@
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { QuantitativeStyle } from '$lib/types';
+  import { history } from '$lib/state/history.svelte';
 
   interface Props {
     layerId: string;
@@ -20,13 +21,26 @@
   function onColorStepsChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    dispatchLayerUpdate({
-      type: 'color-count',
+    const update = {
+      type: 'color-count' as const,
       layerId,
       payload: {
         count: +event.currentTarget.value
       }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'color-count',
+        layerId,
+        payload: {
+          count: style.count
+        }
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 </script>
 

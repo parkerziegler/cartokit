@@ -2,6 +2,7 @@
   import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { history } from '$lib/state/history.svelte';
   import type { ConstantStroke } from '$lib/types';
 
   interface Props {
@@ -12,19 +13,41 @@
   let { layerId, stroke }: Props = $props();
 
   function onRemoveStroke() {
-    dispatchLayerUpdate({
-      type: 'remove-stroke',
+    const update = {
+      type: 'remove-stroke' as const,
       layerId,
       payload: {}
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'add-stroke',
+        layerId,
+        payload: {}
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 
   function onAddStroke() {
-    dispatchLayerUpdate({
-      type: 'add-stroke',
+    const update = {
+      type: 'add-stroke' as const,
       layerId,
       payload: {}
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'remove-stroke',
+        layerId,
+        payload: {}
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 </script>
 

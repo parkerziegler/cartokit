@@ -4,6 +4,7 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { history } from '$lib/state/history.svelte';
   import type {
     CategoricalColorScheme,
     QuantitativeColorScheme,
@@ -56,20 +57,37 @@
     showOptions = false;
   }
 
-  function onClickScheme(
+  function dispatchSchemeUpdate(
     scheme: CategoricalColorScheme | QuantitativeColorScheme
   ) {
-    return function handleSchemeSelect() {
-      dispatchLayerUpdate({
+    const update = {
+      type: 'color-scheme' as const,
+      layerId,
+      payload: {
+        scheme
+      }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
         type: 'color-scheme',
         layerId,
         payload: {
-          scheme
+          scheme: style.scheme
         }
-      });
+      }
+    });
 
-      showOptions = false;
-    };
+    dispatchLayerUpdate(update);
+  }
+
+  function onClickScheme(
+    scheme: CategoricalColorScheme | QuantitativeColorScheme
+  ) {
+    showOptions = false;
+
+    dispatchSchemeUpdate(scheme);
   }
 
   function onSchemeReverse() {
@@ -80,13 +98,7 @@
         ? reverseQuantitativeColorScheme(style.scheme)
         : reverseCategoricalColorScheme(style.scheme);
 
-    dispatchLayerUpdate({
-      type: 'color-scheme',
-      layerId,
-      payload: {
-        scheme
-      }
-    });
+    dispatchSchemeUpdate(scheme);
   }
 </script>
 
@@ -127,7 +139,7 @@
               <ColorSchemePalette
                 colors={scheme[style.count]}
                 active={scheme === style.scheme}
-                onclickscheme={onClickScheme(scheme)}
+                onclickscheme={() => onClickScheme(scheme)}
               />
             {/each}
           {:else}
@@ -135,7 +147,7 @@
               <ColorSchemePalette
                 colors={scheme}
                 active={scheme === style.scheme}
-                onclickscheme={onClickScheme(scheme)}
+                onclickscheme={() => onClickScheme(scheme)}
               />
             {/each}
           {/if}

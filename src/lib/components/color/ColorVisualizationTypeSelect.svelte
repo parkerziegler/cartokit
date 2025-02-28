@@ -1,6 +1,7 @@
 <script lang="ts">
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { history } from '$lib/state/history.svelte';
   import type { LayerType, VisualizationType } from '$lib/types';
 
   interface Props {
@@ -37,13 +38,26 @@
   function onVisualizationTypeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    dispatchLayerUpdate({
-      type: 'visualization-type',
+    const update = {
+      type: 'visualization-type' as const,
       layerId,
       payload: {
         visualizationType: event.currentTarget.value as VisualizationType
       }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'visualization-type',
+        layerId,
+        payload: {
+          visualizationType
+        }
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 
   let options = $derived(
