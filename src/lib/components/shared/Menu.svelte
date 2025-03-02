@@ -1,14 +1,13 @@
 <script lang="ts">
   import cs from 'classnames';
   import type { Snippet } from 'svelte';
-  import type { MouseEventHandler } from 'svelte/elements';
 
   import { clickoutside } from '$lib/utils/actions';
 
   interface Props {
     class?: string;
     id?: string;
-    onclickoutsidemenu?: MouseEventHandler<HTMLElement>;
+    onclickoutsidemenu?: (event: CustomEvent<MouseEvent>) => void;
     children: Snippet;
   }
 

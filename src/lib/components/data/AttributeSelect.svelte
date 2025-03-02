@@ -28,7 +28,7 @@
   let editor: TransformationEditor | undefined = $state();
   let trigger: HTMLButtonElement;
   let left = $state(0);
-  let attributeEditorVisible = $state(false);
+  let transformationEditorVisible = $state(false);
 
   let properties = $derived(
     Object.keys(geojson.features[0]?.properties ?? {}).filter((prop) =>
@@ -72,7 +72,7 @@
   }
 
   function onClickComputedAttribute() {
-    attributeEditorVisible = true;
+    transformationEditorVisible = true;
     const propertiesMenu = document.getElementById('properties');
 
     if (propertiesMenu) {
@@ -81,11 +81,11 @@
   }
 
   function onCloseEditor() {
-    attributeEditorVisible = false;
+    transformationEditorVisible = false;
   }
 
-  function onClickOutsideEditor(event: MouseEvent) {
-    if (!trigger.contains(event.target as Node)) {
+  function onClickOutsideEditor(event: CustomEvent<MouseEvent>) {
+    if (!trigger.contains(event.detail.target as Node)) {
       onCloseEditor();
     }
   }
@@ -113,7 +113,7 @@
     data-testid="open-transformation-editor-button"><GearIcon /></button
   >
 </div>
-{#if attributeEditorVisible}
+{#if transformationEditorVisible}
   <Portal
     class="absolute top-4"
     {target}

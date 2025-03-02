@@ -16,11 +16,10 @@
   import { selectedFeature } from '$lib/stores/selected-feature';
   import { parseUserDefinedTransformation } from '$lib/utils/parse';
   import { transformationWorker } from '$lib/utils/worker';
-  import type { MouseEventHandler } from 'svelte/elements';
 
   interface Props {
     oncloseeditor: () => void;
-    onclickoutsideeditor: MouseEventHandler<HTMLElement>;
+    onclickoutsideeditor: (event: CustomEvent<MouseEvent>) => void;
     layerId: string;
     geojson: FeatureCollection;
   }
