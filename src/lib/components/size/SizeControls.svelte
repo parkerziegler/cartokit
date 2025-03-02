@@ -3,6 +3,7 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { history } from '$lib/state/history.svelte';
   import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 
   interface Props {
@@ -13,13 +14,26 @@
 
   function onSizeChange(field: 'min' | 'max') {
     return function handleSizeChange(value: number) {
-      dispatchLayerUpdate({
-        type: 'size',
+      const update = {
+        type: 'size' as const,
         layerId: layer.id,
         payload: {
           [field]: value
         }
+      };
+
+      history.undo.push({
+        execute: update,
+        invert: {
+          type: 'size',
+          layerId: layer.id,
+          payload: {
+            [field]: layer.style.size[field]
+          }
+        }
       });
+
+      dispatchLayerUpdate(update);
     };
   }
 </script>

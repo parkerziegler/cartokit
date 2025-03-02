@@ -181,7 +181,7 @@ interface FillVisualizationUpdate extends LayerUpdate {
   };
 }
 
-type DispatchLayerUpdateParams =
+export type DispatchLayerUpdateParams =
   | LayerTypeUpdate
   | AttributeUpdate
   | FillUpdate

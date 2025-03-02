@@ -8,6 +8,7 @@
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { ConstantStroke } from '$lib/types';
   import { DEFAULT_STROKE } from '$lib/utils/constants';
+  import { history } from '$lib/state/history.svelte';
 
   interface Props {
     layerId: string;
@@ -16,36 +17,60 @@
 
   let { layerId, stroke }: Props = $props();
 
+  function dispatchStrokeUpdate(color: string) {
+    const update = {
+      type: 'stroke' as const,
+      layerId,
+      payload: {
+        color
+      }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'stroke',
+        layerId,
+        payload: {
+          color: stroke.color
+        }
+      }
+    });
+
+    dispatchLayerUpdate(update);
+  }
+
   function onStrokeInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
-    dispatchLayerUpdate({
-      type: 'stroke',
-      layerId,
-      payload: {
-        color: event.currentTarget.value
-      }
-    });
+    dispatchStrokeUpdate(event.currentTarget.value);
   }
 
   function onStrokeHexChange(hex: string) {
-    dispatchLayerUpdate({
-      type: 'stroke',
-      layerId,
-      payload: {
-        color: hex
-      }
-    });
+    dispatchStrokeUpdate(hex);
   }
 
   function onStrokeWidthChange(value: number) {
-    dispatchLayerUpdate({
-      type: 'stroke-width',
+    const update = {
+      type: 'stroke-width' as const,
       layerId,
       payload: {
         strokeWidth: value
       }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'stroke-width',
+        layerId,
+        payload: {
+          strokeWidth: stroke.width
+        }
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 </script>
 

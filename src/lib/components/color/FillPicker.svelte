@@ -6,6 +6,7 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { ConstantFill } from '$lib/types';
+  import { history } from '$lib/state/history.svelte';
   import { DEFAULT_FILL } from '$lib/utils/constants';
 
   interface Props {
@@ -16,13 +17,26 @@
   let { layerId, fill }: Props = $props();
 
   function dispatchFillUpdate(color: string) {
-    dispatchLayerUpdate({
-      type: 'fill',
+    const update = {
+      type: 'fill' as const,
       layerId,
       payload: {
         color
       }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'fill',
+        layerId,
+        payload: {
+          color: fill.color
+        }
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 
   function onFillInput(

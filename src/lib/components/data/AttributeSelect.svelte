@@ -11,6 +11,7 @@
     isPropertyCategorical,
     isPropertyQuantitative
   } from '$lib/utils/property';
+  import { history } from '$lib/state/history.svelte';
 
   interface Props {
     selected: string;
@@ -27,7 +28,7 @@
   let editor: TransformationEditor | undefined = $state();
   let trigger: HTMLButtonElement;
   let left = $state(0);
-  let attributeEditorVisible = $state(false);
+  let transformationEditorVisible = $state(false);
 
   let properties = $derived(
     Object.keys(geojson.features[0]?.properties ?? {}).filter((prop) =>
@@ -46,18 +47,32 @@
   function onAttributeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    dispatchLayerUpdate({
-      type: 'attribute',
+    const update = {
+      type: 'attribute' as const,
       layerId,
       payload: {
         attribute: event.currentTarget.value,
         channel
       }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'attribute',
+        layerId,
+        payload: {
+          attribute: selected,
+          channel
+        }
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 
   function onClickComputedAttribute() {
-    attributeEditorVisible = true;
+    transformationEditorVisible = true;
     const propertiesMenu = document.getElementById('properties');
 
     if (propertiesMenu) {
@@ -66,7 +81,7 @@
   }
 
   function onCloseEditor() {
-    attributeEditorVisible = false;
+    transformationEditorVisible = false;
   }
 
   function onClickOutsideEditor(event: CustomEvent<MouseEvent>) {
@@ -98,7 +113,7 @@
     data-testid="open-transformation-editor-button"><GearIcon /></button
   >
 </div>
-{#if attributeEditorVisible}
+{#if transformationEditorVisible}
   <Portal
     class="absolute top-4"
     {target}

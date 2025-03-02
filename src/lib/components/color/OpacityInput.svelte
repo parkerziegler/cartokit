@@ -1,6 +1,7 @@
 <script lang="ts">
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { history } from '$lib/state/history.svelte';
   import type {
     CategoricalStyle,
     Channel,
@@ -34,11 +35,22 @@
   }
 
   function onOpacityChange(opacity: number) {
-    dispatchLayerUpdate({
-      type: `${channel}-opacity`,
+    const update = {
+      type: `${channel}-opacity` as const,
       layerId,
       payload: { opacity }
+    };
+
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: `${channel}-opacity`,
+        layerId,
+        payload: { opacity: style.opacity }
+      }
     });
+
+    dispatchLayerUpdate(update);
   }
 </script>
 
