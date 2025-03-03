@@ -64,7 +64,7 @@ importers:
         version: 3.5.3
       recast:
         specifier: ^0.23.9
-        version: 0.23.10
+        version: 0.23.11
       simple-statistics:
         specifier: ^7.8.7
         version: 7.8.7
@@ -2095,8 +2095,8 @@ packages:
     resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
     engines: {node: '>= 14.18.0'}
 
-  recast@0.23.10:
-    resolution: {integrity: sha512-mbCmRMJUKCJ1h41V0cu2C26ULBURwuoZ34C9rChjcDaeJ/4Kv5al3O2HPwTs2m0wQ1vGhMY+tguhzU1aE8md1A==}
+  recast@0.23.11:
+    resolution: {integrity: sha512-YTUo+Flmw4ZXiWfQKGcwwc11KnoRAYgzAE2E7mXKCjSviTKShtxBsN6YUUBB2gtaBzKzeKunxhUwNHQuRryhWA==}
     engines: {node: '>= 4'}
 
   resolve-from@4.0.0:
@@ -4287,7 +4287,7 @@ snapshots:
 
   readdirp@4.1.2: {}
 
-  recast@0.23.10:
+  recast@0.23.11:
     dependencies:
       ast-types: 0.16.1
       esprima: 4.0.1
