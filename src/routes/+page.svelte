@@ -9,6 +9,7 @@
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import PropertiesMenu from '$lib/components/properties/PropertiesMenu.svelte';
+  import Alert from '$lib/components/shared/Alert.svelte';
   import DataTable from '$lib/components/shared/DataTable.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
@@ -27,6 +28,7 @@
   let { data }: Props = $props();
 
   let map = $state<maplibregl.Map>();
+  let error = $state({ message: '' });
 
   onMount(() => {
     // maplibre-gl is actually a CJS module, and not all module.exports may be
@@ -73,6 +75,14 @@
 
     map.on('style.load', () => {
       map?.setProjection({ type: $ir.projection });
+    });
+
+    map.on('error', () => {
+      error.message = 'A map rendering error occurred.';
+
+      window.setTimeout(() => {
+        error.message = '';
+      }, 5000);
     });
 
     const destroyHistory = initHistory();
@@ -148,6 +158,13 @@
   </div>
   {#if $layout.editorVisible}
     <Editor />
+  {/if}
+  {#if error.message}
+    <div
+      class="absolute bottom-12 left-4 rounded-md bg-slate-900 p-2 text-xs tracking-wider text-white shadow-lg"
+    >
+      <Alert kind="error" message="A map rendering error occurred." />
+    </div>
   {/if}
 </main>
 
