@@ -11,13 +11,18 @@
   let prompt = $state('');
   let fetching = $state(false);
   let textarea: HTMLTextAreaElement | undefined = $state();
+  let layerIds = $derived(Object.keys($ir.layers));
 
   function onClick() {
     chatVisible = true;
   }
 
-  function onClickOutsideChat(event: CustomEvent<{ target: HTMLElement }>) {
-    if (chatVisible && !event.detail.target.contains(textarea ?? null)) {
+  function onClickOutsideChat(event: CustomEvent<MouseEvent>) {
+    if (
+      chatVisible &&
+      textarea &&
+      !(event.detail.target as Node).contains(textarea)
+    ) {
       chatVisible = false;
     }
   }
@@ -27,6 +32,7 @@
   ) {
     if (event.key === 'Enter' && prompt.length > 0) {
       fetching = true;
+
       if (textarea) {
         textarea.blur();
       }
@@ -38,7 +44,7 @@
         },
         body: JSON.stringify({
           prompt,
-          layerIds: Object.keys($ir.layers)
+          layerIds
         })
       })
         .then((response) => response.json())
@@ -49,6 +55,9 @@
           if (textarea) {
             textarea.value = '';
           }
+        })
+        .catch(() => {
+          fetching = false;
         });
     }
   }
@@ -56,9 +65,13 @@
 
 <button
   onclick={onClick}
-  class="flex h-[22px] w-[22px] items-center justify-center rounded-[5px] bg-slate-400 text-white shadow"
+  class={[
+    'flex h-[22px] w-[22px] items-center justify-center rounded-[5px] border border-transparent bg-slate-400 text-white shadow transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+    chatVisible && 'border-white'
+  ]}
   use:clickoutside
   onclickoutside={onClickOutsideChat}
+  disabled={layerIds.length === 0}
 >
   <ChatIcon />
 </button>
@@ -75,9 +88,7 @@
           disabled={fetching}
         >
         </textarea>
-        <code class="absolute bottom-2 left-2 z-10 text-slate-400"
-          >gpt-4o-mini</code
-        >
+        <code class="absolute bottom-2 left-2 z-10 text-slate-400">gpt-4o</code>
       </div>
       {#if fetching}
         <p class="loading text-slate-400" transition:slide>Thinking</p>

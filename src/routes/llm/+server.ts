@@ -28,6 +28,14 @@ export const POST = (async ({ request }) => {
   return json(completion.choices[0].message.parsed);
 }) satisfies RequestHandler;
 
+/**
+ * Construct the schema for the layerId field for a diff object. We want con-
+ * strained decoding responses from the OpenAI API to only target existing
+ * layers on the map.
+ *
+ * @param layerIds – An array of the current layer IDs on the map.
+ * @returns – A Zod schema for the layerId field in a diff object.
+ */
 function makeLayerIdSchema(layerIds: string[]) {
   return layerIds.length > 1
     ? z.union([
@@ -56,22 +64,6 @@ function LayerTypeUpdate(layerIds: string[]) {
     })
   });
 }
-
-const Channel = z.union([
-  z.literal('fill'),
-  z.literal('stroke'),
-  z.literal('size'),
-  z.literal('dots')
-]);
-
-const AttributeUpdate = z.object({
-  type: z.literal('attribute'),
-  layerId: z.string(),
-  payload: z.object({
-    attribute: z.string(),
-    channel: Channel
-  })
-});
 
 function FillUpdate(layerIds: string[]) {
   return z.object({
@@ -183,20 +175,6 @@ function ClassificationMethodUpdate(layerIds: string[]) {
   });
 }
 
-// const Hex = z.string().regex(/^#([0-9A-Fa-f]{3}){1,2}$/i);
-
-// const QuantitativeColorScheme = z.array(z.array(z.string()));
-
-// const CategoricalColorScheme = z.array(z.string());
-
-// const ColorSchemeUpdate = z.object({
-//   type: z.literal('color-scheme'),
-//   layerId: z.string(),
-//   payload: z.object({
-//     scheme: z.union([QuantitativeColorScheme, CategoricalColorScheme])
-//   })
-// });
-
 function ColorCountUpdate(layerIds: string[]) {
   return z.object({
     type: z.literal('color-count'),
@@ -259,7 +237,6 @@ function makeSchema(layerIds: string[]) {
   return z.object({
     diff: z.discriminatedUnion('type', [
       LayerTypeUpdate(layerIds),
-      AttributeUpdate,
       FillUpdate(layerIds),
       FillOpacityUpdate(layerIds),
       AddFillUpdate(layerIds),
@@ -271,7 +248,6 @@ function makeSchema(layerIds: string[]) {
       RemoveStrokeUpdate(layerIds),
       PointSizeUpdate(layerIds),
       ClassificationMethodUpdate(layerIds),
-      // ColorSchemeUpdate,
       ColorCountUpdate(layerIds),
       ColorThresholdUpdate(layerIds),
       SizeUpdate(layerIds),
