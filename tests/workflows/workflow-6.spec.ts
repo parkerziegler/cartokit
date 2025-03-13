@@ -3,6 +3,8 @@ import * as url from 'node:url';
 
 import { test, expect } from '@playwright/test';
 
+import { registerConsoleListener } from '../utils/persist';
+
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 /**
@@ -16,15 +18,12 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * https://academic.oup.com/qje/article/137/4/2037/6571943
  */
 test('workflow-6', async ({ page }) => {
-  // Identify the playwright test for application code.
-  await page.addInitScript(() => {
-    (
-      window as unknown as Window & { playwrightWorkflowId: string }
-    ).playwrightWorkflowId = 'workflow-6';
-  });
-
   // Mark workflow tests as slow.
   test.slow();
+
+  // Register our console listener, which listens for recon performance metrics
+  // printed to the console and saves them to a file.
+  registerConsoleListener(page, 'workflow-6');
 
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
@@ -39,6 +38,11 @@ test('workflow-6', async ({ page }) => {
       element.style.display = 'none';
     });
   }
+
+  // Increment the program counter.
+  await page.evaluate(() => {
+    window.programId = 'program-1';
+  });
 
   // Wait for the Open Editor button and Add Layer button to become enabled. These
   // are proxies for the map reaching an idle state.
@@ -107,70 +111,187 @@ test('workflow-6', async ({ page }) => {
   await expect(page.locator('#properties')).toBeVisible();
 
   // Remove the layer's stroke.
+  await page.evaluate(() => {
+    window.programId = 'program-2';
+  });
+
   await page.getByTestId('remove-stroke-button').click();
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
   // Switch the layer's Layer Type to Choropleth.
+  await page.evaluate(() => {
+    window.programId = 'program-3';
+  });
+
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
   // Set the layer's Attribute to 'years_2080_2099'.
+  await page.evaluate(() => {
+    window.programId = 'program-4';
+  });
+
   await page.locator('#fill-attribute-select').selectOption('years_2080_2099');
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
   // Switch the layer's Color Scheme to PRGn.
+  await page.evaluate(() => {
+    window.programId = 'program-5';
+  });
+
   await page.locator('#color-scheme').getByRole('button').click();
   await page.locator('li:nth-child(20)').getByRole('button').click();
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
   // Reverse the color scheme.
+  await page.evaluate(() => {
+    window.programId = 'program-6';
+  });
+
   await page.getByTestId('color-scheme-reverse-button').click();
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
   // Set the layer's Steps to 8.
+  await page.evaluate(() => {
+    window.programId = 'program-7';
+  });
+
   await page.locator('#color-steps-select').selectOption('8');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
 
   // Set the layer's Method to Manual.
   await page.locator('#classification-method-select').selectOption('Manual');
 
   // Set the layer's Breaks to -200, -100, -50, 0, 50, 100, 200.
+  // Set layer break to -200.
+  await page.evaluate(() => {
+    window.programId = 'program-8';
+  });
+
   await page.getByTestId('breaks-editor').locator('input').first().fill('-200');
   await page
     .getByTestId('breaks-editor')
     .locator('input')
     .first()
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
+  // Set layer break to -100.
+  await page.evaluate(() => {
+    window.programId = 'program-9';
+  });
+
   await page.getByTestId('breaks-editor').locator('input').nth(1).fill('-100');
   await page
     .getByTestId('breaks-editor')
     .locator('input')
     .nth(1)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
+  // Set layer break to -50.
+  await page.evaluate(() => {
+    window.programId = 'program-10';
+  });
+
   await page.getByTestId('breaks-editor').locator('input').nth(2).fill('-50');
   await page
     .getByTestId('breaks-editor')
     .locator('input')
     .nth(2)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
+  // Set layer break to 0.
+  await page.evaluate(() => {
+    window.programId = 'program-11';
+  });
+
   await page.getByTestId('breaks-editor').locator('input').nth(3).fill('0');
   await page
     .getByTestId('breaks-editor')
     .locator('input')
     .nth(3)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
+  // Set layer break to 50.
+  await page.evaluate(() => {
+    window.programId = 'program-12';
+  });
+
   await page.getByTestId('breaks-editor').locator('input').nth(4).fill('50');
   await page
     .getByTestId('breaks-editor')
     .locator('input')
     .nth(4)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
+  // Set layer break to 100.
+  await page.evaluate(() => {
+    window.programId = 'program-13';
+  });
+
   await page.getByTestId('breaks-editor').locator('input').nth(5).fill('100');
   await page
     .getByTestId('breaks-editor')
     .locator('input')
     .nth(5)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
+  // Set layer break to 200.
+  await page.evaluate(() => {
+    window.programId = 'program-14';
+  });
+
   await page.getByTestId('breaks-editor').locator('input').nth(6).fill('200');
   await page
     .getByTestId('breaks-editor')
     .locator('input')
     .nth(6)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
 
   // Click on a page location that will trigger deselection of both layers.
   await page.locator('#map').click({

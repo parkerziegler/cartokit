@@ -3,6 +3,8 @@ import * as url from 'node:url';
 
 import { test, expect } from '@playwright/test';
 
+import { registerConsoleListener } from '../utils/persist';
+
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 /**
@@ -17,15 +19,11 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * iles (i.e., 10%-90% coverage).
  */
 test('workflow-1', async ({ page }) => {
-  // Identify the playwright test for application code.
-  await page.addInitScript(() => {
-    (
-      window as unknown as Window & { playwrightWorkflowId: string }
-    ).playwrightWorkflowId = 'workflow-1';
-  });
-
   // Mark workflow tests as slow.
   test.slow();
+
+  // Enable intercepting performance metrics from the console.
+  registerConsoleListener(page, 'workflow-1');
 
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
@@ -50,12 +48,6 @@ test('workflow-1', async ({ page }) => {
     timeout: 10000
   });
 
-  // Click the Open Editor button.
-  await page.getByTestId('editor-toggle').click();
-
-  // Ensure the Editor Panel is visible.
-  await expect(page.getByTestId('program-editor')).toBeVisible();
-
   // Focus the map and trigger a 'wheel' event to zoom out.
   await page.locator('#map').click({
     position: {
@@ -64,6 +56,17 @@ test('workflow-1', async ({ page }) => {
     }
   });
   await page.mouse.wheel(0, 400);
+
+  // Click the Open Editor button.
+  await page.getByTestId('editor-toggle').click();
+
+  // Ensure the Editor Panel is visible.
+  await expect(page.getByTestId('program-editor')).toBeVisible();
+
+  // Increment the program counter.
+  await page.evaluate(() => {
+    window.programId = 'program-1';
+  });
 
   // Open the Add Layer modal.
   await expect(page.getByTestId('add-layer-button')).toBeEnabled();
@@ -114,21 +117,56 @@ test('workflow-1', async ({ page }) => {
   await expect(page.locator('#properties')).toBeVisible();
 
   // Set the layer's Layer Type to Choropleth.
+  await page.evaluate(() => {
+    window.programId = 'program-2';
+  });
+
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
   // Set the layer's stroke to #1f2b2e.
+  await page.evaluate(() => {
+    window.programId = 'program-3';
+  });
+
   await page.getByTestId('stroke-color-input').fill('#1f2b2e');
   await page.getByTestId('stroke-color-input').press('Enter');
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
 
   // Set the layer's stroke-opacity to 7.5%.
+  await page.evaluate(() => {
+    window.programId = 'program-4';
+  });
+
   await page.locator('#stroke-opacity-input').fill('7.5');
   await page.locator('#stroke-opacity-input').press('Enter');
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
   // Set the layer's stroke-width to 0.25.
+  await page.evaluate(() => {
+    window.programId = 'program-5';
+  });
+
   await page.locator('#stroke-width-input').fill('0.25');
   await page.locator('#stroke-width-input').press('Enter');
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
   // Open the Transformation Editor.
+  await page.evaluate(() => {
+    window.programId = 'program-6';
+  });
+
   await page.getByTestId('open-transformation-editor-button').click();
   await expect(page.getByTestId('transformation-editor')).toBeVisible();
 
@@ -148,16 +186,44 @@ test('workflow-1', async ({ page }) => {
   // Wait for the transformation to complete.
   await expect(page.getByText('Successfully transformed data.')).toBeVisible();
 
-  // Switch the Layer Type to Fill.
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
+  // Switch the Layer Type to Polygon.
+  await page.evaluate(() => {
+    window.programId = 'program-7';
+  });
+
   await page.locator('#layer-type-select').selectOption('Polygon');
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
   // Set the layer's fill to #1f2b2e.
+  await page.evaluate(() => {
+    window.programId = 'program-8';
+  });
+
   await page.getByTestId('fill-color-input').fill('#1f2b2e');
   await page.getByTestId('fill-color-input').press('Enter');
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
+
   // Set the fill-opacity to 7.5%.
+  await page.evaluate(() => {
+    window.programId = 'program-9';
+  });
+
   await page.locator('#fill-opacity-input').fill('7.5');
   await page.locator('#fill-opacity-input').press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
 
   // Deselect the layer.
   await page.locator('#map').click({
@@ -168,14 +234,28 @@ test('workflow-1', async ({ page }) => {
   });
 
   // Upload the Path of Totality GeoJSON file.
+  await page.evaluate(() => {
+    window.programId = 'program-10';
+  });
+
+  // Open the Add Layer modal.
   await page.getByTestId('add-layer-button').click();
+
+  // Select the From File tab.
+  await page.getByRole('button', { name: 'From File' }).waitFor();
   await page.getByRole('button', { name: 'From File' }).click();
+
+  // Upload the Path of Totality GeoJSON file.
   await page
-    .locator('#from-file-input')
+    .getByLabel('File')
     .setInputFiles(
       path.join(__dirname, '../data/workflow-1/nyt-nasa-path-of-totality.json')
     );
+
+  // Specify the layer's Display Name.
   await page.getByLabel('Display Name').fill('Path of Totality');
+
+  // Add the layer.
   await page.getByRole('button', { name: 'Add' }).click();
 
   // Wait for the loading indicator to disappear.
@@ -205,13 +285,39 @@ test('workflow-1', async ({ page }) => {
   await expect(page.locator('#properties')).toBeVisible();
 
   // Set the layer's fill to #000000.
+  await page.evaluate(() => {
+    window.programId = 'program-11';
+  });
+
   await page.getByTestId('fill-color-input').fill('#000000');
+  await page.getByTestId('fill-color-input').press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
 
   // Set the fill-opacity to 100%.
+  await page.evaluate(() => {
+    window.programId = 'program-12';
+  });
+
   await page.locator('#fill-opacity-input').fill('100');
+  await page.locator('#fill-opacity-input').press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
 
   // Remove the layer's stroke.
+  await page.evaluate(() => {
+    window.programId = 'program-13';
+  });
+
   await page.getByTestId('remove-stroke-button').click();
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+  });
 
   // Deselect the layer.
   await page.locator('#map').click({

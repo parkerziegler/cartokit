@@ -33,6 +33,7 @@
     if (!endpoint || !displayName) {
       return;
     }
+    performance.mark('reconciliation-start');
 
     dataLoading = true;
 
@@ -42,6 +43,14 @@
       url: endpoint,
       onSourceLoaded
     });
+    performance.mark('reconciliation-end');
+
+    const { duration } = performance.measure(
+      'reconciliation',
+      'reconciliation-start',
+      'reconciliation-end'
+    );
+    console.log('recon', duration, window.programId);
   }
 </script>
 

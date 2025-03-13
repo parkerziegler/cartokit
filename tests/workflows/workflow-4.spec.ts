@@ -3,6 +3,8 @@ import * as url from 'node:url';
 
 import { test, expect } from '@playwright/test';
 
+import { registerConsoleListener } from '../utils/persist';
+
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 /**
@@ -17,12 +19,12 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * geographic space.
  */
 test('workflow-4', async ({ page }) => {
-  // Identify the playwright test for application code.
-  await page.addInitScript(() => {
-    (
-      window as unknown as Window & { playwrightWorkflowId: string }
-    ).playwrightWorkflowId = 'workflow-4';
-  });
+  // Mark workflow tests as slow.
+  test.slow();
+
+  // Register our console listener, which listens for recon performance metrics
+  // printed to the console and saves them to a file.
+  registerConsoleListener(page, 'workflow-4');
 
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
@@ -73,6 +75,11 @@ test('workflow-4', async ({ page }) => {
   await page.mouse.down();
   await page.mouse.move(-50, -400);
   await page.mouse.up();
+
+  // Increment the program counter.
+  await page.evaluate(() => {
+    window.programId = 'program-1';
+  });
 
   // Open the Add Layer modal.
   await page.getByTestId('add-layer-button').click();
@@ -125,23 +132,76 @@ test('workflow-4', async ({ page }) => {
   await expect(page.locator('#properties')).toBeVisible();
 
   // Remove the layer's stroke.
+  await page.evaluate(() => {
+    window.programId = 'program-2';
+  });
+
   await page.getByTestId('remove-stroke-button').click();
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => {
+      const text = await msg.args()[0].jsonValue();
+
+      return text === 'recon-ttq';
+    }
+  });
+
   // Switch the layer's Layer Type to Choropleth.
+  await page.evaluate(() => {
+    window.programId = 'program-3';
+  });
+
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => {
+      const text = await msg.args()[0].jsonValue();
+
+      return text === 'recon-ttq';
+    }
+  });
+
   // Set the layer's Steps to 8.
+  await page.evaluate(() => {
+    window.programId = 'program-4';
+  });
+
   await page.locator('#color-steps-select').selectOption('8');
 
+  await page.waitForEvent('console', {
+    predicate: async (msg) => {
+      const text = await msg.args()[0].jsonValue();
+
+      return text === 'recon-ttq';
+    }
+  });
+
   // Set the layer's Color Scheme to RdYlBu.
+  await page.evaluate(() => {
+    window.programId = 'program-5';
+  });
   await page.locator('#color-scheme').getByRole('button').click();
   await page.locator('li:nth-child(25)').getByRole('button').click();
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => {
+      const text = await msg.args()[0].jsonValue();
+
+      return text === 'recon-ttq';
+    }
+  });
 
   // Set the layer's Method to Manual.
   await page.locator('#classification-method-select').selectOption('Manual');
 
   // Set the layer's Breaks to 614.791, 973.836, 1228.582, 1426.178, 1587.626,
   // 1724.178, 1842.373.
+
+  // Set the break to 614.791.
+  await page.evaluate(() => {
+    window.programId = 'program-6';
+  });
+
   await page
     .getByTestId('breaks-editor')
     .locator('input')
@@ -152,6 +212,20 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .first()
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => {
+      const text = await msg.args()[0].jsonValue();
+
+      return text === 'recon-ttq';
+    }
+  });
+
+  // Set the break to 973.836.
+  await page.evaluate(() => {
+    window.programId = 'program-7';
+  });
+
   await page
     .getByTestId('breaks-editor')
     .locator('input')
@@ -162,6 +236,20 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(1)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => {
+      const text = await msg.args()[0].jsonValue();
+
+      return text === 'recon-ttq';
+    }
+  });
+
+  // Set the break to 1228.582.
+  await page.evaluate(() => {
+    window.programId = 'program-8';
+  });
+
   await page
     .getByTestId('breaks-editor')
     .locator('input')
@@ -172,6 +260,20 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(2)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => {
+      const text = await msg.args()[0].jsonValue();
+
+      return text === 'recon-ttq';
+    }
+  });
+
+  // Set the break to 1426.178.
+  await page.evaluate(() => {
+    window.programId = 'program-9';
+  });
+
   await page
     .getByTestId('breaks-editor')
     .locator('input')
@@ -182,6 +284,20 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(3)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => {
+      const text = await msg.args()[0].jsonValue();
+
+      return text === 'recon-ttq';
+    }
+  });
+
+  // Set the break to 1587.626.
+  await page.evaluate(() => {
+    window.programId = 'program-10';
+  });
+
   await page
     .getByTestId('breaks-editor')
     .locator('input')
@@ -192,6 +308,19 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(4)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => {
+      const text = await msg.args()[0].jsonValue();
+
+      return text === 'recon-ttq';
+    }
+  });
+
+  // Set the break to 1724.178.
+  await page.evaluate(() => {
+    window.programId = 'program-11';
+  });
   await page
     .getByTestId('breaks-editor')
     .locator('input')
@@ -202,6 +331,20 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(5)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => {
+      const text = await msg.args()[0].jsonValue();
+
+      return text === 'recon-ttq';
+    }
+  });
+
+  // Set the break to 1842.373.
+  await page.evaluate(() => {
+    window.programId = 'program-12';
+  });
+
   await page
     .getByTestId('breaks-editor')
     .locator('input')
@@ -212,6 +355,14 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(6)
     .press('Enter');
+
+  await page.waitForEvent('console', {
+    predicate: async (msg) => {
+      const text = await msg.args()[0].jsonValue();
+
+      return text === 'recon-ttq';
+    }
+  });
 
   // Deselect the layer.
   await page.locator('#map').click({

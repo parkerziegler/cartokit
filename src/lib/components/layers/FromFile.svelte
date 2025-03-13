@@ -32,6 +32,7 @@
   }
 
   function onSubmit() {
+    performance.mark('reconciliation-start');
     if (!file || !displayName) {
       return;
     }
@@ -58,6 +59,13 @@
     };
 
     reader.readAsText(file, 'UTF-8');
+    performance.mark('reconciliation-end');
+    const { duration } = performance.measure(
+      'reconciliation',
+      'reconciliation-start',
+      'reconciliation-end'
+    );
+    console.log('recon', duration, window.programId);
   }
 </script>
 

@@ -34,6 +34,7 @@
       ) => Promise<string>)
     | null;
   let program = '';
+  let programId = '';
 
   onMount(() => {
     // maplibre-gl is actually a CJS module, and not all module.exports may be
@@ -77,6 +78,19 @@
       });
     });
 
+    map.on('idle', () => {
+      if ($mapStore && window.programId && window.programId !== programId) {
+        performance.mark('reconciliation-idle-end');
+        const { duration } = performance.measure(
+          'reconciliation-idle',
+          'reconciliation-start',
+          'reconciliation-idle-end'
+        );
+        console.log('recon-ttq', duration, window.programId);
+        programId = window.programId;
+      }
+    });
+
     map.on('move', (event) => {
       ir.update((ir) => {
         const { lng, lat } = event.target.getCenter();
@@ -118,12 +132,7 @@
   }
 
   $: if (codegen) {
-    codegen(
-      $ir,
-      data.env,
-      (window as unknown as Window & { playwrightWorkflowId: string })
-        .playwrightWorkflowId
-    )
+    codegen($ir, data.env)
       .then((code) => {
         program = code;
       })
