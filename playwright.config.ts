@@ -30,7 +30,14 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        launchOptions: { args: ['--use-gl=angle'] }
+        headless: true,
+        launchOptions: {
+          args: [
+            '--use-gl=swiftshader', // Fallback to software rendering for Docker.
+            '--enable-features=Vulkan',
+            '--enable-unsafe-swiftshader'
+          ]
+        }
       }
     }
   ],
