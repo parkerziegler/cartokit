@@ -74,7 +74,7 @@ export function registerConsoleListener(
 ): void {
   page.on('console', async (msg) => {
     console.log('Console message: ', msg.text());
-    const type = await msg.args()[0].jsonValue();
+    const type = (await msg.args()[0]?.jsonValue()) ?? '';
 
     switch (type) {
       case 'recon': {
