@@ -1,10 +1,6 @@
 <script>
-  import { inject } from '@vercel/analytics';
-
   import 'maplibre-gl/dist/maplibre-gl.css';
   import '../app.css';
-
-  inject();
 </script>
 
 <svelte:head>

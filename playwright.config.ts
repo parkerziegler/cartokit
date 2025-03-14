@@ -20,7 +20,7 @@ export default defineConfig({
   reporter: 'line',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    baseURL: 'http://localhost:5173/',
+    baseURL: 'http://localhost:4173/',
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     video: 'on'
@@ -39,8 +39,8 @@ export default defineConfig({
   ],
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:5173/',
+    command: 'pnpm build && pnpm preview',
+    url: 'http://localhost:4173/',
     reuseExistingServer: !process.env.CI
   }
 });

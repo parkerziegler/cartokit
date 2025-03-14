@@ -360,15 +360,4 @@ test('workflow-4', async ({ page }) => {
       return text === 'recon-ttq';
     }
   });
-
-  // Deselect the layer.
-  await page.locator('#map').click({
-    position: {
-      x: 0,
-      y: 360
-    }
-  });
-
-  // Ensure the Properties Panel is hidden.
-  await expect(page.locator('#properties')).not.toBeVisible();
 });

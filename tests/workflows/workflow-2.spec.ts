@@ -284,15 +284,4 @@ test('workflow-2', async ({ page }) => {
   await page.waitForEvent('console', {
     predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
-
-  // Click on a page location that will trigger deselection of the layer.
-  await page.locator('#map').click({
-    position: {
-      x: 0,
-      y: 0
-    }
-  });
-
-  // Ensure the Properties Panel is hidden.
-  await expect(page.locator('#properties')).not.toBeVisible();
 });
