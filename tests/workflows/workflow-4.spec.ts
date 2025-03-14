@@ -19,9 +19,6 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * geographic space.
  */
 test('workflow-4', async ({ page }) => {
-  // Mark workflow tests as slow.
-  test.slow();
-
   // Register our console listener, which listens for recon performance metrics
   // printed to the console and saves them to a file.
   registerConsoleListener(page, 'workflow-4');
@@ -140,7 +137,7 @@ test('workflow-4', async ({ page }) => {
 
   await page.waitForEvent('console', {
     predicate: async (msg) => {
-      const text = await msg.args()[0].jsonValue();
+      const text = await msg.args()[0]?.jsonValue();
 
       return text === 'recon-ttq';
     }
@@ -155,7 +152,7 @@ test('workflow-4', async ({ page }) => {
 
   await page.waitForEvent('console', {
     predicate: async (msg) => {
-      const text = await msg.args()[0].jsonValue();
+      const text = await msg.args()[0]?.jsonValue();
 
       return text === 'recon-ttq';
     }
@@ -170,7 +167,7 @@ test('workflow-4', async ({ page }) => {
 
   await page.waitForEvent('console', {
     predicate: async (msg) => {
-      const text = await msg.args()[0].jsonValue();
+      const text = await msg.args()[0]?.jsonValue();
 
       return text === 'recon-ttq';
     }
@@ -185,7 +182,7 @@ test('workflow-4', async ({ page }) => {
 
   await page.waitForEvent('console', {
     predicate: async (msg) => {
-      const text = await msg.args()[0].jsonValue();
+      const text = await msg.args()[0]?.jsonValue();
 
       return text === 'recon-ttq';
     }
@@ -215,7 +212,7 @@ test('workflow-4', async ({ page }) => {
 
   await page.waitForEvent('console', {
     predicate: async (msg) => {
-      const text = await msg.args()[0].jsonValue();
+      const text = await msg.args()[0]?.jsonValue();
 
       return text === 'recon-ttq';
     }
@@ -239,7 +236,7 @@ test('workflow-4', async ({ page }) => {
 
   await page.waitForEvent('console', {
     predicate: async (msg) => {
-      const text = await msg.args()[0].jsonValue();
+      const text = await msg.args()[0]?.jsonValue();
 
       return text === 'recon-ttq';
     }
@@ -263,7 +260,7 @@ test('workflow-4', async ({ page }) => {
 
   await page.waitForEvent('console', {
     predicate: async (msg) => {
-      const text = await msg.args()[0].jsonValue();
+      const text = await msg.args()[0]?.jsonValue();
 
       return text === 'recon-ttq';
     }
@@ -287,7 +284,7 @@ test('workflow-4', async ({ page }) => {
 
   await page.waitForEvent('console', {
     predicate: async (msg) => {
-      const text = await msg.args()[0].jsonValue();
+      const text = await msg.args()[0]?.jsonValue();
 
       return text === 'recon-ttq';
     }
@@ -311,7 +308,7 @@ test('workflow-4', async ({ page }) => {
 
   await page.waitForEvent('console', {
     predicate: async (msg) => {
-      const text = await msg.args()[0].jsonValue();
+      const text = await msg.args()[0]?.jsonValue();
 
       return text === 'recon-ttq';
     }
@@ -334,7 +331,7 @@ test('workflow-4', async ({ page }) => {
 
   await page.waitForEvent('console', {
     predicate: async (msg) => {
-      const text = await msg.args()[0].jsonValue();
+      const text = await msg.args()[0]?.jsonValue();
 
       return text === 'recon-ttq';
     }
@@ -358,7 +355,7 @@ test('workflow-4', async ({ page }) => {
 
   await page.waitForEvent('console', {
     predicate: async (msg) => {
-      const text = await msg.args()[0].jsonValue();
+      const text = await msg.args()[0]?.jsonValue();
 
       return text === 'recon-ttq';
     }

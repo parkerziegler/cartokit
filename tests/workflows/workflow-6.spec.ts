@@ -18,9 +18,6 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * https://academic.oup.com/qje/article/137/4/2037/6571943
  */
 test('workflow-6', async ({ page }) => {
-  // Mark workflow tests as slow.
-  test.slow();
-
   // Register our console listener, which listens for recon performance metrics
   // printed to the console and saves them to a file.
   registerConsoleListener(page, 'workflow-6');
@@ -118,7 +115,7 @@ test('workflow-6', async ({ page }) => {
   await page.getByTestId('remove-stroke-button').click();
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Switch the layer's Layer Type to Choropleth.
@@ -129,7 +126,7 @@ test('workflow-6', async ({ page }) => {
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the layer's Attribute to 'years_2080_2099'.
@@ -140,7 +137,7 @@ test('workflow-6', async ({ page }) => {
   await page.locator('#fill-attribute-select').selectOption('years_2080_2099');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Switch the layer's Color Scheme to PRGn.
@@ -152,7 +149,7 @@ test('workflow-6', async ({ page }) => {
   await page.locator('li:nth-child(20)').getByRole('button').click();
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Reverse the color scheme.
@@ -163,7 +160,7 @@ test('workflow-6', async ({ page }) => {
   await page.getByTestId('color-scheme-reverse-button').click();
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the layer's Steps to 8.
@@ -174,7 +171,7 @@ test('workflow-6', async ({ page }) => {
   await page.locator('#color-steps-select').selectOption('8');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the layer's Method to Manual.
@@ -194,7 +191,7 @@ test('workflow-6', async ({ page }) => {
     .press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set layer break to -100.
@@ -210,7 +207,7 @@ test('workflow-6', async ({ page }) => {
     .press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set layer break to -50.
@@ -226,7 +223,7 @@ test('workflow-6', async ({ page }) => {
     .press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set layer break to 0.
@@ -242,7 +239,7 @@ test('workflow-6', async ({ page }) => {
     .press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set layer break to 50.
@@ -258,7 +255,7 @@ test('workflow-6', async ({ page }) => {
     .press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set layer break to 100.
@@ -274,7 +271,7 @@ test('workflow-6', async ({ page }) => {
     .press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set layer break to 200.
@@ -290,7 +287,7 @@ test('workflow-6', async ({ page }) => {
     .press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Click on a page location that will trigger deselection of both layers.

@@ -13,6 +13,7 @@ export default defineConfig({
   testDir: './tests',
   /* Enable 2 retries per test. */
   retries: 2,
+  timeout: 90_000,
   /* Serialize execution of tests. */
   workers: 1,
   /* Use line reporter to ensure process termination. */
@@ -30,13 +31,8 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        headless: true,
         launchOptions: {
-          args: [
-            '--use-gl=swiftshader', // Fallback to software rendering for Docker.
-            '--enable-features=Vulkan',
-            '--enable-unsafe-swiftshader'
-          ]
+          args: ['--use-gl=egl', '--ignore-gpu-blocklist', '--use-gl=angle']
         }
       }
     }

@@ -19,9 +19,6 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * iles (i.e., 10%-90% coverage).
  */
 test('workflow-1', async ({ page }) => {
-  // Mark workflow tests as slow.
-  test.slow();
-
   // Enable intercepting performance metrics from the console.
   registerConsoleListener(page, 'workflow-1');
 
@@ -124,7 +121,7 @@ test('workflow-1', async ({ page }) => {
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the layer's stroke to #1f2b2e.
@@ -135,7 +132,7 @@ test('workflow-1', async ({ page }) => {
   await page.getByTestId('stroke-color-input').fill('#1f2b2e');
   await page.getByTestId('stroke-color-input').press('Enter');
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the layer's stroke-opacity to 7.5%.
@@ -147,7 +144,7 @@ test('workflow-1', async ({ page }) => {
   await page.locator('#stroke-opacity-input').press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the layer's stroke-width to 0.25.
@@ -159,7 +156,7 @@ test('workflow-1', async ({ page }) => {
   await page.locator('#stroke-width-input').press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Open the Transformation Editor.
@@ -187,7 +184,7 @@ test('workflow-1', async ({ page }) => {
   await expect(page.getByText('Successfully transformed data.')).toBeVisible();
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Switch the Layer Type to Polygon.
@@ -198,7 +195,7 @@ test('workflow-1', async ({ page }) => {
   await page.locator('#layer-type-select').selectOption('Polygon');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the layer's fill to #1f2b2e.
@@ -210,7 +207,7 @@ test('workflow-1', async ({ page }) => {
   await page.getByTestId('fill-color-input').press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the fill-opacity to 7.5%.
@@ -222,7 +219,7 @@ test('workflow-1', async ({ page }) => {
   await page.locator('#fill-opacity-input').press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Deselect the layer.
@@ -293,7 +290,7 @@ test('workflow-1', async ({ page }) => {
   await page.getByTestId('fill-color-input').press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the fill-opacity to 100%.
@@ -305,7 +302,7 @@ test('workflow-1', async ({ page }) => {
   await page.locator('#fill-opacity-input').press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Remove the layer's stroke.
@@ -316,7 +313,7 @@ test('workflow-1', async ({ page }) => {
   await page.getByTestId('remove-stroke-button').click();
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Deselect the layer.

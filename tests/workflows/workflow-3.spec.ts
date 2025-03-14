@@ -14,7 +14,7 @@ import { registerConsoleListener } from '../utils/persist';
  */
 test('workflow-3', async ({ page }) => {
   // Mark workflow tests as slow.
-  test.setTimeout(150000);
+  test.slow();
 
   // Register our console listener, which listens for recon performance metrics
   // printed to the console and saves them to a file.
@@ -125,7 +125,7 @@ test('workflow-3', async ({ page }) => {
   await page.getByTestId('remove-stroke-button').click();
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Switch the layer's Layer Type to Choropleth.
@@ -136,7 +136,7 @@ test('workflow-3', async ({ page }) => {
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the layer's Attribute to 'decadal_rate'.
@@ -147,7 +147,7 @@ test('workflow-3', async ({ page }) => {
   await page.locator('#fill-attribute-select').selectOption('decadal_rate');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the layer's Method to Manual.
@@ -168,7 +168,7 @@ test('workflow-3', async ({ page }) => {
     .press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the break to 0.
@@ -184,7 +184,7 @@ test('workflow-3', async ({ page }) => {
     .press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the break to 0.5.
@@ -200,7 +200,7 @@ test('workflow-3', async ({ page }) => {
     .press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the break to 1.
@@ -216,7 +216,7 @@ test('workflow-3', async ({ page }) => {
     .press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the layer's Color Scheme to RdYlBu.
@@ -228,7 +228,7 @@ test('workflow-3', async ({ page }) => {
   await page.locator('li:nth-child(25)').getByRole('button').click();
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Reverse the layer's Color Scheme.
@@ -239,7 +239,7 @@ test('workflow-3', async ({ page }) => {
   await page.getByTestId('color-scheme-reverse-button').click();
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Set the layer's fill-opacity to 100%.
@@ -251,7 +251,7 @@ test('workflow-3', async ({ page }) => {
   await page.locator('#fill-opacity-input').press('Enter');
 
   await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0].jsonValue()) === 'recon-ttq'
+    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
   });
 
   // Click on a page location that will trigger deselection of the layer.
