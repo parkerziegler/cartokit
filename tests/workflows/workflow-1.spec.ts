@@ -118,46 +118,55 @@ test('workflow-1', async ({ page }) => {
     window.programId = 'program-2';
   });
 
-  await page.locator('#layer-type-select').selectOption('Choropleth');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#layer-type-select').selectOption('Choropleth')
+  ]);
 
   // Set the layer's stroke to #1f2b2e.
   await page.evaluate(() => {
     window.programId = 'program-3';
   });
 
-  await page.getByTestId('stroke-color-input').fill('#1f2b2e');
-  await page.getByTestId('stroke-color-input').press('Enter');
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('stroke-color-input').fill('#1f2b2e'),
+    page.getByTestId('stroke-color-input').press('Enter')
+  ]);
 
   // Set the layer's stroke-opacity to 7.5%.
   await page.evaluate(() => {
     window.programId = 'program-4';
   });
 
-  await page.locator('#stroke-opacity-input').fill('7.5');
-  await page.locator('#stroke-opacity-input').press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#stroke-opacity-input').fill('7.5'),
+    page.locator('#stroke-opacity-input').press('Enter')
+  ]);
 
   // Set the layer's stroke-width to 0.25.
   await page.evaluate(() => {
     window.programId = 'program-5';
   });
 
-  await page.locator('#stroke-width-input').fill('0.25');
-  await page.locator('#stroke-width-input').press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#stroke-width-input').fill('0.25'),
+    page.locator('#stroke-width-input').press('Enter')
+  ]);
 
   // Open the Transformation Editor.
   await page.evaluate(() => {
@@ -177,50 +186,55 @@ test('workflow-1', async ({ page }) => {
   
   return geojson;`);
 
-  // Execute the transformation.
-  await page.getByTestId('run-transformation-button').click();
-
-  // Wait for the transformation to complete.
-  await expect(page.getByText('Successfully transformed data.')).toBeVisible();
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('run-transformation-button').click(),
+    expect(page.getByText('Successfully transformed data.')).toBeVisible()
+  ]);
 
   // Switch the Layer Type to Polygon.
   await page.evaluate(() => {
     window.programId = 'program-7';
   });
 
-  await page.locator('#layer-type-select').selectOption('Polygon');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#layer-type-select').selectOption('Polygon')
+  ]);
 
   // Set the layer's fill to #1f2b2e.
   await page.evaluate(() => {
     window.programId = 'program-8';
   });
 
-  await page.getByTestId('fill-color-input').fill('#1f2b2e');
-  await page.getByTestId('fill-color-input').press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('fill-color-input').fill('#1f2b2e'),
+    page.getByTestId('fill-color-input').press('Enter')
+  ]);
 
   // Set the fill-opacity to 7.5%.
   await page.evaluate(() => {
     window.programId = 'program-9';
   });
 
-  await page.locator('#fill-opacity-input').fill('7.5');
-  await page.locator('#fill-opacity-input').press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#fill-opacity-input').fill('7.5'),
+    page.locator('#fill-opacity-input').press('Enter')
+  ]);
 
   // Deselect the layer.
   await page.locator('#map').click({
@@ -286,33 +300,39 @@ test('workflow-1', async ({ page }) => {
     window.programId = 'program-11';
   });
 
-  await page.getByTestId('fill-color-input').fill('#000000');
-  await page.getByTestId('fill-color-input').press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('fill-color-input').fill('#000000'),
+    page.getByTestId('fill-color-input').press('Enter')
+  ]);
 
   // Set the fill-opacity to 100%.
   await page.evaluate(() => {
     window.programId = 'program-12';
   });
 
-  await page.locator('#fill-opacity-input').fill('100');
-  await page.locator('#fill-opacity-input').press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#fill-opacity-input').fill('100'),
+    page.locator('#fill-opacity-input').press('Enter')
+  ]);
 
   // Remove the layer's stroke.
   await page.evaluate(() => {
     window.programId = 'program-13';
   });
 
-  await page.getByTestId('remove-stroke-button').click();
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('remove-stroke-button').click()
+  ]);
 });
