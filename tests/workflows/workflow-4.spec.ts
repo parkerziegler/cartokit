@@ -133,60 +133,52 @@ test('workflow-4', async ({ page }) => {
     window.programId = 'program-2';
   });
 
-  await page.getByTestId('remove-stroke-button').click();
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => {
-      const text = await msg.args()[0]?.jsonValue();
-
-      return text === 'recon-ttq';
-    }
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('remove-stroke-button').click()
+  ]);
 
   // Switch the layer's Layer Type to Choropleth.
   await page.evaluate(() => {
     window.programId = 'program-3';
   });
 
-  await page.locator('#layer-type-select').selectOption('Choropleth');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => {
-      const text = await msg.args()[0]?.jsonValue();
-
-      return text === 'recon-ttq';
-    }
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#layer-type-select').selectOption('Choropleth')
+  ]);
 
   // Set the layer's Steps to 8.
   await page.evaluate(() => {
     window.programId = 'program-4';
   });
 
-  await page.locator('#color-steps-select').selectOption('8');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => {
-      const text = await msg.args()[0]?.jsonValue();
-
-      return text === 'recon-ttq';
-    }
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#color-steps-select').selectOption('8')
+  ]);
 
   // Set the layer's Color Scheme to RdYlBu.
   await page.evaluate(() => {
     window.programId = 'program-5';
   });
   await page.locator('#color-scheme').getByRole('button').click();
-  await page.locator('li:nth-child(25)').getByRole('button').click();
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => {
-      const text = await msg.args()[0]?.jsonValue();
-
-      return text === 'recon-ttq';
-    }
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('li:nth-child(25)').getByRole('button').click()
+  ]);
 
   // Set the layer's Method to Manual.
   await page.locator('#classification-method-select').selectOption('Manual');
@@ -204,19 +196,14 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .first()
     .fill('614.791');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .first()
-    .press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => {
-      const text = await msg.args()[0]?.jsonValue();
-
-      return text === 'recon-ttq';
-    }
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').first().press('Enter')
+  ]);
 
   // Set the break to 973.836.
   await page.evaluate(() => {
@@ -228,19 +215,14 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(1)
     .fill('973.836');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(1)
-    .press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => {
-      const text = await msg.args()[0]?.jsonValue();
-
-      return text === 'recon-ttq';
-    }
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(1).press('Enter')
+  ]);
 
   // Set the break to 1228.582.
   await page.evaluate(() => {
@@ -252,19 +234,14 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(2)
     .fill('1228.582');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(2)
-    .press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => {
-      const text = await msg.args()[0]?.jsonValue();
-
-      return text === 'recon-ttq';
-    }
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(2).press('Enter')
+  ]);
 
   // Set the break to 1426.178.
   await page.evaluate(() => {
@@ -276,19 +253,14 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(3)
     .fill('1426.178');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(3)
-    .press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => {
-      const text = await msg.args()[0]?.jsonValue();
-
-      return text === 'recon-ttq';
-    }
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(3).press('Enter')
+  ]);
 
   // Set the break to 1587.626.
   await page.evaluate(() => {
@@ -300,19 +272,14 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(4)
     .fill('1587.626');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(4)
-    .press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => {
-      const text = await msg.args()[0]?.jsonValue();
-
-      return text === 'recon-ttq';
-    }
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(4).press('Enter')
+  ]);
 
   // Set the break to 1724.178.
   await page.evaluate(() => {
@@ -323,19 +290,14 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(5)
     .fill('1724.178');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(5)
-    .press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => {
-      const text = await msg.args()[0]?.jsonValue();
-
-      return text === 'recon-ttq';
-    }
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(5).press('Enter')
+  ]);
 
   // Set the break to 1842.373.
   await page.evaluate(() => {
@@ -347,17 +309,12 @@ test('workflow-4', async ({ page }) => {
     .locator('input')
     .nth(6)
     .fill('1842.373');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(6)
-    .press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => {
-      const text = await msg.args()[0]?.jsonValue();
-
-      return text === 'recon-ttq';
-    }
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(6).press('Enter')
+  ]);
 });

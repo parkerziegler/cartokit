@@ -107,7 +107,7 @@ test('workflow-2', async ({ page }) => {
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(20000);
+  await page.waitForTimeout(30000);
 
   // Click on a page location that will trigger selection of the Spring Leaf
   // Appearance layer.
@@ -126,44 +126,52 @@ test('workflow-2', async ({ page }) => {
     window.programId = 'program-2';
   });
 
-  await page.getByTestId('remove-stroke-button').click();
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('remove-stroke-button').click()
+  ]);
 
   // Switch the layer's Layer Type to Choropleth.
   await page.evaluate(() => {
     window.programId = 'program-3';
   });
 
-  await page.locator('#layer-type-select').selectOption('Choropleth');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#layer-type-select').selectOption('Choropleth')
+  ]);
 
   // Set the layer's Attribute to 'trend'.
   await page.evaluate(() => {
     window.programId = 'program-4';
   });
 
-  await page.locator('#fill-attribute-select').selectOption('trend');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#fill-attribute-select').selectOption('trend')
+  ]);
 
   // Set the layer's Steps to 6.
   await page.evaluate(() => {
     window.programId = 'program-5';
   });
 
-  await page.locator('#color-steps-select').selectOption('6');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#color-steps-select').selectOption('6')
+  ]);
 
   // Switch the layer's Color Scheme to PRGn.
   await page.evaluate(() => {
@@ -171,22 +179,27 @@ test('workflow-2', async ({ page }) => {
   });
 
   await page.locator('#color-scheme').getByRole('button').click();
-  await page.locator('li:nth-child(20)').getByRole('button').click();
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('li:nth-child(20)').getByRole('button').click()
+  ]);
 
   // Reverse the layer's Color Scheme.
   await page.evaluate(() => {
     window.programId = 'program-7';
   });
 
-  await page.getByTestId('color-scheme-reverse-button').click();
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('color-scheme-reverse-button').click()
+  ]);
 
   // Set the layer's Method to Manual.
   await page.locator('#classification-method-select').selectOption('Manual');
@@ -199,15 +212,13 @@ test('workflow-2', async ({ page }) => {
   });
 
   await page.getByTestId('breaks-editor').locator('input').first().fill('-21');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .first()
-    .press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').first().press('Enter')
+  ]);
 
   // Set the break to -14.
   await page.evaluate(() => {
@@ -215,15 +226,13 @@ test('workflow-2', async ({ page }) => {
   });
 
   await page.getByTestId('breaks-editor').locator('input').nth(1).fill('-14');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(1)
-    .press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(1).press('Enter')
+  ]);
 
   // Set the break to -7.
   await page.evaluate(() => {
@@ -231,15 +240,13 @@ test('workflow-2', async ({ page }) => {
   });
 
   await page.getByTestId('breaks-editor').locator('input').nth(2).fill('-7');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(2)
-    .press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(2).press('Enter')
+  ]);
 
   // Set the break to 0.
   await page.evaluate(() => {
@@ -247,15 +254,13 @@ test('workflow-2', async ({ page }) => {
   });
 
   await page.getByTestId('breaks-editor').locator('input').nth(3).fill('0');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(3)
-    .press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(3).press('Enter')
+  ]);
 
   // Set the break to 7.
   await page.evaluate(() => {
@@ -263,15 +268,13 @@ test('workflow-2', async ({ page }) => {
   });
 
   await page.getByTestId('breaks-editor').locator('input').nth(4).fill('7');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(4)
-    .press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(4).press('Enter')
+  ]);
 
   // Set the layer's fill-opacity to 100%.
   await page.evaluate(() => {
@@ -279,9 +282,11 @@ test('workflow-2', async ({ page }) => {
   });
 
   await page.locator('#fill-opacity-input').fill('100');
-  await page.locator('#fill-opacity-input').press('Enter');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#fill-opacity-input').press('Enter')
+  ]);
 });

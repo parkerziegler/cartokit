@@ -122,33 +122,39 @@ test('workflow-3', async ({ page }) => {
     window.programId = 'program-2';
   });
 
-  await page.getByTestId('remove-stroke-button').click();
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('remove-stroke-button').click()
+  ]);
 
   // Switch the layer's Layer Type to Choropleth.
   await page.evaluate(() => {
     window.programId = 'program-3';
   });
 
-  await page.locator('#layer-type-select').selectOption('Choropleth');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#layer-type-select').selectOption('Choropleth')
+  ]);
 
   // Set the layer's Attribute to 'decadal_rate'.
   await page.evaluate(() => {
     window.programId = 'program-4';
   });
 
-  await page.locator('#fill-attribute-select').selectOption('decadal_rate');
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#fill-attribute-select').selectOption('decadal_rate')
+  ]);
 
   // Set the layer's Method to Manual.
   await page.locator('#classification-method-select').selectOption('Manual');
@@ -161,15 +167,14 @@ test('workflow-3', async ({ page }) => {
   });
 
   await page.getByTestId('breaks-editor').locator('input').first().fill('-0.5');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .first()
-    .press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').first().press('Enter')
+  ]);
 
   // Set the break to 0.
   await page.evaluate(() => {
@@ -177,15 +182,14 @@ test('workflow-3', async ({ page }) => {
   });
 
   await page.getByTestId('breaks-editor').locator('input').nth(1).fill('0');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(1)
-    .press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(1).press('Enter')
+  ]);
 
   // Set the break to 0.5.
   await page.evaluate(() => {
@@ -193,15 +197,14 @@ test('workflow-3', async ({ page }) => {
   });
 
   await page.getByTestId('breaks-editor').locator('input').nth(2).fill('0.5');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(2)
-    .press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(2).press('Enter')
+  ]);
 
   // Set the break to 1.
   await page.evaluate(() => {
@@ -209,15 +212,14 @@ test('workflow-3', async ({ page }) => {
   });
 
   await page.getByTestId('breaks-editor').locator('input').nth(3).fill('1');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(3)
-    .press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('breaks-editor').locator('input').nth(3).press('Enter')
+  ]);
 
   // Set the layer's Color Scheme to RdYlBu.
   await page.evaluate(() => {
@@ -225,22 +227,27 @@ test('workflow-3', async ({ page }) => {
   });
 
   await page.locator('#color-scheme').getByRole('button').click();
-  await page.locator('li:nth-child(25)').getByRole('button').click();
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('li:nth-child(25)').getByRole('button').click()
+  ]);
 
   // Reverse the layer's Color Scheme.
   await page.evaluate(() => {
     window.programId = 'program-10';
   });
 
-  await page.getByTestId('color-scheme-reverse-button').click();
-
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.getByTestId('color-scheme-reverse-button').click()
+  ]);
 
   // Set the layer's fill-opacity to 100%.
   await page.evaluate(() => {
@@ -248,9 +255,12 @@ test('workflow-3', async ({ page }) => {
   });
 
   await page.locator('#fill-opacity-input').fill('100');
-  await page.locator('#fill-opacity-input').press('Enter');
 
-  await page.waitForEvent('console', {
-    predicate: async (msg) => (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
-  });
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: async (msg) =>
+        (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
+    }),
+    page.locator('#fill-opacity-input').press('Enter')
+  ]);
 });

@@ -131,12 +131,13 @@ test('workflow-1', async ({ page }) => {
     window.programId = 'program-3';
   });
 
+  await page.getByTestId('stroke-color-input').fill('#1f2b2e');
+
   await Promise.all([
     page.waitForEvent('console', {
       predicate: async (msg) =>
         (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
     }),
-    page.getByTestId('stroke-color-input').fill('#1f2b2e'),
     page.getByTestId('stroke-color-input').press('Enter')
   ]);
 
@@ -145,12 +146,12 @@ test('workflow-1', async ({ page }) => {
     window.programId = 'program-4';
   });
 
+  await page.locator('#stroke-opacity-input').fill('7.5');
   await Promise.all([
     page.waitForEvent('console', {
       predicate: async (msg) =>
         (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
     }),
-    page.locator('#stroke-opacity-input').fill('7.5'),
     page.locator('#stroke-opacity-input').press('Enter')
   ]);
 
@@ -159,12 +160,13 @@ test('workflow-1', async ({ page }) => {
     window.programId = 'program-5';
   });
 
+  await page.locator('#stroke-width-input').fill('0.25');
+
   await Promise.all([
     page.waitForEvent('console', {
       predicate: async (msg) =>
         (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
     }),
-    page.locator('#stroke-width-input').fill('0.25'),
     page.locator('#stroke-width-input').press('Enter')
   ]);
 
@@ -213,12 +215,13 @@ test('workflow-1', async ({ page }) => {
     window.programId = 'program-8';
   });
 
+  await page.getByTestId('fill-color-input').fill('#1f2b2e');
+
   await Promise.all([
     page.waitForEvent('console', {
       predicate: async (msg) =>
         (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
     }),
-    page.getByTestId('fill-color-input').fill('#1f2b2e'),
     page.getByTestId('fill-color-input').press('Enter')
   ]);
 
@@ -227,12 +230,13 @@ test('workflow-1', async ({ page }) => {
     window.programId = 'program-9';
   });
 
+  await page.locator('#fill-opacity-input').fill('7.5');
+
   await Promise.all([
     page.waitForEvent('console', {
       predicate: async (msg) =>
         (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
     }),
-    page.locator('#fill-opacity-input').fill('7.5'),
     page.locator('#fill-opacity-input').press('Enter')
   ]);
 
@@ -300,12 +304,13 @@ test('workflow-1', async ({ page }) => {
     window.programId = 'program-11';
   });
 
+  await page.getByTestId('fill-color-input').fill('#000000');
+
   await Promise.all([
     page.waitForEvent('console', {
       predicate: async (msg) =>
         (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
     }),
-    page.getByTestId('fill-color-input').fill('#000000'),
     page.getByTestId('fill-color-input').press('Enter')
   ]);
 
@@ -314,12 +319,13 @@ test('workflow-1', async ({ page }) => {
     window.programId = 'program-12';
   });
 
+  await page.locator('#fill-opacity-input').fill('100');
+
   await Promise.all([
     page.waitForEvent('console', {
       predicate: async (msg) =>
         (await msg.args()[0]?.jsonValue()) === 'recon-ttq'
     }),
-    page.locator('#fill-opacity-input').fill('100'),
     page.locator('#fill-opacity-input').press('Enter')
   ]);
 
