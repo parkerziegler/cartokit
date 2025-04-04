@@ -6,12 +6,14 @@ import { z } from 'zod';
 import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 
+import type { LayerType } from '$lib/types';
+
 const openai = new OpenAI({
   apiKey: env.OPENAI_API_KEY ?? ''
 });
 
 export const POST = (async ({ request }) => {
-  const { prompt, layerIds } = await request.json();
+  const { prompt, layerIds, layerIdsToAttributes } = await request.json();
 
   const completion = await openai.beta.chat.completions.parse({
     model: 'gpt-4o',
@@ -22,7 +24,10 @@ export const POST = (async ({ request }) => {
       },
       { role: 'user', content: prompt }
     ],
-    response_format: zodResponseFormat(makeSchema(layerIds), 'diff')
+    response_format: zodResponseFormat(
+      makeSchema(layerIds, layerIdsToAttributes),
+      'diff'
+    )
   });
 
   return json(completion.choices[0].message.parsed);
@@ -61,6 +66,26 @@ function LayerTypeUpdate(layerIds: string[]) {
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
       layerType: LayerType
+    })
+  });
+}
+
+function AttributeUpdate(
+  layerIds: string[],
+  layerIdsToAttributes: Record<string, string[]>
+) {
+  const attrs = Object.values(layerIdsToAttributes).flat();
+
+  return z.object({
+    type: z.literal('attribute'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      attribute: z.union([
+        z.literal(attrs[0]),
+        z.literal(attrs[1]),
+        ...attrs.slice(2).map((attr) => z.literal(attr))
+      ]),
+      channel: z.union([z.literal('fill'), z.literal('size')])
     })
   });
 }
@@ -175,6 +200,65 @@ function ClassificationMethodUpdate(layerIds: string[]) {
   });
 }
 
+function ColorSchemeUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('color-scheme'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      scheme: z.union([
+        z.literal('schemeBlues'),
+        z.literal('schemeGreens'),
+        z.literal('schemeGreys'),
+        z.literal('schemeOranges'),
+        z.literal('schemePurples'),
+        z.literal('schemeReds'),
+        z.literal('schemeBuGn'),
+        z.literal('schemeBuPu'),
+        z.literal('schemeGnBu'),
+        z.literal('schemeOrRd'),
+        z.literal('schemePuBuGn'),
+        z.literal('schemePuBu'),
+        z.literal('schemePuRd'),
+        z.literal('schemeRdPu'),
+        z.literal('schemeYlGnBu'),
+        z.literal('schemeYlGn'),
+        z.literal('schemeYlOrBr'),
+        z.literal('schemeYlOrRd'),
+        z.literal('schemeBrBG'),
+        z.literal('schemePRGn'),
+        z.literal('schemePiYG'),
+        z.literal('schemePuOr'),
+        z.literal('schemeRdBu'),
+        z.literal('schemeRdGy'),
+        z.literal('schemeRdYlBu'),
+        z.literal('schemeRdYlGn'),
+        z.literal('schemeSpectral'),
+        z.literal('schemeCategory10'),
+        z.literal('schemeAccent'),
+        z.literal('schemeDark2'),
+        z.literal('schemeObservable10'),
+        z.literal('schemePaired'),
+        z.literal('schemePastel1'),
+        z.literal('schemePastel2'),
+        z.literal('schemeSet1'),
+        z.literal('schemeSet2'),
+        z.literal('schemeSet3'),
+        z.literal('schemeTableau10')
+      ])
+    })
+  });
+}
+
+function ColorSchemeDirectionUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('color-scheme-direction'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      direction: z.union([z.literal('Forward'), z.literal('Reverse')])
+    })
+  });
+}
+
 function ColorCountUpdate(layerIds: string[]) {
   return z.object({
     type: z.literal('color-count'),
@@ -233,10 +317,14 @@ function VisualizationTypeUpdate(layerIds: string[]) {
   });
 }
 
-function makeSchema(layerIds: string[]) {
+function makeSchema(
+  layerIds: string[],
+  layerIdsToAttributes: Record<string, string[]>
+) {
   return z.object({
     diff: z.discriminatedUnion('type', [
       LayerTypeUpdate(layerIds),
+      AttributeUpdate(layerIds, layerIdsToAttributes),
       FillUpdate(layerIds),
       FillOpacityUpdate(layerIds),
       AddFillUpdate(layerIds),
@@ -248,6 +336,8 @@ function makeSchema(layerIds: string[]) {
       RemoveStrokeUpdate(layerIds),
       PointSizeUpdate(layerIds),
       ClassificationMethodUpdate(layerIds),
+      ColorSchemeUpdate(layerIds),
+      ColorSchemeDirectionUpdate(layerIds),
       ColorCountUpdate(layerIds),
       ColorThresholdUpdate(layerIds),
       SizeUpdate(layerIds),

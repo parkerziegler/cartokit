@@ -1,6 +1,9 @@
 <script lang="ts">
+  import * as d3 from 'd3';
+
   import type { CategoricalFill, ConstantStroke, LayerType } from '$lib/types';
   import { DEFAULT_FILL } from '$lib/utils/constants';
+  import { materializeCategoricalColorScheme } from '$lib/utils/scheme';
 
   interface Props {
     fill: CategoricalFill;
@@ -11,9 +14,16 @@
   let { fill, stroke, layerType }: Props = $props();
 
   let entries = $derived(
-    fill.scheme.length < fill.categories.length
-      ? fill.categories.slice(0, fill.scheme.length).concat('Other')
+    d3[fill.scheme.id].length < fill.categories.length
+      ? fill.categories.slice(0, d3[fill.scheme.id].length).concat('Other')
       : fill.categories
+  );
+  let colors = $derived(
+    materializeCategoricalColorScheme(
+      fill.scheme.id,
+      fill.scheme.direction,
+      entries.length
+    )
   );
 </script>
 
@@ -29,7 +39,7 @@
               y="0"
               width="32"
               height="16"
-              fill={fill.scheme[i] ?? DEFAULT_FILL}
+              fill={colors[i] ?? DEFAULT_FILL}
               fill-opacity={fill.opacity}
               stroke={stroke?.color ?? 'none'}
               stroke-width={stroke?.width ?? '0'}
@@ -42,7 +52,7 @@
               r="7"
               cx="8"
               cy="8"
-              fill={fill.scheme[i] ?? DEFAULT_FILL}
+              fill={colors[i] ?? DEFAULT_FILL}
               fill-opacity={fill.opacity}
               stroke={stroke?.color ?? 'none'}
               stroke-width={stroke?.width ?? '0'}

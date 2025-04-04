@@ -12,12 +12,55 @@ export type ClassificationMethod =
 /**
  * Represents a quantitative D3 color scheme.
  */
-export type QuantitativeColorScheme = readonly (readonly string[])[];
+export type QuantitativeColorScheme =
+  | 'schemeBlues'
+  | 'schemeGreens'
+  | 'schemeGreys'
+  | 'schemeOranges'
+  | 'schemePurples'
+  | 'schemeReds'
+  | 'schemeBuGn'
+  | 'schemeBuPu'
+  | 'schemeGnBu'
+  | 'schemeOrRd'
+  | 'schemePuBuGn'
+  | 'schemePuBu'
+  | 'schemePuRd'
+  | 'schemeYlGnBu'
+  | 'schemeYlGn'
+  | 'schemeYlOrBr'
+  | 'schemeYlOrRd'
+  | 'schemeBrBG'
+  | 'schemePRGn'
+  | 'schemePiYG'
+  | 'schemePuOr'
+  | 'schemeRdBu'
+  | 'schemeRdGy'
+  | 'schemeRdPu'
+  | 'schemeRdYlBu'
+  | 'schemeRdYlGn'
+  | 'schemeSpectral';
 
 /**
  * Represents a categorical D3 color scheme.
  */
-export type CategoricalColorScheme = readonly string[];
+export type CategoricalColorScheme =
+  | 'schemeCategory10'
+  | 'schemeAccent'
+  | 'schemeDark2'
+  | 'schemeObservable10'
+  | 'schemePaired'
+  | 'schemePastel1'
+  | 'schemePastel2'
+  | 'schemeSet1'
+  | 'schemeSet2'
+  | 'schemeSet3'
+  | 'schemeTableau10';
+
+/**
+ * Represents the direction of a color scheme.
+ */
+export type SchemeDirection = 'Forward' | 'Reverse';
 
 /**
  * Represents the cartographic form of a layer.
@@ -251,7 +294,10 @@ export interface CategoricalStyle {
   type: 'Categorical';
   attribute: string;
   categories: string[];
-  scheme: CategoricalColorScheme;
+  scheme: {
+    id: CategoricalColorScheme;
+    direction: SchemeDirection;
+  };
   opacity: number;
 }
 
@@ -281,7 +327,10 @@ export interface QuantitativeStyle {
   type: 'Quantitative';
   attribute: string;
   method: ClassificationMethod;
-  scheme: QuantitativeColorScheme;
+  scheme: {
+    id: QuantitativeColorScheme;
+    direction: SchemeDirection;
+  };
   count: number;
   thresholds: number[];
   opacity: number;

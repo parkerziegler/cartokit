@@ -12,6 +12,18 @@
   let fetching = $state(false);
   let textarea: HTMLTextAreaElement | undefined = $state();
   let layerIds = $derived(Object.keys($ir.layers));
+  let layerIdsToAttributes = $derived(
+    Object.entries($ir.layers).reduce<Record<string, string[]>>(
+      (acc, [layerId, layer]) => {
+        acc[layerId] = Object.keys(
+          layer.data.geojson.features[0].properties ?? {}
+        );
+
+        return acc;
+      },
+      {}
+    )
+  );
 
   function onClick() {
     chatVisible = true;
@@ -44,7 +56,8 @@
         },
         body: JSON.stringify({
           prompt,
-          layerIds
+          layerIds,
+          layerIdsToAttributes
         })
       })
         .then((response) => response.json())

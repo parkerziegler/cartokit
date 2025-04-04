@@ -22,7 +22,8 @@ import type {
   CategoricalFill,
   CategoricalColorScheme,
   ConstantFill,
-  Channel
+  Channel,
+  SchemeDirection
 } from '$lib/types';
 import {
   DEFAULT_FILL,
@@ -136,6 +137,13 @@ interface ColorSchemeUpdate extends LayerUpdate {
   };
 }
 
+interface ColorSchemeDirectionUpdate extends LayerUpdate {
+  type: 'color-scheme-direction';
+  payload: {
+    direction: SchemeDirection;
+  };
+}
+
 interface ColorCountUpdate extends LayerUpdate {
   type: 'color-count';
   payload: {
@@ -196,6 +204,7 @@ export type DispatchLayerUpdateParams =
   | PointSizeUpdate
   | ClassificationMethodUpdate
   | ColorSchemeUpdate
+  | ColorSchemeDirectionUpdate
   | ColorCountUpdate
   | ColorThresholdUpdate
   | SizeUpdate
@@ -613,7 +622,29 @@ export function dispatchLayerUpdate({
         switch (lyr.style.fill?.type) {
           case 'Quantitative':
           case 'Categorical':
-            lyr.style.fill.scheme = payload.scheme;
+            lyr.style.fill.scheme.id = payload.scheme;
+
+            updateLayerChannel(map, lyr, 'fill');
+            break;
+          default:
+            break;
+        }
+
+        return ir;
+      });
+      break;
+    }
+    case 'color-scheme-direction': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layerId] as
+          | CartoKitPointLayer
+          | CartoKitChoroplethLayer
+          | CartoKitProportionalSymbolLayer;
+
+        switch (lyr.style.fill?.type) {
+          case 'Quantitative':
+          case 'Categorical':
+            lyr.style.fill.scheme.direction = payload.direction;
 
             updateLayerChannel(map, lyr, 'fill');
             break;
@@ -735,7 +766,13 @@ export function dispatchLayerUpdate({
                 lyr.data.geojson.features,
                 attribute
               ),
-              scheme: DEFAULT_CATEGORICAL_SCHEME,
+              scheme: {
+                id: DEFAULT_CATEGORICAL_SCHEME,
+                direction:
+                  lyr.style.fill && 'scheme' in lyr.style.fill
+                    ? lyr.style.fill.scheme.direction
+                    : 'Forward'
+              },
               opacity: lyr.style.fill?.opacity ?? DEFAULT_OPACITY
             };
             break;
@@ -749,7 +786,13 @@ export function dispatchLayerUpdate({
               type: payload.visualizationType,
               attribute: attribute,
               method: 'Quantile',
-              scheme: DEFAULT_QUANTITATIVE_SCHEME,
+              scheme: {
+                id: DEFAULT_QUANTITATIVE_SCHEME,
+                direction:
+                  lyr.style.fill && 'scheme' in lyr.style.fill
+                    ? lyr.style.fill.scheme.direction
+                    : 'Forward'
+              },
               count: DEFAULT_COUNT,
               thresholds: DEFAULT_THRESHOLDS(lyr.id, attribute),
               opacity: lyr.style.fill?.opacity ?? DEFAULT_OPACITY
