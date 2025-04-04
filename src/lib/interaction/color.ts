@@ -6,6 +6,10 @@ import type {
   QuantitativeStyle
 } from '$lib/types';
 import { DEFAULT_FILL } from '$lib/utils/constants';
+import {
+  materializeCategoricalColorScheme,
+  materializeQuantitativeColorScheme
+} from '$lib/utils/scheme';
 
 /**
  * Derive a MapLibre GL JS expression for a choropleth color scale.
@@ -22,7 +26,11 @@ export function deriveColorScale(
     case 'Quantitative': {
       const { scheme, count, attribute, thresholds } = style;
 
-      const colors = scheme[count] as string[];
+      const colors = materializeQuantitativeColorScheme(
+        scheme.id,
+        scheme.direction,
+        count
+      );
 
       const prelude: ExpressionSpecification = [
         'step',
@@ -35,24 +43,37 @@ export function deriveColorScale(
         []
       );
 
+      console.log('stops', stops);
+
       return [...prelude, ...stops];
     }
     case 'Categorical': {
       const { categories, scheme, attribute } = style;
 
-      let stops: string[] = [];
+      // let stops: string[] = [];
+      const colors = materializeCategoricalColorScheme(
+        scheme.id,
+        scheme.direction,
+        categories.length
+      );
 
-      if (scheme.length < categories.length) {
-        stops = scheme.reduce<string[]>(
-          (acc, scheme, i) => [...acc, categories[i], scheme],
-          []
-        );
-      } else {
-        stops = categories.reduce<string[]>(
-          (acc, category, i) => [...acc, category, scheme[i]],
-          []
-        );
-      }
+      const stops = colors.reduce<(string | number)[]>(
+        (acc, color, i) =>
+          i === 0 ? acc : acc.concat([categories[i - 1], color]),
+        []
+      );
+
+      // if (scheme.length < categories.length) {
+      //   stops = scheme.reduce<string[]>(
+      //     (acc, scheme, i) => [...acc, categories[i], scheme],
+      //     []
+      //   );
+      // } else {
+      //   stops = categories.reduce<string[]>(
+      //     (acc, category, i) => [...acc, category, scheme[i]],
+      //     []
+      //   );
+      // }
 
       return [
         'match',

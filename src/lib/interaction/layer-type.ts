@@ -941,7 +941,10 @@ function transitionToChoropleth(
             type: 'Quantitative',
             attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_QUANTITATIVE_SCHEME,
+            scheme: {
+              id: DEFAULT_QUANTITATIVE_SCHEME,
+              direction: 'Forward'
+            },
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(layer.id, attribute),
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
@@ -980,7 +983,10 @@ function transitionToChoropleth(
             type: 'Quantitative',
             attribute: layer.style.size.attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_QUANTITATIVE_SCHEME,
+            scheme: {
+              id: DEFAULT_QUANTITATIVE_SCHEME,
+              direction: 'Forward'
+            },
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               layer.id,
@@ -1011,7 +1017,10 @@ function transitionToChoropleth(
             type: 'Quantitative',
             attribute: layer.style.dots.attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_QUANTITATIVE_SCHEME,
+            scheme: {
+              id: DEFAULT_QUANTITATIVE_SCHEME,
+              direction: 'Forward'
+            },
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(
               layer.id,
@@ -1054,7 +1063,10 @@ function transitionToChoropleth(
             type: 'Quantitative',
             attribute,
             method: DEFAULT_METHOD,
-            scheme: DEFAULT_QUANTITATIVE_SCHEME,
+            scheme: {
+              id: DEFAULT_QUANTITATIVE_SCHEME,
+              direction: 'Forward'
+            },
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(layer.id, attribute),
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY

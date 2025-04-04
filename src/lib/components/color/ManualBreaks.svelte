@@ -1,4 +1,5 @@
 <script lang="ts">
+  import * as d3 from 'd3';
   import type { Feature } from 'geojson';
 
   import Menu from '$lib/components/shared/Menu.svelte';
@@ -82,7 +83,7 @@
       {#each [min, ...style.thresholds] as threshold, i (threshold)}
         <span
           class="h-6 self-center"
-          style="background-color: {style.scheme[style.count][i]};"
+          style="background-color: {d3[style.scheme][style.count][i]};"
         ></span>
         <span class="self-center">{threshold.toFixed(2)}</span>
         <span class="self-center">to</span>

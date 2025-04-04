@@ -9,17 +9,16 @@
     CategoricalColorScheme,
     QuantitativeColorScheme,
     QuantitativeStyle,
-    CategoricalStyle
+    CategoricalStyle,
+    SchemeDirection
   } from '$lib/types';
   import { clickoutside } from '$lib/utils/actions';
   import {
-    reverseQuantitativeColorScheme,
-    reverseCategoricalColorScheme,
     QUANTITATIVE_COLOR_SCHEMES,
-    QUANTITATIVE_COLOR_SCHEMES_REV,
     CATEGORICAL_COLOR_SCHEMES,
-    CATEGORICAL_COLOR_SCHEMES_REV
-  } from '$lib/utils/color';
+    materializeCategoricalColorScheme,
+    materializeQuantitativeColorScheme
+  } from '$lib/utils/scheme';
 
   interface Props {
     layerId: string;
@@ -33,16 +32,46 @@
   let offsetWidth = $state(0);
   let x = $state(0);
   let y = $state(0);
-  let schemeReversed = $state(false);
 
   let colors = $derived(
-    style.type === 'Quantitative' ? style.scheme[style.count] : style.scheme
+    style.type === 'Quantitative'
+      ? materializeQuantitativeColorScheme(
+          style.scheme.id,
+          style.scheme.direction,
+          style.count
+        )
+      : materializeCategoricalColorScheme(
+          style.scheme.id,
+          style.scheme.direction
+        )
   );
+
   let quantitativeSchemes = $derived(
-    schemeReversed ? QUANTITATIVE_COLOR_SCHEMES_REV : QUANTITATIVE_COLOR_SCHEMES
+    style.type === 'Quantitative'
+      ? QUANTITATIVE_COLOR_SCHEMES.map((scheme) => {
+          return {
+            id: scheme,
+            colors: materializeQuantitativeColorScheme(
+              scheme,
+              style.scheme.direction,
+              style.count
+            )
+          };
+        })
+      : []
   );
   let categoricalSchemes = $derived(
-    schemeReversed ? CATEGORICAL_COLOR_SCHEMES_REV : CATEGORICAL_COLOR_SCHEMES
+    style.type === 'Categorical'
+      ? CATEGORICAL_COLOR_SCHEMES.map((scheme) => {
+          return {
+            id: scheme,
+            colors: materializeCategoricalColorScheme(
+              scheme,
+              style.scheme.direction
+            )
+          };
+        })
+      : []
   );
 
   let trigger: HTMLDivElement;
@@ -74,7 +103,7 @@
         type: 'color-scheme',
         layerId,
         payload: {
-          scheme: style.scheme
+          scheme: style.scheme.id
         }
       }
     });
@@ -91,14 +120,30 @@
   }
 
   function onSchemeReverse() {
-    schemeReversed = !schemeReversed;
+    const currentDirection = style.scheme.direction;
+    const nextDirection: SchemeDirection =
+      currentDirection === 'Forward' ? 'Reverse' : 'Forward';
 
-    const scheme =
-      style.type === 'Quantitative'
-        ? reverseQuantitativeColorScheme(style.scheme)
-        : reverseCategoricalColorScheme(style.scheme);
+    const update = {
+      type: 'color-scheme-direction' as const,
+      layerId,
+      payload: {
+        direction: nextDirection
+      }
+    };
 
-    dispatchSchemeUpdate(scheme);
+    history.undo.push({
+      execute: update,
+      invert: {
+        type: 'color-scheme-direction',
+        layerId,
+        payload: {
+          direction: currentDirection
+        }
+      }
+    });
+
+    dispatchLayerUpdate(update);
   }
 </script>
 
@@ -137,17 +182,17 @@
           {#if style.type === 'Quantitative'}
             {#each quantitativeSchemes as scheme, i (i)}
               <ColorSchemePalette
-                colors={scheme[style.count]}
-                active={scheme === style.scheme}
-                onclickscheme={() => onClickScheme(scheme)}
+                colors={scheme.colors}
+                active={scheme.id === style.scheme.id}
+                onclickscheme={() => onClickScheme(scheme.id)}
               />
             {/each}
           {:else}
             {#each categoricalSchemes as scheme (scheme[0])}
               <ColorSchemePalette
-                colors={scheme}
-                active={scheme === style.scheme}
-                onclickscheme={() => onClickScheme(scheme)}
+                colors={scheme.colors}
+                active={scheme.id === style.scheme.id}
+                onclickscheme={() => onClickScheme(scheme.id)}
               />
             {/each}
           {/if}
