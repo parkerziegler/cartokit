@@ -58,9 +58,16 @@ export function deriveSize(
  */
 export function deriveCentroids(features: Feature[]): FeatureCollection {
   return featureCollection(
-    features.map(({ geometry, properties }) =>
-      feature(centroid(geometry).geometry, properties)
-    )
+    features.reduce<Feature[]>((acc, { geometry, properties }) => {
+      if (
+        !geometry ||
+        ('coordinates' in geometry && geometry.coordinates.length === 0)
+      ) {
+        return acc;
+      }
+
+      return [...acc, feature(centroid(geometry).geometry, properties)];
+    }, [])
   );
 }
 
