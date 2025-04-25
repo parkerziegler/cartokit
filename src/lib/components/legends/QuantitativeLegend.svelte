@@ -20,7 +20,7 @@
   <p class="font-semibold">{fill.attribute} ↓</p>
   <div class="stack-h stack-h-xs rounded-md bg-slate-900">
     <ul class="stack stack-xs mt-3">
-      {#each fill.scheme[fill.count] as color}
+      {#each fill.scheme[fill.count] as color (color)}
         <li class="stack stack-xs stack-h stack-h-xs">
           {#if layerType === 'Choropleth'}
             <svg viewBox="0 0 32 16" width="32" height="16">
@@ -54,7 +54,7 @@
       {/each}
     </ul>
     <ul class="stack stack-xs">
-      {#each [min, ...fill.thresholds, max] as stop}
+      {#each [min, ...fill.thresholds, max] as stop (stop)}
         <li class="stack-h stack-h-xs h-4 font-mono text-3xs">
           <span class="text-slate-400"> → </span>
           <span>{stop.toFixed(2)}</span>

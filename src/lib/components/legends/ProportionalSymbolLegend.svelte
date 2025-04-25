@@ -43,7 +43,7 @@
 <div class="stack stack-xs ml-8">
   <span class="text-xs font-semibold">{layer.style.size.attribute} →</span>
   <div class="stack-h stack-h-xs">
-    {#each circles as circle}
+    {#each circles as circle (circle.value)}
       <div class="stack stack-xs items-center">
         <span class="text-3xs">{circle.value.toFixed(2)}</span>
         <div

@@ -26,7 +26,7 @@
     bind:this={ref}
   >
     <div class="flex h-4 w-full">
-      {#each colors as color}
+      {#each colors as color (color)}
         <span style="background-color: {color};" class="flex-1"></span>
       {/each}
     </div>

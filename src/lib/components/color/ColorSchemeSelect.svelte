@@ -118,7 +118,7 @@
       class="flex-1"
     >
       <div class="flex h-4 w-full">
-        {#each colors as color}
+        {#each colors as color (color)}
           <span style="background-color: {color};" class="flex-1"></span>
         {/each}
       </div>
@@ -135,7 +135,7 @@
           class="flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 shadow-lg"
         >
           {#if style.type === 'Quantitative'}
-            {#each quantitativeSchemes as scheme}
+            {#each quantitativeSchemes as scheme (scheme[style.count][0])}
               <ColorSchemePalette
                 colors={scheme[style.count]}
                 active={scheme === style.scheme}
@@ -143,7 +143,7 @@
               />
             {/each}
           {:else}
-            {#each categoricalSchemes as scheme}
+            {#each categoricalSchemes as scheme (scheme[0])}
               <ColorSchemePalette
                 colors={scheme}
                 active={scheme === style.scheme}

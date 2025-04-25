@@ -49,7 +49,7 @@
       {onclick}
       {id}
     >
-      {#each options as option}
+      {#each options as option (option.value)}
         <option value={option.value} selected={option.value === selected}
           >{option.label}</option
         >
@@ -68,7 +68,7 @@
     {onclick}
     bind:this={ref}
   >
-    {#each options as option}
+    {#each options as option (option.value)}
       <option value={option.value} selected={option.value === selected}
         >{option.label}</option
       >

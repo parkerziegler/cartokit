@@ -116,7 +116,7 @@
     <table class="w-full border-collapse">
       <thead>
         <tr class="sticky top-0">
-          {#each cols as col}
+          {#each cols as col (col)}
             <th
               class="relative bg-slate-900 px-4 py-2 text-left font-semibold text-slate-400 hover:cursor-pointer"
               class:sort-desc={sort.col === col && sort.desc}
@@ -128,9 +128,9 @@
         </tr>
       </thead>
       <tbody>
-        {#each array as row}
+        {#each array as row, i (i)}
           <tr class="border-t border-dotted border-slate-400 first:border-t-0">
-            {#each cols as col}
+            {#each cols as col (col)}
               <td class="cell truncate px-4 py-2"
                 >{row.properties?.[col] ?? ''}</td
               >

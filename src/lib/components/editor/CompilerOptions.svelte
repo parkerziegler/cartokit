@@ -37,7 +37,7 @@
           class="font-sans text-sm text-slate-400 underline decoration-dotted underline-offset-4"
           >Language</legend
         >
-        {#each languageBackends as { value, name }}
+        {#each languageBackends as { value, name } (value)}
           <label class="flex items-center gap-2 text-xs">
             <input
               type="radio"
@@ -58,7 +58,7 @@
           class="font-sans text-sm text-slate-400 underline decoration-dotted underline-offset-4"
           >Library</legend
         >
-        {#each libraryBackends as { value, name }}
+        {#each libraryBackends as { value, name } (value)}
           <label class="flex items-center gap-2 text-xs">
             <input
               type="radio"

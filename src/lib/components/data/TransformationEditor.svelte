@@ -205,7 +205,7 @@
   </MenuItem>
   <MenuItem title="Console">
     <ul class="-mx-4 max-h-[9.5rem] overflow-auto">
-      {#each consoleOutput as entry}
+      {#each consoleOutput as entry, i (`${entry}-${i}`)}
         <li
           class="border-b border-slate-600 px-4 py-2 text-white first:border-t"
         >
