@@ -2,15 +2,19 @@
   import { slide } from 'svelte/transition';
 
   import ChatIcon from '$lib/components/icons/ChatIcon.svelte';
+  import Alert from '$lib/components/shared/Alert.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { user } from '$lib/state/user.svelte';
   import { ir } from '$lib/stores/ir';
   import { clickoutside } from '$lib/utils/actions';
 
   let chatVisible = $state(false);
   let prompt = $state('');
   let fetching = $state(false);
+  let diffUnknown = $state(false);
   let textarea: HTMLTextAreaElement | undefined = $state();
+
   let layerIds = $derived(Object.keys($ir.layers));
   let layerIdsToAttributes = $derived(
     Object.entries($ir.layers).reduce<Record<string, string[]>>(
@@ -57,16 +61,27 @@
         body: JSON.stringify({
           prompt,
           layerIds,
-          layerIdsToAttributes
+          layerIdsToAttributes,
+          userId: user.userId
         })
       })
         .then((response) => response.json())
         .then((data) => {
-          dispatchLayerUpdate(data.diff);
+          for (const diff of data.diffs) {
+            if (diff.type === 'unknown') {
+              diffUnknown = true;
+
+              setTimeout(() => {
+                diffUnknown = false;
+              }, 3000);
+            } else {
+              dispatchLayerUpdate(diff);
+            }
+          }
 
           fetching = false;
           if (textarea) {
-            textarea.value = '';
+            prompt = '';
           }
         })
         .catch(() => {
@@ -84,7 +99,6 @@
   ]}
   use:clickoutside
   onclickoutside={onClickOutsideChat}
-  disabled={layerIds.length === 0}
 >
   <ChatIcon />
 </button>
@@ -93,7 +107,7 @@
     <div class="flex flex-col gap-2">
       <div class="relative">
         <textarea
-          class="w-fullborder h-32 w-64 resize-none rounded border border-slate-600 bg-slate-900 p-2 text-white"
+          class="h-32 w-72 resize-none rounded border border-slate-600 bg-slate-900 p-2 text-white"
           placeholder="Prompt the model to update map layers..."
           bind:value={prompt}
           bind:this={textarea}
@@ -101,8 +115,15 @@
           disabled={fetching}
         >
         </textarea>
+
         <code class="absolute bottom-2 left-2 z-10 text-slate-400">gpt-4o</code>
       </div>
+      {#if diffUnknown}
+        <Alert
+          kind="warn"
+          message="⚠️ The model was unable to understand the request. Please rephrase your prompt."
+        />
+      {/if}
       {#if fetching}
         <p class="loading text-slate-400" transition:slide>Thinking</p>
       {/if}

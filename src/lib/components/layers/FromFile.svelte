@@ -33,7 +33,11 @@
     closeModal();
   }
 
-  function onSubmit() {
+  function onSubmit(
+    event: Event & { currentTarget: EventTarget & HTMLFormElement }
+  ) {
+    event.preventDefault();
+
     if (!file || !displayName) {
       return;
     }

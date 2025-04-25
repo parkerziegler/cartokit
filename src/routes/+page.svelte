@@ -1,7 +1,7 @@
 <script lang="ts">
   import cs from 'classnames';
   import maplibregl from 'maplibre-gl';
-  import { onMount } from 'svelte';
+  import { onMount, setContext } from 'svelte';
 
   import type { PageData } from './$types';
 
@@ -20,6 +20,7 @@
   import { map as mapStore } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
   import { initHistory } from '$lib/utils/history';
+  import { user } from '$lib/state/user.svelte';
 
   interface Props {
     data: PageData;
@@ -29,6 +30,9 @@
 
   let map = $state<maplibregl.Map>();
   let error = $state({ message: '' });
+  user.userId = data.userId;
+
+  setContext('enableChat', data.enableChat);
 
   onMount(() => {
     // maplibre-gl is actually a CJS module, and not all module.exports may be
