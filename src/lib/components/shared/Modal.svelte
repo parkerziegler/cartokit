@@ -35,7 +35,6 @@
   });
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <dialog
   class={cs(
     'overflow-hidden rounded bg-slate-900 font-sans text-white',

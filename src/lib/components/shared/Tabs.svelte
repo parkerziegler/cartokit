@@ -27,7 +27,7 @@
 
 <div class={cs('stack', containerClass)}>
   <ul class="stack-h stack-h-md border-b border-b-slate-400 px-4">
-    {#each tabs as tab, i}
+    {#each tabs as tab, i (tab.name)}
       <li
         class="border-b-2 pb-2 text-base transition-all duration-200"
         class:active={activeIndex === i}
@@ -38,7 +38,7 @@
     {/each}
   </ul>
   <div class={cs('p-4', bodyClass)}>
-    {#each tabs as tab, i}
+    {#each tabs as tab, i (tab.name)}
       {#if activeIndex === i}
         <tab.content {...tab.props} />
       {/if}

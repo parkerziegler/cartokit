@@ -55,7 +55,7 @@
   </form>
 {:else}
   <div class="grid grid-cols-3 gap-4">
-    {#each BASEMAPS[provider] as basemap}
+    {#each BASEMAPS[provider] as basemap (basemap.tileId)}
       <button
         class={cs(
           'flex flex-col rounded border p-2 transition-colors hover:border-slate-400',

@@ -79,7 +79,7 @@
       onclickoutside={toggleBreaksEditorVisibility}
       data-testid="breaks-editor"
     >
-      {#each [min, ...style.thresholds] as threshold, i}
+      {#each [min, ...style.thresholds] as threshold, i (threshold)}
         <span
           class="h-6 self-center"
           style="background-color: {style.scheme[style.count][i]};"
