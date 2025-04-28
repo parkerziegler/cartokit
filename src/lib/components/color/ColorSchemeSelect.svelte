@@ -135,7 +135,7 @@
           class="flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 shadow-lg"
         >
           {#if style.type === 'Quantitative'}
-            {#each quantitativeSchemes as scheme (scheme[style.count][0])}
+            {#each quantitativeSchemes as scheme, i (i)}
               <ColorSchemePalette
                 colors={scheme[style.count]}
                 active={scheme === style.scheme}
