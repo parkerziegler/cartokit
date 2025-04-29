@@ -43,14 +43,11 @@ export function deriveColorScale(
         []
       );
 
-      console.log('stops', stops);
-
       return [...prelude, ...stops];
     }
     case 'Categorical': {
       const { categories, scheme, attribute } = style;
 
-      // let stops: string[] = [];
       const colors = materializeCategoricalColorScheme(
         scheme.id,
         scheme.direction,
@@ -62,18 +59,6 @@ export function deriveColorScale(
           i === 0 ? acc : acc.concat([categories[i - 1], color]),
         []
       );
-
-      // if (scheme.length < categories.length) {
-      //   stops = scheme.reduce<string[]>(
-      //     (acc, scheme, i) => [...acc, categories[i], scheme],
-      //     []
-      //   );
-      // } else {
-      //   stops = categories.reduce<string[]>(
-      //     (acc, category, i) => [...acc, category, scheme[i]],
-      //     []
-      //   );
-      // }
 
       return [
         'match',
