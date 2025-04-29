@@ -2,9 +2,9 @@
   import cs from 'classnames';
   import { getContext } from 'svelte';
 
-  import Chat from '$lib/components/toolbar/Chat.svelte';
   import BasemapPicker from '$lib/components/map/BasemapPicker.svelte';
   import ProjectionPicker from '$lib/components/map/ProjectionPicker.svelte';
+  import Chat from '$lib/components/toolbar/Chat.svelte';
   import { layout } from '$lib/stores/layout';
 
   const enableChat = getContext<boolean>('enableChat');

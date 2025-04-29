@@ -4,7 +4,7 @@
   import type { FeatureCollection } from 'geojson';
   import { onDestroy } from 'svelte';
 
-  import TransformationAlert from '$lib/components/shared/Alert.svelte';
+  import Alert from '$lib/components/shared/Alert.svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import PlayCircle from '$lib/components/icons/PlayCircle.svelte';
   import TerminalIcon from '$lib/components/icons/TerminalIcon.svelte';
@@ -179,15 +179,12 @@
         testId="transformation-editor"
       />
       {#if error}
-        <TransformationAlert
+        <Alert
           kind="error"
           message={`Failed to transform data. Error: ${error}`}
         />
       {:else if success}
-        <TransformationAlert
-          kind="success"
-          message="Successfully transformed data."
-        />
+        <Alert kind="success" message="Successfully transformed data." />
       {/if}
       <Button
         class="stack-h stack-h-xs items-center self-end"
@@ -206,7 +203,7 @@
       <p class="text-slate-400">OUTPUT</p>
     {/snippet}
     {#if previewError}
-      <TransformationAlert kind="error" message={previewError} />
+      <Alert kind="error" message={previewError} />
     {/if}
   </MenuItem>
   <MenuItem title="Console">

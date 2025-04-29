@@ -1,5 +1,4 @@
 <script lang="ts">
-  import cs from 'classnames';
   import type { Snippet } from 'svelte';
 
   import { clickoutside } from '$lib/utils/actions';
@@ -14,7 +13,6 @@
 
   let {
     class: className = '',
-    style = '',
     id = '',
     onclickoutsidemenu = () => {},
     children
@@ -23,8 +21,7 @@
 
 <div
   {id}
-  class={cs('stack-border rounded-md bg-slate-900 shadow-lg', className)}
-  {style}
+  class={['stack-border rounded-md bg-slate-900 shadow-lg', className]}
   use:clickoutside
   onclickoutside={onclickoutsidemenu}
 >

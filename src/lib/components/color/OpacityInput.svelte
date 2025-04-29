@@ -8,7 +8,7 @@
     ConstantStyle,
     QuantitativeStyle
   } from '$lib/types';
-  import { percentToDecimal, decimalToPercent } from '$lib/utils/color';
+  import { percentToDecimal, decimalToPercent } from '$lib/utils/number';
 
   interface Props {
     layerId: string;

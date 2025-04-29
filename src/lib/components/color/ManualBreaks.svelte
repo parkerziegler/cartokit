@@ -15,11 +15,10 @@
     layerId: string;
     style: QuantitativeStyle;
     features: Feature[];
-    toggleBreaksEditorVisibility: () => void;
+    hideBreaksEditor: () => void;
   }
 
-  let { layerId, style, features, toggleBreaksEditorVisibility }: Props =
-    $props();
+  let { layerId, style, features, hideBreaksEditor }: Props = $props();
 
   let [min, max] = $derived(deriveExtent(style.attribute, features));
 
@@ -54,10 +53,7 @@
 <Menu class="w-80 overflow-auto">
   <MenuItem title="Set steps">
     {#snippet action()}
-      <button
-        onclick={toggleBreaksEditorVisibility}
-        aria-label="Close breaks editor"
-      >
+      <button onclick={hideBreaksEditor} aria-label="Close breaks editor">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
@@ -77,13 +73,13 @@
     <div
       class="grid grid-cols-[0.75rem_1fr_1rem_1fr] gap-x-2 gap-y-1"
       use:clickoutside
-      onclickoutside={toggleBreaksEditorVisibility}
+      onclickoutside={hideBreaksEditor}
       data-testid="breaks-editor"
     >
       {#each [min, ...style.thresholds] as threshold, i (threshold)}
         <span
           class="h-6 self-center"
-          style="background-color: {d3[style.scheme][style.count][i]};"
+          style="background-color: {d3[style.scheme.id][style.count][i]};"
         ></span>
         <span class="self-center">{threshold.toFixed(2)}</span>
         <span class="self-center">to</span>

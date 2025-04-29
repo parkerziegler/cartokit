@@ -135,7 +135,7 @@
     history.undo.push({
       execute: update,
       invert: {
-        type: 'color-scheme-direction',
+        type: 'color-scheme-direction' as const,
         layerId,
         payload: {
           direction: currentDirection
@@ -180,7 +180,7 @@
           class="flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 shadow-lg"
         >
           {#if style.type === 'Quantitative'}
-            {#each quantitativeSchemes as scheme, i (i)}
+            {#each quantitativeSchemes as scheme (scheme.id)}
               <ColorSchemePalette
                 colors={scheme.colors}
                 active={scheme.id === style.scheme.id}
@@ -188,7 +188,7 @@
               />
             {/each}
           {:else}
-            {#each categoricalSchemes as scheme (scheme[0])}
+            {#each categoricalSchemes as scheme (scheme.id)}
               <ColorSchemePalette
                 colors={scheme.colors}
                 active={scheme.id === style.scheme.id}
