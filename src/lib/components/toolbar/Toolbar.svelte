@@ -1,9 +1,13 @@
-<script>
+<script lang="ts">
   import cs from 'classnames';
+  import { getContext } from 'svelte';
 
   import BasemapPicker from '$lib/components/map/BasemapPicker.svelte';
   import ProjectionPicker from '$lib/components/map/ProjectionPicker.svelte';
+  import Chat from '$lib/components/toolbar/Chat.svelte';
   import { layout } from '$lib/stores/layout';
+
+  const enableChat = getContext<boolean>('enableChat');
 </script>
 
 <div
@@ -16,6 +20,8 @@
   )}
 >
   <BasemapPicker />
-  <div class="h-10 w-[1.5px] bg-slate-600"></div>
   <ProjectionPicker />
+  {#if enableChat}
+    <Chat />
+  {/if}
 </div>

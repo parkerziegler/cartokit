@@ -3,6 +3,7 @@
 
   import { deriveExtent } from '$lib/interaction/scales';
   import type { ConstantStroke, LayerType, QuantitativeFill } from '$lib/types';
+  import { materializeQuantitativeColorScheme } from '$lib/utils/scheme';
 
   interface Props {
     fill: QuantitativeFill;
@@ -14,13 +15,20 @@
   let { fill, stroke, features, layerType }: Props = $props();
 
   let [min, max] = $derived(deriveExtent(fill.attribute, features));
+  let colors = $derived(
+    materializeQuantitativeColorScheme(
+      fill.scheme.id,
+      fill.scheme.direction,
+      fill.count
+    )
+  );
 </script>
 
 <div class="stack stack-xs text-white">
   <p class="font-semibold">{fill.attribute} ↓</p>
   <div class="stack-h stack-h-xs rounded-md bg-slate-900">
     <ul class="stack stack-xs mt-3">
-      {#each fill.scheme[fill.count] as color (color)}
+      {#each colors as color (color)}
         <li class="stack stack-xs stack-h stack-h-xs">
           {#if layerType === 'Choropleth'}
             <svg viewBox="0 0 32 16" width="32" height="16">

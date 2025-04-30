@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 import type { Feature, Polygon, MultiPolygon } from 'geojson';
 import type { Map, GeoJSONSource } from 'maplibre-gl';
 
@@ -171,15 +172,21 @@ function updateFillChannel(
           layer.style.fill.attribute
         );
         break;
-      case 'Quantitative':
+      case 'Quantitative': {
+        const colors = d3[layer.style.fill.scheme.id][layer.style.fill.count];
+
         layer.style.fill.thresholds = deriveThresholds({
           method: layer.style.fill.method,
           layerId: layer.id,
           attribute: layer.style.fill.attribute,
-          range: layer.style.fill.scheme[layer.style.fill.count] as string[],
+          range:
+            layer.style.fill.scheme.direction === 'Reverse'
+              ? [...colors].reverse()
+              : [...colors],
           thresholds: layer.style.fill.thresholds
         });
         break;
+      }
     }
 
     map.setPaintProperty(

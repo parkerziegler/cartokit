@@ -28,14 +28,22 @@
     label: scale
   }));
 
+  function showBreaksEditor() {
+    displayBreaksEditor = true;
+  }
+
+  function hideBreaksEditor() {
+    displayBreaksEditor = false;
+  }
+
   function onClassificationMethodChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     if (event.currentTarget.value === 'Manual') {
       ({ top, left } = ref.getBoundingClientRect());
-      displayBreaksEditor = true;
+      showBreaksEditor();
     } else {
-      displayBreaksEditor = false;
+      hideBreaksEditor();
     }
 
     const update = {
@@ -60,16 +68,12 @@
     dispatchLayerUpdate(update);
   }
 
-  function toggleBreaksEditorVisibility() {
-    displayBreaksEditor = !displayBreaksEditor;
-  }
-
   function onClassificationMethodClick(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    if (event.currentTarget.value === 'Manual') {
+    if (event.currentTarget.value === 'Manual' && !displayBreaksEditor) {
       ({ top, left } = ref.getBoundingClientRect());
-      toggleBreaksEditorVisibility();
+      showBreaksEditor();
     }
   }
 </script>
@@ -89,6 +93,6 @@
     {target}
     style="top: {top}px; left: {left - 24 - 20 * 16}px;"
   >
-    <ManualBreaks {layerId} {style} {features} {toggleBreaksEditorVisibility} />
+    <ManualBreaks {layerId} {style} {features} {hideBreaksEditor} />
   </Portal>
 {/if}
