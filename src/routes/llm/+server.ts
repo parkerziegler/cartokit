@@ -170,7 +170,7 @@ function FillOpacityUpdate(layerIds: string[]) {
     type: z.literal('fill-opacity'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
-      opacity: z.string()
+      opacity: z.number()
     })
   });
 }

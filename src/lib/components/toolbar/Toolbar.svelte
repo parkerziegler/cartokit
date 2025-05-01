@@ -4,7 +4,7 @@
 
   import BasemapPicker from '$lib/components/map/BasemapPicker.svelte';
   import ProjectionPicker from '$lib/components/map/ProjectionPicker.svelte';
-  import Chat from '$lib/components/toolbar/Chat.svelte';
+  import ChatButton from '$lib/components/chat/ChatButton.svelte';
   import { layout } from '$lib/stores/layout';
 
   const enableChat = getContext<boolean>('enableChat');
@@ -22,6 +22,6 @@
   <BasemapPicker />
   <ProjectionPicker />
   {#if enableChat}
-    <Chat />
+    <ChatButton />
   {/if}
 </div>
