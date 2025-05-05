@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
 
   import ArrowUpIcon from '$lib/components/icons/ArrowUpIcon.svelte';
@@ -33,6 +34,10 @@
       {}
     )
   );
+
+  onMount(() => {
+    textarea?.focus();
+  });
 
   function onKeyDown(
     event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
