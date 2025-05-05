@@ -25,10 +25,12 @@
   ]}
   transition:slide
 >
-  {#if kind === 'success'}
-    <CheckIcon />
-  {:else if kind === 'error'}
-    <AlertIcon />
-  {/if}
+  <span class="shrink-0">
+    {#if kind === 'success'}
+      <CheckIcon />
+    {:else if kind === 'error'}
+      <AlertIcon />
+    {/if}
+  </span>
   <p class="font-sans">{message}</p>
 </div>
