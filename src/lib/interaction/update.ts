@@ -686,6 +686,10 @@ export function dispatchLayerUpdate({
 
         switch (lyr.style.fill?.type) {
           case 'Quantitative':
+            if (payload.index > lyr.style.fill.thresholds.length) {
+              break;
+            }
+
             lyr.style.fill.thresholds[payload.index] = payload.threshold;
 
             updateLayerChannel(map, lyr, 'fill');
