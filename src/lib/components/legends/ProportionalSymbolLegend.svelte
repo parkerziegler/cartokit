@@ -3,7 +3,7 @@
 
   import CategoricalLegend from '$lib/components/legends/CategoricalLegend.svelte';
   import QuantitativeLegend from '$lib/components/legends/QuantitativeLegend.svelte';
-  import { deriveExtent } from '$lib/interaction/scales';
+  import { catalog } from '$lib/state/catalog.svelte';
   import type { CartoKitProportionalSymbolLayer } from '$lib/types';
   import { hexWithOpacity } from '$lib/utils/color';
 
@@ -13,12 +13,11 @@
 
   let { layer }: Props = $props();
 
-  let [min, max] = $derived(
-    deriveExtent(layer.style.size.attribute, layer.data.geojson.features)
-  );
+  let { min, max } = catalog.value[layer.id][layer.style.size.attribute];
   let scale = $derived(
     d3.scaleLinear([layer.style.size.min, layer.style.size.max], [min, max])
   );
+
   let circles = $derived([
     {
       size: layer.style.size.max / 3,
@@ -64,7 +63,7 @@
     <QuantitativeLegend
       fill={layer.style.fill}
       stroke={layer.style.stroke}
-      features={layer.data.geojson.features}
+      layerId={layer.id}
       layerType="Proportional Symbol"
     />
   {/if}

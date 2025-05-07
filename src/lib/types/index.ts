@@ -428,6 +428,8 @@ export type Catalog = Record<
       Quantile: { domain: number[] };
       'Equal Interval': { domain: [number, number] };
       Jenks: Record<number, { breaks: number[] }>;
+      min: number;
+      max: number;
     }
   >
 >;

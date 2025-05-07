@@ -1,6 +1,4 @@
 <script lang="ts">
-  import cs from 'classnames';
-
   interface Props {
     id?: string;
     min?: number;
@@ -10,6 +8,7 @@
     disabled?: boolean;
     class?: string;
     onchange: (value: number) => void;
+    ref?: HTMLInputElement;
   }
 
   let {
@@ -45,10 +44,10 @@
   {step}
   {disabled}
   onchange={onChange}
-  class={cs(
+  class={[
     'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
     className
-  )}
+  ]}
 />
 
 <style lang="postcss">
