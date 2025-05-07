@@ -1,13 +1,12 @@
 <script lang="ts" generics="T">
   import cs from 'classnames';
-  import type { ChangeEventHandler, MouseEventHandler } from 'svelte/elements';
+  import type { ChangeEventHandler } from 'svelte/elements';
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
 
   interface Props {
     selected: T;
     onchange: ChangeEventHandler<HTMLSelectElement>;
-    onclick?: MouseEventHandler<HTMLSelectElement>;
     id: string;
     options: {
       value: T;
@@ -22,7 +21,6 @@
   let {
     selected,
     onchange,
-    onclick = () => {},
     id,
     options = [],
     title = '',
@@ -46,7 +44,6 @@
       )}
       value={selected}
       {onchange}
-      {onclick}
       {id}
     >
       {#each options as option (option.value)}
@@ -65,7 +62,6 @@
     value={selected}
     {id}
     {onchange}
-    {onclick}
     bind:this={ref}
   >
     {#each options as option (option.value)}

@@ -21,7 +21,7 @@
     <QuantitativeLegend
       fill={layer.style.fill}
       stroke={layer.style.stroke}
-      features={layer.data.geojson.features}
+      layerId={layer.id}
       layerType="Choropleth"
     />
   {/if}

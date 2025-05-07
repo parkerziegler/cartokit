@@ -64,10 +64,10 @@
     />
   {:else if layer.style.fill?.type === 'Quantitative'}
     <QuantitativeLegend
-      layerType="Point"
       fill={layer.style.fill}
       stroke={layer.style.stroke}
-      features={layer.data.geojson.features}
+      layerId={layer.id}
+      layerType="Point"
     />
   {/if}
 </div>

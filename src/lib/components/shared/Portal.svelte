@@ -2,9 +2,9 @@
   import { onMount, type Snippet } from 'svelte';
 
   interface Props {
-    class: string;
-    target: HTMLElement;
-    style: string;
+    class?: string;
+    target?: HTMLElement;
+    style?: string;
     children: Snippet;
   }
 
