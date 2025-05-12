@@ -5,7 +5,6 @@ import type { Map, GeoJSONSource } from 'maplibre-gl';
 import { deriveColorScale } from '$lib/interaction/color';
 import {
   deriveSize,
-  deriveDotDensityStartingValue,
   generateDotDensityPoints
 } from '$lib/interaction/geometry';
 import { deriveThresholds } from '$lib/interaction/scales';
@@ -204,19 +203,13 @@ function updateFillChannel(
  * @param {CartoKitDotDensityLayer} layer – The layer to update.
  */
 function updateDotsChannel(map: Map, layer: CartoKitDotDensityLayer): void {
-  const dotValue = deriveDotDensityStartingValue(
-    layer.data.sourceGeojson.features,
-    layer.style.dots.attribute
-  );
-
   const features = generateDotDensityPoints(
     layer.data.sourceGeojson.features as Feature<Polygon | MultiPolygon>[],
     layer.style.dots.attribute,
-    dotValue
+    layer.style.dots.value
   );
 
   layer.data.geojson = features;
-  layer.style.dots.value = dotValue;
 
   // Update the source with the new data.
   (map.getSource(layer.id) as GeoJSONSource).setData(features);
