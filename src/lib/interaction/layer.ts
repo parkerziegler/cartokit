@@ -98,7 +98,8 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
       if (!map.getSource(`${layer.id}-outlines`)) {
         map.addSource(`${layer.id}-outlines`, {
           type: 'geojson',
-          data: layer.data.sourceGeojson
+          data: layer.data.sourceGeojson,
+          generateId: true
         });
       }
 
