@@ -86,7 +86,7 @@ export function generateDotDensityPoints(
   value: number
 ): FeatureCollection<Point> {
   return featureCollection(
-    features.reduce<Feature<Point>[]>((acc, { geometry, properties }, i) => {
+    features.reduce<Feature<Point>[]>((acc, { geometry, properties }) => {
       if (
         !geometry ||
         ('coordinates' in geometry && geometry.coordinates.length === 0)
@@ -102,8 +102,6 @@ export function generateDotDensityPoints(
       // Begin "throwing" random points within the bounding box, keeping them only
       // if they fall within the polygon.
       const selectedFeatures: Feature<Point>[] = [];
-
-      console.log({ geometry, properties, i });
 
       while (selectedFeatures.length < numPoints) {
         const candidate = randomPoint(1, { bbox: boundingBox }).features[0];
