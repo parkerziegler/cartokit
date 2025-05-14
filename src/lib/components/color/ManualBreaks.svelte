@@ -55,6 +55,8 @@
         ></span>
       </div>
       <NumberInput
+        {min}
+        {max}
         value={style.thresholds[i - 1] ?? min}
         step={0.01}
         class="self-center p-1 hover:border-transparent"
@@ -62,11 +64,14 @@
         onchange={onThresholdChange(i - 1)}
       />
       <NumberInput
+        {min}
+        {max}
         value={style.thresholds[i] ?? max}
         step={0.01}
         class="self-center p-1 hover:border-transparent"
         disabled={i === style.thresholds.length}
         onchange={onThresholdChange(i)}
+        autofocus={i === 0}
       />
     </div>
   {/each}
