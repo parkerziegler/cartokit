@@ -1,6 +1,4 @@
 <script lang="ts">
-  import cs from 'classnames';
-
   interface Props {
     id?: string;
     min?: number;
@@ -9,7 +7,9 @@
     value: number;
     disabled?: boolean;
     class?: string;
+    autofocus?: boolean;
     onchange: (value: number) => void;
+    ref?: HTMLInputElement;
   }
 
   let {
@@ -20,6 +20,7 @@
     value,
     disabled = false,
     class: className = '',
+    autofocus = false,
     onchange
   }: Props = $props();
 
@@ -36,6 +37,7 @@
   }
 </script>
 
+<!-- svelte-ignore a11y_autofocus -->
 <input
   type="number"
   {id}
@@ -44,11 +46,12 @@
   {value}
   {step}
   {disabled}
+  {autofocus}
   onchange={onChange}
-  class={cs(
+  class={[
     'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
     className
-  )}
+  ]}
 />
 
 <style lang="postcss">

@@ -2,7 +2,7 @@
   import type { FeatureCollection } from 'geojson';
 
   import TransformationEditor from '$lib/components/data/TransformationEditor.svelte';
-  import GearIcon from '$lib/components/icons/GearIcon.svelte';
+  import MoreIcon from '$lib/components/icons/MoreIcon.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
@@ -110,7 +110,7 @@
   <button
     bind:this={trigger}
     onclick={onClickComputedAttribute}
-    data-testid="open-transformation-editor-button"><GearIcon /></button
+    data-testid="open-transformation-editor-button"><MoreIcon /></button
   >
 </div>
 {#if transformationEditorVisible}

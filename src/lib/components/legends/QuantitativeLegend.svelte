@@ -1,20 +1,18 @@
 <script lang="ts">
-  import type { Feature } from 'geojson';
-
-  import { deriveExtent } from '$lib/interaction/scales';
   import type { ConstantStroke, LayerType, QuantitativeFill } from '$lib/types';
+  import { catalog } from '$lib/state/catalog.svelte';
   import { materializeQuantitativeColorScheme } from '$lib/utils/scheme';
 
   interface Props {
     fill: QuantitativeFill;
     stroke: ConstantStroke | undefined;
-    features: Feature[];
+    layerId: string;
     layerType: LayerType;
   }
 
-  let { fill, stroke, features, layerType }: Props = $props();
+  let { fill, stroke, layerId, layerType }: Props = $props();
+  let { min, max } = catalog.value[layerId][fill.attribute];
 
-  let [min, max] = $derived(deriveExtent(fill.attribute, features));
   let colors = $derived(
     materializeQuantitativeColorScheme(
       fill.scheme.id,

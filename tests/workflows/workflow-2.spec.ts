@@ -143,36 +143,19 @@ test('workflow-2', async ({ page }) => {
   await page.locator('#classification-method-select').selectOption('Manual');
 
   // Set the layer's Breaks to -21, -14, -7, 0, 7.
-  await page.getByTestId('breaks-editor').locator('input').first().fill('-21');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .first()
-    .press('Enter');
-  await page.getByTestId('breaks-editor').locator('input').nth(1).fill('-14');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(1)
-    .press('Enter');
-  await page.getByTestId('breaks-editor').locator('input').nth(2).fill('-7');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(2)
-    .press('Enter');
-  await page.getByTestId('breaks-editor').locator('input').nth(3).fill('0');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(3)
-    .press('Enter');
-  await page.getByTestId('breaks-editor').locator('input').nth(4).fill('7');
-  await page
-    .getByTestId('breaks-editor')
-    .locator('input')
-    .nth(4)
-    .press('Enter');
+  const stops = [-21, -14, -7, 0, 7];
+  let i = 0;
+
+  for await (const stop of stops) {
+    const input = page
+      .getByTestId('breaks-editor')
+      .locator('input:last-child')
+      .nth(i);
+
+    await input.fill(stop.toString());
+    await input.press('Enter');
+    i++;
+  }
 
   // Set the layer's fill-opacity to 100%.
   await page.locator('#fill-opacity-input').fill('100');
