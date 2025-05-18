@@ -118,11 +118,7 @@ function forceAscendingThresholds({
   layerId,
   attribute,
   thresholds
-}: {
-  layerId: string;
-  attribute: string;
-  thresholds: number[];
-}): number[] {
+}: Omit<DeriveBreaksParams, 'range'> & { thresholds: number[] }): number[] {
   const min = catalog.value[layerId][attribute]['min'];
   const max = catalog.value[layerId][attribute]['max'];
 

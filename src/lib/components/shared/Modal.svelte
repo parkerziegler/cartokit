@@ -17,7 +17,7 @@
   }
 
   let {
-    showModal = $bindable(undefined),
+    showModal = $bindable(false),
     initialHeight = 0,
     class: className,
     testId = '',

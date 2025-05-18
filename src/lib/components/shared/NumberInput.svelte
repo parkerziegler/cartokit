@@ -9,7 +9,6 @@
     class?: string;
     autofocus?: boolean;
     onchange: (value: number) => void;
-    ref?: HTMLInputElement;
   }
 
   let {
