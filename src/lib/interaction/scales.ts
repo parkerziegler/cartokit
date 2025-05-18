@@ -1,34 +1,7 @@
 import * as d3 from 'd3';
-import type { Feature } from 'geojson';
-import { get } from 'svelte/store';
 
-import { catalog } from '$lib/stores/catalog';
+import { catalog } from '$lib/state/catalog.svelte';
 import type { ClassificationMethod } from '$lib/types';
-import { isPropertyQuantitative } from '$lib/utils/property';
-
-/**
- * Derive the extent for a given attribute of a GeoJSON FeatureCollection.
- *
- * @param attribute – The data attribute to compute the extent over.
- * @param features – The GeoJSON features of the dataset,
- * @returns – The extent of the dataset represented as a tuple.
- */
-export function deriveExtent(
-  attribute: string,
-  features: Feature[]
-): [number, number] {
-  const [min, max] = d3.extent(
-    features
-      .map((feature) => feature.properties?.[attribute])
-      .filter(isPropertyQuantitative)
-  );
-  const data: [number, number] =
-    typeof min === 'undefined' || typeof max === 'undefined'
-      ? [0, 1]
-      : [min, max];
-
-  return data;
-}
 
 interface DeriveBreaksParams {
   layerId: string;
@@ -43,7 +16,6 @@ interface DeriveBreaksParams {
  * @param layerId – The ID of the visualized layer.
  * @param attribute – The data attribute to compute quantiles over.
  * @param range – The output range of the quantile scale.
- *
  * @returns – The quantiles of the dataset.
  */
 function deriveQuantiles({
@@ -51,8 +23,7 @@ function deriveQuantiles({
   attribute,
   range
 }: DeriveBreaksParams): number[] {
-  const ctlg = get(catalog);
-  const domain = ctlg[layerId][attribute]['Quantile'].domain;
+  const domain = catalog.value[layerId][attribute]['Quantile'].domain;
 
   // Derive quantiles.
   const quantiles = d3
@@ -71,7 +42,6 @@ function deriveQuantiles({
  * @param layerId – The ID of the visualized layer.
  * @param attribute – The data attribute to compute equal interval thresholds over.
  * @param range – The output range of the equal interval (quantize) scale.
- *
  * @returns – The equal interval thresholds of the dataset.
  */
 function deriveEqualIntervals({
@@ -79,8 +49,7 @@ function deriveEqualIntervals({
   attribute,
   range
 }: DeriveBreaksParams): number[] {
-  const ctlg = get(catalog);
-  const domain = ctlg[layerId][attribute]['Equal Interval'].domain;
+  const domain = catalog.value[layerId][attribute]['Equal Interval'].domain;
 
   // Derive ticks.
   const ticks = d3
@@ -99,7 +68,6 @@ function deriveEqualIntervals({
  * @param layerId – The ID of the visualized layer.
  * @param attribute – The data attribute to compute Jenks natural breaks over.
  * @param range – The output range of the Jenks scale.
- *
  * @returns – The Jenks natural breaks of the dataset.
  */
 function deriveJenksBreaks({
@@ -107,9 +75,69 @@ function deriveJenksBreaks({
   attribute,
   range
 }: DeriveBreaksParams): number[] {
-  const ctlg = get(catalog);
+  return catalog.value[layerId][attribute]['Jenks'][range.length].breaks;
+}
 
-  return ctlg[layerId][attribute]['Jenks'][range.length].breaks;
+/**
+ * Derive manual thresholds for a given attribute of a GeoJSON FeatureCollection.
+ *
+ * @param params – Input parameters to compute manual thresholds over a GeoJSON FeatureCollection.
+ * @param layerId – The ID of the visualized layer.
+ * @param attribute – The data attribute to compute manual thresholds over.
+ * @param range – The output range of the scale.
+ * @param thresholds – The current thresholds of the dataset.
+ * @returns – The (potentially updated) manual thresholds of the dataset.
+ */
+function deriveManualBreaks({
+  layerId,
+  attribute,
+  range,
+  thresholds
+}: DeriveBreaksParams & { thresholds: number[] }): number[] {
+  // If the number of thresholds does not match the number of range values,
+  // derive a fully new set of thresholds, defaulting to quantiles.
+  if (thresholds.length !== range.length - 1) {
+    const quantiles = deriveQuantiles({ layerId, attribute, range });
+
+    return quantiles;
+  }
+
+  return forceAscendingThresholds({ layerId, attribute, thresholds });
+}
+
+/**
+ * Force ascending thresholds.
+ *
+ * @param params – Input parameters to force ascending thresholds.
+ * @param layerId – The ID of the visualized layer.
+ * @param attribute – The data attribute to force ascending thresholds over.
+ * @param thresholds – The current thresholds of the dataset.
+ * @returns – The (potentially updated) ascending thresholds of the dataset.
+ */
+function forceAscendingThresholds({
+  layerId,
+  attribute,
+  thresholds
+}: Omit<DeriveBreaksParams, 'range'> & { thresholds: number[] }): number[] {
+  const min = catalog.value[layerId][attribute]['min'];
+  const max = catalog.value[layerId][attribute]['max'];
+
+  let prev = min;
+  const output: number[] = [];
+
+  thresholds.forEach((threshold) => {
+    if (threshold <= prev) {
+      // Get a random value between the previous threshold and the max.
+      threshold = d3.randomUniform(prev, max)();
+    } else if (threshold > max) {
+      threshold = max - 0.00001;
+    }
+
+    output.push(threshold);
+    prev = threshold;
+  });
+
+  return output;
 }
 
 interface DeriveThresholdsParams extends DeriveBreaksParams {
@@ -144,6 +172,6 @@ export function deriveThresholds({
     case 'Jenks':
       return deriveJenksBreaks({ layerId, attribute, range });
     case 'Manual':
-      return thresholds;
+      return deriveManualBreaks({ layerId, attribute, range, thresholds });
   }
 }

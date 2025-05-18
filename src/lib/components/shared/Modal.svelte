@@ -5,6 +5,8 @@
   import { cubicOut } from 'svelte/easing';
   import { Tween } from 'svelte/motion';
 
+  import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
+
   interface Props {
     showModal?: boolean;
     initialHeight?: number;
@@ -15,7 +17,7 @@
   }
 
   let {
-    showModal = $bindable(),
+    showModal = $bindable(false),
     initialHeight = 0,
     class: className,
     testId = '',
@@ -69,20 +71,7 @@
     <div class="flex items-center justify-between p-4">
       {@render header?.()}
       <button onclick={() => dialog?.close()} aria-label="Close">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
+        <CloseIcon />
       </button>
     </div>
     {@render children()}
@@ -102,6 +91,7 @@
   dialog[open] {
     animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+
   @keyframes zoom {
     from {
       transform: scale(0.95);

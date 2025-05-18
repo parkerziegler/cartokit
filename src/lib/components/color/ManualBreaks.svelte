@@ -1,26 +1,19 @@
 <script lang="ts">
   import * as d3 from 'd3';
-  import type { Feature } from 'geojson';
 
-  import Menu from '$lib/components/shared/Menu.svelte';
-  import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { deriveExtent } from '$lib/interaction/scales';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { QuantitativeStyle } from '$lib/types';
-  import { clickoutside } from '$lib/utils/actions';
+  import { catalog } from '$lib/state/catalog.svelte';
   import { history } from '$lib/state/history.svelte';
 
   interface Props {
     layerId: string;
     style: QuantitativeStyle;
-    features: Feature[];
-    hideBreaksEditor: () => void;
   }
 
-  let { layerId, style, features, hideBreaksEditor }: Props = $props();
-
-  let [min, max] = $derived(deriveExtent(style.attribute, features));
+  let { layerId, style }: Props = $props();
+  let { min, max } = catalog.value[layerId][style.attribute];
 
   function onThresholdChange(i: number) {
     return function handleThresholdChange(value: number) {
@@ -50,47 +43,36 @@
   }
 </script>
 
-<Menu class="w-80 overflow-auto">
-  <MenuItem title="Set steps">
-    {#snippet action()}
-      <button onclick={hideBreaksEditor} aria-label="Close breaks editor">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-    {/snippet}
+<div data-testid="breaks-editor" class="font-mono text-xs">
+  {#each [min, ...style.thresholds] as threshold, i (threshold)}
     <div
-      class="grid grid-cols-[0.75rem_1fr_1rem_1fr] gap-x-2 gap-y-1"
-      use:clickoutside
-      onclickoutside={hideBreaksEditor}
-      data-testid="breaks-editor"
+      class="grid grid-cols-[3rem_minmax(0,1fr)_minmax(0,1fr)] gap-x-1 gap-y-2 border-b border-slate-600 last:border-b-0"
     >
-      {#each [min, ...style.thresholds] as threshold, i (threshold)}
+      <div class="self-center justify-self-center">
         <span
-          class="h-6 self-center"
+          class="inline-block h-4 w-4 rounded-sm"
           style="background-color: {d3[style.scheme.id][style.count][i]};"
         ></span>
-        <span class="self-center">{threshold.toFixed(2)}</span>
-        <span class="self-center">to</span>
-        <NumberInput
-          value={style.thresholds[i] ?? max}
-          step={0.01}
-          class="self-center p-1"
-          disabled={i === style.thresholds.length}
-          onchange={onThresholdChange(i)}
-        />
-      {/each}
+      </div>
+      <NumberInput
+        {min}
+        {max}
+        value={style.thresholds[i - 1] ?? min}
+        step={0.01}
+        class="self-center hover:border-transparent"
+        disabled={i === 0}
+        onchange={onThresholdChange(i - 1)}
+      />
+      <NumberInput
+        {min}
+        {max}
+        value={style.thresholds[i] ?? max}
+        step={0.01}
+        class="self-center hover:border-transparent"
+        disabled={i === style.thresholds.length}
+        onchange={onThresholdChange(i)}
+        autofocus={i === 0}
+      />
     </div>
-  </MenuItem>
-</Menu>
+  {/each}
+</div>

@@ -189,7 +189,7 @@
     max-height: calc(100% - 2rem);
     transition:
       max-height 200ms ease-out,
-      transform 400ms cubic-bezier(0, 0, 0.2, 1);
+      transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   :global(.properties--x-compact) {

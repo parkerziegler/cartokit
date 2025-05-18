@@ -12,17 +12,21 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
   const properties = Object.entries(features[0].properties || {})
     .filter(([, value]) => isPropertyQuantitative(value))
     .map(([key]) => key);
+
   const catalog: Catalog = {};
 
   properties.forEach((property) => {
-    CLASSIFICATION_METHODS.forEach((method) => {
-      const domain = features.map((feature) => feature.properties?.[property]);
-      const extent = d3.extent(domain);
-      const [min, max]: [number, number] =
-        typeof extent[0] === 'undefined' || typeof extent[1] === 'undefined'
-          ? [0, 1]
-          : extent;
+    const domain = features.map((feature) => feature.properties?.[property]);
+    const extent = d3.extent(domain);
+    const [min, max]: [number, number] =
+      typeof extent[0] === 'undefined' || typeof extent[1] === 'undefined'
+        ? [0, 1]
+        : extent;
 
+    set(catalog, `${layer.id}.${property}.min`, min);
+    set(catalog, `${layer.id}.${property}.max`, max);
+
+    CLASSIFICATION_METHODS.forEach((method) => {
       switch (method) {
         case 'Quantile': {
           set(catalog, `${layer.id}.${property}.${method}.domain`, domain);

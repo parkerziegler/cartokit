@@ -3,7 +3,7 @@ import type { FeatureCollection } from 'geojson';
 import type { Map, MapSourceDataEvent } from 'maplibre-gl';
 
 import { addLayer, generateCartoKitLayer } from '$lib/interaction/layer';
-import { catalog } from '$lib/stores/catalog';
+import { catalog } from '$lib/state/catalog.svelte';
 import { ir } from '$lib/stores/ir';
 import type { CartoKitLayer, Catalog } from '$lib/types';
 import { sourceWorker } from '$lib/utils/worker';
@@ -66,11 +66,7 @@ async function loadSource(
   );
   const buildCatalog =
     Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
-  const catalogUpdate = await buildCatalog(layer);
-
-  catalog.update((catalog) => {
-    return { ...catalog, ...catalogUpdate };
-  });
+  catalog.value = await buildCatalog(layer);
 
   addLayer(map, layer);
 }
