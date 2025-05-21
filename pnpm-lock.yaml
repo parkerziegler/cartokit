@@ -64,7 +64,7 @@ importers:
         version: 6.16.0
       openai:
         specifier: ^4.85.4
-        version: 4.100.0(zod@3.25.8)
+        version: 4.100.0(zod@3.25.17)
       prettier:
         specifier: ^3.5.2
         version: 3.5.3
@@ -76,7 +76,7 @@ importers:
         version: 7.8.8
       zod:
         specifier: ^3.24.2
-        version: 3.25.8
+        version: 3.25.17
     devDependencies:
       '@eslint/compat':
         specifier: ^1.2.7
@@ -119,7 +119,7 @@ importers:
         version: 10.1.5(eslint@9.27.0(jiti@1.21.7))
       eslint-plugin-svelte:
         specifier: ^3.5.1
-        version: 3.8.2(eslint@9.27.0(jiti@1.21.7))(svelte@5.32.1)
+        version: 3.9.0(eslint@9.27.0(jiti@1.21.7))(svelte@5.32.1)
       globals:
         specifier: ^16.0.0
         version: 16.1.0
@@ -1461,8 +1461,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-svelte@3.8.2:
-    resolution: {integrity: sha512-TtepyI7nqWOPBqDXu/1kAFTeus9VuMByFGj6WIxNiByCknmR7b4w5DBoQ2qhj2RY5dMXyUJGHRp/pm/J2BSRxg==}
+  eslint-plugin-svelte@3.9.0:
+    resolution: {integrity: sha512-nvIUNyyPGbr5922Kd1p/jXe+FfNdVPXsxLyrrXpwfSbZZEFdAYva9O/gm2lObC/wXkQo/AUmQkAihfmNJYeCjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.1 || ^9.0.0
@@ -2640,8 +2640,8 @@ packages:
   zimmerframe@1.1.2:
     resolution: {integrity: sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w==}
 
-  zod@3.25.8:
-    resolution: {integrity: sha512-iJPWX8HoZ2VE21VrhHGU9jVo/kVDUQyqM9vF0MxDhW/fp2sAl1eVwGJgiYZdHGiMwQJImXIW80lKk0MnfDxqiQ==}
+  zod@3.25.17:
+    resolution: {integrity: sha512-8hQzQ/kMOIFbwOgPrm9Sf9rtFHpFUMy4HvN0yEB0spw14aYi0uT5xG5CE2DB9cd51GWNsz+DNO7se1kztHMKnw==}
 
 snapshots:
 
@@ -3930,7 +3930,7 @@ snapshots:
     dependencies:
       eslint: 9.27.0(jiti@1.21.7)
 
-  eslint-plugin-svelte@3.8.2(eslint@9.27.0(jiti@1.21.7))(svelte@5.32.1):
+  eslint-plugin-svelte@3.9.0(eslint@9.27.0(jiti@1.21.7))(svelte@5.32.1):
     dependencies:
       '@eslint-community/eslint-utils': 4.7.0(eslint@9.27.0(jiti@1.21.7))
       '@jridgewell/sourcemap-codec': 1.5.0
@@ -4461,7 +4461,7 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@4.100.0(zod@3.25.8):
+  openai@4.100.0(zod@3.25.17):
     dependencies:
       '@types/node': 18.19.103
       '@types/node-fetch': 2.6.12
@@ -4471,7 +4471,7 @@ snapshots:
       formdata-node: 4.4.1
       node-fetch: 2.7.0
     optionalDependencies:
-      zod: 3.25.8
+      zod: 3.25.17
     transitivePeerDependencies:
       - encoding
 
@@ -5013,4 +5013,4 @@ snapshots:
 
   zimmerframe@1.1.2: {}
 
-  zod@3.25.8: {}
+  zod@3.25.17: {}
