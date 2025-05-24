@@ -64,7 +64,7 @@ importers:
         version: 6.16.0
       openai:
         specifier: ^4.85.4
-        version: 4.103.0(zod@3.25.23)
+        version: 4.103.0(zod@3.25.28)
       prettier:
         specifier: ^3.5.2
         version: 3.5.3
@@ -76,7 +76,7 @@ importers:
         version: 7.8.8
       zod:
         specifier: ^3.24.2
-        version: 3.25.23
+        version: 3.25.28
     devDependencies:
       '@eslint/compat':
         specifier: ^1.2.7
@@ -2640,8 +2640,8 @@ packages:
   zimmerframe@1.1.2:
     resolution: {integrity: sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w==}
 
-  zod@3.25.23:
-    resolution: {integrity: sha512-Od2bdMosahjSrSgJtakrwjMDb1zM1A3VIHCPGveZt/3/wlrTWBya2lmEh2OYe4OIu8mPTmmr0gnLHIWQXdtWBg==}
+  zod@3.25.28:
+    resolution: {integrity: sha512-/nt/67WYKnr5by3YS7LroZJbtcCBurDKKPBPWWzaxvVCGuG/NOsiKkrjoOhI8mJ+SQUXEbUzeB3S+6XDUEEj7Q==}
 
 snapshots:
 
@@ -4461,7 +4461,7 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@4.103.0(zod@3.25.23):
+  openai@4.103.0(zod@3.25.28):
     dependencies:
       '@types/node': 18.19.103
       '@types/node-fetch': 2.6.12
@@ -4471,7 +4471,7 @@ snapshots:
       formdata-node: 4.4.1
       node-fetch: 2.7.0
     optionalDependencies:
-      zod: 3.25.23
+      zod: 3.25.28
     transitivePeerDependencies:
       - encoding
 
@@ -5013,4 +5013,4 @@ snapshots:
 
   zimmerframe@1.1.2: {}
 
-  zod@3.25.23: {}
+  zod@3.25.28: {}
