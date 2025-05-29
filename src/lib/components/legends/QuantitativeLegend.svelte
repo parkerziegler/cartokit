@@ -11,7 +11,7 @@
   }
 
   let { fill, stroke, layerId, layerType }: Props = $props();
-  let { min, max } = catalog.value[layerId][fill.attribute];
+  let { min, max } = $derived(catalog.value[layerId][fill.attribute]);
 
   let colors = $derived(
     materializeQuantitativeColorScheme(

@@ -13,7 +13,7 @@
   }
 
   let { layerId, style }: Props = $props();
-  let { min, max } = catalog.value[layerId][style.attribute];
+  let { min, max } = $derived(catalog.value[layerId][style.attribute]);
 
   function onThresholdChange(i: number) {
     return function handleThresholdChange(value: number) {

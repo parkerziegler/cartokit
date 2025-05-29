@@ -13,7 +13,9 @@
 
   let { layer }: Props = $props();
 
-  let { min, max } = catalog.value[layer.id][layer.style.size.attribute];
+  let { min, max } = $derived(
+    catalog.value[layer.id][layer.style.size.attribute]
+  );
   let scale = $derived(
     d3.scaleLinear([layer.style.size.min, layer.style.size.max], [min, max])
   );
