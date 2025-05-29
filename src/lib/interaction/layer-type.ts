@@ -197,7 +197,7 @@ function transitionToPoint(
           geojson: deriveCentroids(layer.data.sourceGeojson.features),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            transformGeometryToCentroids
           ]
         },
         style: {
@@ -221,7 +221,7 @@ function transitionToPoint(
           geojson: deriveCentroids(layer.data.geojson.features),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            transformGeometryToCentroids
           ]
         },
         style: {
@@ -250,7 +250,7 @@ function transitionToPoint(
           geojson: deriveCentroids(layer.data.geojson.features),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            transformGeometryToCentroids
           ]
         },
         style: {
@@ -275,7 +275,7 @@ function transitionToPoint(
           geojson: deriveCentroids(layer.data.geojson.features),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            transformGeometryToCentroids
           ]
         },
         style: {
@@ -354,7 +354,7 @@ function transitionToProportionalSymbol(
           geojson: deriveCentroids(layer.data.sourceGeojson.features),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            transformGeometryToCentroids
           ]
         },
         style: {
@@ -383,7 +383,7 @@ function transitionToProportionalSymbol(
           geojson: deriveCentroids(features),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            transformGeometryToCentroids
           ]
         },
         style: {
@@ -416,7 +416,7 @@ function transitionToProportionalSymbol(
           geojson: deriveCentroids(features),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            transformGeometryToCentroids
           ]
         },
         style: {
@@ -445,7 +445,7 @@ function transitionToProportionalSymbol(
           geojson: deriveCentroids(features),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            transformGeometryToCentroids
           ]
         },
         style: {
@@ -508,10 +508,7 @@ function transitionToDotDensity(
         data: {
           ...layer.data,
           geojson: generateDotDensityPoints(features, attribute, dotValue),
-          transformations: [
-            ...layer.data.transformations,
-            transformDotDensity(attribute, dotValue)
-          ]
+          transformations: [...layer.data.transformations, transformDotDensity]
         },
         style: {
           dots: {
@@ -561,10 +558,7 @@ function transitionToDotDensity(
         data: {
           ...layer.data,
           geojson: generateDotDensityPoints(features, attribute, dotValue),
-          transformations: [
-            ...layer.data.transformations,
-            transformDotDensity(attribute, dotValue)
-          ]
+          transformations: [...layer.data.transformations, transformDotDensity]
         },
         style: {
           dots: {
@@ -616,10 +610,7 @@ function transitionToDotDensity(
         data: {
           ...layer.data,
           geojson: generateDotDensityPoints(features, attribute, dotValue),
-          transformations: [
-            ...layer.data.transformations,
-            transformDotDensity(attribute, dotValue)
-          ]
+          transformations: [...layer.data.transformations, transformDotDensity]
         },
         style: {
           dots: {
@@ -651,10 +642,7 @@ function transitionToDotDensity(
         data: {
           ...layer.data,
           geojson: generateDotDensityPoints(features, attribute, dotValue),
-          transformations: [
-            ...layer.data.transformations,
-            transformDotDensity(attribute, dotValue)
-          ]
+          transformations: [...layer.data.transformations, transformDotDensity]
         },
         style: {
           dots: {

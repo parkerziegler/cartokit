@@ -16,8 +16,6 @@ export function codegenSource(
   const { transformation, data } = codegenTransformations(layer, uploadTable);
 
   return `
-  ${transformation}
-
   map.addSource('${layer.id}', {
 		type: 'geojson',
 		data: ${data}

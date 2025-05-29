@@ -54,7 +54,7 @@ function isFetchGeoJSONRequired(ir: CartoKitIR): boolean {
  * @param ir – The CartoKit IR.
  * @param languageBackend – The @see{CartoKitLanguageBackend} for the analysis.
  */
-export function isFeatureCollectionRequired(
+function isFeatureCollectionRequired(
   ir: CartoKitIR,
   languageBackend: CartoKitBackend['language']
 ): boolean {
@@ -62,6 +62,22 @@ export function isFeatureCollectionRequired(
     languageBackend === 'typescript' &&
     Object.values(ir.layers).some(
       (layer) => layer.data.transformations.length > 0
+    )
+  );
+}
+
+/**
+ * Determine whether we need to insert our function for applying the dot density
+ * transformation.
+ *
+ * @param ir – The CartoKit IR.
+ * @returns – A Boolean value indicting whether we need to insert our function
+ * for applying the dot density transformation.
+ */
+function isTransformDotDensityRequired(ir: CartoKitIR): boolean {
+  return Object.values(ir.layers).some((layer) =>
+    layer.data.transformations.some(
+      (transformation) => transformation.name === 'transformDotDensity'
     )
   );
 }
@@ -84,6 +100,7 @@ export function analyzeIR(
     isFeatureCollectionRequired: isFeatureCollectionRequired(
       ir,
       languageBackend
-    )
+    ),
+    isTransformDotDensityRequired: isTransformDotDensityRequired(ir)
   };
 }

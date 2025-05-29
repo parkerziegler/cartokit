@@ -1,22 +1,10 @@
 import { camelCase } from 'lodash-es';
 
-import type { CartoKitLayer, Transformation } from '$lib/types';
+import type { CartoKitLayer } from '$lib/types';
 
 interface TransformationProgramFragment {
   transformation: string;
   data: string;
-}
-
-/**
- * Generate a JavaScript program fragment for a single transformation function.
- *
- * @param transformation – A @see{Transformation}.
- * @returns – A JavaScript program fragment.
- */
-function codegenTransformationFn(transformation: Transformation): string {
-  return `function ${transformation.name}(geojson) {
-  ${transformation.definition}
-}`;
 }
 
 /**
@@ -46,21 +34,32 @@ export function codegenTransformations(
         data: layer.data.url ? `"${layer.data.url}"` : dataIdent
       };
     case 1: {
-      const fn = codegenTransformationFn(transformations[0]);
-
       return {
-        transformation: `${fetchData}
-        ${fn}`,
-        data: `${transformations[0].name}(${dataIdent})`
+        transformation: fetchData,
+        data: `${transformations[0].name}(${dataIdent}${
+          transformations[0].args.length > 0
+            ? `, ${transformations[0].args.join(', ')}`
+            : ''
+        })`
       };
     }
-    default:
+    default: {
+      const callSite = transformations.reduce((acc, transformation, i) => {
+        if (i === 0) {
+          return `${transformation.name}(${dataIdent}${
+            transformation.args.length > 0
+              ? `, ${transformation.args.join(', ')}`
+              : ''
+          })`;
+        }
+
+        return `${transformation.name}(${acc}, ${transformation.args.join(', ')})`;
+      }, '');
+
       return {
-        transformation: `${fetchData}
-        ${transformations.map(codegenTransformationFn).join('\n\n')}`,
-        data: `flow(${transformations
-          .map((transformation) => transformation.name)
-          .join(', ')})(${dataIdent})`
+        transformation: fetchData,
+        data: callSite
       };
+    }
   }
 }

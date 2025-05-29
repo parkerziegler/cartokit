@@ -75,6 +75,7 @@
               geojson: message.data,
               transformation: {
                 name: functionName,
+                args: ['geojson'],
                 definition: functionBody,
                 type: 'tabular'
               }

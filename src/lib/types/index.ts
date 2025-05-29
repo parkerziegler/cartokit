@@ -97,6 +97,8 @@ export type VisualizationType = 'Quantitative' | 'Categorical' | 'Constant';
  */
 export interface Transformation {
   name: string;
+  params: string[];
+  args: unknown[];
   definition: string;
   type: 'geometric' | 'tabular';
 }
@@ -463,10 +465,13 @@ export interface CartoKitBackend {
  * to insert a function to fetch GeoJSON hosted at a remote URL.
  * @property isFeatureCollectionRequired - A Boolean value indicating whether we
  * need to insert an import of the GeoJSON FeatureCollection type.
+ * @property isTransformDotDensityRequired - A Boolean value indicating whether
+ * we need to insert our function for applying the dot density transformation.
  */
 export interface CartoKitBackendAnalysis {
   isTurfRequired: boolean;
   isLodashFlowRequired: boolean;
   isFetchGeoJSONRequired: boolean;
   isFeatureCollectionRequired: boolean;
+  isTransformDotDensityRequired: boolean;
 }
