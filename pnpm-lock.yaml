@@ -64,7 +64,7 @@ importers:
         version: 6.17.0
       openai:
         specifier: ^5.0.0
-        version: 5.1.1(zod@3.25.51)
+        version: 5.1.1(zod@3.25.56)
       prettier:
         specifier: ^3.5.2
         version: 3.5.3
@@ -76,7 +76,7 @@ importers:
         version: 7.8.8
       zod:
         specifier: ^3.24.2
-        version: 3.25.51
+        version: 3.25.56
     devDependencies:
       '@eslint/compat':
         specifier: ^1.2.7
@@ -2544,8 +2544,8 @@ packages:
   zimmerframe@1.1.2:
     resolution: {integrity: sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w==}
 
-  zod@3.25.51:
-    resolution: {integrity: sha512-TQSnBldh+XSGL+opiSIq0575wvDPqu09AqWe1F7JhUMKY+M91/aGlK4MhpVNO7MgYfHcVCB1ffwAUTJzllKJqg==}
+  zod@3.25.56:
+    resolution: {integrity: sha512-rd6eEF3BTNvQnR2e2wwolfTmUTnp70aUTqr0oaGbHifzC3BKJsoV+Gat8vxUMR1hwOKBs6El+qWehrHbCpW6SQ==}
 
 snapshots:
 
@@ -4276,9 +4276,9 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@5.1.1(zod@3.25.51):
+  openai@5.1.1(zod@3.25.56):
     optionalDependencies:
-      zod: 3.25.51
+      zod: 3.25.56
 
   optionator@0.9.4:
     dependencies:
@@ -4814,4 +4814,4 @@ snapshots:
 
   zimmerframe@1.1.2: {}
 
-  zod@3.25.51: {}
+  zod@3.25.56: {}
