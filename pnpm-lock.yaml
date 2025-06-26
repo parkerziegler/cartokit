@@ -40,7 +40,7 @@ importers:
         version: 7.2.0
       '@vercel/analytics':
         specifier: ^1.5.0
-        version: 1.5.0(@sveltejs/kit@2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)
+        version: 1.5.0(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -89,10 +89,10 @@ importers:
         version: 1.53.1
       '@sveltejs/adapter-vercel':
         specifier: ^4.0.5
-        version: 4.0.5(@sveltejs/kit@2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))
+        version: 4.0.5(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))
       '@sveltejs/kit':
         specifier: ^2.17.3
-        version: 2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0))
+        version: 2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0))
       '@sveltejs/vite-plugin-svelte':
         specifier: ^5.0.3
         version: 5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0))
@@ -763,8 +763,8 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^2.0.0
 
-  '@sveltejs/kit@2.22.0':
-    resolution: {integrity: sha512-DJm0UxVgzXq+1MUfiJK4Ridk7oIQsIets6JwHiEl97sI6nXScfXe+BeqNhzB7jQIVBb3BM51U4hNk8qQxRXBAA==}
+  '@sveltejs/kit@2.22.2':
+    resolution: {integrity: sha512-2MvEpSYabUrsJAoq5qCOBGAlkICjfjunrnLcx3YAk2XV7TvAIhomlKsAgR4H/4uns5rAfYmj7Wet5KRtc8dPIg==}
     engines: {node: '>=18.13'}
     hasBin: true
     peerDependencies:
@@ -3015,16 +3015,16 @@ snapshots:
     dependencies:
       acorn: 8.15.0
 
-  '@sveltejs/adapter-vercel@4.0.5(@sveltejs/kit@2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))':
+  '@sveltejs/adapter-vercel@4.0.5(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))':
     dependencies:
-      '@sveltejs/kit': 2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0))
+      '@sveltejs/kit': 2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0))
       '@vercel/nft': 0.26.5
       esbuild: 0.19.12
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  '@sveltejs/kit@2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0))':
+  '@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0))':
     dependencies:
       '@sveltejs/acorn-typescript': 1.0.5(acorn@8.15.0)
       '@sveltejs/vite-plugin-svelte': 5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0))
@@ -3360,9 +3360,9 @@ snapshots:
       '@typescript-eslint/types': 8.35.0
       eslint-visitor-keys: 4.2.1
 
-  '@vercel/analytics@1.5.0(@sveltejs/kit@2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)':
+  '@vercel/analytics@1.5.0(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)':
     optionalDependencies:
-      '@sveltejs/kit': 2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0))
+      '@sveltejs/kit': 2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.8)(vite@7.0.0(@types/node@22.15.33)(jiti@1.21.7)(yaml@2.8.0))
       svelte: 5.34.8
 
   '@vercel/nft@0.26.5':
