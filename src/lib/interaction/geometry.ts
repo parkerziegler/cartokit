@@ -86,7 +86,14 @@ export function generateDotDensityPoints(
   value: number
 ): FeatureCollection<Point> {
   return featureCollection(
-    features.flatMap(({ geometry, properties }) => {
+    features.reduce<Feature<Point>[]>((acc, { geometry, properties }) => {
+      if (
+        !geometry ||
+        ('coordinates' in geometry && geometry.coordinates.length === 0)
+      ) {
+        return acc;
+      }
+
       const numPoints = Math.floor(properties?.[attribute] / value) ?? 0;
 
       // Obtain the bounding box of the polygon.
@@ -104,10 +111,11 @@ export function generateDotDensityPoints(
         }
       }
 
-      return selectedFeatures.map((point) =>
-        feature(point.geometry, properties)
-      );
-    })
+      return [
+        ...acc,
+        ...selectedFeatures.map((point) => feature(point.geometry, properties))
+      ];
+    }, [])
   );
 }
 
@@ -127,5 +135,5 @@ export function deriveDotDensityStartingValue(
   const max = d3.max(features, (d) => d.properties?.[attribute] ?? 0);
 
   // Aim for a ratio where the number of dots is 1% of the max data value.
-  return Math.floor(max / 100);
+  return max * 0.01 || 1;
 }
