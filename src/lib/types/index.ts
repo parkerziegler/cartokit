@@ -92,15 +92,25 @@ export type VisualizationType = 'Quantitative' | 'Categorical' | 'Constant';
  * layer.
  *
  * @property name - The function name of the transformation.
+ * @property params - The parameters of the transformation.
  * @property definition - The function body of the transformation.
  * @property type - The type of the transformation, either geometric or tabular.
  */
 export interface Transformation {
   name: string;
   params: string[];
-  args: unknown[];
   definition: string;
   type: 'geometric' | 'tabular';
+}
+
+/**
+ * Represents a concrete call of a transformation, extending the Transformation
+ * interface with a list of arguments.
+ *
+ * @property args - The arguments of the transformation call.
+ */
+export interface TransformationCall extends Transformation {
+  args: unknown[];
 }
 
 /**
@@ -124,7 +134,7 @@ interface LayerData {
   fileName?: string;
   geojson: FeatureCollection;
   sourceGeojson: FeatureCollection;
-  transformations: Transformation[];
+  transformations: TransformationCall[];
 }
 
 /**

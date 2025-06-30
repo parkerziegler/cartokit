@@ -1,15 +1,10 @@
 {
-  "name": "cartokit",
-  "version": "0.11.2",
-  "private": true,
+  "name": "arcgis-data-fetcher",
+  "version": "1.0.0",
+  "description": "Script to fetch data from ArcGIS REST API with pagination support",
+  "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "preview": "vite preview",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "fetch": "node scripts/fetch-arcgis-data.js"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.3",
@@ -63,6 +58,5 @@
     "typescript-eslint": "^8.31.0",
     "vite": "^7.0.0"
   },
-  "type": "module",
   "packageManager": "pnpm@10.12.4"
 }

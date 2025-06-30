@@ -1,5 +1,5 @@
 import type { CartoKitBackendAnalysis, Transformation } from '$lib/types';
-import { transformDotDensity } from '$lib/utils/transformation';
+import { transformDotDensity } from '$lib/utils/stdlib';
 
 /**
  * Generate a JavaScript program fragment for a single transformation function.
@@ -8,7 +8,7 @@ import { transformDotDensity } from '$lib/utils/transformation';
  * @returns – A JavaScript program fragment.
  */
 function codegenTransformationFn(transformation: Transformation): string {
-  return `function ${transformation.name}(${transformation.args.join(', ')}) {
+  return `function ${transformation.name}(${transformation.params.join(', ')}) {
   ${transformation.definition}
 }`;
 }
@@ -39,9 +39,7 @@ export function codegenFns(analysis: CartoKitBackendAnalysis): string {
   }
 
   if (analysis.isTransformDotDensityRequired) {
-    fns.push(`function ${transformDotDensity.name}(${transformDotDensity.params.join(', ')}) {
-      ${transformDotDensity.definition}
-    }`);
+    fns.push(codegenTransformationFn(transformDotDensity));
   }
 
   return fns.join('\n');

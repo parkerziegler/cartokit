@@ -16,7 +16,7 @@ import type {
   ClassificationMethod,
   QuantitativeColorScheme,
   LayerType,
-  Transformation,
+  TransformationCall,
   VisualizationType,
   QuantitativeFill,
   CategoricalFill,
@@ -178,7 +178,7 @@ interface TransformationUpdate extends LayerUpdate {
   type: 'transformation';
   payload: {
     geojson: FeatureCollection;
-    transformation: Transformation;
+    transformation: TransformationCall;
   };
 }
 

@@ -33,31 +33,29 @@
   }
 </script>
 
-<div class="stack-h stack-h-xs items-baseline" bind:this={ref}>
-  {#if title}
-    <FieldLabel fieldId={id}>
-      {title}
-    </FieldLabel>
-  {/if}
-  <select
-    class={[
-      'relative border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
-      className
-    ]}
-    value={selected}
-    {onchange}
-    {id}
-  >
-    {#each options as option (option.value)}
-      <option value={option.value} selected={option.value === selected}
-        >{option.label}</option
-      >
-    {/each}
-  </select>
-  {#if loading}
-    <span class="loader align-text-top" data-testid="loading-indicator"></span>
-  {/if}
-</div>
+{#if title}
+  <FieldLabel fieldId={id}>
+    {title}
+  </FieldLabel>
+{/if}
+<select
+  class={[
+    'relative border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
+    className
+  ]}
+  value={selected}
+  {onchange}
+  {id}
+>
+  {#each options as option (option.value)}
+    <option value={option.value} selected={option.value === selected}
+      >{option.label}</option
+    >
+  {/each}
+</select>
+{#if loading}
+  <span class="loader align-text-top" data-testid="loading-indicator"></span>
+{/if}
 
 <style lang="postcss">
   .loader {
