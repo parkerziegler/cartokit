@@ -20,6 +20,6 @@
   <Tabs
     {tabs}
     containerClass="flex-1 pt-2 absolute inset-0"
-    bodyClass="flex flex-1 overflow-hidden !p-0"
+    bodyClass="flex flex-1 overflow-hidden p-0!"
   />
 </div>

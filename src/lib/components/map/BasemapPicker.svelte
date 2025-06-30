@@ -107,15 +107,15 @@
 >
   <div
     id="inset-{mapStyles[0]}"
-    class="z-10 h-10 w-10 cursor-pointer rounded border border-white"
+    class="z-10 h-10 w-10 cursor-pointer rounded-sm border border-white"
   ></div>
   <div
     id="inset-{mapStyles[1]}"
-    class="absolute inset-0 h-10 w-10 rounded border border-white transition-transform group-hover:translate-x-2 group-hover:rotate-12"
+    class="!absolute inset-0 h-10 w-10 rounded-sm border border-white transition-transform group-hover:translate-x-2 group-hover:rotate-12"
   ></div>
   <div
     id="inset-{mapStyles[2]}"
-    class="absolute inset-0 h-10 w-10 rounded border border-white transition-transform group-hover:-translate-x-2 group-hover:-rotate-12"
+    class="!absolute inset-0 h-10 w-10 rounded-sm border border-white transition-transform group-hover:-translate-x-2 group-hover:-rotate-12"
   ></div>
 </button>
 <Modal bind:showModal class="max-w-2xl" initialHeight={277}>

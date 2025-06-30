@@ -24,7 +24,7 @@
   let { layerId, layerType, geojson, fill }: Props = $props();
 </script>
 
-<div class="stack stack-2xs">
+<div class="flex flex-col gap-1">
   <ColorVisualizationTypeSelect
     {layerId}
     {layerType}
@@ -49,11 +49,7 @@
       selected={fill.attribute}
       channel="fill"
     />
-    <ClassificationMethodSelect
-      {layerId}
-      style={fill}
-      features={geojson.features}
-    />
+    <ClassificationMethodSelect {layerId} style={fill} />
     <ColorStepsSelect {layerId} style={fill} />
     <ColorSchemeSelect {layerId} style={fill} />
   {/if}

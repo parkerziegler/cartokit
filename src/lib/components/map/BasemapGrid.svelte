@@ -1,5 +1,4 @@
 <script lang="ts">
-  import cs from 'classnames';
   import { getContext } from 'svelte';
 
   import Button from '$lib/components/shared/Button.svelte';
@@ -36,8 +35,8 @@
 </script>
 
 {#if provider === 'Custom'}
-  <form class="stack stack-sm">
-    <div class="stack stack-xs">
+  <form class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
       <FieldLabel fieldId="tile-url">Tile URL</FieldLabel>
       <TextInput
         oninput={onTileUrlInput}
@@ -57,18 +56,18 @@
   <div class="grid grid-cols-3 gap-4">
     {#each BASEMAPS[provider] as basemap (basemap.tileId)}
       <button
-        class={cs(
-          'flex flex-col rounded border p-2 transition-colors hover:border-slate-400',
+        class={[
+          'flex flex-col rounded-sm border p-2 transition-colors hover:border-slate-400',
           TILE_URLS[provider](basemap.tileId) === $ir.basemap.url
             ? 'border-slate-400'
             : 'border-transparent'
-        )}
+        ]}
         onclick={onSelectBasemap(TILE_URLS[provider](basemap.tileId))}
       >
         <img
           src={basemap.src}
           alt="tiles-{basemap.tileId}"
-          class="rounded-sm"
+          class="rounded-xs"
         />
         <p class="mt-2 text-sm font-semibold">{basemap.title}</p>
       </button>

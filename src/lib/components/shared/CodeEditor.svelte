@@ -2,7 +2,6 @@
   import { javascript } from '@codemirror/lang-javascript';
   import { json } from '@codemirror/lang-json';
   import { syntaxHighlighting } from '@codemirror/language';
-  import cs from 'classnames';
   import { basicSetup, EditorView } from 'codemirror';
   import { onMount } from 'svelte';
 
@@ -85,11 +84,11 @@
 
 <div
   bind:this={editor}
-  class={cs(
+  class={[
     'grow overflow-auto border border-slate-600 text-white',
     config.kind === 'editable' &&
       'transition-colors focus-within:border-slate-400 hover:border-slate-400 focus:border-slate-400',
     className
-  )}
+  ]}
   data-testid={testId || undefined}
 ></div>

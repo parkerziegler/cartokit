@@ -4,7 +4,7 @@
   import { clickoutside } from '$lib/utils/actions';
 
   interface Props {
-    class?: string;
+    class?: string | (string | boolean)[];
     style?: string;
     id?: string;
     onclickoutsidemenu?: (event: CustomEvent<MouseEvent>) => void;

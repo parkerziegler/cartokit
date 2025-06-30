@@ -1,5 +1,4 @@
 <script lang="ts" generics="T">
-  import cs from 'classnames';
   import type { ChangeEventHandler } from 'svelte/elements';
 
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
@@ -33,15 +32,15 @@
 </script>
 
 {#if title}
-  <div class="stack-h stack-h-xs items-baseline" bind:this={ref}>
+  <div class="flex items-baseline gap-2" bind:this={ref}>
     <FieldLabel fieldId={id}>
       {title}
     </FieldLabel>
     <select
-      class={cs(
+      class={[
         'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
         className
-      )}
+      ]}
       value={selected}
       {onchange}
       {id}
@@ -55,10 +54,10 @@
   </div>
 {:else}
   <select
-    class={cs(
+    class={[
       'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
       className
-    )}
+    ]}
     value={selected}
     {id}
     {onchange}

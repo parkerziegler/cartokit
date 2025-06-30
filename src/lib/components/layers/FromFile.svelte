@@ -67,12 +67,12 @@
   }
 </script>
 
-<form class="stack stack-sm" onsubmit={onSubmit}>
-  <div class="stack stack-xs">
+<form class="flex flex-col gap-4" onsubmit={onSubmit}>
+  <div class="flex flex-col gap-2">
     <FieldLabel fieldId="from-file-input">File</FieldLabel>
     <FileInput id="from-file-input" onfilechange={onFileUpload} {file} />
   </div>
-  <div class="stack stack-xs">
+  <div class="flex flex-col gap-2">
     <FieldLabel fieldId="Display Name">Display Name</FieldLabel>
     <TextInput
       oninput={onDisplayNameInput}

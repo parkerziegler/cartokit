@@ -1,5 +1,4 @@
 <script lang="ts">
-  import cs from 'classnames';
   import maplibregl from 'maplibre-gl';
   import { onMount, setContext } from 'svelte';
 
@@ -121,7 +120,7 @@
     class:map--x-compact={$layout.editorVisible}
     id="map"
   >
-    <Menu class="min-w-xs absolute left-4 top-4 z-10 max-w-lg overflow-auto">
+    <Menu class="absolute top-4 left-4 z-10 max-w-lg overflow-auto">
       <MenuTitle class="mr-4">
         Layers
         {#snippet action()}
@@ -135,13 +134,13 @@
     {/if}
     <Toolbar />
     <button
-      class={cs(
-        'absolute bottom-12 right-4 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-[400ms] ease-out disabled:cursor-not-allowed',
+      class={[
+        'absolute right-4 bottom-12 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 ease-out disabled:cursor-not-allowed',
         {
           '-translate-y-72': $layout.dataVisible,
           '-translate-x-[33.333333vw]': $layout.editorVisible
         }
-      )}
+      ]}
       onclick={toggleEditorVisibility}
       disabled={!$mapStore}
       data-testid="editor-toggle"
@@ -153,10 +152,10 @@
         data={$selectedLayer.data.geojson.features}
         tableName={$selectedLayer.displayName}
         onClose={onViewDataClose}
-        class={cs(
-          'absolute bottom-0 h-72 transition-all duration-[400ms] ease-out',
+        class={[
+          'absolute bottom-0 h-72 transition-all duration-400 ease-out',
           $layout.editorVisible ? 'w-2/3' : 'w-full'
-        )}
+        ]}
       />
     {/if}
   </div>
@@ -173,8 +172,10 @@
 </main>
 
 <style lang="postcss">
+  @reference 'tailwindcss';
+
   :global(#map .maplibregl-ctrl-attrib.maplibregl-compact) {
-    @apply transition-transform duration-[400ms] ease-out;
+    @apply transition-transform duration-400 ease-out;
   }
 
   :global(#map.map--y-compact .maplibregl-ctrl-attrib.maplibregl-compact) {
@@ -183,20 +184,5 @@
 
   :global(#map.map--x-compact .maplibregl-ctrl-attrib.maplibregl-compact) {
     @apply -translate-x-[33.333333vw];
-  }
-
-  :global(.properties) {
-    max-height: calc(100% - 2rem);
-    transition:
-      max-height 200ms ease-out,
-      transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  :global(.properties--x-compact) {
-    @apply -translate-x-[33.333333vw];
-  }
-
-  :global(.properties--y-compact) {
-    max-height: calc(100% - 25.25rem);
   }
 </style>

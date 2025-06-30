@@ -1,7 +1,6 @@
 <!-- Inspiration for this implementation courtesy of Observable:
      https://github.com/observablehq/inputs/blob/main/src/table.js -->
 <script lang="ts">
-  import cs from 'classnames';
   import type { Feature } from 'geojson';
   import { orderBy } from 'lodash-es';
   import { onMount } from 'svelte';
@@ -14,7 +13,7 @@
     data: Feature[];
     tableName: string;
     onClose: () => void;
-    class?: string;
+    class?: string | (string | boolean)[];
   }
 
   let { data, tableName, onClose, class: className = '' }: Props = $props();
@@ -91,17 +90,17 @@
 </script>
 
 <div
-  class={cs(
+  class={[
     'z-10 flex flex-col overflow-hidden bg-slate-700 font-mono',
     className
-  )}
+  ]}
   transition:slide
 >
   <div class="flex justify-between px-3 py-2 text-xs text-white">
     <span>
       {tableName}
     </span>
-    <div class="stack-h stack-h-sm">
+    <div class="flex gap-4">
       <span>{data.length} {pluralize('Feature', data.length)}</span>
       <button onclick={onClose}>
         <CloseIcon />
@@ -109,7 +108,7 @@
     </div>
   </div>
   <div
-    class="w-full overflow-auto border-t border-slate-400 bg-slate-900 text-2xs text-white"
+    class="text-2xs w-full overflow-auto border-t border-slate-400 bg-slate-900 text-white"
     bind:this={root}
     onscroll={onScroll}
   >
@@ -143,6 +142,8 @@
 </div>
 
 <style lang="postcss">
+  @reference 'tailwindcss';
+
   .table-name::after {
     @apply absolute left-0 w-full bg-slate-900;
     content: '';

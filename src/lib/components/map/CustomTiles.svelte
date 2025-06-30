@@ -25,8 +25,8 @@
   }
 </script>
 
-<form class="stack stack-sm">
-  <div class="stack stack-xs">
+<form class="flex flex-col gap-4">
+  <div class="flex flex-col gap-2">
     <FieldLabel fieldId="tile-url">Tile URL</FieldLabel>
     <TextInput
       oninput={onTileUrlInput}

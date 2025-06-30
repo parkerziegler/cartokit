@@ -54,7 +54,7 @@
   }
 </script>
 
-<div class="stack-h stack-h-xs items-center">
+<div class="flex items-center gap-2">
   <FieldLabel fieldId="{channel}-opacity-input">Opacity</FieldLabel>
   <input
     id="{channel}-opacity-input"

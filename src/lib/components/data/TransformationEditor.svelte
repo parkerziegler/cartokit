@@ -163,7 +163,7 @@
     {#snippet action()}
       <button onclick={oncloseeditor}><CloseIcon /></button>
     {/snippet}
-    <div class="stack stack-sm">
+    <div class="flex flex-col gap-4">
       <p class="font-sans">
         Use the editor below to transform your dataset using JavaScript.
       </p>
@@ -174,7 +174,7 @@
           language: 'javascript',
           onchange: onEditorChange
         }}
-        class="-mx-4 max-h-[9.5rem] overflow-auto"
+        class="-mx-4 max-h-38 overflow-auto"
         bind:view
         testId="transformation-editor"
       />
@@ -187,7 +187,7 @@
         <Alert kind="success" message="Successfully transformed data." />
       {/if}
       <Button
-        class="stack-h stack-h-xs items-center self-end"
+        class="flex items-center gap-2 self-end"
         onclick={onClick}
         testId="run-transformation-button"
         ><span>Run</span><PlayCircle /></Button
@@ -197,7 +197,7 @@
   <MenuItem title="Preview (1 selected feature)" titleClass="items-baseline">
     <CodeEditor
       config={{ kind: 'readonly', doc: previewDoc, language: 'json' }}
-      class="-mx-4 max-h-[9.5rem] overflow-auto"
+      class="-mx-4 max-h-38 overflow-auto"
     />
     {#snippet action()}
       <p class="text-slate-400">OUTPUT</p>
@@ -207,7 +207,7 @@
     {/if}
   </MenuItem>
   <MenuItem title="Console">
-    <ul class="-mx-4 max-h-[9.5rem] overflow-auto">
+    <ul class="-mx-4 max-h-38 overflow-auto">
       {#each consoleOutput as entry, i (`${entry}-${i}`)}
         <li
           class="border-b border-slate-600 px-4 py-2 text-white first:border-t"

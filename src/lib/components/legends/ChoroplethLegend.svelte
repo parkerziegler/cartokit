@@ -10,7 +10,7 @@
   let { layer }: Props = $props();
 </script>
 
-<div class="stack stack-xs ml-8">
+<div class="ml-8 flex flex-col gap-2">
   {#if layer.style.fill?.type === 'Categorical'}
     <CategoricalLegend
       fill={layer.style.fill}

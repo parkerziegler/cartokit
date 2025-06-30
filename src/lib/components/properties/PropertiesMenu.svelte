@@ -1,5 +1,4 @@
 <script lang="ts">
-  import cs from 'classnames';
   import maplibregl from 'maplibre-gl';
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
@@ -48,10 +47,11 @@
 
 <Menu
   id="properties"
-  class={cs('properties absolute right-4 top-4 z-10 w-80 overflow-auto', {
-    'properties--y-compact': $layout.dataVisible,
-    'properties--x-compact': $layout.editorVisible
-  })}
+  class={[
+    'absolute top-4 right-4 z-10 max-h-[calc(100%-2rem)] w-80 overflow-auto transition-[max-height,translate] duration-[200ms,400ms] ease-[ease-out,cubic-bezier(0,0,0.2,1)]',
+    $layout.dataVisible && 'max-h-[calc(100%-25.25rem)]',
+    $layout.editorVisible && '-translate-x-[33.333333vw]'
+  ]}
 >
   <MenuTitle class="mr-4"
     >{layer.displayName}
@@ -61,7 +61,7 @@
       </button>
     {/snippet}
     {#snippet subtitle()}
-      <div class="stack-h stack-h-xs">
+      <div class="flex gap-2">
         <ViewData />
         <DownloadData {layer} />
       </div>

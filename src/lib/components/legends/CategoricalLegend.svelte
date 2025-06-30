@@ -27,11 +27,11 @@
   );
 </script>
 
-<div class="stack stack-xs text-white">
+<div class="flex flex-col gap-2 text-white">
   <p class="font-semibold">{fill.attribute} ↓</p>
-  <ul class="stack stack-2xs">
+  <ul class="flex flex-col gap-1">
     {#each entries as category, i (category)}
-      <li class="stack-h stack-h-xs">
+      <li class="flex gap-2">
         {#if layerType === 'Choropleth'}
           <svg viewBox="0 0 32 16" width="32" height="16">
             <rect

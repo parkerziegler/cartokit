@@ -1,104 +1,185 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-@layer utilities {
-  /* Block Stack */
-  .stack {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+@theme {
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-3xs: 0.625rem;
+  --text-3xs--line-height: 1rem;
+
+  --font-sans: 'Inter', sans-serif;
+
+  --color-ck: #7e58ff;
+  --color-ck-light: rgba(126, 88, 255, 0.8);
+}
+
+@layer base {
+  dialog {
+    @apply m-auto;
   }
 
-  .stack > * {
+  * {
+    font-optical-sizing: auto;
+  }
+}
+
+@utility stack {
+  /* Block Stack */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  & > * {
     margin-block: 0;
   }
+}
 
-  .stack-2xs > * + * {
+@utility stack-2xs {
+  & > * + * {
     margin-block-start: 0.25rem;
   }
+}
 
-  .stack-xs > * + * {
+@utility stack-xs {
+  & > * + * {
     margin-block-start: 0.5rem;
   }
+}
 
-  .stack-sm > * + * {
+@utility stack-sm {
+  & > * + * {
     margin-block-start: 1rem;
   }
+}
 
-  .stack-md > * + * {
+@utility stack-md {
+  & > * + * {
     margin-block-start: 1.5rem;
   }
+}
 
-  .stack-lg > * + * {
+@utility stack-lg {
+  & > * + * {
     margin-block-start: 2rem;
   }
+}
 
+@utility stack-h {
   /* Inline Stack */
-  .stack-h {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-  }
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
 
-  .stack-h > * {
+  & > * {
     margin-inline: 0;
   }
+}
 
-  .stack-h-xs > * + * {
+@utility stack-h-xs {
+  & > * + * {
     margin-inline-start: 0.5rem;
   }
+}
 
-  .stack-h-sm > * + * {
+@utility stack-h-sm {
+  & > * + * {
     margin-inline-start: 1rem;
   }
+}
 
-  .stack-h-md > * + * {
+@utility stack-h-md {
+  & > * + * {
     margin-inline-start: 1.5rem;
   }
+}
 
-  .stack-h-lg > * + * {
+@utility stack-h-lg {
+  & > * + * {
     margin-inline-start: 2rem;
   }
+}
 
+@utility stack-border {
   /* Stack Borders */
-  .stack-border > * + * {
+  & > * + * {
     @apply border-t border-t-slate-400;
   }
 }
 
-@layer components {
+@utility color-picker {
   /* Color Picker and Color Palette */
-  .color-picker ::-webkit-color-swatch-wrapper,
-  .color-palette ::-webkit-color-swatch-wrapper {
+  & ::-webkit-color-swatch-wrapper {
     padding: 0;
   }
 
-  ::-webkit-color-swatch {
+  & ::-webkit-color-swatch {
+    @apply rounded-sm;
+  }
+
+  & ::-moz-color-swatch {
     border: 0;
   }
 
-  .color-picker ::-webkit-color-swatch {
-    @apply rounded;
+  & ::-moz-focus-inner {
+    border: 0;
   }
 
-  .color-palette li:first-child ::-webkit-color-swatch {
+  & ::-moz-focus-inner {
+    padding: 0;
+  }
+}
+
+@utility color-palette {
+  & ::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  & li:first-child ::-webkit-color-swatch {
     @apply rounded-l;
   }
 
-  .color-palette li:last-child ::-webkit-color-swatch {
+  & li:last-child ::-webkit-color-swatch {
     @apply rounded-r;
   }
 
-  .color-picker ::-moz-color-swatch,
-  .color-picker ::-moz-focus-inner,
-  .color-palette ::-moz-color-swatch {
+  & ::-moz-color-swatch {
     border: 0;
   }
 
-  .color-picker ::-moz-focus-inner,
-  .color-palette ::-moz-focus-inner {
+  & ::-moz-focus-inner {
     padding: 0;
+  }
+}
+
+@utility hex-input {
+  /* Hex Input */
+  & > input:first-child {
+    @apply border-r border-transparent;
+  }
+
+  &:hover > input:first-child {
+    @apply border-slate-600;
+  }
+
+  &:focus-within > input:first-child {
+    @apply border-slate-600;
+  }
+}
+
+@utility transformation-editor {
+  & .cm-editor {
+    max-height: 148px;
+  }
+}
+
+@utility cm-editor {
+  .transformation-editor & {
+    max-height: 148px;
+  }
+}
+
+@layer components {
+  ::-webkit-color-swatch {
+    border: 0;
   }
 
   /* Number input */
@@ -112,20 +193,6 @@
   /* Firefox */
   input[type='number'] {
     -moz-appearance: textfield;
-  }
-
-  /* Hex Input */
-  .hex-input > input:first-child {
-    @apply border-r border-transparent;
-  }
-
-  .hex-input:hover > input:first-child,
-  .hex-input:focus-within > input:first-child {
-    @apply border-slate-600;
-  }
-
-  .transformation-editor .cm-editor {
-    max-height: 148px;
   }
 }
 

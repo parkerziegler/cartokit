@@ -20,7 +20,7 @@
 <button
   onclick={onClick}
   class={[
-    'flex h-[22px] w-[22px] items-center justify-center rounded-[5px] border border-transparent bg-slate-400 text-white shadow transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+    'flex h-[22px] w-[22px] items-center justify-center rounded-[5px] border border-transparent bg-slate-400 text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50',
     chatVisible && 'border-white'
   ]}
   use:clickoutside

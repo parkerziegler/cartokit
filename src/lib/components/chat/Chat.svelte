@@ -104,10 +104,10 @@
 </script>
 
 <Menu class="absolute bottom-16 left-1/2 -translate-x-1/2 p-4">
-  <div class="flex flex-col gap-2 rounded border border-slate-600">
+  <div class="flex flex-col gap-2 rounded-sm border border-slate-600">
     <form class="flex flex-col gap-2" onsubmit={onSubmit} bind:this={form}>
       <textarea
-        class="h-32 w-72 resize-none rounded rounded-b-none bg-slate-900 p-2 text-white"
+        class="h-32 w-72 resize-none rounded-sm rounded-b-none bg-slate-900 p-2 text-white"
         placeholder="Prompt the model to update map layers..."
         bind:value={prompt}
         bind:this={textarea}
@@ -117,11 +117,11 @@
       </textarea>
       <div class="flex items-center justify-between px-2 pb-2">
         <code
-          class="self-start rounded-sm bg-slate-400 px-1 py-0.5 text-xs text-white"
+          class="self-start rounded-xs bg-slate-400 px-1 py-0.5 text-xs text-white"
           >gpt-4o</code
         >
         <button
-          class="flex h-[22px] w-[22px] items-center justify-center rounded-sm border border-white bg-slate-400 text-white disabled:opacity-50"
+          class="flex h-[22px] w-[22px] items-center justify-center rounded-xs border border-white bg-slate-400 text-white disabled:opacity-50"
           disabled={fetching || error || diffUnknown || !prompt.length}
         >
           <ArrowUpIcon />
@@ -149,6 +149,8 @@
 </Menu>
 
 <style lang="postcss">
+  @reference 'tailwindcss';
+
   .loading::after {
     @apply inline-block w-0 overflow-hidden align-middle;
 

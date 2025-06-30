@@ -43,7 +43,7 @@
   }
 </script>
 
-<li class="stack stack-xs">
+<li class="flex flex-col gap-2">
   <div class="flex items-center justify-between">
     <div class="flex items-center">
       <span class="shrink-0">
@@ -62,7 +62,7 @@
         {/if}
       </span>
       <span
-        class="ml-2 mr-8 truncate font-sans text-sm font-medium tracking-wider"
+        class="mr-8 ml-2 truncate font-sans text-sm font-medium tracking-wider"
         >{layer.displayName}</span
       >
     </div>

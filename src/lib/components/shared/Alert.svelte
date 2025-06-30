@@ -15,7 +15,7 @@
 
 <div
   class={[
-    'flex items-center gap-2 rounded border bg-opacity-50 px-2 py-1 text-white',
+    'flex items-center gap-2 rounded-sm border bg-opacity-50 px-2 py-1 text-white',
     {
       'border-green-400 bg-green-400': kind === 'success',
       'border-red-400 bg-red-400': kind === 'error',

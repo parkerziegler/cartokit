@@ -50,13 +50,13 @@
   }
 </script>
 
-<div class="color-picker stack stack-2xs" transition:slide>
+<div class="color-picker flex flex-col gap-1" transition:slide>
   <div class="flex items-center">
     <FieldLabel fieldId="fill-color">Color</FieldLabel>
     <input
       type="color"
       id="fill-color"
-      class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
+      class="mr-2 ml-4 h-4 w-4 cursor-pointer appearance-none rounded-sm"
       value={d3.color(fill.color)?.formatHex() ?? DEFAULT_FILL}
       oninput={onFillInput}
     />

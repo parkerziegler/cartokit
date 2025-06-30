@@ -11,9 +11,9 @@
   );
 </script>
 
-<div class="stack stack-xs ml-8">
+<div class="ml-8 flex flex-col gap-2">
   <span>{layer.style.dots.attribute}</span>
-  <div class="stack-h stack-h-xs items-center">
+  <div class="flex items-center gap-2">
     <svg
       viewBox="0 0 {dimension} {dimension}"
       width={dimension}
