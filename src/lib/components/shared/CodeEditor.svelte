@@ -92,3 +92,15 @@
   ]}
   data-testid={testId || undefined}
 ></div>
+
+<style lang="postcss">
+  @reference 'tailwindcss';
+
+  :global(.cm-editor) {
+    @apply h-full;
+  }
+
+  :global(.cm-editor .cm-scroller) {
+    @apply font-mono text-xs;
+  }
+</style>

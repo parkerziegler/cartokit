@@ -13,11 +13,6 @@
 }
 
 @layer base {
-  /* Variable font rendering. */
-  * {
-    font-optical-sizing: auto;
-  }
-
   /* Dialog */
   dialog {
     @apply m-auto;
@@ -48,34 +43,13 @@
   /* Chrome, Safari, Edge, Opera */
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
+    @apply m-0;
+
     -webkit-appearance: none;
-    margin: 0;
   }
 
   /* Firefox */
   input[type='number'] {
     -moz-appearance: textfield;
   }
-}
-
-/*************
- * Overrides *
- *************/
-
-/* CodeMirror */
-.cm-editor {
-  @apply h-full;
-}
-
-.cm-editor .cm-scroller {
-  @apply font-mono text-xs;
-}
-
-/* Basemap Inset */
-[id^='inset'] .maplibregl-ctrl-bottom-right {
-  display: none;
-}
-
-[id^='inset'] .maplibregl-canvas-container.maplibregl-interactive {
-  cursor: pointer;
 }

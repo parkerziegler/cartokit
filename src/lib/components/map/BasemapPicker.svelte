@@ -124,3 +124,16 @@
   {/snippet}
   <Tabs {tabs} />
 </Modal>
+
+<style lang="postcss">
+  @reference 'tailwindcss';
+
+  /* Basemap Inset */
+  :global([id^='inset'] .maplibregl-ctrl-bottom-right) {
+    @apply hidden;
+  }
+
+  :global([id^='inset'] .maplibregl-canvas-container.maplibregl-interactive) {
+    @apply cursor-pointer;
+  }
+</style>
