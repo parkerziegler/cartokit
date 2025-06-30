@@ -21,9 +21,17 @@
 
 <div
   {id}
-  class={['stack-border rounded-md bg-slate-900 shadow-lg', className]}
+  class={['stack-border menu rounded-md bg-slate-900 shadow-lg', className]}
   use:clickoutside
   onclickoutside={onclickoutsidemenu}
 >
   {@render children()}
 </div>
+
+<style lang="postcss">
+  @reference 'tailwindcss';
+
+  :global(.menu > * + *) {
+    @apply border-t border-t-slate-400;
+  }
+</style>

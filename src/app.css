@@ -9,177 +9,39 @@
   --font-sans: 'Inter', sans-serif;
 
   --color-ck: #7e58ff;
-  --color-ck-light: rgba(126, 88, 255, 0.8);
+  --color-ck-light: #7e58ffcc;
 }
 
 @layer base {
+  /* Variable font rendering. */
+  * {
+    font-optical-sizing: auto;
+  }
+
+  /* Dialog */
   dialog {
     @apply m-auto;
   }
 
-  * {
-    font-optical-sizing: auto;
-  }
-}
-
-@utility stack {
-  /* Block Stack */
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-
-  & > * {
-    margin-block: 0;
-  }
-}
-
-@utility stack-2xs {
-  & > * + * {
-    margin-block-start: 0.25rem;
-  }
-}
-
-@utility stack-xs {
-  & > * + * {
-    margin-block-start: 0.5rem;
-  }
-}
-
-@utility stack-sm {
-  & > * + * {
-    margin-block-start: 1rem;
-  }
-}
-
-@utility stack-md {
-  & > * + * {
-    margin-block-start: 1.5rem;
-  }
-}
-
-@utility stack-lg {
-  & > * + * {
-    margin-block-start: 2rem;
-  }
-}
-
-@utility stack-h {
-  /* Inline Stack */
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-
-  & > * {
-    margin-inline: 0;
-  }
-}
-
-@utility stack-h-xs {
-  & > * + * {
-    margin-inline-start: 0.5rem;
-  }
-}
-
-@utility stack-h-sm {
-  & > * + * {
-    margin-inline-start: 1rem;
-  }
-}
-
-@utility stack-h-md {
-  & > * + * {
-    margin-inline-start: 1.5rem;
-  }
-}
-
-@utility stack-h-lg {
-  & > * + * {
-    margin-inline-start: 2rem;
-  }
-}
-
-@utility stack-border {
-  /* Stack Borders */
-  & > * + * {
-    @apply border-t border-t-slate-400;
-  }
-}
-
-@utility color-picker {
-  /* Color Picker and Color Palette */
-  & ::-webkit-color-swatch-wrapper {
-    padding: 0;
+  /* Color Picker */
+  ::-webkit-color-swatch-wrapper {
+    @apply p-0;
   }
 
-  & ::-webkit-color-swatch {
-    @apply rounded-sm;
-  }
-
-  & ::-moz-color-swatch {
-    border: 0;
-  }
-
-  & ::-moz-focus-inner {
-    border: 0;
-  }
-
-  & ::-moz-focus-inner {
-    padding: 0;
-  }
-}
-
-@utility color-palette {
-  & ::-webkit-color-swatch-wrapper {
-    padding: 0;
-  }
-
-  & li:first-child ::-webkit-color-swatch {
-    @apply rounded-l;
-  }
-
-  & li:last-child ::-webkit-color-swatch {
-    @apply rounded-r;
-  }
-
-  & ::-moz-color-swatch {
-    border: 0;
-  }
-
-  & ::-moz-focus-inner {
-    padding: 0;
-  }
-}
-
-@utility hex-input {
-  /* Hex Input */
-  & > input:first-child {
-    @apply border-r border-transparent;
-  }
-
-  &:hover > input:first-child {
-    @apply border-slate-600;
-  }
-
-  &:focus-within > input:first-child {
-    @apply border-slate-600;
-  }
-}
-
-@utility transformation-editor {
-  & .cm-editor {
-    max-height: 148px;
-  }
-}
-
-@utility cm-editor {
-  .transformation-editor & {
-    max-height: 148px;
-  }
-}
-
-@layer components {
   ::-webkit-color-swatch {
-    border: 0;
+    @apply rounded-sm border-0;
+  }
+
+  ::-moz-color-swatch {
+    @apply border-0;
+  }
+
+  ::-moz-focus-inner {
+    @apply border-0;
+  }
+
+  ::-moz-focus-inner {
+    @apply p-0;
   }
 
   /* Number input */

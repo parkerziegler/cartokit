@@ -26,8 +26,7 @@
     accept=".geojson,.json"
   />
   <span
-    class="file-prompt"
-    class:file-prompt--uploaded={file?.name}
+    class={['file-prompt', file?.name && 'file-prompt--uploaded']}
     data-content={file?.name ?? 'Choose file...'}
   ></span>
 </label>

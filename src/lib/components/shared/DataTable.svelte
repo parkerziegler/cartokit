@@ -117,9 +117,11 @@
         <tr class="sticky top-0">
           {#each cols as col (col)}
             <th
-              class="relative bg-slate-900 px-4 py-2 text-left font-semibold text-slate-400 hover:cursor-pointer"
-              class:sort-desc={sort.col === col && sort.desc}
-              class:sort-asc={sort.col === col && !sort.desc}
+              class={[
+                'relative bg-slate-900 px-4 py-2 text-left font-semibold text-slate-400 hover:cursor-pointer',
+                sort.col === col && sort.desc && 'sort-desc',
+                sort.col === col && !sort.desc && 'sort-asc'
+              ]}
               onclick={resort(col)}
               >{col}
             </th>
@@ -145,21 +147,18 @@
   @reference 'tailwindcss';
 
   .table-name::after {
-    @apply absolute left-0 w-full bg-slate-900;
+    @apply absolute -bottom-px left-0 h-px w-full bg-slate-900;
     content: '';
-    height: 1px;
-    bottom: -1px;
   }
 
   th:first-child,
   td:first-child {
-    padding-left: 1rem;
+    @apply pl-4;
   }
 
   thead tr::after {
-    @apply absolute left-0 w-full border-t border-slate-400;
+    @apply absolute -bottom-px left-0 w-full border-t border-slate-400;
     content: '';
-    bottom: -1px;
   }
 
   .sort-desc::after,

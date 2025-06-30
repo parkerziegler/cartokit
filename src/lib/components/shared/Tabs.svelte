@@ -28,9 +28,12 @@
   <ul class="flex gap-6 border-b border-b-slate-400 px-4">
     {#each tabs as tab, i (tab.name)}
       <li
-        class="border-b-2 pb-2 text-base transition-all duration-200"
-        class:active={activeIndex === i}
-        class:inactive={activeIndex !== i}
+        class={[
+          'border-b-2 pb-2 text-base transition-all duration-200',
+          activeIndex === i
+            ? 'border-b-slate-400 font-semibold text-white'
+            : 'border-b-transparent font-light text-slate-400'
+        ]}
       >
         <button onclick={onClick(i)}>{tab.name}</button>
       </li>
@@ -44,15 +47,3 @@
     {/each}
   </div>
 </div>
-
-<style lang="postcss">
-  @reference 'tailwindcss';
-
-  .active {
-    @apply border-b-slate-400 font-semibold text-white;
-  }
-
-  .inactive {
-    @apply border-b-transparent font-light text-slate-400;
-  }
-</style>
