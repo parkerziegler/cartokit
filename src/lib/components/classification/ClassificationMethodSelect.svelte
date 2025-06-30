@@ -79,7 +79,7 @@
   {/if}
 </div>
 <Portal
-  class="fixed right-150 top-64 transition-transform duration-400"
+  class="fixed top-64 right-150 transition-transform duration-400"
   style="transform: translateX({$layout.editorVisible ? '-33.333333vw' : 0})"
 >
   <Dialog bind:showDialog={displayBreaksEditor} class="w-64">

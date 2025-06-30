@@ -14,7 +14,7 @@
 </script>
 
 <div
-  class="absolute right-0 top-0 flex h-full w-1/3 flex-col bg-slate-900 shadow-lg"
+  class="absolute top-0 right-0 flex h-full w-1/3 flex-col bg-slate-900 shadow-lg"
   transition:slide={{ axis: 'x' }}
 >
   <Tabs
