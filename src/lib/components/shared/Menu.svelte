@@ -22,7 +22,7 @@
 
 <div
   {id}
-  class={['stack-border menu rounded-md bg-slate-900 shadow-lg', className]}
+  class={['menu rounded-md bg-slate-900 shadow-lg', className]}
   use:clickoutside
   onclickoutside={onclickoutsidemenu}
 >

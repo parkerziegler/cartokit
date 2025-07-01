@@ -4,6 +4,7 @@
   import type { Feature } from 'geojson';
   import { orderBy } from 'lodash-es';
   import { onMount } from 'svelte';
+  import type { ClassValue } from 'svelte/elements';
   import { slide } from 'svelte/transition';
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
@@ -13,7 +14,7 @@
     data: Feature[];
     tableName: string;
     onClose: () => void;
-    class?: string | (string | boolean)[];
+    class?: ClassValue;
   }
 
   let { data, tableName, onClose, class: className = '' }: Props = $props();
