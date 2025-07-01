@@ -119,8 +119,10 @@
             <th
               class={[
                 'relative bg-slate-900 px-4 py-2 text-left font-semibold text-slate-400 hover:cursor-pointer',
-                sort.col === col && sort.desc && 'sort-desc',
-                sort.col === col && !sort.desc && 'sort-asc'
+                {
+                  'sort-desc': sort.col === col && sort.desc,
+                  'sort-asc': sort.col === col && !sort.desc
+                }
               ]}
               onclick={resort(col)}
               >{col}

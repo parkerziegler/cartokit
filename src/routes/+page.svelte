@@ -117,8 +117,10 @@
   <div
     class={[
       'maplibregl-map relative h-full w-full',
-      $layout.dataVisible && 'compact-y',
-      $layout.editorVisible && 'compact-x'
+      {
+        'compact-y': $layout.dataVisible,
+        'compact-x': $layout.editorVisible
+      }
     ]}
     id="map"
   >
@@ -138,8 +140,10 @@
     <button
       class={[
         'absolute right-4 bottom-12 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 ease-out disabled:cursor-not-allowed',
-        $layout.dataVisible && '-translate-y-72',
-        $layout.editorVisible && '-translate-x-[33.333333vw]'
+        {
+          '-translate-y-72': $layout.dataVisible,
+          '-translate-x-[33.333333vw]': $layout.editorVisible
+        }
       ]}
       onclick={toggleEditorVisibility}
       disabled={!$mapStore}

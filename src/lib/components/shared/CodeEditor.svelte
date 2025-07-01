@@ -86,8 +86,10 @@
   bind:this={editor}
   class={[
     'grow overflow-auto border border-slate-600 text-white',
-    config.kind === 'editable' &&
-      'transition-colors focus-within:border-slate-400 hover:border-slate-400 focus:border-slate-400',
+    {
+      'transition-colors focus-within:border-slate-400 hover:border-slate-400 focus:border-slate-400':
+        config.kind === 'editable'
+    },
     className
   ]}
   data-testid={testId || undefined}

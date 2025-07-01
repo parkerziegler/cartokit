@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { ClassValue } from 'svelte/elements';
 
   import { clickoutside } from '$lib/utils/actions';
 
   interface Props {
-    class?: string | (string | boolean)[];
+    class?: ClassValue;
     style?: string;
     id?: string;
     onclickoutsidemenu?: (event: CustomEvent<MouseEvent>) => void;

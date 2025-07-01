@@ -111,11 +111,11 @@
   ></div>
   <div
     id="inset-{mapStyles[1]}"
-    class="!absolute inset-0 h-10 w-10 rounded-sm border border-white transition-transform group-hover:translate-x-2 group-hover:rotate-12"
+    class="absolute! inset-0 h-10 w-10 rounded-sm border border-white transition-transform group-hover:translate-x-2 group-hover:rotate-12"
   ></div>
   <div
     id="inset-{mapStyles[2]}"
-    class="!absolute inset-0 h-10 w-10 rounded-sm border border-white transition-transform group-hover:-translate-x-2 group-hover:-rotate-12"
+    class="absolute! inset-0 h-10 w-10 rounded-sm border border-white transition-transform group-hover:-translate-x-2 group-hover:-rotate-12"
   ></div>
 </button>
 <Modal bind:showModal class="max-w-2xl" initialHeight={277}>
@@ -128,11 +128,12 @@
 <style lang="postcss">
   @reference 'tailwindcss';
 
-  /* Basemap Inset */
+  /* Hide controls on inset maps. */
   :global([id^='inset'] .maplibregl-ctrl-bottom-right) {
     @apply hidden;
   }
 
+  /* Indicate that inset maps are clickable to open the BasemapGrid. */
   :global([id^='inset'] .maplibregl-canvas-container.maplibregl-interactive) {
     @apply cursor-pointer;
   }
