@@ -41,11 +41,11 @@
   );
 </script>
 
-<div class="stack stack-xs ml-8">
+<div class="ml-8 flex flex-col gap-2">
   <span class="text-xs font-semibold">{layer.style.size.attribute} →</span>
-  <div class="stack-h stack-h-xs">
+  <div class="flex gap-2">
     {#each circles as circle (circle.value)}
-      <div class="stack stack-xs items-center">
+      <div class="flex flex-col items-center gap-2">
         <span class="text-3xs">{circle.value.toFixed(2)}</span>
         <div
           class="bg-primary rounded-full border border-white"

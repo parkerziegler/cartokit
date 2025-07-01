@@ -53,8 +53,8 @@
   }
 </script>
 
-<form class="stack stack-sm" onsubmit={onSubmit}>
-  <div class="stack stack-xs">
+<form class="flex flex-col gap-4" onsubmit={onSubmit}>
+  <div class="flex flex-col gap-2">
     <FieldLabel fieldId="from-endpoint-input">Endpoint</FieldLabel>
     <TextInput
       oninput={onEndpointInput}
@@ -64,7 +64,7 @@
       placeholder="(e.g., https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson)"
     />
   </div>
-  <div class="stack stack-xs">
+  <div class="flex flex-col gap-2">
     <FieldLabel fieldId="Display Name">Display Name</FieldLabel>
     <TextInput
       oninput={onDisplayNameInput}

@@ -1,6 +1,5 @@
 <!-- Core implementation adapted from: https://svelte.dev/playground/modal -->
 <script lang="ts">
-  import cs from 'classnames';
   import type { Snippet } from 'svelte';
   import { cubicOut } from 'svelte/easing';
   import { Tween } from 'svelte/motion';
@@ -48,10 +47,10 @@
 </script>
 
 <dialog
-  class={cs(
-    'overflow-hidden rounded bg-slate-900 font-sans text-white',
+  class={[
+    'overflow-hidden rounded-sm bg-slate-900 font-sans text-white',
     className
-  )}
+  ]}
   bind:this={dialog}
   onclose={() => (showModal = false)}
   onclick={(e) => {

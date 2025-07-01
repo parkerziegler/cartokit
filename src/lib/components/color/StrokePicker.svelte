@@ -1,6 +1,5 @@
 <script lang="ts">
   import * as d3 from 'd3';
-  import { slide } from 'svelte/transition';
 
   import HexInput from '$lib/components/color/HexInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
@@ -9,7 +8,6 @@
   import type { ConstantStroke } from '$lib/types';
   import { DEFAULT_STROKE } from '$lib/utils/constants';
   import { history } from '$lib/state/history.svelte';
-
   interface Props {
     layerId: string;
     stroke: ConstantStroke;
@@ -74,13 +72,13 @@
   }
 </script>
 
-<div class="color-picker stack stack-2xs" transition:slide>
+<div class="flex flex-col gap-1">
   <div class="flex items-center">
     <FieldLabel fieldId="stroke-color">Color</FieldLabel>
     <input
       type="color"
       id="stroke-color"
-      class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
+      class="mr-2 ml-4 h-4 w-4 cursor-pointer appearance-none rounded-sm"
       value={d3.color(stroke.color)?.formatHex() ?? DEFAULT_STROKE}
       oninput={onStrokeInput}
     />
@@ -90,7 +88,7 @@
       onHexChange={onStrokeHexChange}
     />
   </div>
-  <div class="stack-h stack-h-xs items-center">
+  <div class="flex items-center gap-2">
     <FieldLabel fieldId="stroke-width-input">Width</FieldLabel>
     <NumberInput
       id="stroke-width-input"

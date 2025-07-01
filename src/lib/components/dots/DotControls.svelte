@@ -37,7 +37,7 @@
   }
 </script>
 
-<div class="stack stack-2xs">
+<div class="flex flex-col gap-1">
   <AttributeSelect
     layerId={layer.id}
     geojson={layer.data.geojson}
@@ -51,7 +51,7 @@
     fieldId="dot-size"
     label="Dot Size"
   />
-  <div class="stack-h stack-h-xs items-center">
+  <div class="flex items-center gap-2">
     <FieldLabel fieldId="dot-value">Dot Value</FieldLabel>
     <NumberInput
       id="dot-value"

@@ -14,7 +14,7 @@
   );
 </script>
 
-<div class="stack-h stack-h-xs ml-8 items-center">
+<div class="ml-8 flex items-center gap-2">
   <svg
     viewBox="0 0 16 {layer.style.stroke.width}"
     width="16"

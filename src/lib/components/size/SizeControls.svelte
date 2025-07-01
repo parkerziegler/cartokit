@@ -38,7 +38,7 @@
   }
 </script>
 
-<div class="stack stack-2xs">
+<div class="flex flex-col gap-1">
   <AttributeSelect
     layerId={layer.id}
     geojson={layer.data.geojson}
@@ -46,7 +46,7 @@
     selected={layer.style.size.attribute}
     channel="size"
   />
-  <div class="stack-h stack-h-xs items-center">
+  <div class="flex items-center gap-2">
     <FieldLabel fieldId="min">Min</FieldLabel>
     <NumberInput
       id="min"
@@ -56,7 +56,7 @@
       class="w-10"
     />
   </div>
-  <div class="stack-h stack-h-xs items-center">
+  <div class="flex items-center gap-2">
     <FieldLabel fieldId="max">Max</FieldLabel>
     <NumberInput
       id="max"

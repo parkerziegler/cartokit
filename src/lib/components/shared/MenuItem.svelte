@@ -1,5 +1,4 @@
 <script lang="ts">
-  import cs from 'classnames';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -12,9 +11,9 @@
   let { title, titleClass = '', action, children }: Props = $props();
 </script>
 
-<div class="stack stack-2xs p-4 font-mono text-xs text-white">
+<div class="flex flex-col gap-1 p-4 font-mono text-xs text-white">
   {#if action}
-    <div class={cs('flex items-center justify-between', titleClass)}>
+    <div class={['flex items-center justify-between', titleClass]}>
       <p class="font-sans text-sm font-medium tracking-wider">
         {title}
       </p>

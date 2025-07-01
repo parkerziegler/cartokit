@@ -98,7 +98,7 @@
   });
 </script>
 
-<div class="stack-h stack-h-xs items-center">
+<div class="flex items-center gap-2">
   <Select
     {options}
     {selected}

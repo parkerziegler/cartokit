@@ -54,6 +54,8 @@
 />
 
 <style lang="postcss">
+  @reference 'tailwindcss';
+
   input:disabled {
     @apply text-slate-400;
   }

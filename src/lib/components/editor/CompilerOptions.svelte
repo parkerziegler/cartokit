@@ -17,10 +17,12 @@
   ];
 </script>
 
-<div class="stack stack-xs border-r border-r-slate-600 px-4 py-2 text-white">
+<div
+  class="flex flex-col gap-2 border-r border-r-slate-600 px-4 py-2 text-white"
+>
   <button onclick={() => (optionsExpanded = !optionsExpanded)}>
     <div class="flex items-center justify-between">
-      <div class="stack-h stack-h-xs items-center">
+      <div class="flex items-center gap-2">
         <p class="font-sans text-sm font-medium tracking-wider">Options</p>
         <GearIcon />
       </div>
@@ -30,7 +32,7 @@
   {#if optionsExpanded}
     <div class="flex gap-4">
       <fieldset
-        class="stack stack-xs text-white"
+        class="flex flex-col gap-2 text-white"
         transition:slide={{ axis: 'y', duration: 150 }}
       >
         <legend
@@ -51,7 +53,7 @@
         {/each}
       </fieldset>
       <fieldset
-        class="stack stack-xs text-white"
+        class="flex flex-col gap-2 text-white"
         transition:slide={{ axis: 'y', duration: 150 }}
       >
         <legend

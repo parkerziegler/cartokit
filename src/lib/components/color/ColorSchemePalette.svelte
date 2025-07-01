@@ -33,7 +33,7 @@
   </button>
 </li>
 
-<style lang="postcss">
+<style>
   .scheme:focus {
     outline: 5px auto Highlight;
     outline: 5px auto -webkit-focus-ring-color;

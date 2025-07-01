@@ -22,12 +22,12 @@
   );
 </script>
 
-<div class="stack stack-xs text-white">
+<div class="flex flex-col gap-2 text-white">
   <p class="font-semibold">{fill.attribute} ↓</p>
-  <div class="stack-h stack-h-xs rounded-md bg-slate-900">
-    <ul class="stack stack-xs mt-3">
+  <div class="flex gap-2 rounded-md bg-slate-900">
+    <ul class="mt-3 flex flex-col gap-2">
       {#each colors as color (color)}
-        <li class="stack stack-xs stack-h stack-h-xs">
+        <li>
           {#if layerType === 'Choropleth'}
             <svg viewBox="0 0 32 16" width="32" height="16">
               <rect
@@ -59,9 +59,9 @@
         </li>
       {/each}
     </ul>
-    <ul class="stack stack-xs">
+    <ul class="flex flex-col gap-2">
       {#each [min, ...fill.thresholds, max] as stop (stop)}
-        <li class="stack-h stack-h-xs h-4 font-mono text-3xs">
+        <li class="text-3xs flex h-4 gap-2 font-mono">
           <span class="text-slate-400"> → </span>
           <span>{stop.toFixed(2)}</span>
         </li>

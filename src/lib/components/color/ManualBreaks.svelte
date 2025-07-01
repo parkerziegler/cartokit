@@ -50,7 +50,7 @@
     >
       <div class="self-center justify-self-center">
         <span
-          class="inline-block h-4 w-4 rounded-sm"
+          class="inline-block h-4 w-4 rounded-xs"
           style="background-color: {d3[style.scheme.id][style.count][i]};"
         ></span>
       </div>

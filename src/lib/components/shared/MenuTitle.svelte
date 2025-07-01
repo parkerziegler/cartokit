@@ -1,5 +1,4 @@
 <script lang="ts">
-  import cs from 'classnames';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -13,9 +12,9 @@
 </script>
 
 {#if action && subtitle}
-  <div class="stack stack-xs p-4 text-white">
+  <div class="flex flex-col gap-2 p-4 text-white">
     <div class="flex items-center justify-between">
-      <p class={cs('font-sans text-lg font-medium tracking-wider', className)}>
+      <p class={['font-sans text-lg font-medium tracking-wider', className]}>
         {@render children()}
       </p>
       {@render action?.()}
@@ -24,17 +23,17 @@
   </div>
 {:else if action}
   <div class="flex items-center justify-between p-4 text-white">
-    <p class={cs('font-sans text-xl font-medium tracking-wider', className)}>
+    <p class={['font-sans text-xl font-medium tracking-wider', className]}>
       {@render children?.()}
     </p>
     {@render action?.()}
   </div>
 {:else}
   <p
-    class={cs(
+    class={[
       'p-4 font-sans text-xl font-medium tracking-wider text-white',
       className
-    )}
+    ]}
   >
     {@render children?.()}
   </p>

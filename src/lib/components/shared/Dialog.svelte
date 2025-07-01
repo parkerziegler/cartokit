@@ -29,7 +29,7 @@
 
 <dialog
   class={[
-    'overflow-hidden rounded bg-slate-900 font-sans text-white',
+    'overflow-hidden rounded-sm bg-slate-900 font-sans text-white',
     className
   ]}
   bind:this={dialog}

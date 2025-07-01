@@ -1,6 +1,5 @@
 <script lang="ts">
   import * as d3 from 'd3';
-  import { slide } from 'svelte/transition';
 
   import HexInput from '$lib/components/color/HexInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
@@ -50,20 +49,18 @@
   }
 </script>
 
-<div class="color-picker stack stack-2xs" transition:slide>
-  <div class="flex items-center">
-    <FieldLabel fieldId="fill-color">Color</FieldLabel>
-    <input
-      type="color"
-      id="fill-color"
-      class="ml-4 mr-2 h-4 w-4 cursor-pointer appearance-none rounded"
-      value={d3.color(fill.color)?.formatHex() ?? DEFAULT_FILL}
-      oninput={onFillInput}
-    />
-    <HexInput
-      hex={d3.color(fill.color)?.formatHex() ?? DEFAULT_FILL}
-      testId="fill-color-input"
-      onHexChange={onFillHexChange}
-    />
-  </div>
+<div class="flex items-center">
+  <FieldLabel fieldId="fill-color">Color</FieldLabel>
+  <input
+    type="color"
+    id="fill-color"
+    class="mr-2 ml-4 h-4 w-4 cursor-pointer appearance-none rounded-sm"
+    value={d3.color(fill.color)?.formatHex() ?? DEFAULT_FILL}
+    oninput={onFillInput}
+  />
+  <HexInput
+    hex={d3.color(fill.color)?.formatHex() ?? DEFAULT_FILL}
+    testId="fill-color-input"
+    onHexChange={onFillHexChange}
+  />
 </div>

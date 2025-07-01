@@ -1,152 +1,55 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-@layer utilities {
-  /* Block Stack */
-  .stack {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-  }
+@theme {
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-3xs: 0.625rem;
+  --text-3xs--line-height: 1rem;
 
-  .stack > * {
-    margin-block: 0;
-  }
+  --font-sans: 'Inter', sans-serif;
 
-  .stack-2xs > * + * {
-    margin-block-start: 0.25rem;
-  }
-
-  .stack-xs > * + * {
-    margin-block-start: 0.5rem;
-  }
-
-  .stack-sm > * + * {
-    margin-block-start: 1rem;
-  }
-
-  .stack-md > * + * {
-    margin-block-start: 1.5rem;
-  }
-
-  .stack-lg > * + * {
-    margin-block-start: 2rem;
-  }
-
-  /* Inline Stack */
-  .stack-h {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-  }
-
-  .stack-h > * {
-    margin-inline: 0;
-  }
-
-  .stack-h-xs > * + * {
-    margin-inline-start: 0.5rem;
-  }
-
-  .stack-h-sm > * + * {
-    margin-inline-start: 1rem;
-  }
-
-  .stack-h-md > * + * {
-    margin-inline-start: 1.5rem;
-  }
-
-  .stack-h-lg > * + * {
-    margin-inline-start: 2rem;
-  }
-
-  /* Stack Borders */
-  .stack-border > * + * {
-    @apply border-t border-t-slate-400;
-  }
+  --color-ck: #7e58ff;
+  --color-ck-light: #7e58ffcc;
 }
 
-@layer components {
-  /* Color Picker and Color Palette */
-  .color-picker ::-webkit-color-swatch-wrapper,
-  .color-palette ::-webkit-color-swatch-wrapper {
-    padding: 0;
+@layer base {
+  /* Dialog */
+  dialog {
+    @apply m-auto;
+  }
+
+  /* Color Picker */
+  ::-webkit-color-swatch-wrapper {
+    @apply p-0;
   }
 
   ::-webkit-color-swatch {
-    border: 0;
+    @apply rounded-sm border-0;
   }
 
-  .color-picker ::-webkit-color-swatch {
-    @apply rounded;
+  ::-moz-color-swatch {
+    @apply border-0;
   }
 
-  .color-palette li:first-child ::-webkit-color-swatch {
-    @apply rounded-l;
+  ::-moz-focus-inner {
+    @apply border-0;
   }
 
-  .color-palette li:last-child ::-webkit-color-swatch {
-    @apply rounded-r;
-  }
-
-  .color-picker ::-moz-color-swatch,
-  .color-picker ::-moz-focus-inner,
-  .color-palette ::-moz-color-swatch {
-    border: 0;
-  }
-
-  .color-picker ::-moz-focus-inner,
-  .color-palette ::-moz-focus-inner {
-    padding: 0;
+  ::-moz-focus-inner {
+    @apply p-0;
   }
 
   /* Number input */
   /* Chrome, Safari, Edge, Opera */
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
+    @apply m-0;
+
     -webkit-appearance: none;
-    margin: 0;
   }
 
   /* Firefox */
   input[type='number'] {
     -moz-appearance: textfield;
   }
-
-  /* Hex Input */
-  .hex-input > input:first-child {
-    @apply border-r border-transparent;
-  }
-
-  .hex-input:hover > input:first-child,
-  .hex-input:focus-within > input:first-child {
-    @apply border-slate-600;
-  }
-
-  .transformation-editor .cm-editor {
-    max-height: 148px;
-  }
-}
-
-/*************
- * Overrides *
- *************/
-
-/* CodeMirror */
-.cm-editor {
-  @apply h-full;
-}
-
-.cm-editor .cm-scroller {
-  @apply font-mono text-xs;
-}
-
-/* Basemap Inset */
-[id^='inset'] .maplibregl-ctrl-bottom-right {
-  display: none;
-}
-
-[id^='inset'] .maplibregl-canvas-container.maplibregl-interactive {
-  cursor: pointer;
 }

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import cs from 'classnames';
   import type { FormEventHandler } from 'svelte/elements';
 
   interface Props {
@@ -24,8 +23,8 @@
   {placeholder}
   {id}
   {oninput}
-  class={cs(
-    'border border-slate-600 bg-inherit bg-slate-900 p-2 hover:border-slate-400 focus:border-slate-400',
+  class={[
+    'border border-slate-600 bg-slate-900 p-2 hover:border-slate-400 focus:border-slate-400',
     className
-  )}
+  ]}
 />

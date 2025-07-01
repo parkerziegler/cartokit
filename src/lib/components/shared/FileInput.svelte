@@ -26,13 +26,14 @@
     accept=".geojson,.json"
   />
   <span
-    class="file-prompt"
-    class:file-prompt--uploaded={file?.name}
+    class={['file-prompt', { 'file-prompt--uploaded': file?.name }]}
     data-content={file?.name ?? 'Choose file...'}
   ></span>
 </label>
 
 <style lang="postcss">
+  @reference 'tailwindcss';
+
   .file {
     height: 38px;
   }
@@ -43,7 +44,7 @@
   }
 
   .file-prompt {
-    @apply absolute left-0 right-0 top-0 z-10 h-full border border-slate-600 bg-inherit p-2 shadow-inner;
+    @apply absolute top-0 right-0 left-0 z-10 h-full border border-slate-600 bg-inherit p-2 shadow-inner;
   }
 
   .file-prompt:hover {
