@@ -477,8 +477,6 @@ export interface CartoKitBackend {
  *
  * @property isTurfRequired - A Boolean value indicating whether @turf/turf is
  * required to support cross-geometry transformations.
- * @property isLodashFlowRequired - A Boolean value indicating whether lodash's
- * flow function is required to support chaining transformations.
  * @property isFetchGeoJSONRequired - A Boolean value indicating whether we need
  * to insert a function to fetch GeoJSON hosted at a remote URL.
  * @property isGeoJSONNamespaceRequired - A Boolean value indicating whether we
@@ -486,7 +484,6 @@ export interface CartoKitBackend {
  */
 export interface CartoKitBackendAnalysis {
   isTurfRequired: boolean;
-  isLodashFlowRequired: boolean;
   isFetchGeoJSONRequired: boolean;
   isGeoJSONNamespaceRequired: boolean;
 }

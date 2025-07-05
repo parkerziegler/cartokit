@@ -20,20 +20,6 @@ function isTurfRequired(ir: CartoKitIR): boolean {
 }
 
 /**
- * Determine whether lodash's flow function is required for composing trans-
- * formations.
- *
- * @param ir – The CartoKit IR.
- * @returns - A Boolean value indicating whether lodash's flow function is
- * required.
- */
-function isLodashFlowRequired(ir: CartoKitIR): boolean {
-  return Object.values(ir.layers).some(
-    (layer) => layer.data.transformations.length > 1
-  );
-}
-
-/**
  * Determine whether we need to insert a function to fetch GeoJSON hosted at a
  * remote URL.
  *
@@ -79,7 +65,6 @@ export function analyzeIR(
 ): CartoKitBackendAnalysis {
   return {
     isTurfRequired: isTurfRequired(ir),
-    isLodashFlowRequired: isLodashFlowRequired(ir),
     isFetchGeoJSONRequired: isFetchGeoJSONRequired(ir),
     isGeoJSONNamespaceRequired: isGeoJSONNamespaceRequired(ir, languageBackend)
   };

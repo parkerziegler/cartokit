@@ -23,7 +23,6 @@ export function codegenImports(
   const libraryImports = [
     "import mapboxgl from 'maplibre-gl';",
     analysis.isTurfRequired ? "import * as turf from '@turf/turf';" : '',
-    analysis.isLodashFlowRequired ? "import { flow } from 'lodash-es';" : '',
     analysis.isGeoJSONNamespaceRequired
       ? "import type * as GeoJSON from 'geojson';"
       : ''

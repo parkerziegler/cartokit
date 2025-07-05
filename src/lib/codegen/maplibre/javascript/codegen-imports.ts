@@ -22,8 +22,7 @@ export function codegenImports(
 
   const libraryImports = [
     "import maplibregl from 'maplibre-gl';",
-    analysis.isTurfRequired ? "import * as turf from '@turf/turf';" : '',
-    analysis.isLodashFlowRequired ? "import { flow } from 'lodash-es';" : ''
+    analysis.isTurfRequired ? "import * as turf from '@turf/turf';" : ''
   ]
     .filter(Boolean)
     .join('\n');
