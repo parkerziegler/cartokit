@@ -15,11 +15,11 @@
 
 <div
   class={[
-    'bg-opacity-50 flex items-center gap-2 rounded-sm border px-2 py-1 text-white',
+    'flex items-center gap-2 rounded-sm border px-2 py-1 text-white',
     {
-      'border-green-400 bg-green-400': kind === 'success',
-      'border-red-400 bg-red-400': kind === 'error',
-      'border-yellow-400 bg-yellow-400': kind === 'warn'
+      'border-green-400 bg-green-400/50': kind === 'success',
+      'border-red-400 bg-red-400/50': kind === 'error',
+      'border-yellow-400 bg-yellow-400/50': kind === 'warn'
     },
     className
   ]}

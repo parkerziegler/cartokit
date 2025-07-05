@@ -64,7 +64,7 @@ export const POST = (async ({ request }) => {
     await request.json();
 
   try {
-    const completion = await openai.beta.chat.completions.parse({
+    const completion = await openai.chat.completions.parse({
       model: 'gpt-4o',
       messages: [
         {

@@ -1,12 +1,9 @@
 <script lang="ts">
-  import * as d3 from 'd3';
-
   import HexInput from '$lib/components/color/HexInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { ConstantFill } from '$lib/types';
   import { history } from '$lib/state/history.svelte';
-  import { DEFAULT_FILL } from '$lib/utils/constants';
 
   interface Props {
     layerId: string;
@@ -55,11 +52,11 @@
     type="color"
     id="fill-color"
     class="mr-2 ml-4 h-4 w-4 cursor-pointer appearance-none rounded-sm"
-    value={d3.color(fill.color)?.formatHex() ?? DEFAULT_FILL}
+    value={fill.color}
     oninput={onFillInput}
   />
   <HexInput
-    hex={d3.color(fill.color)?.formatHex() ?? DEFAULT_FILL}
+    hex={fill.color}
     testId="fill-color-input"
     onHexChange={onFillHexChange}
   />

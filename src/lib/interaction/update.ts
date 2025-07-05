@@ -16,14 +16,14 @@ import type {
   ClassificationMethod,
   QuantitativeColorScheme,
   LayerType,
-  Transformation,
   VisualizationType,
   QuantitativeFill,
   CategoricalFill,
   CategoricalColorScheme,
   ConstantFill,
   Channel,
-  SchemeDirection
+  SchemeDirection,
+  TransformationCall
 } from '$lib/types';
 import {
   DEFAULT_FILL,
@@ -178,7 +178,7 @@ interface TransformationUpdate extends LayerUpdate {
   type: 'transformation';
   payload: {
     geojson: FeatureCollection;
-    transformation: Transformation;
+    transformation: TransformationCall;
   };
 }
 

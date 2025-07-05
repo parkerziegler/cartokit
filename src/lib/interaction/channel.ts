@@ -1,14 +1,11 @@
 import * as d3 from 'd3';
-import type { Feature, Polygon, MultiPolygon } from 'geojson';
+import type { Polygon, MultiPolygon, FeatureCollection } from 'geojson';
 import type { Map, GeoJSONSource } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
-import {
-  deriveSize,
-  deriveDotDensityStartingValue,
-  generateDotDensityPoints
-} from '$lib/interaction/geometry';
+import { deriveSize } from '$lib/interaction/geometry';
 import { deriveThresholds } from '$lib/interaction/scales';
+import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
 import type {
   CartoKitLayer,
   CartoKitChoroplethLayer,
@@ -204,19 +201,13 @@ function updateFillChannel(
  * @param {CartoKitDotDensityLayer} layer – The layer to update.
  */
 function updateDotsChannel(map: Map, layer: CartoKitDotDensityLayer): void {
-  const dotValue = deriveDotDensityStartingValue(
-    layer.data.sourceGeojson.features,
-    layer.style.dots.attribute
-  );
-
   const features = generateDotDensityPoints(
-    layer.data.sourceGeojson.features as Feature<Polygon | MultiPolygon>[],
+    layer.data.sourceGeojson as FeatureCollection<Polygon | MultiPolygon>,
     layer.style.dots.attribute,
-    dotValue
+    layer.style.dots.value
   );
 
   layer.data.geojson = features;
-  layer.style.dots.value = dotValue;
 
   // Update the source with the new data.
   (map.getSource(layer.id) as GeoJSONSource).setData(features);

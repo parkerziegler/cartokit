@@ -88,17 +88,37 @@ export type Channel = 'fill' | 'stroke' | 'size' | 'dots';
 export type VisualizationType = 'Quantitative' | 'Categorical' | 'Constant';
 
 /**
+ * Represents the kind of transformation.
+ */
+export type TransformationKind = 'geometric' | 'tabular';
+
+/**
  * Represents a transformation—either internal or user-defined—applied to a
  * layer.
  *
  * @property name - The function name of the transformation.
- * @property definition - The function body of the transformation.
- * @property type - The type of the transformation, either geometric or tabular.
+ * @property params - The function parameters of the transformation.
+ * @property paramTypes - The types of the function parameters of the transforma-
+ * tion.
+ * @property returnType - The type of the function return value of the transfor-
+ * mation.
+ * @property args - The arguments passed to the transformation.
+ * @property definitionTS - The TypeScript function body of the transformation.
+ * @property definitionJS - The JavaScript function body of the transformation.
+ * @property kind - The kind of the transformation, either geometric or tabular.
  */
 export interface Transformation {
   name: string;
-  definition: string;
-  type: 'geometric' | 'tabular';
+  params: string[];
+  paramTypes: string[];
+  returnType: string;
+  definitionTS: string;
+  definitionJS: string;
+  kind: TransformationKind;
+}
+
+export interface TransformationCall extends Transformation {
+  args: (string | number)[];
 }
 
 /**
@@ -122,7 +142,7 @@ interface LayerData {
   fileName?: string;
   geojson: FeatureCollection;
   sourceGeojson: FeatureCollection;
-  transformations: Transformation[];
+  transformations: TransformationCall[];
 }
 
 /**
@@ -457,16 +477,13 @@ export interface CartoKitBackend {
  *
  * @property isTurfRequired - A Boolean value indicating whether @turf/turf is
  * required to support cross-geometry transformations.
- * @property isLodashFlowRequired - A Boolean value indicating whether lodash's
- * flow function is required to support chaining transformations.
  * @property isFetchGeoJSONRequired - A Boolean value indicating whether we need
  * to insert a function to fetch GeoJSON hosted at a remote URL.
- * @property isFeatureCollectionRequired - A Boolean value indicating whether we
- * need to insert an import of the GeoJSON FeatureCollection type.
+ * @property isGeoJSONNamespaceRequired - A Boolean value indicating whether we
+ * need to insert an import of the GeoJSON namespace.
  */
 export interface CartoKitBackendAnalysis {
   isTurfRequired: boolean;
-  isLodashFlowRequired: boolean;
   isFetchGeoJSONRequired: boolean;
-  isFeatureCollectionRequired: boolean;
+  isGeoJSONNamespaceRequired: boolean;
 }

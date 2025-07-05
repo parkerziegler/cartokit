@@ -14,22 +14,8 @@ function isTurfRequired(ir: CartoKitIR): boolean {
   return Object.values(ir.layers).some(
     (layer) =>
       layer.data.transformations.filter(
-        (transformation) => transformation.type === 'geometric'
+        (transformation) => transformation.kind === 'geometric'
       ).length > 0
-  );
-}
-
-/**
- * Determine whether lodash's flow function is required for composing trans-
- * formations.
- *
- * @param ir – The CartoKit IR.
- * @returns - A Boolean value indicating whether lodash's flow function is
- * required.
- */
-function isLodashFlowRequired(ir: CartoKitIR): boolean {
-  return Object.values(ir.layers).some(
-    (layer) => layer.data.transformations.length > 1
   );
 }
 
@@ -48,13 +34,13 @@ function isFetchGeoJSONRequired(ir: CartoKitIR): boolean {
 }
 
 /**
- * Determine whether we need to insert an import of the GeoJSON
- * FeatureCollection type. This is only relevant for TypeScript codegen.
+ * Determine whether we need to insert an import of the GeoJSON namespace.
+ * This is only relevant for TypeScript codegen.
  *
  * @param ir – The CartoKit IR.
  * @param languageBackend – The @see{CartoKitLanguageBackend} for the analysis.
  */
-export function isFeatureCollectionRequired(
+export function isGeoJSONNamespaceRequired(
   ir: CartoKitIR,
   languageBackend: CartoKitBackend['language']
 ): boolean {
@@ -79,11 +65,7 @@ export function analyzeIR(
 ): CartoKitBackendAnalysis {
   return {
     isTurfRequired: isTurfRequired(ir),
-    isLodashFlowRequired: isLodashFlowRequired(ir),
     isFetchGeoJSONRequired: isFetchGeoJSONRequired(ir),
-    isFeatureCollectionRequired: isFeatureCollectionRequired(
-      ir,
-      languageBackend
-    )
+    isGeoJSONNamespaceRequired: isGeoJSONNamespaceRequired(ir, languageBackend)
   };
 }

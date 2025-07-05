@@ -24,7 +24,7 @@
   {id}
   {oninput}
   class={[
-    'border border-slate-600 bg-slate-900 p-2 hover:border-slate-400 focus:border-slate-400',
+    'border border-slate-600 bg-slate-900 p-2 placeholder:text-slate-400 hover:border-slate-400 focus:border-slate-400',
     className
   ]}
 />
