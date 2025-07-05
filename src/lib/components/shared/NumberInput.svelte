@@ -26,13 +26,15 @@
   function onChange(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
-    const value = +event.currentTarget.value;
+    let v = +event.currentTarget.value;
 
-    if (Number.isNaN(value)) {
-      return;
+    if (Number.isNaN(v) || v < min) {
+      v = min;
+    } else if (v > max) {
+      v = max;
     }
 
-    onchange(value);
+    onchange(v);
   }
 </script>
 
@@ -42,7 +44,7 @@
   {id}
   {min}
   {max}
-  {value}
+  bind:value
   {step}
   {disabled}
   {autofocus}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { featureCollection } from '@turf/helpers';
+  import * as turf from '@turf/turf';
   import { EditorView } from 'codemirror';
   import type { FeatureCollection } from 'geojson';
   import { onDestroy } from 'svelte';
@@ -14,7 +14,7 @@
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { selectedFeature } from '$lib/stores/selected-feature';
-  import { parseUserDefinedTransformation } from '$lib/utils/parse';
+  import { parseStringToTransformation } from '$lib/utils/parse';
   import { transformationWorker } from '$lib/utils/worker';
 
   interface Props {
@@ -65,18 +65,14 @@
     transformationWorker(program, geojson, (message) => {
       switch (message.type) {
         case 'data': {
-          const { functionName, functionBody } =
-            parseUserDefinedTransformation(program);
-
           dispatchLayerUpdate({
             type: 'transformation',
             layerId,
             payload: {
               geojson: message.data,
               transformation: {
-                name: functionName,
-                definition: functionBody,
-                type: 'tabular'
+                ...parseStringToTransformation(program, 'tabular'),
+                args: []
               }
             }
           });
@@ -105,7 +101,7 @@
     if ($selectedFeature) {
       transformationWorker(
         program,
-        featureCollection([$selectedFeature]),
+        turf.featureCollection([$selectedFeature]),
         (message) => {
           // TODO: Split out the additional edge cases here.
           // - message.data?.[0] is strictly a GeoJSON feature.

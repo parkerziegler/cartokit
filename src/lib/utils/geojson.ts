@@ -1,4 +1,4 @@
-import { feature, featureCollection } from '@turf/helpers';
+import * as turf from '@turf/turf';
 import type { GeoJSON, Feature, FeatureCollection, Geometry } from 'geojson';
 
 import {
@@ -23,13 +23,13 @@ export function normalizeGeoJSONToFeatureCollection(
     case 'MultiLineString':
     case 'Polygon':
     case 'MultiPolygon':
-      return featureCollection([feature(geojson)]);
+      return turf.featureCollection([turf.feature(geojson)]);
     case 'GeometryCollection':
-      return featureCollection(
-        geojson.geometries.map((geometry) => feature(geometry))
+      return turf.featureCollection(
+        geojson.geometries.map((geometry) => turf.feature(geometry))
       );
     case 'Feature':
-      return featureCollection([geojson]);
+      return turf.featureCollection([geojson]);
     case 'FeatureCollection':
       return geojson;
   }

@@ -45,7 +45,7 @@ export function codegenImports(
 
   return `${imports}
   
-  ${codegenFns(analysis)}
+  ${codegenFns(ir, analysis)}
   
   ${codegenMap(ir, uploadTable, analysis)}`;
 }

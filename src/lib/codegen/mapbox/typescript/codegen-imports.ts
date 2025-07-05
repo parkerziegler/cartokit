@@ -24,8 +24,8 @@ export function codegenImports(
     "import mapboxgl from 'mapbox-gl';",
     analysis.isTurfRequired ? "import * as turf from '@turf/turf';" : '',
     analysis.isLodashFlowRequired ? "import { flow } from 'lodash-es';" : '',
-    analysis.isFeatureCollectionRequired
-      ? "import type { FeatureCollection } from 'geojson';"
+    analysis.isGeoJSONNamespaceRequired
+      ? "import type * as GeoJSON from 'geojson';"
       : ''
   ]
     .filter(Boolean)
@@ -50,7 +50,7 @@ export function codegenImports(
 
   return `${imports}
 
-  ${codegenFns(analysis)}
+  ${codegenFns(ir, analysis)}
 
   ${codegenMap(ir, uploadTable, analysis)}`;
 }

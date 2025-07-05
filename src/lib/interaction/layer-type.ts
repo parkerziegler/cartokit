@@ -1,15 +1,22 @@
-import type { Geometry, Feature, Polygon, MultiPolygon } from 'geojson';
+import type {
+  Geometry,
+  Polygon,
+  MultiPolygon,
+  FeatureCollection
+} from 'geojson';
 import type { Map, GeoJSONSource } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
 import {
-  generateDotDensityPoints,
   deriveDotDensityStartingValue,
-  deriveCentroids,
   deriveSize
 } from '$lib/interaction/geometry';
 import { addLayer } from '$lib/interaction/layer';
 import { listeners, type LayerListeners } from '$lib/stores/listeners';
+import { deriveCentroids } from '$lib/stdlib/centroid';
+import deriveCentroidsSrc from '$lib/stdlib/centroid?raw';
+import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
+import generateDotDensityPointsSrc from '$lib/stdlib/dot-density?raw';
 import type {
   CartoKitLayer,
   CartoKitPointLayer,
@@ -38,10 +45,7 @@ import {
   selectQuantitativeAttribute
 } from '$lib/utils/geojson';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
-import {
-  transformDotDensity,
-  transformGeometryToCentroids
-} from '$lib/utils/transformation';
+import { parseStringToTransformation } from '$lib/utils/parse';
 
 interface TransitionMapTypeReturnValue {
   targetLayer: CartoKitLayer;
@@ -194,10 +198,13 @@ function transitionToPoint(
         type: 'Point',
         data: {
           ...layer.data,
-          geojson: deriveCentroids(layer.data.sourceGeojson.features),
+          geojson: deriveCentroids(layer.data.sourceGeojson),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            {
+              ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+              args: []
+            }
           ]
         },
         style: {
@@ -218,10 +225,13 @@ function transitionToPoint(
         type: 'Point',
         data: {
           ...layer.data,
-          geojson: deriveCentroids(layer.data.geojson.features),
+          geojson: deriveCentroids(layer.data.geojson),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            {
+              ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+              args: []
+            }
           ]
         },
         style: {
@@ -247,10 +257,13 @@ function transitionToPoint(
         type: 'Point',
         data: {
           ...layer.data,
-          geojson: deriveCentroids(layer.data.geojson.features),
+          geojson: deriveCentroids(layer.data.geojson),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            {
+              ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+              args: []
+            }
           ]
         },
         style: {
@@ -272,10 +285,13 @@ function transitionToPoint(
         type: 'Point',
         data: {
           ...layer.data,
-          geojson: deriveCentroids(layer.data.geojson.features),
+          geojson: deriveCentroids(layer.data.geojson),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            {
+              ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+              args: []
+            }
           ]
         },
         style: {
@@ -351,10 +367,13 @@ function transitionToProportionalSymbol(
         type: 'Proportional Symbol',
         data: {
           ...layer.data,
-          geojson: deriveCentroids(layer.data.sourceGeojson.features),
+          geojson: deriveCentroids(layer.data.sourceGeojson),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            {
+              ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+              args: []
+            }
           ]
         },
         style: {
@@ -380,10 +399,13 @@ function transitionToProportionalSymbol(
         type: 'Proportional Symbol',
         data: {
           ...layer.data,
-          geojson: deriveCentroids(features),
+          geojson: deriveCentroids(layer.data.geojson),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            {
+              ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+              args: []
+            }
           ]
         },
         style: {
@@ -413,10 +435,13 @@ function transitionToProportionalSymbol(
         type: 'Proportional Symbol',
         data: {
           ...layer.data,
-          geojson: deriveCentroids(features),
+          geojson: deriveCentroids(layer.data.geojson),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            {
+              ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+              args: []
+            }
           ]
         },
         style: {
@@ -442,10 +467,13 @@ function transitionToProportionalSymbol(
         type: 'Proportional Symbol',
         data: {
           ...layer.data,
-          geojson: deriveCentroids(features),
+          geojson: deriveCentroids(layer.data.geojson),
           transformations: [
             ...layer.data.transformations,
-            transformGeometryToCentroids()
+            {
+              ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+              args: []
+            }
           ]
         },
         style: {
@@ -495,11 +523,14 @@ function transitionToDotDensity(
         generateUnsupportedTransitionError(sourceGeometryType, 'Polygon');
       }
 
-      const features = layer.data.sourceGeojson.features as Feature<
+      const geojson = layer.data.sourceGeojson as FeatureCollection<
         Polygon | MultiPolygon
-      >[];
-      const attribute = selectQuantitativeAttribute(features);
-      const dotValue = deriveDotDensityStartingValue(features, attribute);
+      >;
+      const attribute = selectQuantitativeAttribute(geojson.features);
+      const dotValue = deriveDotDensityStartingValue(
+        geojson.features,
+        attribute
+      );
 
       const targetLayer: CartoKitDotDensityLayer = {
         id: layer.id,
@@ -507,10 +538,16 @@ function transitionToDotDensity(
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geojson: generateDotDensityPoints(features, attribute, dotValue),
+          geojson: generateDotDensityPoints(geojson, attribute, dotValue),
           transformations: [
             ...layer.data.transformations,
-            transformDotDensity(attribute, dotValue)
+            {
+              ...parseStringToTransformation(
+                generateDotDensityPointsSrc,
+                'geometric'
+              ),
+              args: [attribute, dotValue]
+            }
           ]
         },
         style: {
@@ -545,12 +582,12 @@ function transitionToDotDensity(
         generateUnsupportedTransitionError(sourceGeometryType, 'Polygon');
       }
 
-      const features = layer.data.sourceGeojson.features as Feature<
+      const geojson = layer.data.sourceGeojson as FeatureCollection<
         Polygon | MultiPolygon
-      >[];
+      >;
       const attribute = layer.style.size.attribute;
       const dotValue = deriveDotDensityStartingValue(
-        features,
+        geojson.features,
         layer.style.size.attribute
       );
 
@@ -560,10 +597,16 @@ function transitionToDotDensity(
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geojson: generateDotDensityPoints(features, attribute, dotValue),
+          geojson: generateDotDensityPoints(geojson, attribute, dotValue),
           transformations: [
             ...layer.data.transformations,
-            transformDotDensity(attribute, dotValue)
+            {
+              ...parseStringToTransformation(
+                generateDotDensityPointsSrc,
+                'geometric'
+              ),
+              args: [attribute, dotValue]
+            }
           ]
         },
         style: {
@@ -603,11 +646,14 @@ function transitionToDotDensity(
       throw error;
     }
     case 'Polygon': {
-      const features = layer.data.geojson.features as Feature<
+      const geojson = layer.data.geojson as FeatureCollection<
         Polygon | MultiPolygon
-      >[];
-      const attribute = selectQuantitativeAttribute(features);
-      const dotValue = deriveDotDensityStartingValue(features, attribute);
+      >;
+      const attribute = selectQuantitativeAttribute(geojson.features);
+      const dotValue = deriveDotDensityStartingValue(
+        geojson.features,
+        attribute
+      );
 
       const targetLayer: CartoKitDotDensityLayer = {
         id: layer.id,
@@ -615,10 +661,16 @@ function transitionToDotDensity(
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geojson: generateDotDensityPoints(features, attribute, dotValue),
+          geojson: generateDotDensityPoints(geojson, attribute, dotValue),
           transformations: [
             ...layer.data.transformations,
-            transformDotDensity(attribute, dotValue)
+            {
+              ...parseStringToTransformation(
+                generateDotDensityPointsSrc,
+                'geometric'
+              ),
+              args: [attribute, dotValue]
+            }
           ]
         },
         style: {
@@ -638,11 +690,14 @@ function transitionToDotDensity(
       };
     }
     case 'Choropleth': {
-      const features = layer.data.geojson.features as Feature<
+      const geojson = layer.data.geojson as FeatureCollection<
         Polygon | MultiPolygon
-      >[];
+      >;
       const attribute = layer.style.fill.attribute;
-      const dotValue = deriveDotDensityStartingValue(features, attribute);
+      const dotValue = deriveDotDensityStartingValue(
+        geojson.features,
+        attribute
+      );
 
       const targetLayer: CartoKitDotDensityLayer = {
         id: layer.id,
@@ -650,10 +705,16 @@ function transitionToDotDensity(
         type: 'Dot Density',
         data: {
           ...layer.data,
-          geojson: generateDotDensityPoints(features, attribute, dotValue),
+          geojson: generateDotDensityPoints(geojson, attribute, dotValue),
           transformations: [
             ...layer.data.transformations,
-            transformDotDensity(attribute, dotValue)
+            {
+              ...parseStringToTransformation(
+                generateDotDensityPointsSrc,
+                'geometric'
+              ),
+              args: [attribute, dotValue]
+            }
           ]
         },
         style: {

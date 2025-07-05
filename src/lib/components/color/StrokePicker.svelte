@@ -1,12 +1,9 @@
 <script lang="ts">
-  import * as d3 from 'd3';
-
   import HexInput from '$lib/components/color/HexInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { ConstantStroke } from '$lib/types';
-  import { DEFAULT_STROKE } from '$lib/utils/constants';
   import { history } from '$lib/state/history.svelte';
   interface Props {
     layerId: string;
@@ -79,11 +76,11 @@
       type="color"
       id="stroke-color"
       class="mr-2 ml-4 h-4 w-4 cursor-pointer appearance-none rounded-sm"
-      value={d3.color(stroke.color)?.formatHex() ?? DEFAULT_STROKE}
+      value={stroke.color}
       oninput={onStrokeInput}
     />
     <HexInput
-      hex={d3.color(stroke.color)?.formatHex() ?? DEFAULT_STROKE}
+      hex={stroke.color}
       testId="stroke-color-input"
       onHexChange={onStrokeHexChange}
     />

@@ -1,4 +1,22 @@
-import type { CartoKitBackendAnalysis } from '$lib/types';
+import { uniqBy } from 'lodash-es';
+
+import type {
+  CartoKitIR,
+  CartoKitBackendAnalysis,
+  Transformation
+} from '$lib/types';
+
+/**
+ * Generate a JavaScript program fragment for a single transformation function.
+ *
+ * @param transformation – A @see{Transformation}.
+ * @returns – A JavaScript program fragment.
+ */
+function codegenTransformationFn(transformation: Transformation): string {
+  return `function ${transformation.name}(${transformation.params.join(', ')})
+  ${transformation.definitionJS}
+`;
+}
 
 /**
  * Generate a JavaScript program fragment for top-level, reusable functions.
@@ -6,7 +24,10 @@ import type { CartoKitBackendAnalysis } from '$lib/types';
  * @param analysis – The analysis of the CartoKit IR.
  * @returns – A JavaScript program fragment.
  */
-export function codegenFns(analysis: CartoKitBackendAnalysis): string {
+export function codegenFns(
+  ir: CartoKitIR,
+  analysis: CartoKitBackendAnalysis
+): string {
   const fns: string[] = [];
 
   if (analysis.isFetchGeoJSONRequired) {
@@ -25,5 +46,14 @@ export function codegenFns(analysis: CartoKitBackendAnalysis): string {
     }`);
   }
 
-  return fns.join('\n');
+  // Obtain the set of transformations identified uniquely by their name
+  // property and generate a function for each.
+  uniqBy(
+    Object.values(ir.layers).flatMap((layer) => layer.data.transformations),
+    'name'
+  ).forEach((transformation) => {
+    fns.push(codegenTransformationFn(transformation));
+  });
+
+  return fns.join('\n\n');
 }

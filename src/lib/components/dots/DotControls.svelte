@@ -55,7 +55,7 @@
     <FieldLabel fieldId="dot-value">Dot Value</FieldLabel>
     <NumberInput
       id="dot-value"
-      min={1}
+      min={0.000001}
       max={Infinity}
       value={layer.style.dots.value}
       onchange={onDotValueChange}

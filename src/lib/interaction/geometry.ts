@@ -1,16 +1,5 @@
-import { bbox } from '@turf/bbox';
-import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
-import { centroid } from '@turf/centroid';
-import { feature, featureCollection } from '@turf/helpers';
-import { randomPoint } from '@turf/random';
 import * as d3 from 'd3';
-import type {
-  Feature,
-  FeatureCollection,
-  Point,
-  MultiPolygon,
-  Polygon
-} from 'geojson';
+import type { Feature } from 'geojson';
 import type { ExpressionSpecification } from 'maplibre-gl';
 
 import type { CartoKitProportionalSymbolLayer } from '$lib/types';
@@ -47,76 +36,6 @@ export function deriveSize(
     max,
     rMax
   ];
-}
-
-/**
- * Derive centroids for a set of GeoJSON features.
- *
- * @param features – The input features to derive centroids for.
- *
- * @returns – A FeatureCollection of centroids.
- */
-export function deriveCentroids(features: Feature[]): FeatureCollection {
-  return featureCollection(
-    features.reduce<Feature[]>((acc, { geometry, properties }) => {
-      if (
-        !geometry ||
-        ('coordinates' in geometry && geometry.coordinates.length === 0)
-      ) {
-        return acc;
-      }
-
-      return [...acc, feature(centroid(geometry).geometry, properties)];
-    }, [])
-  );
-}
-
-/**
- * Generate dots for a dot density layer.
- *
- * @param {Feature<Polygon | MultiPolygon>[]} features – The polygon features
- * within which to generate dots.
- * @param {string} attribute – The attribute being visualized.
- * @param {number} value – The dot value of the dot density layer.
- * @returns {FeatureCollection<Point>} – A FeatureCollection of dots.
- */
-export function generateDotDensityPoints(
-  features: Feature<Polygon | MultiPolygon>[],
-  attribute: string,
-  value: number
-): FeatureCollection<Point> {
-  return featureCollection(
-    features.reduce<Feature<Point>[]>((acc, { geometry, properties }) => {
-      if (
-        !geometry ||
-        ('coordinates' in geometry && geometry.coordinates.length === 0)
-      ) {
-        return acc;
-      }
-
-      const numPoints = Math.floor(properties?.[attribute] / value) ?? 0;
-
-      // Obtain the bounding box of the polygon.
-      const boundingBox = bbox(geometry);
-
-      // Begin "throwing" random points within the bounding box, keeping them only
-      // if they fall within the polygon.
-      const selectedFeatures: Feature<Point>[] = [];
-
-      while (selectedFeatures.length < numPoints) {
-        const candidate = randomPoint(1, { bbox: boundingBox }).features[0];
-
-        if (booleanPointInPolygon(candidate, geometry)) {
-          selectedFeatures.push(candidate);
-        }
-      }
-
-      return [
-        ...acc,
-        ...selectedFeatures.map((point) => feature(point.geometry, properties))
-      ];
-    }, [])
-  );
 }
 
 /**

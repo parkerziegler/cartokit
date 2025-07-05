@@ -1,7 +1,7 @@
 import { camelCase } from 'lodash-es';
 
-import { codegenFns } from '$lib/codegen/maplibre/typescript/codegen-fns';
-import { codegenMap } from '$lib/codegen/maplibre/typescript/codegen-map';
+import { codegenFns } from '$lib/codegen/mapbox/typescript/codegen-fns';
+import { codegenMap } from '$lib/codegen/mapbox/typescript/codegen-map';
 import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
 
 /**
@@ -21,11 +21,11 @@ export function codegenImports(
   const uploadTable = new Map<string, string>();
 
   const libraryImports = [
-    "import maplibregl from 'maplibre-gl';",
+    "import mapboxgl from 'maplibre-gl';",
     analysis.isTurfRequired ? "import * as turf from '@turf/turf';" : '',
     analysis.isLodashFlowRequired ? "import { flow } from 'lodash-es';" : '',
-    analysis.isFeatureCollectionRequired
-      ? "import type { FeatureCollection } from 'geojson';"
+    analysis.isGeoJSONNamespaceRequired
+      ? "import type * as GeoJSON from 'geojson';"
       : ''
   ]
     .filter(Boolean)
@@ -48,7 +48,7 @@ export function codegenImports(
 
   return `${imports}
 
-  ${codegenFns(analysis)}
+  ${codegenFns(ir, analysis)}
 
   ${codegenMap(ir, uploadTable, analysis)}`;
 }

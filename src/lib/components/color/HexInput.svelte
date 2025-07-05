@@ -1,4 +1,6 @@
 <script lang="ts">
+  import * as d3 from 'd3';
+
   import { DEFAULT_FILL } from '$lib/utils/constants';
 
   interface Props {
@@ -29,7 +31,7 @@
 
 <input
   size="7"
-  value={hex}
+  value={d3.color(hex)?.formatHex() ?? DEFAULT_FILL}
   onchange={validateHex}
   class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
   data-testid={testId}
