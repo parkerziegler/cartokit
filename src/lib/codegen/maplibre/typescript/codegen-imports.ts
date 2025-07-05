@@ -1,7 +1,7 @@
 import { camelCase } from 'lodash-es';
 
-import { codegenFns } from '$lib/codegen/mapbox/typescript/codegen-fns';
-import { codegenMap } from '$lib/codegen/mapbox/typescript/codegen-map';
+import { codegenFns } from '$lib/codegen/maplibre/typescript/codegen-fns';
+import { codegenMap } from '$lib/codegen/maplibre/typescript/codegen-map';
 import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
 
 /**

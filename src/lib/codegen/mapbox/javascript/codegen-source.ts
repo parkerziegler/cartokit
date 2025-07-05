@@ -29,27 +29,43 @@ export function codegenSource(
 		data: ${layer.data.url ? `"${layer.data.url}"` : dataIdent}
 	});
   `;
-    case 1:
+    case 1: {
+      const args = transformations[0].args
+        .map((arg, i) => {
+          const type = transformations[0].paramTypes[i + 1];
+
+          return type === 'string' ? `'${arg}'` : arg;
+        })
+        .join(', ');
+
       return `
   ${fetchData}
 
   map.addSource('${layer.id}', {
 		type: 'geojson',
-		data: ${transformations[0].name}(${dataIdent}, ${transformations[0].args.join(', ')})
+		data: ${transformations[0].name}(${dataIdent}, ${args})
 	});
   `;
-    default:
+    }
+    default: {
       return `
   ${fetchData}
   
   map.addSource('${layer.id}', {
 		type: 'geojson',
 		data: ${transformations.reduce((acc, transformation, i) => {
-      const args = transformation.args.join(', ');
+      const args = transformation.args
+        .map((arg, i) => {
+          const type = transformation.paramTypes[i + 1];
+
+          return type === 'string' ? `'${arg}'` : arg;
+        })
+        .join(', ');
 
       return `${transformation.name}(${i === 0 ? dataIdent : acc}, ${args})`;
     }, '')}
 	});
   `;
+    }
   }
 }
