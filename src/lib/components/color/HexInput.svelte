@@ -22,7 +22,7 @@
     }
 
     if (hexPattern.test(output)) {
-      onHexChange(output);
+      onHexChange(d3.color(output)?.formatHex() ?? DEFAULT_FILL);
     } else {
       onHexChange(DEFAULT_FILL);
     }
@@ -31,7 +31,7 @@
 
 <input
   size="7"
-  value={d3.color(hex)?.formatHex() ?? DEFAULT_FILL}
+  bind:value={hex}
   onchange={validateHex}
   class="border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600"
   data-testid={testId}
