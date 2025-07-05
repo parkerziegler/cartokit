@@ -43,7 +43,7 @@ export function codegenFns(
     fns.push(`async function fetchGeoJSON(url: string): Promise<GeoJSON.FeatureCollection> {
       try {
         const response = await fetch(url);
-        const data = await response.json() as GeoJSON.FeatureCollection;
+        const data = (await response.json()) as GeoJSON.FeatureCollection;
 
         return data;
       } catch (error) {

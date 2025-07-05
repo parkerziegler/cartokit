@@ -21,7 +21,7 @@ export function codegenImports(
   const uploadTable = new Map<string, string>();
 
   const libraryImports = [
-    "import mapboxgl from 'maplibre-gl';",
+    "import maplibregl from 'maplibre-gl';",
     analysis.isTurfRequired ? "import * as turf from '@turf/turf';" : '',
     analysis.isGeoJSONNamespaceRequired
       ? "import type * as GeoJSON from 'geojson';"
