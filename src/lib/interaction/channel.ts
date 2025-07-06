@@ -208,6 +208,19 @@ function updateDotsChannel(map: Map, layer: CartoKitDotDensityLayer): void {
   );
 
   layer.data.geojson = features;
+  // Update the args of the dot density transformation in this layer.
+  //
+  // Find the transformation call for the dot density transformation.
+  const transformationIndex = layer.data.transformations.findIndex(
+    (t) => t.name === 'generateDotDensityPoints'
+  );
+
+  if (transformationIndex > -1) {
+    layer.data.transformations[transformationIndex].args = [
+      layer.style.dots.attribute,
+      layer.style.dots.value
+    ];
+  }
 
   // Update the source with the new data.
   (map.getSource(layer.id) as GeoJSONSource).setData(features);

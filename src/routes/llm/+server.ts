@@ -65,7 +65,7 @@ export const POST = (async ({ request }) => {
 
   try {
     const completion = await openai.chat.completions.parse({
-      model: 'gpt-4o',
+      model: 'gpt-4.1',
       messages: [
         {
           role: 'system',
@@ -350,15 +350,15 @@ function SizeUpdate(layerIds: string[]) {
     type: z.literal('size'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
-      min: z.optional(z.number()),
-      max: z.optional(z.number())
+      min: z.number().nullable(),
+      max: z.number().nullable()
     })
   });
 }
 
 function DotValueUpdate(layerIds: string[]) {
   return z.object({
-    type: z.literal('dots'),
+    type: z.literal('dot-value'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
       value: z.number()
