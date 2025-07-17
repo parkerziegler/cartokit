@@ -19,7 +19,7 @@
 
   interface Props {
     oncloseeditor: () => void;
-    onclickoutsideeditor: (event: CustomEvent<MouseEvent>) => void;
+    onclickoutsideeditor: (event: MouseEvent) => void;
     layerId: string;
     geojson: FeatureCollection;
   }

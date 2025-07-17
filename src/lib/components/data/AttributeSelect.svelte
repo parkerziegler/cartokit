@@ -84,8 +84,8 @@
     transformationEditorVisible = false;
   }
 
-  function onClickOutsideEditor(event: CustomEvent<MouseEvent>) {
-    if (!trigger.contains(event.detail.target as Node)) {
+  function onClickOutsideEditor(event: MouseEvent) {
+    if (!trigger.contains(event.target as Node)) {
       onCloseEditor();
     }
   }
