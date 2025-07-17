@@ -1,6 +1,6 @@
 <script lang="ts">
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import OpacityInput from '$lib/components/shared/OpacityInput.svelte';
+  import OpacityInput from '$lib/components/channel/shared/OpacityInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { history } from '$lib/state/history.svelte';
   import type { CartoKitHeatmapLayer } from '$lib/types';
