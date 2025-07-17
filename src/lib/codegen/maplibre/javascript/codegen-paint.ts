@@ -138,12 +138,12 @@ export function codegenFill(layer: CartoKitLayer): string {
           layer.style.heatmap.opacity,
           MAPLIBRE_DEFAULTS['heatmap-opacity']
         ),
-        `'heatmap-weight': ${JSON.stringify(deriveHeatmapWeight(layer))}`,
         withDefault(
           'heatmap-radius',
           layer.style.heatmap.radius,
           MAPLIBRE_DEFAULTS['heatmap-radius']
-        )
+        ),
+        `'heatmap-weight': ${JSON.stringify(deriveHeatmapWeight(layer))}`
       ]
         .filter(Boolean)
         .join(',\n');
