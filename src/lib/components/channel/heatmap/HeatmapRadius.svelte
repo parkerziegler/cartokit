@@ -38,6 +38,6 @@
     min={1}
     value={layer.style.heatmap.radius}
     onchange={onHeatmapRadiusChange}
-    class="w-10"
+    class="w-8"
   />
 </div>
