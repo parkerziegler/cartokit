@@ -22,7 +22,7 @@
   <p class="font-semibold">{fill.attribute} ↓</p>
   <div class="flex gap-2 rounded-md bg-slate-900">
     <ul class="mt-3 flex flex-col gap-2">
-      {#each colors as color, i (i)}
+      {#each colors as color (color)}
         <li>
           {#if layerType === 'Choropleth'}
             <svg viewBox="0 0 32 16" width="32" height="16">
