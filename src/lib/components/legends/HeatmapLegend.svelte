@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ColorSchemeRamp from '$lib/components/color/ColorRamp.svelte';
+  import ColorSchemeRamp from '$lib/components/channel/shared/ColorRamp.svelte';
   import type { CartoKitHeatmapLayer } from '$lib/types';
 
   interface Props {

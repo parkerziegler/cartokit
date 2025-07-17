@@ -1,7 +1,7 @@
 <script lang="ts">
   import { clickoutside } from '$lib/actions/clickoutside.svelte';
   import { focus } from '$lib/actions/focus.svelte';
-  import ColorRamp from '$lib/components/color/ColorRamp.svelte';
+  import ColorRamp from '$lib/components/channel/shared/ColorRamp.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';

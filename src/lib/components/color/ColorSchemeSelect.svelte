@@ -1,7 +1,7 @@
 <script lang="ts">
   import { clickoutside } from '$lib/actions/clickoutside.svelte';
-  import ColorSchemePalette from '$lib/components/color/ColorSchemePalette.svelte';
-  import ColorSchemePaletteOption from '$lib/components/color/ColorSchemePaletteOption.svelte';
+  import { focus } from '$lib/actions/focus.svelte';
+  import ColorPalette from '$lib/components/channel/shared/ColorPalette.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
@@ -125,7 +125,7 @@
       use:clickoutside={onClickOutsideCurrentScheme}
       class="flex-1"
     >
-      <ColorSchemePalette
+      <ColorPalette
         scheme={style.scheme.id}
         direction={style.scheme.direction}
         count={style.type === 'Quantitative' ? style.count : undefined}
@@ -144,13 +144,19 @@
         >
           {#each schemes as scheme (scheme)}
             <li class="flex">
-              <ColorSchemePaletteOption
-                {scheme}
-                direction={style.scheme.direction}
-                active={scheme === style.scheme.id}
-                onclickscheme={() => onClickScheme(scheme)}
-                count={style.type === 'Quantitative' ? style.count : undefined}
-              />
+              <button
+                onclick={() => onClickScheme(scheme)}
+                use:focus={() => scheme === style.scheme.id}
+                class="flex-1 p-2 hover:bg-slate-600"
+              >
+                <ColorPalette
+                  {scheme}
+                  direction={style.scheme.direction}
+                  count={style.type === 'Quantitative'
+                    ? style.count
+                    : undefined}
+                />
+              </button>
             </li>
           {/each}
         </ul>
