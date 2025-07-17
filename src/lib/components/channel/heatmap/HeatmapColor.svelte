@@ -86,7 +86,7 @@
   <FieldLabel fieldId="heatmap-color-ramp">Ramp</FieldLabel>
   <div
     id="heatmap-color-ramp"
-    class="flex grow items-center border border-transparent p-2 focus-within:border-slate-600 hover:border-slate-600"
+    class="flex grow items-center"
     bind:this={trigger}
     bind:offsetHeight
     bind:offsetWidth
@@ -94,7 +94,7 @@
     <button
       onclick={onClickCurrentRamp}
       use:clickoutside={onClickOutsideCurrentRamp}
-      class="flex-1"
+      class="flex-1 border border-transparent p-2 focus-within:border-slate-600 hover:border-slate-600"
     >
       <ColorRamp
         ramp={layer.style.heatmap.ramp.id}
