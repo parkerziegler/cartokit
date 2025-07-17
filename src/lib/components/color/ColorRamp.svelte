@@ -9,6 +9,7 @@
     direction: RampDirection;
   }
 
+  const RAMP_HEIGHT = 16;
   let { ramp, direction }: Props = $props();
   let colors = $derived(materializeColorRamp(ramp, direction));
 
@@ -19,7 +20,7 @@
 
     for (let i = 0; i < colors.length; ++i) {
       ctx.fillStyle = colors[i];
-      ctx.fillRect(i, 0, 1, 16);
+      ctx.fillRect(i, 0, 1, RAMP_HEIGHT);
     }
   }
 
@@ -27,7 +28,7 @@
     const ctx = canvas.getContext('2d');
 
     canvas.style.width = '100%';
-    canvas.style.height = '16px';
+    canvas.style.height = `${RAMP_HEIGHT}px`;
 
     if (ctx) {
       drawRamp(ctx);
@@ -44,5 +45,6 @@
 </script>
 
 <div class="flex h-4 w-full">
-  <canvas bind:this={canvas} width={colors.length} height={16}></canvas>
+  <canvas bind:this={canvas} width={colors.length} height={RAMP_HEIGHT}
+  ></canvas>
 </div>
