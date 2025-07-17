@@ -6,7 +6,6 @@
     CategoricalStyle,
     Channel,
     ConstantStyle,
-    HeatmapStyle,
     QuantitativeStyle
   } from '$lib/types';
   import { percentToDecimal, decimalToPercent } from '$lib/utils/number';
@@ -14,7 +13,7 @@
   interface Props {
     layerId: string;
     channel: Exclude<Channel, 'size' | 'dots'>;
-    style: QuantitativeStyle | CategoricalStyle | ConstantStyle | HeatmapStyle;
+    style: QuantitativeStyle | CategoricalStyle | ConstantStyle;
   }
 
   let { layerId, channel, style }: Props = $props();
