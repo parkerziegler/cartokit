@@ -18,6 +18,7 @@
   interface Props {
     layer: CartoKitHeatmapLayer;
   }
+
   let { layer }: Props = $props();
 
   const target = document.getElementById('map') ?? document.body;
@@ -73,7 +74,7 @@
       invert: {
         type: 'heatmap-ramp-direction',
         layerId: layer.id,
-        payload: { direction: layer.style.heatmap.ramp.direction }
+        payload: { direction: currentDirection }
       }
     });
 
