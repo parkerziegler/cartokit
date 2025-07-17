@@ -3,7 +3,7 @@
 
   import type { CategoricalFill, ConstantStroke, LayerType } from '$lib/types';
   import { DEFAULT_FILL } from '$lib/utils/constants';
-  import { materializeColorScheme } from '$lib/utils/scheme';
+  import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
     fill: CategoricalFill;

@@ -8,8 +8,8 @@ import type {
   HeatmapStyle
 } from '$lib/types';
 import { DEFAULT_FILL } from '$lib/utils/constants';
-import { materializeColorRamp } from '$lib/utils/ramp';
-import { materializeColorScheme } from '$lib/utils/scheme';
+import { materializeColorRamp } from '$lib/utils/color/ramp';
+import { materializeColorScheme } from '$lib/utils/color/scheme';
 
 /**
  * Derive a MapLibre GL JS expression for a choropleth color scale.

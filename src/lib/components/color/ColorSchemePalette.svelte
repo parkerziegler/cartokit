@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { materializeColorScheme } from '$lib/utils/scheme';
+  import { materializeColorScheme } from '$lib/utils/color/scheme';
   import type {
     CategoricalColorScheme,
     QuantitativeColorScheme,

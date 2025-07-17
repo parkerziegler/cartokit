@@ -17,7 +17,7 @@
   import {
     QUANTITATIVE_COLOR_SCHEMES,
     CATEGORICAL_COLOR_SCHEMES
-  } from '$lib/utils/scheme';
+  } from '$lib/utils/color/scheme';
 
   interface Props {
     layerId: string;

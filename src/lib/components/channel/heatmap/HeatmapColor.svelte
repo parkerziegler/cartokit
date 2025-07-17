@@ -13,7 +13,7 @@
     RampDirection
   } from '$lib/types';
 
-  import { COLOR_RAMPS } from '$lib/utils/ramp';
+  import { COLOR_RAMPS } from '$lib/utils/color/ramp';
 
   interface Props {
     layer: CartoKitHeatmapLayer;

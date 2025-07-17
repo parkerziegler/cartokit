@@ -1,5 +1,5 @@
 import { deriveThresholds } from '$lib/interaction/scales';
-import { materializeColorScheme } from '$lib/utils/scheme';
+import { materializeColorScheme } from '$lib/utils/color/scheme';
 
 // CartoKit default values.
 export const DEFAULT_MAP_TYPE = 'Polygon';
