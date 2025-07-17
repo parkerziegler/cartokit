@@ -5,11 +5,13 @@
   import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
   import LayerVisibleIcon from '$lib/components/icons/LayerVisibleIcon.svelte';
   import LineIcon from '$lib/components/icons/LineIcon.svelte';
+  import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
   import ChoroplethLegend from '$lib/components/legends/ChoroplethLegend.svelte';
   import DotDensityLegend from '$lib/components/legends/DotDensityLegend.svelte';
   import FillLegend from '$lib/components/legends/FillLegend.svelte';
+  import HeatmapLegend from '$lib/components/legends/HeatmapLegend.svelte';
   import LineLegend from '$lib/components/legends/LineLegend.svelte';
   import PointLegend from '$lib/components/legends/PointLegend.svelte';
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
@@ -47,18 +49,20 @@
   <div class="flex items-center justify-between">
     <div class="flex items-center">
       <span class="shrink-0">
-        {#if layer.type === 'Point'}
-          <PointIcon />
-        {:else if layer.type === 'Proportional Symbol'}
-          <ProportionalSymbolIcon />
+        {#if layer.type === 'Choropleth'}
+          <ChoroplethIcon />
         {:else if layer.type === 'Dot Density'}
           <DotDensityIcon />
+        {:else if layer.type === 'Heatmap'}
+          <HeatmapIcon />
         {:else if layer.type === 'Line'}
           <LineIcon />
+        {:else if layer.type === 'Point'}
+          <PointIcon />
         {:else if layer.type === 'Polygon'}
           <FillIcon />
-        {:else if layer.type === 'Choropleth'}
-          <ChoroplethIcon />
+        {:else if layer.type === 'Proportional Symbol'}
+          <ProportionalSymbolIcon />
         {/if}
       </span>
       <span
@@ -76,17 +80,19 @@
       </button>
     {/if}
   </div>
-  {#if layer.type === 'Point'}
-    <PointLegend {layer} />
-  {:else if layer.type === 'Proportional Symbol'}
-    <ProportionalSymbolLegend {layer} />
+  {#if layer.type === 'Choropleth'}
+    <ChoroplethLegend {layer} />
   {:else if layer.type === 'Dot Density'}
     <DotDensityLegend {layer} />
+  {:else if layer.type === 'Heatmap'}
+    <HeatmapLegend {layer} />
   {:else if layer.type === 'Line'}
     <LineLegend {layer} />
+  {:else if layer.type === 'Point'}
+    <PointLegend {layer} />
   {:else if layer.type === 'Polygon'}
     <FillLegend {layer} />
-  {:else if layer.type === 'Choropleth'}
-    <ChoroplethLegend {layer} />
+  {:else if layer.type === 'Proportional Symbol'}
+    <ProportionalSymbolLegend {layer} />
   {/if}
 </li>

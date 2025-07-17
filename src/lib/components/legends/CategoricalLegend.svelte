@@ -3,7 +3,7 @@
 
   import type { CategoricalFill, ConstantStroke, LayerType } from '$lib/types';
   import { DEFAULT_FILL } from '$lib/utils/constants';
-  import { materializeCategoricalColorScheme } from '$lib/utils/scheme';
+  import { materializeColorScheme } from '$lib/utils/scheme';
 
   interface Props {
     fill: CategoricalFill;
@@ -19,7 +19,7 @@
       : fill.categories
   );
   let colors = $derived(
-    materializeCategoricalColorScheme(
+    materializeColorScheme(
       fill.scheme.id,
       fill.scheme.direction,
       entries.length

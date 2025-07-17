@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ConstantStroke, LayerType, QuantitativeFill } from '$lib/types';
   import { catalog } from '$lib/state/catalog.svelte';
-  import { materializeQuantitativeColorScheme } from '$lib/utils/scheme';
+  import { materializeColorScheme } from '$lib/utils/scheme';
 
   interface Props {
     fill: QuantitativeFill;
@@ -14,11 +14,7 @@
   let { min, max } = $derived(catalog.value[layerId][fill.attribute]);
 
   let colors = $derived(
-    materializeQuantitativeColorScheme(
-      fill.scheme.id,
-      fill.scheme.direction,
-      fill.count
-    )
+    materializeColorScheme(fill.scheme.id, fill.scheme.direction, fill.count)
   );
 </script>
 
@@ -26,7 +22,7 @@
   <p class="font-semibold">{fill.attribute} ↓</p>
   <div class="flex gap-2 rounded-md bg-slate-900">
     <ul class="mt-3 flex flex-col gap-2">
-      {#each colors as color (color)}
+      {#each colors as color, i (i)}
         <li>
           {#if layerType === 'Choropleth'}
             <svg viewBox="0 0 32 16" width="32" height="16">

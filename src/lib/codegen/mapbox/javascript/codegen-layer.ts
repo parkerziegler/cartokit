@@ -92,5 +92,17 @@ export function codegenLayer(layer: CartoKitLayer): string {
 
       return [fillLayer, strokeLayer].filter(Boolean).join('\n\n');
     }
+    case 'Heatmap': {
+      const display = codegenFill(layer);
+
+      return `
+        map.addLayer({
+          id: '${layer.id}',
+          source: '${layer.id}',
+          type: 'heatmap',
+          paint: { ${display} }
+        });
+      `;
+    }
   }
 }

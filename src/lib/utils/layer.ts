@@ -14,7 +14,12 @@ export function getInstrumentedLayerIds(layer: CartoKitLayer): string[] {
     case 'Point':
     case 'Proportional Symbol':
     case 'Line':
-      return [`${layer.id}-hover`, `${layer.id}-select`];
+    case 'Heatmap':
+      return [
+        `${layer.id}-points`,
+        `${layer.id}-points-hover`,
+        `${layer.id}-points-select`
+      ];
     case 'Dot Density':
       return [
         `${layer.id}-outlines`,
@@ -29,8 +34,8 @@ export function getInstrumentedLayerIds(layer: CartoKitLayer): string[] {
 
 // A map of GeoJSON Geometry types to the supported cartokit layer types.
 export const geometryToLayerTypes = new Map<Geometry['type'], LayerType[]>([
-  ['Point', ['Point', 'Proportional Symbol']],
-  ['MultiPoint', ['Point', 'Proportional Symbol']],
+  ['Point', ['Point', 'Proportional Symbol', 'Heatmap']],
+  ['MultiPoint', ['Point', 'Proportional Symbol', 'Heatmap']],
   ['LineString', ['Line', 'Point', 'Proportional Symbol']],
   ['MultiLineString', ['Line', 'Point', 'Proportional Symbol']],
   [

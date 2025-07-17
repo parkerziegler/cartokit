@@ -2,7 +2,7 @@ import type { FeatureCollection } from 'geojson';
 import { kebabCase, uniqueId } from 'lodash-es';
 import type { Map } from 'maplibre-gl';
 
-import { deriveColorScale } from '$lib/interaction/color';
+import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
 import {
   instrumentPointHover,
@@ -219,6 +219,45 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 
       instrumentPolygonHover(map, layer.id);
       instrumentPolygonSelect(map, layer.id);
+      break;
+    }
+    case 'Heatmap': {
+      // Add a separate source for the point outlines of the heatmap layer.
+      // Ensure it does not already exist from a previous transition before adding it.
+      if (!map.getSource(`${layer.id}-points`)) {
+        map.addSource(`${layer.id}-points`, {
+          type: 'geojson',
+          data: layer.data.sourceGeojson,
+          generateId: true
+        });
+      }
+
+      // Add a transparent layer to the map for the outlines.
+      // This is the layer we'll instrument for hover and select effects.
+      map.addLayer({
+        id: `${layer.id}-points`,
+        type: 'circle',
+        source: `${layer.id}-points`,
+        paint: {
+          'circle-color': 'transparent',
+          'circle-opacity': 0
+        }
+      });
+
+      // Add the heatmap layer to the map.
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'heatmap',
+        paint: {
+          'heatmap-color': deriveColorRamp(layer.style.heatmap),
+          'heatmap-opacity': layer.style.heatmap.opacity,
+          'heatmap-radius': layer.style.heatmap.radius
+        }
+      });
+
+      instrumentPointHover(map, `${layer.id}-points`);
+      instrumentPointSelect(map, `${layer.id}-points`);
       break;
     }
   }

@@ -56,7 +56,6 @@
     <NumberInput
       id="dot-value"
       min={0.000001}
-      max={Infinity}
       value={layer.style.dots.value}
       onchange={onDotValueChange}
       class="w-10"

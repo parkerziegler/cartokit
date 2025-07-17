@@ -1,41 +1,24 @@
 <script lang="ts">
-  import type { MouseEventHandler } from 'svelte/elements';
+  import { materializeColorScheme } from '$lib/utils/scheme';
+  import type {
+    CategoricalColorScheme,
+    QuantitativeColorScheme,
+    SchemeDirection
+  } from '$lib/types';
 
   interface Props {
-    colors: readonly string[];
-    active: boolean;
-    onclickscheme: MouseEventHandler<HTMLButtonElement>;
+    scheme: CategoricalColorScheme | QuantitativeColorScheme;
+    direction: SchemeDirection;
+    count?: number;
   }
 
-  let { colors, active, onclickscheme }: Props = $props();
+  let { scheme, direction, count }: Props = $props();
 
-  let ref: HTMLButtonElement;
-
-  $effect(() => {
-    if (active && ref) {
-      ref.focus();
-      ref.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  });
+  let colors = $derived(materializeColorScheme(scheme, direction, count));
 </script>
 
-<li class="flex">
-  <button
-    onclick={onclickscheme}
-    class="scheme flex-1 p-2 hover:bg-slate-600"
-    bind:this={ref}
-  >
-    <div class="flex h-4 w-full">
-      {#each colors as color (color)}
-        <span style="background-color: {color};" class="flex-1"></span>
-      {/each}
-    </div>
-  </button>
-</li>
-
-<style>
-  .scheme:focus {
-    outline: 5px auto Highlight;
-    outline: 5px auto -webkit-focus-ring-color;
-  }
-</style>
+<div class="flex h-4 w-full">
+  {#each colors as color (color)}
+    <span style="background-color: {color};" class="flex-1"></span>
+  {/each}
+</div>

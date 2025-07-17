@@ -3,33 +3,27 @@
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { history } from '$lib/state/history.svelte';
+  import type { CartoKitHeatmapLayer } from '$lib/types';
 
   interface Props {
-    layerId: string;
-    size: number;
-    label: string;
-    fieldId: string;
+    layer: CartoKitHeatmapLayer;
   }
 
-  let { layerId, size, label, fieldId }: Props = $props();
+  let { layer }: Props = $props();
 
-  function onPointSizeChange(value: number): void {
+  function onHeatmapRadiusChange(value: number): void {
     const update = {
-      type: 'point-size' as const,
-      layerId,
-      payload: {
-        size: value
-      }
+      type: 'heatmap-radius' as const,
+      layerId: layer.id,
+      payload: { radius: value }
     };
 
     history.undo.push({
       execute: update,
       invert: {
-        type: 'point-size',
-        layerId,
-        payload: {
-          size: size
-        }
+        type: 'heatmap-radius',
+        layerId: layer.id,
+        payload: { radius: layer.style.heatmap.radius }
       }
     });
 
@@ -38,12 +32,12 @@
 </script>
 
 <div class="flex items-center gap-2">
-  <FieldLabel {fieldId}>{label}</FieldLabel>
+  <FieldLabel fieldId="heatmap-radius">Radius</FieldLabel>
   <NumberInput
-    id={fieldId}
+    id="heatmap-radius"
     min={1}
-    value={size}
-    onchange={onPointSizeChange}
+    value={layer.style.heatmap.radius}
+    onchange={onHeatmapRadiusChange}
     class="w-10"
   />
 </div>
