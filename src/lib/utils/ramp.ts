@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-import type { ColorRamp, SchemeDirection } from '$lib/types';
+import type { ColorRamp, RampDirection } from '$lib/types';
 
 export const COLOR_RAMPS: ColorRamp[] = [
   'Cividis',
@@ -27,7 +27,7 @@ export const COLOR_RAMPS: ColorRamp[] = [
  */
 export function materializeColorRamp(
   ramp: ColorRamp,
-  rampDirection: SchemeDirection,
+  rampDirection: RampDirection,
   n = 256
 ): string[] {
   const interpolate = d3[`interpolate${ramp}`];

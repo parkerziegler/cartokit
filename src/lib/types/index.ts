@@ -80,6 +80,11 @@ export type ColorRamp =
   | 'Sinebow';
 
 /**
+ * Represents the direction of a color ramp.
+ */
+export type RampDirection = 'Forward' | 'Reverse';
+
+/**
  * Represents the cartographic form of a layer.
  *
  * Layer types convey high-level information about the display of a layer, its
@@ -466,7 +471,7 @@ export interface HeatmapStyle {
   weight: ConstantHeatmapWeight | QuantitativeHeatmapWeight;
   ramp: {
     id: ColorRamp;
-    direction: SchemeDirection;
+    direction: RampDirection;
   };
   radius: number;
   intensity: number;

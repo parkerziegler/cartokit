@@ -10,7 +10,7 @@
   import type {
     CartoKitHeatmapLayer,
     ColorRamp as ColorRampType,
-    SchemeDirection
+    RampDirection
   } from '$lib/types';
 
   import { COLOR_RAMPS } from '$lib/utils/ramp';
@@ -59,7 +59,7 @@
 
   function onRampReverse() {
     const currentDirection = layer.style.heatmap.ramp.direction;
-    const nextDirection: SchemeDirection =
+    const nextDirection: RampDirection =
       currentDirection === 'Forward' ? 'Reverse' : 'Forward';
 
     const update = {

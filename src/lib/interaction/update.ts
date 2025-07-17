@@ -24,6 +24,7 @@ import type {
   LayerType,
   QuantitativeColorScheme,
   QuantitativeFill,
+  RampDirection,
   SchemeDirection,
   TransformationCall,
   VisualizationType
@@ -218,7 +219,7 @@ interface HeatmapRampUpdate extends LayerUpdate {
 interface HeatmapRampDirectionUpdate extends LayerUpdate {
   type: 'heatmap-ramp-direction';
   payload: {
-    direction: SchemeDirection;
+    direction: RampDirection;
   };
 }
 
