@@ -2,9 +2,9 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import Select from '$lib/components/shared/Select.svelte';
+  import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { history } from '$lib/state/history.svelte';
   import type { CartoKitHeatmapLayer } from '$lib/types';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { DEFAULT_HEATMAP_WEIGHT } from '$lib/utils/constants';
   import { selectQuantitativeAttribute } from '$lib/utils/geojson';
   import { isPropertyQuantitative } from '$lib/utils/property';
@@ -152,31 +152,34 @@
     onchange={onWeightAttributeChange}
   />
   <div class="flex items-center gap-2">
-    <FieldLabel fieldId="min">Min</FieldLabel>
+    <FieldLabel fieldId="heatmap-weight-min">Min</FieldLabel>
     <NumberInput
+      id="heatmap-weight-min"
       min={0}
       value={layer.style.heatmap.weight.min}
       onchange={onWeightBoundsChange('min')}
-      class="w-10"
+      class="w-8"
     />
   </div>
   <div class="flex items-center gap-2">
-    <FieldLabel fieldId="max">Max</FieldLabel>
+    <FieldLabel fieldId="heatmap-weight-max">Max</FieldLabel>
     <NumberInput
+      id="heatmap-weight-max"
       min={0}
       value={layer.style.heatmap.weight.max}
       onchange={onWeightBoundsChange('max')}
-      class="w-10"
+      class="w-8"
     />
   </div>
 {:else}
   <div class="flex items-center gap-2">
-    <FieldLabel fieldId="min">Value</FieldLabel>
+    <FieldLabel fieldId="heatmap-weight-value">Value</FieldLabel>
     <NumberInput
+      id="heatmap-weight-value"
       min={0}
       value={layer.style.heatmap.weight.value}
       onchange={onWeightValueChange}
-      class="w-10"
+      class="w-8"
     />
   </div>
 {/if}
