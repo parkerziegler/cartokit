@@ -34,6 +34,7 @@
 <div class="flex items-center gap-2">
   <FieldLabel fieldId="heatmap-opacity">Opacity</FieldLabel>
   <OpacityInput
+    id="heatmap-opacity"
     value={layer.style.heatmap.opacity}
     onchange={onOpacityChange}
   />

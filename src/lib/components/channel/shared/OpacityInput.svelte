@@ -4,9 +4,9 @@
   import { percentToDecimal } from '$lib/utils/converters/percent-to-decimal';
 
   interface Props {
+    id: string;
     value: number;
     onchange: (value: number) => void;
-    id?: string;
   }
 
   let { value, onchange, id }: Props = $props();
