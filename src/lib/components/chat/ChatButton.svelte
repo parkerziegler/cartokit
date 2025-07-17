@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { clickoutside } from '$lib/actions/clickoutside.svelte';
   import Chat from '$lib/components/chat/Chat.svelte';
   import ChatIcon from '$lib/components/icons/ChatIcon.svelte';
-  import { clickoutside } from '$lib/utils/actions';
 
   let chatVisible = $state(false);
   let form: HTMLFormElement | undefined = $state();
@@ -10,8 +10,8 @@
     chatVisible = true;
   }
 
-  function onClickOutsideChat(event: CustomEvent<MouseEvent>) {
-    if (chatVisible && form && !form.contains(event.detail.target as Node)) {
+  function onClickOutsideChat(event: MouseEvent) {
+    if (chatVisible && form && !form.contains(event.target as Node)) {
       chatVisible = false;
     }
   }
@@ -25,8 +25,7 @@
       'border-white': chatVisible
     }
   ]}
-  use:clickoutside
-  onclickoutside={onClickOutsideChat}
+  use:clickoutside={onClickOutsideChat}
 >
   <ChatIcon />
 </button>

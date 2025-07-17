@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { clickoutside } from '$lib/actions/clickoutside.svelte';
   import ColorSchemePalette from '$lib/components/color/ColorSchemePalette.svelte';
   import ColorSchemePaletteOption from '$lib/components/color/ColorSchemePaletteOption.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
@@ -13,7 +14,6 @@
     CategoricalStyle,
     SchemeDirection
   } from '$lib/types';
-  import { clickoutside } from '$lib/utils/actions';
   import {
     QUANTITATIVE_COLOR_SCHEMES,
     CATEGORICAL_COLOR_SCHEMES
@@ -122,8 +122,7 @@
   >
     <button
       onclick={onClickCurrentScheme}
-      use:clickoutside
-      onclickoutside={onClickOutsideCurrentScheme}
+      use:clickoutside={onClickOutsideCurrentScheme}
       class="flex-1"
     >
       <ColorSchemePalette

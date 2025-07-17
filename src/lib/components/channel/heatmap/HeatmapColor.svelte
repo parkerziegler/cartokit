@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { clickoutside } from '$lib/actions/clickoutside.svelte';
+  import { focus } from '$lib/actions/focus.svelte';
   import ColorRamp from '$lib/components/color/ColorRamp.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
@@ -10,8 +12,7 @@
     ColorRamp as ColorRampType,
     SchemeDirection
   } from '$lib/types';
-  import { clickoutside } from '$lib/utils/actions';
-  import { focus } from '$lib/actions/focus.svelte';
+
   import { COLOR_RAMPS } from '$lib/utils/ramp';
 
   interface Props {
@@ -91,8 +92,7 @@
   >
     <button
       onclick={onClickCurrentRamp}
-      use:clickoutside
-      onclickoutside={onClickOutsideCurrentRamp}
+      use:clickoutside={onClickOutsideCurrentRamp}
       class="flex-1"
     >
       <ColorRamp

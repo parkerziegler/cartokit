@@ -2,13 +2,13 @@
   import type { Snippet } from 'svelte';
   import type { ClassValue } from 'svelte/elements';
 
-  import { clickoutside } from '$lib/utils/actions';
+  import { clickoutside } from '$lib/actions/clickoutside.svelte';
 
   interface Props {
     class?: ClassValue;
     style?: string;
     id?: string;
-    onclickoutsidemenu?: (event: CustomEvent<MouseEvent>) => void;
+    onclickoutsidemenu?: (event: MouseEvent) => void;
     children: Snippet;
   }
 
@@ -23,8 +23,7 @@
 <div
   {id}
   class={['menu rounded-md bg-slate-900 shadow-lg', className]}
-  use:clickoutside
-  onclickoutside={onclickoutsidemenu}
+  use:clickoutside={onclickoutsidemenu}
 >
   {@render children()}
 </div>
