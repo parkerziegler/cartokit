@@ -3,6 +3,13 @@ import * as d3 from 'd3';
 
 import type { CartoKitHeatmapLayer } from '$lib/types';
 
+/**
+ * Derive an ExpressionSpecification or number for the weight of a
+ * @see{CartoKitHeatmapLayer}.
+ *
+ * @param {CartoKitHeatmapLayer} layer – The layer to derive the weight for.
+ * @returns – An ExpressionSpecification or number for the layer.
+ */
 export function deriveHeatmapWeight(
   layer: CartoKitHeatmapLayer
 ): ExpressionSpecification | number {
