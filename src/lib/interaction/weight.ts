@@ -1,6 +1,6 @@
 import type { ExpressionSpecification } from 'maplibre-gl';
-import * as d3 from 'd3';
 
+import { catalog } from '$lib/state/catalog.svelte';
 import type { CartoKitHeatmapLayer } from '$lib/types';
 
 /**
@@ -18,17 +18,14 @@ export function deriveHeatmapWeight(
       return layer.style.heatmap.weight.value;
     case 'Quantitative': {
       const {
-        data: {
-          geojson: { features }
-        },
         style: {
           heatmap: {
             weight: { attribute, min: weightMin, max: weightMax }
           }
         }
       } = layer;
-      const extent = d3.extent(features, (d) => d.properties?.[attribute] ?? 0);
-      const [min, max] = [extent[0] ?? 0, extent[1] ?? 1];
+
+      const { min, max } = catalog.value[layer.id][attribute];
 
       return [
         'interpolate',
