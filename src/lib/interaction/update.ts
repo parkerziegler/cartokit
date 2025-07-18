@@ -3,6 +3,8 @@ import type { GeoJSONSource } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { updateLayerChannel } from '$lib/interaction/channel';
+import { deriveColorRamp } from '$lib/interaction/color';
+import { deriveHeatmapWeight } from '$lib/interaction/weight';
 import { transitionLayerType } from '$lib/interaction/layer-type';
 import { ir } from '$lib/stores/ir';
 import { map as mapStore } from '$lib/stores/map';
@@ -45,8 +47,6 @@ import {
   selectCategoricalAttribute,
   selectQuantitativeAttribute
 } from '$lib/utils/geojson';
-import { deriveColorRamp } from './color';
-import { deriveHeatmapWeight } from './weight';
 
 interface LayerUpdate {
   layerId: CartoKitLayer['id'];
