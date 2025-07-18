@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import OpenAI from 'openai';
-import { zodResponseFormat } from 'openai/helpers/zod';
+import type { ChatCompletionParseParams } from 'openai/resources/chat/completions';
 import { z } from 'zod';
 
 import { OPENAI_API_KEY } from '$env/static/private';
@@ -63,8 +63,13 @@ export const POST = (async ({ request }) => {
   const { prompt, layerIds, layerIdsToAttributes, userId } =
     await request.json();
 
+  const schema = makeSchema(layerIds, layerIdsToAttributes);
+
   try {
-    const completion = await openai.chat.completions.parse({
+    const completion = await openai.chat.completions.parse<
+      ChatCompletionParseParams,
+      z.infer<typeof schema>
+    >({
       model: 'gpt-4.1',
       messages: [
         {
@@ -74,10 +79,16 @@ export const POST = (async ({ request }) => {
         },
         { role: 'user', content: prompt }
       ],
-      response_format: zodResponseFormat(
-        makeSchema(layerIds, layerIdsToAttributes),
-        'diffs'
-      )
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'diffs',
+          strict: true,
+          schema: z.toJSONSchema(schema, {
+            target: 'draft-7'
+          })
+        }
+      }
     });
 
     const result = completion.choices[0].message.parsed;
@@ -122,7 +133,8 @@ const LayerType = z.union([
   z.literal('Line'),
   z.literal('Polygon'),
   z.literal('Choropleth'),
-  z.literal('Dot Density')
+  z.literal('Dot Density'),
+  z.literal('Heatmap')
 ]);
 
 function LayerTypeUpdate(layerIds: string[]) {
@@ -382,6 +394,103 @@ function VisualizationTypeUpdate(layerIds: string[]) {
   });
 }
 
+function HeatmapOpacityUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('heatmap-opacity'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({ opacity: z.number() })
+  });
+}
+
+function HeatmapRadiusUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('heatmap-radius'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({ radius: z.number() })
+  });
+}
+
+function HeatmapRampUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('heatmap-ramp'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      ramp: z.union([
+        z.literal('Cividis'),
+        z.literal('Viridis'),
+        z.literal('Inferno'),
+        z.literal('Magma'),
+        z.literal('Plasma'),
+        z.literal('Warm'),
+        z.literal('Cool'),
+        z.literal('CubehelixDefault'),
+        z.literal('Turbo'),
+        z.literal('Spectral'),
+        z.literal('Rainbow'),
+        z.literal('Sinebow')
+      ])
+    })
+  });
+}
+
+function HeatmapRampDirectionUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('heatmap-ramp-direction'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      direction: z.union([z.literal('Forward'), z.literal('Reverse')])
+    })
+  });
+}
+
+function HeatmapWeightTypeUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('heatmap-weight-type'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      weightType: z.union([z.literal('Constant'), z.literal('Quantitative')])
+    })
+  });
+}
+
+function HeatmapWeightAttributeUpdate(
+  layerIds: string[],
+  layerIdsToAttributes: Record<string, string[]>
+) {
+  const attrs = Object.values(layerIdsToAttributes).flat();
+
+  return z.object({
+    type: z.literal('heatmap-weight-attribute'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      attribute: z.union([
+        z.literal(attrs[0]),
+        z.literal(attrs[1]),
+        ...attrs.slice(2).map((attr) => z.literal(attr))
+      ])
+    })
+  });
+}
+
+function HeatmapWeightBoundsUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('heatmap-weight-bounds'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({
+      min: z.number().nullable(),
+      max: z.number().nullable()
+    })
+  });
+}
+
+function HeatmapWeightValueUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('heatmap-weight-value'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({ value: z.number() })
+  });
+}
+
 function UnknownUpdate(layerIds: string[]) {
   return z.object({
     type: z.literal('unknown'),
@@ -417,6 +526,14 @@ function makeSchema(
         SizeUpdate(layerIds),
         DotValueUpdate(layerIds),
         VisualizationTypeUpdate(layerIds),
+        HeatmapOpacityUpdate(layerIds),
+        HeatmapRadiusUpdate(layerIds),
+        HeatmapRampUpdate(layerIds),
+        HeatmapRampDirectionUpdate(layerIds),
+        HeatmapWeightTypeUpdate(layerIds),
+        HeatmapWeightAttributeUpdate(layerIds, layerIdsToAttributes),
+        HeatmapWeightBoundsUpdate(layerIds),
+        HeatmapWeightValueUpdate(layerIds),
         UnknownUpdate(layerIds)
       ])
     )
