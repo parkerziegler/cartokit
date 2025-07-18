@@ -32,64 +32,33 @@ import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
  */
 export function addLayer(map: Map, layer: CartoKitLayer): void {
   switch (layer.type) {
-    case 'Point': {
-      const fillProperties = layer.style.fill
-        ? {
-            'circle-color': deriveColorScale(layer.style.fill),
-            'circle-opacity': layer.style.fill.opacity
-          }
-        : {};
-      const strokeProperties = layer.style.stroke
-        ? {
-            'circle-stroke-color': layer.style.stroke.color,
-            'circle-stroke-width': layer.style.stroke.width,
-            'circle-stroke-opacity': layer.style.stroke.opacity
-          }
-        : {};
-
+    case 'Choropleth': {
       map.addLayer({
         id: layer.id,
         source: layer.id,
-        type: 'circle',
+        type: 'fill',
         paint: {
-          ...fillProperties,
-          ...strokeProperties,
-          'circle-radius': layer.style.size
+          'fill-color': deriveColorScale(layer.style.fill),
+          'fill-opacity': layer.style.fill.opacity
         }
       });
 
-      instrumentPointHover(map, layer.id);
-      instrumentPointSelect(map, layer.id);
-      break;
-    }
-    case 'Proportional Symbol': {
-      const fillProperties = layer.style.fill
-        ? {
-            'circle-color': deriveColorScale(layer.style.fill),
-            'circle-opacity': layer.style.fill.opacity
+      // Add a separate layer for the stroke.
+      if (layer.style.stroke) {
+        map.addLayer({
+          id: `${layer.id}-stroke`,
+          source: layer.id,
+          type: 'line',
+          paint: {
+            'line-color': layer.style.stroke.color,
+            'line-width': layer.style.stroke.width,
+            'line-opacity': layer.style.stroke.opacity
           }
-        : {};
-      const strokeProperties = layer.style.stroke
-        ? {
-            'circle-stroke-color': layer.style.stroke.color,
-            'circle-stroke-width': layer.style.stroke.width,
-            'circle-stroke-opacity': layer.style.stroke.opacity
-          }
-        : {};
+        });
+      }
 
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        type: 'circle',
-        paint: {
-          ...fillProperties,
-          ...strokeProperties,
-          'circle-radius': deriveSize(layer)
-        }
-      });
-
-      instrumentPointHover(map, layer.id);
-      instrumentPointSelect(map, layer.id);
+      instrumentPolygonHover(map, layer.id);
+      instrumentPolygonSelect(map, layer.id);
       break;
     }
     case 'Dot Density': {
@@ -145,82 +114,6 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
       instrumentPolygonSelect(map, `${layer.id}-outlines`);
       break;
     }
-    case 'Line': {
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        type: 'line',
-        paint: {
-          'line-color': layer.style.stroke.color,
-          'line-width': layer.style.stroke.width,
-          'line-opacity': layer.style.stroke.opacity
-        }
-      });
-
-      instrumentLineHover(map, layer.id);
-      instrumentLineSelect(map, layer.id);
-      break;
-    }
-    case 'Polygon': {
-      if (layer.style.fill) {
-        map.addLayer({
-          id: layer.id,
-          source: layer.id,
-          type: 'fill',
-          paint: {
-            'fill-color': layer.style.fill.color,
-            'fill-opacity': layer.style.fill.opacity
-          }
-        });
-      }
-
-      // Add a separate layer for the stroke, if a stroke exists.
-      if (layer.style.stroke) {
-        map.addLayer({
-          id: `${layer.id}-stroke`,
-          source: layer.id,
-          type: 'line',
-          paint: {
-            'line-color': layer.style.stroke.color,
-            'line-width': layer.style.stroke.width,
-            'line-opacity': layer.style.stroke.opacity
-          }
-        });
-      }
-
-      instrumentPolygonHover(map, layer.id);
-      instrumentPolygonSelect(map, layer.id);
-      break;
-    }
-    case 'Choropleth': {
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        type: 'fill',
-        paint: {
-          'fill-color': deriveColorScale(layer.style.fill),
-          'fill-opacity': layer.style.fill.opacity
-        }
-      });
-
-      // Add a separate layer for the stroke.
-      if (layer.style.stroke) {
-        map.addLayer({
-          id: `${layer.id}-stroke`,
-          source: layer.id,
-          type: 'line',
-          paint: {
-            'line-color': layer.style.stroke.color,
-            'line-width': layer.style.stroke.width,
-            'line-opacity': layer.style.stroke.opacity
-          }
-        });
-      }
-
-      instrumentPolygonHover(map, layer.id);
-      instrumentPolygonSelect(map, layer.id);
-      break;
-    }
     case 'Heatmap': {
       // Add a separate source for the point outlines of the heatmap layer.
       // Ensure it does not already exist from a previous transition before adding it.
@@ -258,6 +151,113 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 
       instrumentPointHover(map, `${layer.id}-points`);
       instrumentPointSelect(map, `${layer.id}-points`);
+      break;
+    }
+    case 'Line': {
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'line',
+        paint: {
+          'line-color': layer.style.stroke.color,
+          'line-width': layer.style.stroke.width,
+          'line-opacity': layer.style.stroke.opacity
+        }
+      });
+
+      instrumentLineHover(map, layer.id);
+      instrumentLineSelect(map, layer.id);
+      break;
+    }
+    case 'Point': {
+      const fillProperties = layer.style.fill
+        ? {
+            'circle-color': deriveColorScale(layer.style.fill),
+            'circle-opacity': layer.style.fill.opacity
+          }
+        : {};
+      const strokeProperties = layer.style.stroke
+        ? {
+            'circle-stroke-color': layer.style.stroke.color,
+            'circle-stroke-width': layer.style.stroke.width,
+            'circle-stroke-opacity': layer.style.stroke.opacity
+          }
+        : {};
+
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'circle',
+        paint: {
+          ...fillProperties,
+          ...strokeProperties,
+          'circle-radius': layer.style.size
+        }
+      });
+
+      instrumentPointHover(map, layer.id);
+      instrumentPointSelect(map, layer.id);
+      break;
+    }
+    case 'Polygon': {
+      if (layer.style.fill) {
+        map.addLayer({
+          id: layer.id,
+          source: layer.id,
+          type: 'fill',
+          paint: {
+            'fill-color': layer.style.fill.color,
+            'fill-opacity': layer.style.fill.opacity
+          }
+        });
+      }
+
+      // Add a separate layer for the stroke, if a stroke exists.
+      if (layer.style.stroke) {
+        map.addLayer({
+          id: `${layer.id}-stroke`,
+          source: layer.id,
+          type: 'line',
+          paint: {
+            'line-color': layer.style.stroke.color,
+            'line-width': layer.style.stroke.width,
+            'line-opacity': layer.style.stroke.opacity
+          }
+        });
+      }
+
+      instrumentPolygonHover(map, layer.id);
+      instrumentPolygonSelect(map, layer.id);
+      break;
+    }
+    case 'Proportional Symbol': {
+      const fillProperties = layer.style.fill
+        ? {
+            'circle-color': deriveColorScale(layer.style.fill),
+            'circle-opacity': layer.style.fill.opacity
+          }
+        : {};
+      const strokeProperties = layer.style.stroke
+        ? {
+            'circle-stroke-color': layer.style.stroke.color,
+            'circle-stroke-width': layer.style.stroke.width,
+            'circle-stroke-opacity': layer.style.stroke.opacity
+          }
+        : {};
+
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'circle',
+        paint: {
+          ...fillProperties,
+          ...strokeProperties,
+          'circle-radius': deriveSize(layer)
+        }
+      });
+
+      instrumentPointHover(map, layer.id);
+      instrumentPointSelect(map, layer.id);
       break;
     }
   }
