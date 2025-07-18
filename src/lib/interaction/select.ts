@@ -151,6 +151,9 @@ export const onFeatureLeave = (
       // For dot density layers, we need to deselect the outline layer.
       if (layer.type === 'Dot Density') {
         return `${layer.id}-outlines`;
+        // For heatmap layers, we need to deselect the point layer.
+      } else if (layer.type === 'Heatmap') {
+        return `${layer.id}-points`;
       }
 
       return layer.id;

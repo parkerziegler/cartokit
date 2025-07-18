@@ -1,5 +1,7 @@
 <script lang="ts">
-  import ColorSchemePalette from '$lib/components/color/ColorSchemePalette.svelte';
+  import { clickoutside } from '$lib/actions/clickoutside.svelte';
+  import { focus } from '$lib/actions/focus.svelte';
+  import ColorPalette from '$lib/components/channel/shared/ColorPalette.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
@@ -12,13 +14,10 @@
     CategoricalStyle,
     SchemeDirection
   } from '$lib/types';
-  import { clickoutside } from '$lib/utils/actions';
   import {
     QUANTITATIVE_COLOR_SCHEMES,
-    CATEGORICAL_COLOR_SCHEMES,
-    materializeCategoricalColorScheme,
-    materializeQuantitativeColorScheme
-  } from '$lib/utils/scheme';
+    CATEGORICAL_COLOR_SCHEMES
+  } from '$lib/utils/color/scheme';
 
   interface Props {
     layerId: string;
@@ -33,45 +32,10 @@
   let x = $state(0);
   let y = $state(0);
 
-  let colors = $derived(
+  let schemes = $derived(
     style.type === 'Quantitative'
-      ? materializeQuantitativeColorScheme(
-          style.scheme.id,
-          style.scheme.direction,
-          style.count
-        )
-      : materializeCategoricalColorScheme(
-          style.scheme.id,
-          style.scheme.direction
-        )
-  );
-
-  let quantitativeSchemes = $derived(
-    style.type === 'Quantitative'
-      ? QUANTITATIVE_COLOR_SCHEMES.map((scheme) => {
-          return {
-            id: scheme,
-            colors: materializeQuantitativeColorScheme(
-              scheme,
-              style.scheme.direction,
-              style.count
-            )
-          };
-        })
-      : []
-  );
-  let categoricalSchemes = $derived(
-    style.type === 'Categorical'
-      ? CATEGORICAL_COLOR_SCHEMES.map((scheme) => {
-          return {
-            id: scheme,
-            colors: materializeCategoricalColorScheme(
-              scheme,
-              style.scheme.direction
-            )
-          };
-        })
-      : []
+      ? QUANTITATIVE_COLOR_SCHEMES
+      : CATEGORICAL_COLOR_SCHEMES
   );
 
   let trigger: HTMLDivElement;
@@ -158,15 +122,14 @@
   >
     <button
       onclick={onClickCurrentScheme}
-      use:clickoutside
-      onclickoutside={onClickOutsideCurrentScheme}
+      use:clickoutside={onClickOutsideCurrentScheme}
       class="flex-1"
     >
-      <div class="flex h-4 w-full">
-        {#each colors as color (color)}
-          <span style="background-color: {color};" class="flex-1"></span>
-        {/each}
-      </div>
+      <ColorPalette
+        scheme={style.scheme.id}
+        direction={style.scheme.direction}
+        count={style.type === 'Quantitative' ? style.count : undefined}
+      />
     </button>
     {#if showOptions}
       <Portal
@@ -179,23 +142,23 @@
         <ul
           class="flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 shadow-lg"
         >
-          {#if style.type === 'Quantitative'}
-            {#each quantitativeSchemes as scheme (scheme.id)}
-              <ColorSchemePalette
-                colors={scheme.colors}
-                active={scheme.id === style.scheme.id}
-                onclickscheme={() => onClickScheme(scheme.id)}
-              />
-            {/each}
-          {:else}
-            {#each categoricalSchemes as scheme (scheme.id)}
-              <ColorSchemePalette
-                colors={scheme.colors}
-                active={scheme.id === style.scheme.id}
-                onclickscheme={() => onClickScheme(scheme.id)}
-              />
-            {/each}
-          {/if}
+          {#each schemes as scheme (scheme)}
+            <li class="flex">
+              <button
+                onclick={() => onClickScheme(scheme)}
+                use:focus={() => scheme === style.scheme.id}
+                class="flex-1 p-2 hover:bg-slate-600"
+              >
+                <ColorPalette
+                  {scheme}
+                  direction={style.scheme.direction}
+                  count={style.type === 'Quantitative'
+                    ? style.count
+                    : undefined}
+                />
+              </button>
+            </li>
+          {/each}
         </ul>
       </Portal>
     {/if}

@@ -71,7 +71,6 @@
         class="self-center hover:border-transparent"
         disabled={i === style.thresholds.length}
         onchange={onThresholdChange(i)}
-        autofocus={i === 0}
       />
     </div>
   {/each}

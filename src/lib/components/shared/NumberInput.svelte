@@ -1,53 +1,62 @@
 <script lang="ts">
+  import { validateRange } from '$lib/utils/validators/range';
+
   interface Props {
+    value: number;
+    onchange: (value: number) => void;
     id?: string;
     min?: number;
     max?: number;
     step?: number;
-    value: number;
     disabled?: boolean;
     class?: string;
-    autofocus?: boolean;
-    onchange: (value: number) => void;
   }
 
   let {
-    id = '',
-    min = 0,
+    value,
+    onchange,
+    id,
+    min = -Infinity,
     max = Infinity,
     step = 1,
-    value,
     disabled = false,
-    class: className = '',
-    autofocus = false,
-    onchange
+    class: className = ''
   }: Props = $props();
 
   function onChange(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
-    let v = +event.currentTarget.value;
+    const input = parseFloat(event.currentTarget.value);
+    value = validateRange(input, min, max);
 
-    if (Number.isNaN(v) || v < min) {
-      v = min;
-    } else if (v > max) {
-      v = max;
+    onchange(value);
+  }
+
+  function onKeyDown(
+    event: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    if (event.key === 'ArrowUp') {
+      const input = parseFloat(event.currentTarget.value);
+      value = validateRange(input + step, min, max);
+
+      onchange(value);
+    } else if (event.key === 'ArrowDown') {
+      const input = parseFloat(event.currentTarget.value);
+      value = validateRange(input - step, min, max);
+
+      onchange(value);
     }
-
-    onchange(v);
   }
 </script>
 
-<!-- svelte-ignore a11y_autofocus -->
 <input
-  type="number"
-  {id}
-  {min}
-  {max}
+  type="text"
+  inputmode="numeric"
+  pattern="[0-9]*"
   bind:value
-  {step}
+  {id}
   {disabled}
-  {autofocus}
+  onkeydown={onKeyDown}
   onchange={onChange}
   class={[
     'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',

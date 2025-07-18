@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ConstantStroke, LayerType, QuantitativeFill } from '$lib/types';
   import { catalog } from '$lib/state/catalog.svelte';
-  import { materializeQuantitativeColorScheme } from '$lib/utils/scheme';
+  import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
     fill: QuantitativeFill;
@@ -14,11 +14,7 @@
   let { min, max } = $derived(catalog.value[layerId][fill.attribute]);
 
   let colors = $derived(
-    materializeQuantitativeColorScheme(
-      fill.scheme.id,
-      fill.scheme.direction,
-      fill.count
-    )
+    materializeColorScheme(fill.scheme.id, fill.scheme.direction, fill.count)
   );
 </script>
 

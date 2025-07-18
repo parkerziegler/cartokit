@@ -52,6 +52,12 @@ export const CATEGORICAL_COLOR_SCHEMES: CategoricalColorScheme[] = [
   'schemeTableau10'
 ];
 
+function isQuantitativeColorScheme(
+  scheme: string
+): scheme is QuantitativeColorScheme {
+  return QUANTITATIVE_COLOR_SCHEMES.includes(scheme as QuantitativeColorScheme);
+}
+
 /**
  * Materialize a quantitative color scheme into an array of colors.
  *
@@ -60,7 +66,7 @@ export const CATEGORICAL_COLOR_SCHEMES: CategoricalColorScheme[] = [
  * @param count The number of colors in the color scale.
  * @returns An array of colors in hexadecimal format.
  */
-export function materializeQuantitativeColorScheme(
+function materializeQuantitativeColorScheme(
   scheme: QuantitativeColorScheme,
   direction: SchemeDirection,
   count: number
@@ -78,7 +84,7 @@ export function materializeQuantitativeColorScheme(
  * @param count The number of colors in the color scale.
  * @returns An array of colors in hexadecimal format.
  */
-export function materializeCategoricalColorScheme(
+function materializeCategoricalColorScheme(
   scheme: CategoricalColorScheme,
   direction: SchemeDirection,
   count?: number
@@ -86,4 +92,22 @@ export function materializeCategoricalColorScheme(
   const colors = count ? d3[scheme].slice(0, count) : d3[scheme];
 
   return direction === 'Reverse' ? [...colors].reverse() : [...colors];
+}
+
+/**
+ * Materialize a color scheme into an array of colors.
+ *
+ * @param scheme A @link{CategoricalColorScheme} or @link{QuantitativeColorScheme}.
+ * @param direction The @link{SchemeDirection} of the scheme.
+ * @param count The number of colors in the color scale.
+ * @returns An array of colors in hexadecimal format.
+ */
+export function materializeColorScheme(
+  scheme: CategoricalColorScheme | QuantitativeColorScheme,
+  direction: SchemeDirection,
+  count = 0
+): string[] {
+  return isQuantitativeColorScheme(scheme)
+    ? materializeQuantitativeColorScheme(scheme, direction, count)
+    : materializeCategoricalColorScheme(scheme, direction, count);
 }

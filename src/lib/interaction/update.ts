@@ -3,27 +3,33 @@ import type { GeoJSONSource } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { updateLayerChannel } from '$lib/interaction/channel';
+import { deriveColorRamp } from '$lib/interaction/color';
+import { deriveHeatmapWeight } from '$lib/interaction/weight';
 import { transitionLayerType } from '$lib/interaction/layer-type';
 import { ir } from '$lib/stores/ir';
 import { map as mapStore } from '$lib/stores/map';
 import type {
-  CartoKitLayer,
-  CartoKitPointLayer,
-  CartoKitProportionalSymbolLayer,
-  CartoKitDotDensityLayer,
-  CartoKitPolygonLayer,
   CartoKitChoroplethLayer,
-  ClassificationMethod,
-  QuantitativeColorScheme,
-  LayerType,
-  VisualizationType,
-  QuantitativeFill,
-  CategoricalFill,
+  CartoKitDotDensityLayer,
+  CartoKitHeatmapLayer,
+  CartoKitLayer,
+  CartoKitLineLayer,
+  CartoKitPointLayer,
+  CartoKitPolygonLayer,
+  CartoKitProportionalSymbolLayer,
   CategoricalColorScheme,
-  ConstantFill,
+  CategoricalFill,
   Channel,
+  ClassificationMethod,
+  ColorRamp,
+  ConstantFill,
+  LayerType,
+  QuantitativeColorScheme,
+  QuantitativeFill,
+  RampDirection,
   SchemeDirection,
-  TransformationCall
+  TransformationCall,
+  VisualizationType
 } from '$lib/types';
 import {
   DEFAULT_FILL,
@@ -189,6 +195,63 @@ interface FillVisualizationUpdate extends LayerUpdate {
   };
 }
 
+interface HeatmapOpacityUpdate extends LayerUpdate {
+  type: 'heatmap-opacity';
+  payload: {
+    opacity: number;
+  };
+}
+
+interface HeatmapRadiusUpdate extends LayerUpdate {
+  type: 'heatmap-radius';
+  payload: {
+    radius: number;
+  };
+}
+
+interface HeatmapRampUpdate extends LayerUpdate {
+  type: 'heatmap-ramp';
+  payload: {
+    ramp: ColorRamp;
+  };
+}
+
+interface HeatmapRampDirectionUpdate extends LayerUpdate {
+  type: 'heatmap-ramp-direction';
+  payload: {
+    direction: RampDirection;
+  };
+}
+
+interface HeatmapWeightTypeUpdate extends LayerUpdate {
+  type: 'heatmap-weight-type';
+  payload: {
+    weightType: 'Constant' | 'Quantitative';
+  };
+}
+
+interface HeatmapWeightAttributeUpdate extends LayerUpdate {
+  type: 'heatmap-weight-attribute';
+  payload: {
+    weightAttribute: string;
+  };
+}
+
+interface HeatmapWeightBoundsUpdate extends LayerUpdate {
+  type: 'heatmap-weight-bounds';
+  payload: {
+    min?: number;
+    max?: number;
+  };
+}
+
+interface HeatmapWeightValueUpdate extends LayerUpdate {
+  type: 'heatmap-weight-value';
+  payload: {
+    value: number;
+  };
+}
+
 export type DispatchLayerUpdateParams =
   | LayerTypeUpdate
   | AttributeUpdate
@@ -210,7 +273,15 @@ export type DispatchLayerUpdateParams =
   | SizeUpdate
   | DotValueUpdate
   | TransformationUpdate
-  | FillVisualizationUpdate;
+  | FillVisualizationUpdate
+  | HeatmapOpacityUpdate
+  | HeatmapRadiusUpdate
+  | HeatmapRampUpdate
+  | HeatmapRampDirectionUpdate
+  | HeatmapWeightTypeUpdate
+  | HeatmapWeightAttributeUpdate
+  | HeatmapWeightBoundsUpdate
+  | HeatmapWeightValueUpdate;
 
 /**
  * Dispatch standardized updates to specific layers.
@@ -377,7 +448,14 @@ export function dispatchLayerUpdate({
     }
     case 'stroke': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId];
+        const lyr = ir.layers[layerId] as
+          | CartoKitChoroplethLayer
+          | CartoKitDotDensityLayer
+          | CartoKitLineLayer
+          | CartoKitPointLayer
+          | CartoKitPolygonLayer
+          | CartoKitProportionalSymbolLayer;
+
         if (lyr.style.stroke) {
           lyr.style.stroke.color = payload.color;
 
@@ -411,7 +489,13 @@ export function dispatchLayerUpdate({
     }
     case 'stroke-width': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId];
+        const lyr = ir.layers[layerId] as
+          | CartoKitChoroplethLayer
+          | CartoKitDotDensityLayer
+          | CartoKitLineLayer
+          | CartoKitPointLayer
+          | CartoKitPolygonLayer
+          | CartoKitProportionalSymbolLayer;
 
         if (lyr.style.stroke) {
           lyr.style.stroke.width = payload.strokeWidth;
@@ -446,7 +530,13 @@ export function dispatchLayerUpdate({
     }
     case 'stroke-opacity': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId];
+        const lyr = ir.layers[layerId] as
+          | CartoKitChoroplethLayer
+          | CartoKitDotDensityLayer
+          | CartoKitLineLayer
+          | CartoKitPointLayer
+          | CartoKitPolygonLayer
+          | CartoKitProportionalSymbolLayer;
 
         if (lyr.style.stroke) {
           lyr.style.stroke.opacity = payload.opacity;
@@ -814,6 +904,158 @@ export function dispatchLayerUpdate({
 
         lyr.style.fill = fill;
         updateLayerChannel(map, lyr, 'fill');
+
+        return ir;
+      });
+      break;
+    }
+    case 'heatmap-opacity': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+
+        lyr.style.heatmap.opacity = payload.opacity;
+        map.setPaintProperty(layerId, 'heatmap-opacity', payload.opacity);
+
+        return ir;
+      });
+      break;
+    }
+    case 'heatmap-radius': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+
+        lyr.style.heatmap.radius = payload.radius;
+        map.setPaintProperty(layerId, 'heatmap-radius', payload.radius);
+
+        return ir;
+      });
+      break;
+    }
+    case 'heatmap-ramp': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+
+        lyr.style.heatmap.ramp.id = payload.ramp;
+        map.setPaintProperty(
+          layerId,
+          'heatmap-color',
+          deriveColorRamp(lyr.style.heatmap)
+        );
+
+        return ir;
+      });
+      break;
+    }
+    case 'heatmap-ramp-direction': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+
+        lyr.style.heatmap.ramp.direction = payload.direction;
+        map.setPaintProperty(
+          layerId,
+          'heatmap-color',
+          deriveColorRamp(lyr.style.heatmap)
+        );
+
+        return ir;
+      });
+      break;
+    }
+    case 'heatmap-weight-type': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+
+        switch (payload.weightType) {
+          case 'Constant':
+            lyr.style.heatmap.weight = {
+              type: 'Constant',
+              value: 1
+            };
+            break;
+          case 'Quantitative':
+            lyr.style.heatmap.weight = {
+              type: 'Quantitative',
+              attribute: selectQuantitativeAttribute(lyr.data.geojson.features),
+              min: 0,
+              max: 1
+            };
+            break;
+        }
+
+        map.setPaintProperty(
+          layerId,
+          'heatmap-weight',
+          deriveHeatmapWeight(lyr)
+        );
+
+        return ir;
+      });
+      break;
+    }
+    case 'heatmap-weight-attribute': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+
+        switch (lyr.style.heatmap.weight.type) {
+          case 'Quantitative':
+            lyr.style.heatmap.weight.attribute = payload.weightAttribute;
+            break;
+          default:
+            break;
+        }
+
+        map.setPaintProperty(
+          layerId,
+          'heatmap-weight',
+          deriveHeatmapWeight(lyr)
+        );
+
+        return ir;
+      });
+      break;
+    }
+    case 'heatmap-weight-bounds': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+
+        switch (lyr.style.heatmap.weight.type) {
+          case 'Quantitative':
+            lyr.style.heatmap.weight.min =
+              payload.min ?? lyr.style.heatmap.weight.min;
+            lyr.style.heatmap.weight.max =
+              payload.max ?? lyr.style.heatmap.weight.max;
+            break;
+          default:
+            break;
+        }
+
+        map.setPaintProperty(
+          layerId,
+          'heatmap-weight',
+          deriveHeatmapWeight(lyr)
+        );
+
+        return ir;
+      });
+      break;
+    }
+    case 'heatmap-weight-value': {
+      ir.update((ir) => {
+        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+
+        switch (lyr.style.heatmap.weight.type) {
+          case 'Constant':
+            lyr.style.heatmap.weight.value = payload.value;
+            break;
+          default:
+            break;
+        }
+
+        map.setPaintProperty(
+          layerId,
+          'heatmap-weight',
+          deriveHeatmapWeight(lyr)
+        );
 
         return ir;
       });

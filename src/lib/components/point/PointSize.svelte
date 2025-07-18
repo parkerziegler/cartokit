@@ -42,7 +42,6 @@
   <NumberInput
     id={fieldId}
     min={1}
-    max={Infinity}
     value={size}
     onchange={onPointSizeChange}
     class="w-10"

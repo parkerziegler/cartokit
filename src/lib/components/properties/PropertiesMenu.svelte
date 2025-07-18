@@ -6,6 +6,7 @@
   import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
   import DotDensityPropertiesPanel from '$lib/components/properties/DotDensityPropertiesPanel.svelte';
   import DownloadData from '$lib/components/properties/DownloadData.svelte';
+  import HeatmapPropertiesPanel from '$lib/components/properties/HeatmapPropertiesPanel.svelte';
   import LinePropertiesPanel from '$lib/components/properties/LinePropertiesPanel.svelte';
   import PointPropertiesPanel from '$lib/components/properties/PointPropertiesPanel.svelte';
   import PolygonPropertiesPanel from '$lib/components/properties/PolygonPropertiesPanel.svelte';
@@ -72,17 +73,19 @@
   <MenuItem title="Layer Type">
     <LayerTypeSelect {layer} />
   </MenuItem>
-  {#if layer.type === 'Point'}
-    <PointPropertiesPanel {layer} />
-  {:else if layer.type === 'Proportional Symbol'}
-    <ProportionalSymbolPropertiesPanel {layer} />
+  {#if layer.type === 'Choropleth'}
+    <ChoroplethPropertiesPanel {layer} />
   {:else if layer.type === 'Dot Density'}
     <DotDensityPropertiesPanel {layer} />
+  {:else if layer.type === 'Heatmap'}
+    <HeatmapPropertiesPanel {layer} />
   {:else if layer.type === 'Line'}
     <LinePropertiesPanel {layer} />
+  {:else if layer.type === 'Point'}
+    <PointPropertiesPanel {layer} />
   {:else if layer.type === 'Polygon'}
     <PolygonPropertiesPanel {layer} />
-  {:else if layer.type === 'Choropleth'}
-    <ChoroplethPropertiesPanel {layer} />
+  {:else if layer.type === 'Proportional Symbol'}
+    <ProportionalSymbolPropertiesPanel {layer} />
   {/if}
 </Menu>

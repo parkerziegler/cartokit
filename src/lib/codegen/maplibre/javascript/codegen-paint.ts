@@ -1,5 +1,6 @@
-import { deriveColorScale } from '$lib/interaction/color';
+import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
+import { deriveHeatmapWeight } from '$lib/interaction/weight';
 import type { CartoKitLayer } from '$lib/types';
 
 const MAPLIBRE_DEFAULTS = {
@@ -13,7 +14,10 @@ const MAPLIBRE_DEFAULTS = {
   'circle-opacity': 1,
   'circle-stroke-color': '#000000',
   'circle-stroke-width': 0,
-  'circle-stroke-opacity': 1
+  'circle-stroke-opacity': 1,
+  'heatmap-radius': 30,
+  'heatmap-intensity': 1,
+  'heatmap-opacity': 1
 };
 
 /**
@@ -121,6 +125,29 @@ export function codegenFill(layer: CartoKitLayer): string {
         .filter(Boolean)
         .join(',\n');
     }
+    case 'Heatmap': {
+      return [
+        `'heatmap-color': ${JSON.stringify(deriveColorRamp(layer.style.heatmap))}`,
+        withDefault(
+          'heatmap-intensity',
+          layer.style.heatmap.intensity,
+          MAPLIBRE_DEFAULTS['heatmap-intensity']
+        ),
+        withDefault(
+          'heatmap-opacity',
+          layer.style.heatmap.opacity,
+          MAPLIBRE_DEFAULTS['heatmap-opacity']
+        ),
+        withDefault(
+          'heatmap-radius',
+          layer.style.heatmap.radius,
+          MAPLIBRE_DEFAULTS['heatmap-radius']
+        ),
+        `'heatmap-weight': ${JSON.stringify(deriveHeatmapWeight(layer))}`
+      ]
+        .filter(Boolean)
+        .join(',\n');
+    }
   }
 }
 
@@ -185,6 +212,9 @@ export function codegenStroke(layer: CartoKitLayer): string {
       ]
         .filter(Boolean)
         .join(',\n');
+    }
+    case 'Heatmap': {
+      return '';
     }
   }
 }

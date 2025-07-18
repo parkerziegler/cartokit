@@ -63,6 +63,28 @@ export type CategoricalColorScheme =
 export type SchemeDirection = 'Forward' | 'Reverse';
 
 /**
+ * Represents a color ramp.
+ */
+export type ColorRamp =
+  | 'Cividis'
+  | 'Viridis'
+  | 'Inferno'
+  | 'Magma'
+  | 'Plasma'
+  | 'Warm'
+  | 'Cool'
+  | 'CubehelixDefault'
+  | 'Turbo'
+  | 'Spectral'
+  | 'Rainbow'
+  | 'Sinebow';
+
+/**
+ * Represents the direction of a color ramp.
+ */
+export type RampDirection = 'Forward' | 'Reverse';
+
+/**
  * Represents the cartographic form of a layer.
  *
  * Layer types convey high-level information about the display of a layer, its
@@ -75,7 +97,8 @@ export type LayerType =
   | 'Polygon'
   | 'Choropleth'
   | 'Proportional Symbol'
-  | 'Dot Density';
+  | 'Dot Density'
+  | 'Heatmap';
 
 /**
  * Represents the encoding channels of a layer.
@@ -259,6 +282,20 @@ export interface CartoKitDotDensityLayer extends Layer {
 }
 
 /**
+ * Represents a Heatmap layer in cartokit. Heatmap layers map a data value to the
+ * color of a region using a color ramp.
+ *
+ * @property {'Heatmap'} type - The type of the layer, 'Heatmap'.
+ * @property {Object} style - The style of the layer.
+ */
+export interface CartoKitHeatmapLayer extends Layer {
+  type: 'Heatmap';
+  style: {
+    heatmap: HeatmapStyle;
+  };
+}
+
+/**
  * Represents a layer in cartokit. The CartoKitLayer type is a union of all
  * possible layer types.
  */
@@ -268,7 +305,8 @@ export type CartoKitLayer =
   | CartoKitLineLayer
   | CartoKitPolygonLayer
   | CartoKitChoroplethLayer
-  | CartoKitDotDensityLayer;
+  | CartoKitDotDensityLayer
+  | CartoKitHeatmapLayer;
 
 /**
  * Represents a constant style object. A constant style applies a uniform color
@@ -392,6 +430,52 @@ export interface DotDensityDots {
   attribute: string;
   size: number;
   value: number;
+}
+
+/**
+ * Represents a constant heatmap weight style object.
+ *
+ * @property {number} value - The weight of the heatmap.
+ */
+interface ConstantHeatmapWeight {
+  type: 'Constant';
+  value: number;
+}
+
+/**
+ * Represents a quantitative heatmap weight style object.
+ *
+ * @property {string} attribute - The attribute of the GeoJSON data to map to the
+ * weight of the heatmap.
+ * @property {number} min - The minimum weight of the heatmap.
+ * @property {number} max - The maximum weight of the heatmap.
+ */
+interface QuantitativeHeatmapWeight {
+  type: 'Quantitative';
+  attribute: string;
+  min: number;
+  max: number;
+}
+
+/**
+ * Represents the display style of a heatmap layer.
+ *
+ * @property {ConstantHeatmapWeight | QuantitativeHeatmapWeight} weight - The
+ * weight of the heatmap.
+ * @property {ColorRamp} ramp - The color ramp to use for the heatmap.
+ * @property {number} radius - The radius of the heatmap.
+ * @property {number} intensity - The intensity of the heatmap.
+ * @property {number} opacity - The opacity of the heatmap.
+ */
+export interface HeatmapStyle {
+  weight: ConstantHeatmapWeight | QuantitativeHeatmapWeight;
+  ramp: {
+    id: ColorRamp;
+    direction: RampDirection;
+  };
+  radius: number;
+  intensity: number;
+  opacity: number;
 }
 
 /**

@@ -1,15 +1,15 @@
+import * as d3 from 'd3';
 import type { ExpressionSpecification } from 'maplibre-gl';
 
 import type {
   ConstantStyle,
   CategoricalStyle,
-  QuantitativeStyle
+  QuantitativeStyle,
+  HeatmapStyle
 } from '$lib/types';
 import { DEFAULT_FILL } from '$lib/utils/constants';
-import {
-  materializeCategoricalColorScheme,
-  materializeQuantitativeColorScheme
-} from '$lib/utils/scheme';
+import { materializeColorRamp } from '$lib/utils/color/ramp';
+import { materializeColorScheme } from '$lib/utils/color/scheme';
 
 /**
  * Derive a MapLibre GL JS expression for a choropleth color scale.
@@ -26,11 +26,7 @@ export function deriveColorScale(
     case 'Quantitative': {
       const { scheme, count, attribute, thresholds } = style;
 
-      const colors = materializeQuantitativeColorScheme(
-        scheme.id,
-        scheme.direction,
-        count
-      );
+      const colors = materializeColorScheme(scheme.id, scheme.direction, count);
 
       const prelude: ExpressionSpecification = [
         'step',
@@ -48,7 +44,7 @@ export function deriveColorScale(
     case 'Categorical': {
       const { categories, scheme, attribute } = style;
 
-      const colors = materializeCategoricalColorScheme(
+      const colors = materializeColorScheme(
         scheme.id,
         scheme.direction,
         categories.length
@@ -72,4 +68,32 @@ export function deriveColorScale(
     case 'Constant':
       return style.color;
   }
+}
+
+/**
+ * Derive a MapLibre GL JS expression for a color ramp.
+ *
+ * @param {HeatmapStyle} style – The style from which to derive the color ramp.
+ * @returns {ExpressionSpecification} — A MapLibre GL JS expression for a color
+ * ramp.
+ */
+export function deriveColorRamp(style: HeatmapStyle): ExpressionSpecification {
+  const { ramp } = style;
+
+  const colors = materializeColorRamp(ramp.id, ramp.direction, 11);
+
+  const start = d3.color(colors[0]);
+  start!.opacity = 0;
+
+  return [
+    'interpolate',
+    ['linear'],
+    ['heatmap-density'],
+    0,
+    start!.formatRgb(),
+    ...colors
+      .slice(1, 11)
+      // Prevent floating point precision issues.
+      .flatMap((color, i) => [parseFloat((0.1 * (i + 1)).toFixed(1)), color])
+  ];
 }
