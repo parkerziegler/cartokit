@@ -5,10 +5,10 @@ import type { CartoKitHeatmapLayer } from '$lib/types';
 
 export function deriveHeatmapWeight(
   layer: CartoKitHeatmapLayer
-): ExpressionSpecification {
+): ExpressionSpecification | number {
   switch (layer.style.heatmap.weight.type) {
     case 'Constant':
-      return ['literal', layer.style.heatmap.weight.value];
+      return layer.style.heatmap.weight.value;
     case 'Quantitative': {
       const {
         data: {

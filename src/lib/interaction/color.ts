@@ -91,25 +91,9 @@ export function deriveColorRamp(style: HeatmapStyle): ExpressionSpecification {
     ['heatmap-density'],
     0,
     start!.formatRgb(),
-    0.1,
-    colors[1],
-    0.2,
-    colors[2],
-    0.3,
-    colors[3],
-    0.4,
-    colors[4],
-    0.5,
-    colors[5],
-    0.6,
-    colors[6],
-    0.7,
-    colors[7],
-    0.8,
-    colors[8],
-    0.9,
-    colors[9],
-    1,
-    colors[10]
+    ...colors
+      .slice(1, 11)
+      // Prevent floating point precision issues.
+      .flatMap((color, i) => [parseFloat((0.1 * (i + 1)).toFixed(1)), color])
   ];
 }
