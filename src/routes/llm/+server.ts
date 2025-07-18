@@ -162,7 +162,11 @@ function AttributeUpdate(
         z.literal(attrs[1]),
         ...attrs.slice(2).map((attr) => z.literal(attr))
       ]),
-      channel: z.union([z.literal('fill'), z.literal('size')])
+      channel: z.union([
+        z.literal('fill'),
+        z.literal('size'),
+        z.literal('dots')
+      ])
     })
   });
 }
@@ -182,7 +186,7 @@ function FillOpacityUpdate(layerIds: string[]) {
     type: z.literal('fill-opacity'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
-      opacity: z.number()
+      opacity: z.number().min(0).max(1)
     })
   });
 }
@@ -208,7 +212,7 @@ function StrokeUpdate(layerIds: string[]) {
     type: z.literal('stroke'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
-      width: z.number(),
+      width: z.number().min(0),
       color: z.string()
     })
   });
@@ -219,7 +223,7 @@ function StrokeWidthUpdate(layerIds: string[]) {
     type: z.literal('stroke-width'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
-      strokeWidth: z.number()
+      strokeWidth: z.number().min(0)
     })
   });
 }
@@ -229,7 +233,7 @@ function StrokeOpacityUpdate(layerIds: string[]) {
     type: z.literal('stroke-opacity'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
-      opacity: z.number()
+      opacity: z.number().min(0).max(1)
     })
   });
 }
@@ -255,7 +259,7 @@ function PointSizeUpdate(layerIds: string[]) {
     type: z.literal('point-size'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
-      size: z.number()
+      size: z.number().min(0)
     })
   });
 }
@@ -341,7 +345,7 @@ function ColorCountUpdate(layerIds: string[]) {
     type: z.literal('color-count'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
-      count: z.number()
+      count: z.number().min(3).max(9)
     })
   });
 }
@@ -351,7 +355,7 @@ function ColorThresholdUpdate(layerIds: string[]) {
     type: z.literal('color-threshold'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
-      index: z.number(),
+      index: z.number().min(0),
       threshold: z.number()
     })
   });
@@ -362,8 +366,8 @@ function SizeUpdate(layerIds: string[]) {
     type: z.literal('size'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
-      min: z.number().nullable(),
-      max: z.number().nullable()
+      min: z.number().min(0).nullable(),
+      max: z.number().min(0).nullable()
     })
   });
 }
@@ -373,7 +377,7 @@ function DotValueUpdate(layerIds: string[]) {
     type: z.literal('dot-value'),
     layerId: makeLayerIdSchema(layerIds),
     payload: z.object({
-      value: z.number()
+      value: z.number().min(0.000001)
     })
   });
 }
@@ -398,7 +402,7 @@ function HeatmapOpacityUpdate(layerIds: string[]) {
   return z.object({
     type: z.literal('heatmap-opacity'),
     layerId: makeLayerIdSchema(layerIds),
-    payload: z.object({ opacity: z.number() })
+    payload: z.object({ opacity: z.number().min(0).max(1) })
   });
 }
 
@@ -406,7 +410,7 @@ function HeatmapRadiusUpdate(layerIds: string[]) {
   return z.object({
     type: z.literal('heatmap-radius'),
     layerId: makeLayerIdSchema(layerIds),
-    payload: z.object({ radius: z.number() })
+    payload: z.object({ radius: z.number().min(0) })
   });
 }
 
@@ -487,7 +491,7 @@ function HeatmapWeightValueUpdate(layerIds: string[]) {
   return z.object({
     type: z.literal('heatmap-weight-value'),
     layerId: makeLayerIdSchema(layerIds),
-    payload: z.object({ value: z.number() })
+    payload: z.object({ value: z.number().min(0) })
   });
 }
 
