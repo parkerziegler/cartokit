@@ -7,6 +7,7 @@ import { connectToMongoDB } from '$lib/db';
 interface DiffDoc {
   userId: string;
   diff: unknown;
+  llmAvailable: boolean;
   timestamp: string;
 }
 
@@ -17,13 +18,14 @@ interface DiffDoc {
  * @param diff — The diff object to save.
  * @returns – The document that was saved to MongoDB.
  */
-async function saveDiff(userId: string, diff: unknown) {
+async function saveDiff(userId: string, diff: unknown, llmAvailable: boolean) {
   const db = connectToMongoDB();
   const collection = db.collection('diffs');
 
   const doc: DiffDoc = {
     userId,
     diff,
+    llmAvailable,
     timestamp: new Date().toISOString()
   };
 
@@ -42,10 +44,10 @@ async function saveDiff(userId: string, diff: unknown) {
  * analysis.
  */
 export const POST = (async ({ request }) => {
-  const { userId, diff } = await request.json();
+  const { userId, diff, llmAvailable } = await request.json();
 
   try {
-    const result = await saveDiff(userId, diff);
+    const result = await saveDiff(userId, diff, llmAvailable);
 
     return json(result);
   } catch (err) {
