@@ -10,6 +10,9 @@ export async function load({ url }) {
   const userId = url.searchParams.get('userId');
   const user = await collection.findOne({ id: userId });
 
+  // Check for the LLM enabled flag.
+  const llmEnabled = url.searchParams.get('llm') === '1';
+
   return {
     basemap:
       VERCEL_ENV === 'preview'
@@ -22,6 +25,6 @@ export async function load({ url }) {
             provider: 'Stamen' as const
           },
     userId,
-    enableChat: !!user
+    enableChat: !!user && !!llmEnabled
   };
 }
