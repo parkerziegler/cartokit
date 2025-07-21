@@ -6,6 +6,8 @@ import { updateLayerChannel } from '$lib/interaction/channel';
 import { deriveColorRamp } from '$lib/interaction/color';
 import { deriveHeatmapWeight } from '$lib/interaction/weight';
 import { transitionLayerType } from '$lib/interaction/layer-type';
+import { chat } from '$lib/state/chat.svelte';
+import { user } from '$lib/state/user.svelte';
 import { ir } from '$lib/stores/ir';
 import { map as mapStore } from '$lib/stores/map';
 import type {
@@ -1060,5 +1062,15 @@ export function dispatchLayerUpdate({
         return ir;
       });
     }
+  }
+
+  if (user.userId) {
+    fetch('/diff', {
+      method: 'POST',
+      body: JSON.stringify({
+        userId: user.userId,
+        diff: { type, layerId, payload, llmAvailable: chat.enable }
+      })
+    });
   }
 }
