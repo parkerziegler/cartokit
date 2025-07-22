@@ -11,7 +11,14 @@
 
   let { children }: Props = $props();
 
-  inject();
+  inject({
+    beforeSend: (event) => {
+      if (event.url.includes('playwright')) {
+        return null;
+      }
+      return event;
+    }
+  });
 </script>
 
 <svelte:head>
