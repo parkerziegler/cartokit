@@ -1,5 +1,4 @@
 import { VERCEL_ENV } from '$env/static/private';
-import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
 import { connectToMongoDB } from '$lib/db';
 
 export async function load({ url }) {
@@ -15,10 +14,10 @@ export async function load({ url }) {
 
   return {
     basemap:
-      VERCEL_ENV === 'preview'
+      VERCEL_ENV === 'preview' || !!user
         ? {
-            url: `https://api.maptiler.com/maps/dataviz-light/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
-            provider: 'MapTiler' as const
+            url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+            provider: 'CARTO' as const
           }
         : {
             url: 'https://tiles.stadiamaps.com/styles/stamen_toner_lite.json',

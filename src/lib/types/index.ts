@@ -1,3 +1,4 @@
+import type { EnhancedImgAttributes } from '@sveltejs/enhanced-img';
 import type { FeatureCollection } from 'geojson';
 
 /**
@@ -484,18 +485,24 @@ export interface HeatmapStyle {
  * @property {string} title - The name of the basemap, set by the tile provider.
  * @property {string} tileId - The tile ID of the basemap, set by the tile pro-
  * vider.
- * @property {string} src - The source for the basemap thumbnail.
+ * @property {EnhancedImgAttributes['src']} src - The source for the basemap
+ * thumbnail.
  */
 export interface Basemap {
   title: string;
   tileId: string;
-  src: string;
+  src: EnhancedImgAttributes['src'];
 }
 
 /**
  * Represents the set of possible basemap providers in cartokit.
  */
-export type BasemapProvider = 'Stamen' | 'Stadia Maps' | 'MapTiler' | 'Custom';
+export type BasemapProvider =
+  | 'CARTO'
+  | 'MapTiler'
+  | 'Stadia Maps'
+  | 'Stamen'
+  | 'Custom';
 
 /**
  * Represents the set of possible projections in cartokit.
