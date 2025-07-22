@@ -64,7 +64,7 @@
         ]}
         onclick={onSelectBasemap(TILE_URLS[provider](basemap.tileId))}
       >
-        <img
+        <enhanced:img
           src={basemap.src}
           alt="tiles-{basemap.tileId}"
           class="rounded-xs"
