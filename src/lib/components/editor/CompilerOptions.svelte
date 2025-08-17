@@ -30,11 +30,8 @@
     </div>
   </button>
   {#if optionsExpanded}
-    <div class="flex gap-4">
-      <fieldset
-        class="flex flex-col gap-2 text-white"
-        transition:slide={{ axis: 'y', duration: 150 }}
-      >
+    <div class="flex gap-4" transition:slide={{ axis: 'y', duration: 150 }}>
+      <fieldset class="flex flex-col gap-2 text-white">
         <legend
           class="font-sans text-sm text-slate-400 underline decoration-dotted underline-offset-4"
           >Language</legend
@@ -52,10 +49,7 @@
           >
         {/each}
       </fieldset>
-      <fieldset
-        class="flex flex-col gap-2 text-white"
-        transition:slide={{ axis: 'y', duration: 150 }}
-      >
+      <fieldset class="flex flex-col gap-2 text-white">
         <legend
           class="font-sans text-sm text-slate-400 underline decoration-dotted underline-offset-4"
           >Library</legend

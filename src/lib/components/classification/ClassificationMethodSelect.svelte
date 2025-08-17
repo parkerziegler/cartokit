@@ -79,8 +79,13 @@
   {/if}
 </div>
 <Portal
-  class="fixed top-64 right-150 transition-transform duration-400"
-  style="transform: translateX({$layout.editorVisible ? '-33.333333vw' : 0})"
+  class={[
+    'ease-cubic-out fixed top-64 right-150 transition-transform duration-400',
+    {
+      '-translate-x-[33.333333vw]': $layout.editorVisible,
+      'delay-150': !$layout.editorVisible
+    }
+  ]}
 >
   <Dialog bind:showDialog={displayBreaksEditor} class="w-64">
     {#snippet header()}

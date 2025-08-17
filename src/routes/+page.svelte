@@ -139,10 +139,11 @@
     <Toolbar />
     <button
       class={[
-        'absolute right-4 bottom-12 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 ease-out disabled:cursor-not-allowed',
+        'ease-cubic-out absolute right-4 bottom-12 z-10 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 disabled:cursor-not-allowed',
         {
           '-translate-y-72': $layout.dataVisible,
-          '-translate-x-[33.333333vw]': $layout.editorVisible
+          '-translate-x-[33.333333vw]': $layout.editorVisible,
+          'delay-150': !$layout.editorVisible
         }
       ]}
       onclick={toggleEditorVisibility}
@@ -157,7 +158,7 @@
         tableName={$selectedLayer.displayName}
         onClose={onViewDataClose}
         class={[
-          'absolute bottom-0 h-72 transition-all duration-400 ease-out',
+          'ease-cubic-out absolute bottom-0 h-72 transition-all duration-400',
           $layout.editorVisible ? 'w-2/3' : 'w-full'
         ]}
       />
@@ -179,7 +180,7 @@
   @reference 'tailwindcss';
 
   :global(#map .maplibregl-ctrl-attrib.maplibregl-compact) {
-    @apply transition-transform duration-400 ease-out;
+    @apply ease-cubic-out transition-transform duration-400;
   }
 
   :global(#map.compact-y .maplibregl-ctrl-attrib.maplibregl-compact) {
@@ -188,5 +189,9 @@
 
   :global(#map.compact-x .maplibregl-ctrl-attrib.maplibregl-compact) {
     @apply -translate-x-[33.333333vw];
+  }
+
+  :global(#map:not(.compact-x) .maplibregl-ctrl-attrib.maplibregl-compact) {
+    @apply delay-150;
   }
 </style>

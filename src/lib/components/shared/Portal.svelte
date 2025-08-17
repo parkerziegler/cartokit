@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount, type Snippet } from 'svelte';
+  import type { ClassValue } from 'svelte/elements';
 
   interface Props {
-    class?: string;
+    class?: ClassValue;
     target?: HTMLElement;
     style?: string;
     children: Snippet;
