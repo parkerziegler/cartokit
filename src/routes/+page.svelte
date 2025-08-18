@@ -175,23 +175,3 @@
     </div>
   {/if}
 </main>
-
-<style lang="postcss">
-  @reference 'tailwindcss';
-
-  :global(#map .maplibregl-ctrl-attrib.maplibregl-compact) {
-    @apply ease-cubic-out transition-transform duration-400;
-  }
-
-  :global(#map.compact-y .maplibregl-ctrl-attrib.maplibregl-compact) {
-    @apply -translate-y-72;
-  }
-
-  :global(#map.compact-x .maplibregl-ctrl-attrib.maplibregl-compact) {
-    @apply -translate-x-[33.333333vw];
-  }
-
-  :global(#map:not(.compact-x) .maplibregl-ctrl-attrib.maplibregl-compact) {
-    @apply delay-150;
-  }
-</style>

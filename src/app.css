@@ -85,6 +85,22 @@
   .tooltip {
     @apply z-10 rounded-sm bg-slate-600 px-2 py-1 text-xs text-white;
   }
+
+  #map .maplibregl-ctrl-attrib.maplibregl-compact {
+    @apply ease-cubic-out transition-transform duration-400;
+  }
+
+  #map.compact-y .maplibregl-ctrl-attrib.maplibregl-compact {
+    @apply -translate-y-72;
+  }
+
+  #map.compact-x .maplibregl-ctrl-attrib.maplibregl-compact {
+    @apply -translate-x-[33.333333vw];
+  }
+
+  #map:not(.compact-x) .maplibregl-ctrl-attrib.maplibregl-compact {
+    @apply delay-150;
+  }
 }
 
 @layer utilities {
