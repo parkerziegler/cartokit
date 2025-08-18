@@ -49,10 +49,11 @@
 <Menu
   id="properties"
   class={[
-    'absolute top-4 right-4 z-10 max-h-[calc(100%-2rem)] w-80 overflow-auto transition-[max-height,translate] duration-[200ms,400ms] ease-out',
+    'ease-cubic-out absolute top-4 right-4 z-10 max-h-[calc(100%-2rem)] w-80 overflow-auto transition-[max-height,translate] duration-[200ms,400ms]',
     {
       'max-h-[calc(100%-25.25rem)]': $layout.dataVisible,
-      '-translate-x-[33.333333vw]': $layout.editorVisible
+      '-translate-x-[33.333333vw]': $layout.editorVisible,
+      'delay-150': !$layout.editorVisible
     }
   ]}
 >

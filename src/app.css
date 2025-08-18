@@ -1,15 +1,36 @@
 @import 'tailwindcss';
 
 @theme {
+  /* Font Size */
   --text-2xs: 0.6875rem;
   --text-2xs--line-height: 1rem;
   --text-3xs: 0.625rem;
   --text-3xs--line-height: 1rem;
 
+  /* Fonts */
   --font-sans: 'Inter', sans-serif;
 
+  /* Colors */
   --color-ck: #7e58ff;
   --color-ck-light: #7e58ffcc;
+
+  /* Transitions */
+  --ease-cubic-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+
+  /* Animations */
+  --animate-slide-down-and-fade: slideDownAndFade 300ms
+    cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes slideDownAndFade {
+    from {
+      opacity: 0;
+      transform: translateY(-2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 @layer base {
@@ -57,5 +78,33 @@
   *:focus {
     outline: 5px auto Highlight;
     outline: 5px auto -webkit-focus-ring-color;
+  }
+}
+
+@layer components {
+  .tooltip {
+    @apply z-10 rounded-sm bg-slate-600 px-2 py-1 text-xs text-white;
+  }
+
+  #map .maplibregl-ctrl-attrib.maplibregl-compact {
+    @apply ease-cubic-out transition-transform duration-400;
+  }
+
+  #map.compact-y .maplibregl-ctrl-attrib.maplibregl-compact {
+    @apply -translate-y-72;
+  }
+
+  #map.compact-x .maplibregl-ctrl-attrib.maplibregl-compact {
+    @apply -translate-x-[33.333333vw];
+  }
+
+  #map:not(.compact-x) .maplibregl-ctrl-attrib.maplibregl-compact {
+    @apply delay-150;
+  }
+}
+
+@layer utilities {
+  .will-change-transform-opacity {
+    will-change: transform, opacity;
   }
 }
