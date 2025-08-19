@@ -24,6 +24,7 @@
       Consider joining our
       <a
         href="https://forms.gle/5uNFkkgKq6fRqLdd6"
+        target="_blank"
         class="text-valkyrie underline">paid user study</a
       >.
     </p>

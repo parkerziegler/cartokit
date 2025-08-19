@@ -91,7 +91,7 @@
 
     const destroyHistory = initHistory();
 
-    window.setTimeout(() => {
+    const timeoutId = window.setTimeout(() => {
       layout.update((layout) => {
         layout.studyAdvertisementVisible = true;
 
@@ -102,6 +102,7 @@
     return () => {
       map!.remove();
       destroyHistory();
+      window.clearTimeout(timeoutId);
     };
   });
 
