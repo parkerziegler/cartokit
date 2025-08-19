@@ -13,7 +13,7 @@
 
   inject({
     beforeSend: (event) => {
-      if (event.url.includes('playwright')) {
+      if (event.url.includes('playwright') || event.url.includes('vercel')) {
         return null;
       }
       return event;

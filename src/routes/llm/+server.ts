@@ -71,7 +71,7 @@ export const POST = (async ({ request }) => {
       ChatCompletionParseParams,
       z.infer<typeof schema>
     >({
-      model: 'gpt-4.1',
+      model: 'gpt-5',
       messages: [
         {
           role: 'system',
