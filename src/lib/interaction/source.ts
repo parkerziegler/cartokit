@@ -66,7 +66,8 @@ async function loadSource(
   );
   const buildCatalog =
     Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
-  catalog.value = await buildCatalog(layer);
+  const catalogPatch = await buildCatalog(layer);
+  catalog.value = { ...catalog.value, ...catalogPatch };
 
   addLayer(map, layer);
 }
