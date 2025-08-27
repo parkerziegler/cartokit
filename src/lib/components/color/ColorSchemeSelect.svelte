@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '$lib/attachments/tooltip';
   import { clickoutside } from '$lib/actions/clickoutside.svelte';
   import { focus } from '$lib/actions/focus.svelte';
   import ColorPalette from '$lib/components/channel/shared/ColorPalette.svelte';
@@ -163,7 +164,11 @@
       </Portal>
     {/if}
   </div>
-  <button onclick={onSchemeReverse} data-testid="color-scheme-reverse-button"
-    ><ReverseIcon /></button
+  <button
+    onclick={onSchemeReverse}
+    data-testid="color-scheme-reverse-button"
+    {@attach tooltip({
+      content: 'Reverse Scheme'
+    })}><ReverseIcon /></button
   >
 </div>

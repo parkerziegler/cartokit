@@ -1,6 +1,9 @@
 <script lang="ts">
   import { kebabCase } from 'lodash-es';
+  import { onMount } from 'svelte';
+  import { on } from 'svelte/events';
 
+  import { tooltip } from '$lib/attachments/tooltip';
   import DownloadIcon from '$lib/components/icons/DownloadIcon.svelte';
   import type { CartoKitLayer } from '$lib/types';
 
@@ -21,8 +24,25 @@
     a.click();
     URL.revokeObjectURL(url);
   }
+
+  onMount(() => {
+    const off = on(document, 'keydown', (event) => {
+      if (event.key === 'd') {
+        onClick();
+      }
+    });
+
+    return off;
+  });
 </script>
 
-<button onclick={onClick}>
+<button
+  onclick={onClick}
+  {@attach tooltip({
+    content: 'Download Data',
+    keybinding: 'D',
+    placement: 'bottom'
+  })}
+>
   <DownloadIcon />
 </button>

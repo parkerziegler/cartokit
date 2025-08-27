@@ -1,5 +1,6 @@
 <script lang="ts">
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
+  import { layout } from '$lib/stores/layout';
 
   interface Props {
     onClose: () => void;
@@ -9,7 +10,13 @@
 </script>
 
 <div
-  class="appear absolute bottom-12 left-4 z-10 flex max-w-2xs flex-col gap-2 rounded-md bg-slate-900 p-2 font-sans shadow-lg"
+  class={[
+    'appear ease-cubic-out absolute bottom-12 left-4 z-10 flex max-w-2xs flex-col gap-2 rounded-md bg-slate-900 p-2 font-sans shadow-lg transition-transform duration-400',
+    {
+      '-translate-y-72': $layout.dataVisible,
+      'delay-150': !$layout.editorVisible
+    }
+  ]}
 >
   <div class="flex flex-col">
     <div class="flex justify-between">

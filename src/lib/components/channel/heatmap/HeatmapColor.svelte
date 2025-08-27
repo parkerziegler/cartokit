@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '$lib/attachments/tooltip';
   import { clickoutside } from '$lib/actions/clickoutside.svelte';
   import { focus } from '$lib/actions/focus.svelte';
   import ColorRamp from '$lib/components/channel/shared/ColorRamp.svelte';
@@ -130,7 +131,11 @@
       </Portal>
     {/if}
   </div>
-  <button onclick={onRampReverse} data-testid="color-ramp-reverse-button"
-    ><ReverseIcon /></button
+  <button
+    onclick={onRampReverse}
+    data-testid="color-ramp-reverse-button"
+    {@attach tooltip({
+      content: 'Reverse Ramp'
+    })}><ReverseIcon /></button
   >
 </div>

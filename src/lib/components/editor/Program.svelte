@@ -1,8 +1,10 @@
 <script lang="ts">
   import { EditorView } from 'codemirror';
+  import { onMount } from 'svelte';
+  import { on } from 'svelte/events';
   import { fade } from 'svelte/transition';
 
-  import { tooltip } from '$lib/actions/tooltip.svelte';
+  import { tooltip } from '$lib/attachments/tooltip';
   import CompilerOptions from '$lib/components/editor/CompilerOptions.svelte';
   import CodeEditor from '$lib/components/shared/CodeEditor.svelte';
   import { backend } from '$lib/stores/backend';
@@ -18,6 +20,16 @@
       copyButtonClicked = false;
     }, 2000);
   }
+
+  onMount(() => {
+    const off = on(document, 'keydown', (event) => {
+      if (event.key === 'p') {
+        onCopyButtonClick();
+      }
+    });
+
+    return off;
+  });
 </script>
 
 <div class="flex w-full flex-col overflow-hidden">
@@ -30,10 +42,14 @@
       <button
         class="absolute top-2 right-2 z-10 h-6 w-6 rounded bg-slate-600 p-1 text-xs text-white opacity-100"
         onclick={() => onCopyButtonClick(view)}
-        use:tooltip={() => ({ content: 'Copy', placement: 'top' })}
         in:fade|global={{ delay: 300, duration: 150 }}
         out:fade|global={{ duration: 150 }}
-        aria-label="Copy"
+        aria-label="Copy Program"
+        {@attach tooltip({
+          content: 'Copy Program',
+          keybinding: 'P',
+          placement: 'top'
+        })}
       >
         {#if copyButtonClicked}
           <svg

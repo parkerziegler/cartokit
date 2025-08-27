@@ -1,7 +1,21 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { on } from 'svelte/events';
+
+  import { tooltip } from '$lib/attachments/tooltip';
   import GlobeIcon from '$lib/components/icons/GlobeIcon.svelte';
   import { ir } from '$lib/stores/ir';
   import { map } from '$lib/stores/map';
+
+  onMount(() => {
+    const off = on(document, 'keydown', (event) => {
+      if (event.key === 'g') {
+        onToggleGlobe();
+      }
+    });
+
+    return off;
+  });
 
   function onToggleGlobe() {
     const currentProjection = $map.getProjection();
@@ -18,7 +32,14 @@
   }
 </script>
 
-<div class="flex self-center">
+<div
+  class="flex self-center"
+  {@attach tooltip({
+    content: 'Globe',
+    keybinding: 'G',
+    offsetValue: 12
+  })}
+>
   <div class="self-center">
     <span
       class={[
@@ -37,7 +58,12 @@
         /></span
       >
       <div
-        class="group-has[input:checked]:text-teal-300 flex h-[22px] w-[22px] translate-x-0 items-center justify-center rounded-[5px] bg-slate-400 text-white shadow-sm transition-transform group-has-[input:checked]:translate-x-4"
+        class={[
+          'flex h-[22px] w-[22px] translate-x-0 items-center justify-center rounded-[5px] bg-slate-400 text-white shadow-sm transition-transform group-has-[input:checked]:translate-x-4',
+          {
+            'translate-x-4': $ir.projection === 'globe'
+          }
+        ]}
       >
         <GlobeIcon />
       </div></span

@@ -72,6 +72,7 @@
 
   /* Firefox */
   input[type='number'] {
+    appearance: textfield;
     -moz-appearance: textfield;
   }
 
@@ -84,7 +85,11 @@
 
 @layer components {
   .tooltip {
-    @apply z-10 rounded-sm bg-slate-600 px-2 py-1 text-xs text-white;
+    @apply z-10 items-baseline gap-2 rounded-sm border border-slate-400 bg-slate-900 px-2 py-1 text-xs text-white;
+  }
+
+  .keybinding {
+    @apply text-xs text-slate-400;
   }
 
   #map .maplibregl-ctrl-attrib.maplibregl-compact {

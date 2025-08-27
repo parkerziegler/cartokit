@@ -1,13 +1,14 @@
 <script lang="ts">
-  import { setContext } from 'svelte';
+  import { onMount, setContext } from 'svelte';
+  import { on } from 'svelte/events';
 
+  import { tooltip } from '$lib/attachments/tooltip';
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
   import FromAPI from '$lib/components/layers/FromAPI.svelte';
   import FromFile from '$lib/components/layers/FromFile.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
   import { map } from '$lib/stores/map';
-
   setContext('close-modal', () => {
     showModal = false;
   });
@@ -22,6 +23,16 @@
   function onClick() {
     showModal = true;
   }
+
+  onMount(() => {
+    const off = on(document, 'keydown', (event) => {
+      if (event.key === 'l') {
+        onClick();
+      }
+    });
+
+    return off;
+  });
 </script>
 
 <button
@@ -30,6 +41,12 @@
   data-testid="add-layer-button"
   aria-label="Add Layer"
   disabled={!$map}
+  {@attach tooltip({
+    content: 'Add Layer',
+    keybinding: 'L',
+    placement: 'right',
+    offsetValue: 20
+  })}
 >
   <PlusIcon />
 </button>

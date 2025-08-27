@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '$lib/attachments/tooltip';
   import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
@@ -56,11 +57,21 @@
 </script>
 
 {#if fill}
-  <button onclick={onRemoveFill}>
+  <button
+    onclick={onRemoveFill}
+    {@attach tooltip({
+      content: 'Remove Fill'
+    })}
+  >
     <MinusIcon />
   </button>
 {:else}
-  <button onclick={onAddFill}>
+  <button
+    onclick={onAddFill}
+    {@attach tooltip({
+      content: 'Add Fill'
+    })}
+  >
     <PlusIcon />
   </button>
 {/if}

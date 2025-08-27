@@ -1,8 +1,10 @@
 <script lang="ts">
   import maplibregl from 'maplibre-gl';
   import { onMount, setContext } from 'svelte';
+  import { on } from 'svelte/events';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
+  import { tooltip } from '$lib/attachments/tooltip';
   import BasemapGrid from '$lib/components/map/BasemapGrid.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
@@ -42,10 +44,18 @@
       return map;
     });
 
+    const off = on(document, 'keydown', (event) => {
+      if (event.key === 'b') {
+        onClick();
+      }
+    });
+
     return () => {
       maps.forEach((map) => {
         map.remove();
       });
+
+      off();
     };
   });
 
@@ -104,6 +114,11 @@
   onmouseleave={onMouseLeave}
   onclick={onClick}
   aria-label="Switch basemap"
+  {@attach tooltip({
+    content: 'Basemap',
+    keybinding: 'B',
+    offsetValue: 12
+  })}
 >
   <div
     id="inset-{mapStyles[0]}"
