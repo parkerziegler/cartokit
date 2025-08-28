@@ -28,7 +28,7 @@ export const DEFAULT_THRESHOLDS = (layerId: string, attribute: string) =>
   });
 export const DEFAULT_MIN_SIZE = 1;
 export const DEFAULT_MAX_SIZE = 25;
-export const DEFAULT_RADIUS = 2;
+export const DEFAULT_RADIUS = 3;
 export const DEFAULT_HEATMAP_RADIUS = 10;
 export const DEFAULT_HEATMAP_INTENSITY = 1;
 export const DEFAULT_HEATMAP_WEIGHT = 1;
