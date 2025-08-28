@@ -8,6 +8,7 @@
   import { slide } from 'svelte/transition';
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
+  import { layout } from '$lib/stores/layout';
   import { pluralize } from '$lib/utils/format';
 
   interface Props {
@@ -92,10 +93,12 @@
 
 <div
   class={[
-    'z-10 flex flex-col overflow-hidden bg-slate-700 font-mono',
+    'ease-cubic-out z-10 flex flex-col overflow-hidden bg-slate-700 font-mono',
+    { 'delay-150': !$layout.editorVisible },
     className
   ]}
-  transition:slide
+  in:slide={{ axis: 'y' }}
+  out:slide={{ axis: 'y' }}
 >
   <div class="flex justify-between px-3 py-2 text-xs text-white">
     <span>

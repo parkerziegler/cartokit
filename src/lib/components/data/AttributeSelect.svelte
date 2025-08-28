@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { FeatureCollection } from 'geojson';
 
+  import { tooltip } from '$lib/attachments/tooltip';
   import TransformationEditor from '$lib/components/data/TransformationEditor.svelte';
   import MoreIcon from '$lib/components/icons/MoreIcon.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
@@ -110,8 +111,13 @@
   <button
     bind:this={trigger}
     onclick={onClickComputedAttribute}
-    data-testid="open-transformation-editor-button"><MoreIcon /></button
+    data-testid="open-transformation-editor-button"
+    {@attach tooltip({
+      content: 'Open Transformation Editor'
+    })}
   >
+    <MoreIcon />
+  </button>
 </div>
 {#if transformationEditorVisible}
   <Portal

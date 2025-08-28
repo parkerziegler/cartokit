@@ -2,17 +2,27 @@ import {
   computePosition,
   offset,
   shift,
+  type OffsetOptions,
   type Placement
 } from '@floating-ui/dom';
+import type { Attachment } from 'svelte/attachments';
 
-export function tooltip<T extends HTMLElement>(
-  node: T,
-  fn: () => { content: string; placement?: Placement }
-) {
-  $effect(() => {
-    const { content, placement = 'top' } = fn();
+interface TooltipOptions {
+  content: string;
+  keybinding?: string;
+  placement?: Placement;
+  offsetValue?: OffsetOptions;
+}
+
+export function tooltip(options: TooltipOptions): Attachment {
+  return (element) => {
+    const { content, keybinding, placement = 'top', offsetValue = 6 } = options;
+
     const tt = document.createElement('div');
     tt.innerHTML = content;
+    if (keybinding) {
+      tt.innerHTML += `<span class="keybinding">${keybinding}</span>`;
+    }
     tt.style.display = 'none';
     tt.style.position = 'absolute';
     tt.classList.add(
@@ -22,10 +32,12 @@ export function tooltip<T extends HTMLElement>(
     );
     document.body.appendChild(tt);
 
+    let timeoutId: number;
+
     function update() {
-      computePosition(node, tt, {
+      computePosition(element, tt, {
         placement,
-        middleware: [offset(6), shift({ padding: 8 })]
+        middleware: [offset(offsetValue), shift({ padding: 8 })]
       }).then(({ x, y }) => {
         Object.assign(tt.style, {
           left: `${x}px`,
@@ -35,12 +47,17 @@ export function tooltip<T extends HTMLElement>(
     }
 
     function showTooltip() {
-      tt.style.display = 'block';
-      update();
+      timeoutId = window.setTimeout(() => {
+        tt.style.display = 'flex';
+        update();
+      }, 400);
     }
 
     function hideTooltip() {
       tt.style.display = 'none';
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
     }
 
     [
@@ -49,7 +66,7 @@ export function tooltip<T extends HTMLElement>(
       ['focus', showTooltip],
       ['blur', hideTooltip]
     ].forEach(([event, listener]) => {
-      node.addEventListener(
+      element.addEventListener(
         event as 'mouseenter' | 'mouseleave' | 'focus' | 'blur',
         listener as EventListener
       );
@@ -62,7 +79,7 @@ export function tooltip<T extends HTMLElement>(
         ['focus', showTooltip],
         ['blur', hideTooltip]
       ].forEach(([event, listener]) => {
-        node.removeEventListener(
+        element.removeEventListener(
           event as 'mouseenter' | 'mouseleave' | 'focus' | 'blur',
           listener as EventListener
         );
@@ -70,5 +87,5 @@ export function tooltip<T extends HTMLElement>(
 
       tt.remove();
     };
-  });
+  };
 }

@@ -3,6 +3,7 @@
   import { onMount, setContext } from 'svelte';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
+  import { tooltip } from '$lib/attachments/tooltip';
   import BasemapGrid from '$lib/components/map/BasemapGrid.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
@@ -11,6 +12,7 @@
   import { map as mapStore } from '$lib/stores/map';
   import type { BasemapProvider } from '$lib/types';
   import { BASEMAPS } from '$lib/utils/basemap';
+  import { registerKeybinding } from '$lib/utils/keybinding';
 
   let picker: HTMLButtonElement;
   let maps = $state<maplibregl.Map[]>([]);
@@ -42,10 +44,14 @@
       return map;
     });
 
+    const unregisterKeybinding = registerKeybinding('b', onClick);
+
     return () => {
       maps.forEach((map) => {
         map.remove();
       });
+
+      unregisterKeybinding();
     };
   });
 
@@ -104,6 +110,11 @@
   onmouseleave={onMouseLeave}
   onclick={onClick}
   aria-label="Switch basemap"
+  {@attach tooltip({
+    content: 'Basemap',
+    keybinding: 'B',
+    offsetValue: 12
+  })}
 >
   <div
     id="inset-{mapStyles[0]}"

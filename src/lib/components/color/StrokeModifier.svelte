@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '$lib/attachments/tooltip';
   import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
@@ -56,6 +57,9 @@
     onclick={onRemoveStroke}
     data-testid="remove-stroke-button"
     aria-label="Remove stroke"
+    {@attach tooltip({
+      content: 'Remove Stroke'
+    })}
   >
     <MinusIcon />
   </button>
@@ -64,6 +68,9 @@
     onclick={onAddStroke}
     data-testid="add-stroke"
     aria-label="Add stroke"
+    {@attach tooltip({
+      content: 'Add Stroke'
+    })}
   >
     <PlusIcon />
   </button>
