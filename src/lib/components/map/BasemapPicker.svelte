@@ -1,7 +1,6 @@
 <script lang="ts">
   import maplibregl from 'maplibre-gl';
   import { onMount, setContext } from 'svelte';
-  import { on } from 'svelte/events';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
   import { tooltip } from '$lib/attachments/tooltip';
@@ -13,6 +12,7 @@
   import { map as mapStore } from '$lib/stores/map';
   import type { BasemapProvider } from '$lib/types';
   import { BASEMAPS } from '$lib/utils/basemap';
+  import { registerKeybinding } from '$lib/utils/keybinding';
 
   let picker: HTMLButtonElement;
   let maps = $state<maplibregl.Map[]>([]);
@@ -44,18 +44,14 @@
       return map;
     });
 
-    const off = on(document, 'keydown', (event) => {
-      if (event.key === 'b') {
-        onClick();
-      }
-    });
+    const unregisterKeybinding = registerKeybinding('b', onClick);
 
     return () => {
       maps.forEach((map) => {
         map.remove();
       });
 
-      off();
+      unregisterKeybinding();
     };
   });
 

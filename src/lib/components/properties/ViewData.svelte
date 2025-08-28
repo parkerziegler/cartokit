@@ -5,6 +5,7 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import TableIcon from '$lib/components/icons/TableIcon.svelte';
   import { layout } from '$lib/stores/layout';
+  import { registerKeybinding } from '$lib/utils/keybinding';
 
   function onViewDataClick() {
     layout.update((layout) => {
@@ -15,13 +16,9 @@
   }
 
   onMount(() => {
-    const off = on(document, 'keydown', (event) => {
-      if (event.key === 't') {
-        onViewDataClick();
-      }
-    });
+    const unregisterKeybinding = registerKeybinding('t', onViewDataClick);
 
-    return off;
+    return unregisterKeybinding;
   });
 </script>
 

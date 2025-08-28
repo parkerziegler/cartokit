@@ -9,6 +9,8 @@
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
   import { map } from '$lib/stores/map';
+  import { registerKeybinding } from '$lib/utils/keybinding';
+
   setContext('close-modal', () => {
     showModal = false;
   });
@@ -25,13 +27,9 @@
   }
 
   onMount(() => {
-    const off = on(document, 'keydown', (event) => {
-      if (event.key === 'l') {
-        onClick();
-      }
-    });
+    const unregisterKeybinding = registerKeybinding('l', onClick);
 
-    return off;
+    return unregisterKeybinding;
   });
 </script>
 

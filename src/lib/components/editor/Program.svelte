@@ -1,7 +1,6 @@
 <script lang="ts">
   import { EditorView } from 'codemirror';
   import { onMount } from 'svelte';
-  import { on } from 'svelte/events';
   import { fade } from 'svelte/transition';
 
   import { tooltip } from '$lib/attachments/tooltip';
@@ -9,6 +8,7 @@
   import CodeEditor from '$lib/components/shared/CodeEditor.svelte';
   import { backend } from '$lib/stores/backend';
   import { program } from '$lib/stores/program';
+  import { registerKeybinding } from '$lib/utils/keybinding';
 
   let copyButtonClicked = $state(false);
 
@@ -22,13 +22,9 @@
   }
 
   onMount(() => {
-    const off = on(document, 'keydown', (event) => {
-      if (event.key === 'p') {
-        onCopyButtonClick();
-      }
-    });
+    const unregisterKeybinding = registerKeybinding('p', onCopyButtonClick);
 
-    return off;
+    return unregisterKeybinding;
   });
 </script>
 

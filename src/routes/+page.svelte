@@ -23,6 +23,7 @@
   import { map as mapStore } from '$lib/stores/map';
   import { selectedLayer } from '$lib/stores/selected-layer';
   import { initHistory } from '$lib/utils/history';
+  import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
     data: PageData;
@@ -92,11 +93,10 @@
 
     const destroyHistory = initHistory();
 
-    const off = on(document, 'keydown', (event) => {
-      if (event.key === 'e') {
-        toggleEditorVisibility();
-      }
-    });
+    const unregisterKeybinding = registerKeybinding(
+      'e',
+      toggleEditorVisibility
+    );
 
     const timeoutId = window.setTimeout(() => {
       layout.update((layout) => {
@@ -109,7 +109,7 @@
     return () => {
       map!.remove();
       destroyHistory();
-      off();
+      unregisterKeybinding();
       window.clearTimeout(timeoutId);
     };
   });

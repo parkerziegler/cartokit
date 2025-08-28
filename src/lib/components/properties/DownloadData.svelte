@@ -1,11 +1,11 @@
 <script lang="ts">
   import { kebabCase } from 'lodash-es';
   import { onMount } from 'svelte';
-  import { on } from 'svelte/events';
 
   import { tooltip } from '$lib/attachments/tooltip';
   import DownloadIcon from '$lib/components/icons/DownloadIcon.svelte';
   import type { CartoKitLayer } from '$lib/types';
+  import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
     layer: CartoKitLayer;
@@ -26,13 +26,9 @@
   }
 
   onMount(() => {
-    const off = on(document, 'keydown', (event) => {
-      if (event.key === 'd') {
-        onClick();
-      }
-    });
+    const unregisterKeybinding = registerKeybinding('d', onClick);
 
-    return off;
+    return unregisterKeybinding;
   });
 </script>
 

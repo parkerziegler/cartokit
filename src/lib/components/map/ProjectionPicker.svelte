@@ -1,20 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { on } from 'svelte/events';
 
   import { tooltip } from '$lib/attachments/tooltip';
   import GlobeIcon from '$lib/components/icons/GlobeIcon.svelte';
   import { ir } from '$lib/stores/ir';
   import { map } from '$lib/stores/map';
+  import { registerKeybinding } from '$lib/utils/keybinding';
 
   onMount(() => {
-    const off = on(document, 'keydown', (event) => {
-      if (event.key === 'g') {
-        onToggleGlobe();
-      }
-    });
+    const unregisterKeybinding = registerKeybinding('g', onToggleGlobe);
 
-    return off;
+    return unregisterKeybinding;
   });
 
   function onToggleGlobe() {
