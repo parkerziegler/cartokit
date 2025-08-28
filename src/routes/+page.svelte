@@ -1,7 +1,6 @@
 <script lang="ts">
   import maplibregl from 'maplibre-gl';
   import { onMount } from 'svelte';
-  import { on } from 'svelte/events';
 
   import type { PageData } from './$types';
 

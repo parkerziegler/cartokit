@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { on } from 'svelte/events';
 
   import { tooltip } from '$lib/attachments/tooltip';
   import TableIcon from '$lib/components/icons/TableIcon.svelte';
