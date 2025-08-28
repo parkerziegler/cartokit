@@ -70,6 +70,14 @@ async function loadSource(
   catalog.value = { ...catalog.value, ...catalogPatch };
 
   addLayer(map, layer);
+
+  // Focus the map canvas after adding the layer.
+  // Use a more specific selector to avoid focusing maps in the BasemapPicker.
+  document
+    .querySelector<HTMLCanvasElement>(
+      '#map > .maplibregl-canvas-container > canvas.maplibregl-canvas'
+    )
+    ?.focus();
 }
 
 /**
