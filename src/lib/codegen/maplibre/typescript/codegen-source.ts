@@ -18,7 +18,7 @@ export function codegenSource(
   const dataIdent = uploadTable.get(layer.id) ?? camelCase(layer.displayName);
   const fetchData =
     layer.data.url && !uploadTable.has(layer.id)
-      ? `const ${dataIdent} = await fetchGeoJSON('${layer.data.url}');\n`
+      ? `const ${dataIdent} = await fetchGeoJSON(${JSON.stringify(layer.data.url)});\n`
       : '';
 
   switch (transformations.length) {
