@@ -6,7 +6,7 @@ import { updateLayerChannel } from '$lib/interaction/channel';
 import { deriveColorRamp } from '$lib/interaction/color';
 import { deriveHeatmapWeight } from '$lib/interaction/weight';
 import { transitionLayerType } from '$lib/interaction/layer-type';
-import { chat } from '$lib/state/chat.svelte';
+import { diffs } from '$lib/state/diffs.svelte';
 import { user } from '$lib/state/user.svelte';
 import { ir } from '$lib/stores/ir';
 import { map as mapStore } from '$lib/stores/map';
@@ -293,22 +293,18 @@ export type DispatchLayerUpdateParams =
  * @param layerId – The id of the @see{CartoKitLayer} to update.
  * @param payload – The payload for the update.
  */
-export function dispatchLayerUpdate({
-  type,
-  layerId,
-  payload
-}: DispatchLayerUpdateParams): void {
+export function dispatchLayerUpdate(diff: DispatchLayerUpdateParams): void {
   const map = get(mapStore);
 
-  switch (type) {
+  switch (diff.type) {
     case 'layer-type': {
       ir.update((ir) => {
-        const layer = ir.layers[layerId];
+        const layer = ir.layers[diff.layerId];
 
         ir.layers[layer.id] = transitionLayerType(
           map,
           layer,
-          payload.layerType
+          diff.payload.layerType
         );
 
         return ir;
@@ -317,7 +313,7 @@ export function dispatchLayerUpdate({
     }
     case 'attribute': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
@@ -328,9 +324,9 @@ export function dispatchLayerUpdate({
         // CartoKitProportionalSymbolLayer. However, the UI only renders the
         // component that dispatches this update for valid channels on a given
         // layer type.
-        lyr.style[payload.channel].attribute = payload.attribute;
+        lyr.style[diff.payload.channel].attribute = diff.payload.attribute;
 
-        updateLayerChannel(map, lyr, payload.channel);
+        updateLayerChannel(map, lyr, diff.payload.channel);
 
         return ir;
       });
@@ -338,23 +334,31 @@ export function dispatchLayerUpdate({
     }
     case 'fill': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
           | CartoKitPolygonLayer;
 
         if (lyr.style.fill?.type === 'Constant') {
-          lyr.style.fill.color = payload.color;
+          lyr.style.fill.color = diff.payload.color;
 
           switch (lyr.type) {
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
-              map.setPaintProperty(layerId, 'circle-color', payload.color);
+              map.setPaintProperty(
+                diff.layerId,
+                'circle-color',
+                diff.payload.color
+              );
               break;
             case 'Polygon':
-              map.setPaintProperty(layerId, 'fill-color', payload.color);
+              map.setPaintProperty(
+                diff.layerId,
+                'fill-color',
+                diff.payload.color
+              );
               break;
           }
         }
@@ -365,7 +369,7 @@ export function dispatchLayerUpdate({
     }
     case 'fill-opacity': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
@@ -373,17 +377,25 @@ export function dispatchLayerUpdate({
           | CartoKitChoroplethLayer;
 
         if (lyr.style.fill) {
-          lyr.style.fill.opacity = payload.opacity;
+          lyr.style.fill.opacity = diff.payload.opacity;
 
           switch (lyr.type) {
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
-              map.setPaintProperty(layerId, 'circle-opacity', payload.opacity);
+              map.setPaintProperty(
+                diff.layerId,
+                'circle-opacity',
+                diff.payload.opacity
+              );
               break;
             case 'Polygon':
             case 'Choropleth':
-              map.setPaintProperty(layerId, 'fill-opacity', payload.opacity);
+              map.setPaintProperty(
+                diff.layerId,
+                'fill-opacity',
+                diff.payload.opacity
+              );
               break;
           }
         }
@@ -394,7 +406,7 @@ export function dispatchLayerUpdate({
     }
     case 'add-fill': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
@@ -409,12 +421,16 @@ export function dispatchLayerUpdate({
           case 'Point':
           case 'Proportional Symbol':
           case 'Dot Density':
-            map.setPaintProperty(layerId, 'circle-color', DEFAULT_FILL);
-            map.setPaintProperty(layerId, 'circle-opacity', DEFAULT_OPACITY);
+            map.setPaintProperty(diff.layerId, 'circle-color', DEFAULT_FILL);
+            map.setPaintProperty(
+              diff.layerId,
+              'circle-opacity',
+              DEFAULT_OPACITY
+            );
             break;
           case 'Polygon':
-            map.setPaintProperty(layerId, 'fill-color', DEFAULT_FILL);
-            map.setPaintProperty(layerId, 'fill-opacity', DEFAULT_OPACITY);
+            map.setPaintProperty(diff.layerId, 'fill-color', DEFAULT_FILL);
+            map.setPaintProperty(diff.layerId, 'fill-opacity', DEFAULT_OPACITY);
             break;
         }
 
@@ -424,7 +440,7 @@ export function dispatchLayerUpdate({
     }
     case 'remove-fill': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
@@ -435,12 +451,12 @@ export function dispatchLayerUpdate({
           case 'Point':
           case 'Proportional Symbol':
           case 'Dot Density':
-            map.setPaintProperty(layerId, 'circle-color', 'transparent');
-            map.setPaintProperty(layerId, 'circle-opacity', 0);
+            map.setPaintProperty(diff.layerId, 'circle-color', 'transparent');
+            map.setPaintProperty(diff.layerId, 'circle-opacity', 0);
             break;
           case 'Polygon':
-            map.setPaintProperty(layerId, 'fill-color', 'transparent');
-            map.setPaintProperty(layerId, 'fill-opacity', 0);
+            map.setPaintProperty(diff.layerId, 'fill-color', 'transparent');
+            map.setPaintProperty(diff.layerId, 'fill-opacity', 0);
             break;
         }
 
@@ -450,7 +466,7 @@ export function dispatchLayerUpdate({
     }
     case 'stroke': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitChoroplethLayer
           | CartoKitDotDensityLayer
           | CartoKitLineLayer
@@ -459,27 +475,31 @@ export function dispatchLayerUpdate({
           | CartoKitProportionalSymbolLayer;
 
         if (lyr.style.stroke) {
-          lyr.style.stroke.color = payload.color;
+          lyr.style.stroke.color = diff.payload.color;
 
           switch (lyr.type) {
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(
-                layerId,
+                diff.layerId,
                 'circle-stroke-color',
-                payload.color
+                diff.payload.color
               );
               break;
             case 'Line':
-              map.setPaintProperty(layerId, 'line-color', payload.color);
+              map.setPaintProperty(
+                diff.layerId,
+                'line-color',
+                diff.payload.color
+              );
               break;
             case 'Polygon':
             case 'Choropleth':
               map.setPaintProperty(
-                `${layerId}-stroke`,
+                `${diff.layerId}-stroke`,
                 'line-color',
-                payload.color
+                diff.payload.color
               );
               break;
           }
@@ -491,7 +511,7 @@ export function dispatchLayerUpdate({
     }
     case 'stroke-width': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitChoroplethLayer
           | CartoKitDotDensityLayer
           | CartoKitLineLayer
@@ -500,27 +520,31 @@ export function dispatchLayerUpdate({
           | CartoKitProportionalSymbolLayer;
 
         if (lyr.style.stroke) {
-          lyr.style.stroke.width = payload.strokeWidth;
+          lyr.style.stroke.width = diff.payload.strokeWidth;
 
           switch (lyr.type) {
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(
-                layerId,
+                diff.layerId,
                 'circle-stroke-width',
-                payload.strokeWidth
+                diff.payload.strokeWidth
               );
               break;
             case 'Line':
-              map.setPaintProperty(layerId, 'line-width', payload.strokeWidth);
+              map.setPaintProperty(
+                diff.layerId,
+                'line-width',
+                diff.payload.strokeWidth
+              );
               break;
             case 'Polygon':
             case 'Choropleth':
               map.setPaintProperty(
-                `${layerId}-stroke`,
+                `${diff.layerId}-stroke`,
                 'line-width',
-                payload.strokeWidth
+                diff.payload.strokeWidth
               );
               break;
           }
@@ -532,7 +556,7 @@ export function dispatchLayerUpdate({
     }
     case 'stroke-opacity': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitChoroplethLayer
           | CartoKitDotDensityLayer
           | CartoKitLineLayer
@@ -541,27 +565,31 @@ export function dispatchLayerUpdate({
           | CartoKitProportionalSymbolLayer;
 
         if (lyr.style.stroke) {
-          lyr.style.stroke.opacity = payload.opacity;
+          lyr.style.stroke.opacity = diff.payload.opacity;
 
           switch (lyr.type) {
             case 'Point':
             case 'Proportional Symbol':
             case 'Dot Density':
               map.setPaintProperty(
-                layerId,
+                diff.layerId,
                 'circle-stroke-opacity',
-                payload.opacity
+                diff.payload.opacity
               );
               break;
             case 'Line':
-              map.setPaintProperty(layerId, 'line-opacity', payload.opacity);
+              map.setPaintProperty(
+                diff.layerId,
+                'line-opacity',
+                diff.payload.opacity
+              );
               break;
             case 'Polygon':
             case 'Choropleth':
               map.setPaintProperty(
-                `${layerId}-stroke`,
+                `${diff.layerId}-stroke`,
                 'line-opacity',
-                payload.opacity
+                diff.payload.opacity
               );
               break;
           }
@@ -573,7 +601,7 @@ export function dispatchLayerUpdate({
     }
     case 'add-stroke': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
@@ -592,17 +620,17 @@ export function dispatchLayerUpdate({
           case 'Proportional Symbol':
           case 'Dot Density':
             map.setPaintProperty(
-              layerId,
+              diff.layerId,
               'circle-stroke-color',
               DEFAULT_STROKE
             );
             map.setPaintProperty(
-              layerId,
+              diff.layerId,
               'circle-stroke-width',
               DEFAULT_STROKE_WIDTH
             );
             map.setPaintProperty(
-              layerId,
+              diff.layerId,
               'circle-stroke-opacity',
               DEFAULT_STROKE_OPACITY
             );
@@ -610,17 +638,17 @@ export function dispatchLayerUpdate({
           case 'Polygon':
           case 'Choropleth':
             map.setPaintProperty(
-              `${layerId}-stroke`,
+              `${diff.layerId}-stroke`,
               'line-color',
               DEFAULT_STROKE
             );
             map.setPaintProperty(
-              `${layerId}-stroke`,
+              `${diff.layerId}-stroke`,
               'line-width',
               DEFAULT_STROKE_WIDTH
             );
             map.setPaintProperty(
-              `${layerId}-stroke`,
+              `${diff.layerId}-stroke`,
               'line-opacity',
               DEFAULT_STROKE_OPACITY
             );
@@ -633,7 +661,7 @@ export function dispatchLayerUpdate({
     }
     case 'remove-stroke': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitProportionalSymbolLayer
           | CartoKitDotDensityLayer
@@ -645,19 +673,23 @@ export function dispatchLayerUpdate({
           case 'Point':
           case 'Proportional Symbol':
           case 'Dot Density':
-            map.setPaintProperty(layerId, 'circle-stroke-color', 'transparent');
-            map.setPaintProperty(layerId, 'circle-stroke-width', 0);
-            map.setPaintProperty(layerId, 'circle-stroke-opacity', 0);
+            map.setPaintProperty(
+              diff.layerId,
+              'circle-stroke-color',
+              'transparent'
+            );
+            map.setPaintProperty(diff.layerId, 'circle-stroke-width', 0);
+            map.setPaintProperty(diff.layerId, 'circle-stroke-opacity', 0);
             break;
           case 'Polygon':
           case 'Choropleth':
             map.setPaintProperty(
-              `${layerId}-stroke`,
+              `${diff.layerId}-stroke`,
               'line-color',
               'transparent'
             );
-            map.setPaintProperty(`${layerId}-stroke`, 'line-width', 0);
-            map.setPaintProperty(`${layerId}-stroke`, 'line-opacity', 0);
+            map.setPaintProperty(`${diff.layerId}-stroke`, 'line-width', 0);
+            map.setPaintProperty(`${diff.layerId}-stroke`, 'line-opacity', 0);
             break;
         }
 
@@ -667,17 +699,17 @@ export function dispatchLayerUpdate({
     }
     case 'point-size': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitDotDensityLayer;
 
         if (lyr.type === 'Point') {
-          lyr.style.size = payload.size;
+          lyr.style.size = diff.payload.size;
         } else {
-          lyr.style.dots.size = payload.size;
+          lyr.style.dots.size = diff.payload.size;
         }
 
-        map.setPaintProperty(layerId, 'circle-radius', payload.size);
+        map.setPaintProperty(diff.layerId, 'circle-radius', diff.payload.size);
 
         return ir;
       });
@@ -685,14 +717,14 @@ export function dispatchLayerUpdate({
     }
     case 'classification-method': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer;
 
         switch (lyr.style.fill?.type) {
           case 'Quantitative':
-            lyr.style.fill.method = payload.method;
+            lyr.style.fill.method = diff.payload.method;
 
             updateLayerChannel(map, lyr, 'fill');
             break;
@@ -706,7 +738,7 @@ export function dispatchLayerUpdate({
     }
     case 'color-scheme': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer;
@@ -714,7 +746,7 @@ export function dispatchLayerUpdate({
         switch (lyr.style.fill?.type) {
           case 'Quantitative':
           case 'Categorical':
-            lyr.style.fill.scheme.id = payload.scheme;
+            lyr.style.fill.scheme.id = diff.payload.scheme;
 
             updateLayerChannel(map, lyr, 'fill');
             break;
@@ -728,7 +760,7 @@ export function dispatchLayerUpdate({
     }
     case 'color-scheme-direction': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer;
@@ -736,7 +768,7 @@ export function dispatchLayerUpdate({
         switch (lyr.style.fill?.type) {
           case 'Quantitative':
           case 'Categorical':
-            lyr.style.fill.scheme.direction = payload.direction;
+            lyr.style.fill.scheme.direction = diff.payload.direction;
 
             updateLayerChannel(map, lyr, 'fill');
             break;
@@ -750,14 +782,14 @@ export function dispatchLayerUpdate({
     }
     case 'color-count': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer;
 
         switch (lyr.style.fill?.type) {
           case 'Quantitative':
-            lyr.style.fill.count = payload.count;
+            lyr.style.fill.count = diff.payload.count;
 
             updateLayerChannel(map, lyr, 'fill');
             break;
@@ -771,18 +803,19 @@ export function dispatchLayerUpdate({
     }
     case 'color-threshold': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitPointLayer
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer;
 
         switch (lyr.style.fill?.type) {
           case 'Quantitative':
-            if (payload.index > lyr.style.fill.thresholds.length) {
+            if (diff.payload.index > lyr.style.fill.thresholds.length) {
               break;
             }
 
-            lyr.style.fill.thresholds[payload.index] = payload.threshold;
+            lyr.style.fill.thresholds[diff.payload.index] =
+              diff.payload.threshold;
 
             updateLayerChannel(map, lyr, 'fill');
             break;
@@ -796,9 +829,9 @@ export function dispatchLayerUpdate({
     }
     case 'size': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitProportionalSymbolLayer;
-        lyr.style.size.min = payload.min ?? lyr.style.size.min;
-        lyr.style.size.max = payload.max ?? lyr.style.size.max;
+        const lyr = ir.layers[diff.layerId] as CartoKitProportionalSymbolLayer;
+        lyr.style.size.min = diff.payload.min ?? lyr.style.size.min;
+        lyr.style.size.max = diff.payload.max ?? lyr.style.size.max;
 
         updateLayerChannel(map, lyr, 'size');
 
@@ -808,8 +841,8 @@ export function dispatchLayerUpdate({
     }
     case 'dot-value': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitDotDensityLayer;
-        lyr.style.dots.value = payload.value;
+        const lyr = ir.layers[diff.layerId] as CartoKitDotDensityLayer;
+        lyr.style.dots.value = diff.payload.value;
 
         updateLayerChannel(map, lyr, 'dots');
 
@@ -819,23 +852,25 @@ export function dispatchLayerUpdate({
     }
     case 'transformation': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId];
-        lyr.data.geojson = payload.geojson;
+        const lyr = ir.layers[diff.layerId];
+        lyr.data.geojson = diff.payload.geojson;
 
         const transformationIndex = lyr.data.transformations.findIndex(
-          (t) => t.name === payload.transformation.name
+          (t) => t.name === diff.payload.transformation.name
         );
         lyr.data.transformations =
           transformationIndex > -1
             ? [
                 ...lyr.data.transformations.slice(transformationIndex),
-                payload.transformation,
+                diff.payload.transformation,
                 ...lyr.data.transformations.slice(transformationIndex + 1)
               ]
-            : [...lyr.data.transformations, payload.transformation];
+            : [...lyr.data.transformations, diff.payload.transformation];
 
         // Update the source with the new data.
-        (map.getSource(layerId) as GeoJSONSource).setData(payload.geojson);
+        (map.getSource(diff.layerId) as GeoJSONSource).setData(
+          diff.payload.geojson
+        );
 
         return ir;
       });
@@ -843,20 +878,20 @@ export function dispatchLayerUpdate({
     }
     case 'visualization-type': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as
+        const lyr = ir.layers[diff.layerId] as
           | CartoKitChoroplethLayer
           | CartoKitProportionalSymbolLayer;
 
         let fill: QuantitativeFill | CategoricalFill | ConstantFill;
 
-        switch (payload.visualizationType) {
+        switch (diff.payload.visualizationType) {
           case 'Categorical': {
             const attribute = selectCategoricalAttribute(
               lyr.data.geojson.features
             );
 
             fill = {
-              type: payload.visualizationType,
+              type: diff.payload.visualizationType,
               attribute,
               categories: enumerateAttributeCategories(
                 lyr.data.geojson.features,
@@ -879,7 +914,7 @@ export function dispatchLayerUpdate({
             );
 
             fill = {
-              type: payload.visualizationType,
+              type: diff.payload.visualizationType,
               attribute: attribute,
               method: 'Quantile',
               scheme: {
@@ -897,7 +932,7 @@ export function dispatchLayerUpdate({
           }
           case 'Constant':
             fill = {
-              type: payload.visualizationType,
+              type: diff.payload.visualizationType,
               color: DEFAULT_FILL,
               opacity: DEFAULT_OPACITY
             };
@@ -913,10 +948,14 @@ export function dispatchLayerUpdate({
     }
     case 'heatmap-opacity': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+        const lyr = ir.layers[diff.layerId] as CartoKitHeatmapLayer;
 
-        lyr.style.heatmap.opacity = payload.opacity;
-        map.setPaintProperty(layerId, 'heatmap-opacity', payload.opacity);
+        lyr.style.heatmap.opacity = diff.payload.opacity;
+        map.setPaintProperty(
+          diff.layerId,
+          'heatmap-opacity',
+          diff.payload.opacity
+        );
 
         return ir;
       });
@@ -924,10 +963,14 @@ export function dispatchLayerUpdate({
     }
     case 'heatmap-radius': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+        const lyr = ir.layers[diff.layerId] as CartoKitHeatmapLayer;
 
-        lyr.style.heatmap.radius = payload.radius;
-        map.setPaintProperty(layerId, 'heatmap-radius', payload.radius);
+        lyr.style.heatmap.radius = diff.payload.radius;
+        map.setPaintProperty(
+          diff.layerId,
+          'heatmap-radius',
+          diff.payload.radius
+        );
 
         return ir;
       });
@@ -935,11 +978,11 @@ export function dispatchLayerUpdate({
     }
     case 'heatmap-ramp': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+        const lyr = ir.layers[diff.layerId] as CartoKitHeatmapLayer;
 
-        lyr.style.heatmap.ramp.id = payload.ramp;
+        lyr.style.heatmap.ramp.id = diff.payload.ramp;
         map.setPaintProperty(
-          layerId,
+          diff.layerId,
           'heatmap-color',
           deriveColorRamp(lyr.style.heatmap)
         );
@@ -950,11 +993,11 @@ export function dispatchLayerUpdate({
     }
     case 'heatmap-ramp-direction': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+        const lyr = ir.layers[diff.layerId] as CartoKitHeatmapLayer;
 
-        lyr.style.heatmap.ramp.direction = payload.direction;
+        lyr.style.heatmap.ramp.direction = diff.payload.direction;
         map.setPaintProperty(
-          layerId,
+          diff.layerId,
           'heatmap-color',
           deriveColorRamp(lyr.style.heatmap)
         );
@@ -965,9 +1008,9 @@ export function dispatchLayerUpdate({
     }
     case 'heatmap-weight-type': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+        const lyr = ir.layers[diff.layerId] as CartoKitHeatmapLayer;
 
-        switch (payload.weightType) {
+        switch (diff.payload.weightType) {
           case 'Constant':
             lyr.style.heatmap.weight = {
               type: 'Constant',
@@ -985,7 +1028,7 @@ export function dispatchLayerUpdate({
         }
 
         map.setPaintProperty(
-          layerId,
+          diff.layerId,
           'heatmap-weight',
           deriveHeatmapWeight(lyr)
         );
@@ -996,18 +1039,18 @@ export function dispatchLayerUpdate({
     }
     case 'heatmap-weight-attribute': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+        const lyr = ir.layers[diff.layerId] as CartoKitHeatmapLayer;
 
         switch (lyr.style.heatmap.weight.type) {
           case 'Quantitative':
-            lyr.style.heatmap.weight.attribute = payload.weightAttribute;
+            lyr.style.heatmap.weight.attribute = diff.payload.weightAttribute;
             break;
           default:
             break;
         }
 
         map.setPaintProperty(
-          layerId,
+          diff.layerId,
           'heatmap-weight',
           deriveHeatmapWeight(lyr)
         );
@@ -1018,21 +1061,21 @@ export function dispatchLayerUpdate({
     }
     case 'heatmap-weight-bounds': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+        const lyr = ir.layers[diff.layerId] as CartoKitHeatmapLayer;
 
         switch (lyr.style.heatmap.weight.type) {
           case 'Quantitative':
             lyr.style.heatmap.weight.min =
-              payload.min ?? lyr.style.heatmap.weight.min;
+              diff.payload.min ?? lyr.style.heatmap.weight.min;
             lyr.style.heatmap.weight.max =
-              payload.max ?? lyr.style.heatmap.weight.max;
+              diff.payload.max ?? lyr.style.heatmap.weight.max;
             break;
           default:
             break;
         }
 
         map.setPaintProperty(
-          layerId,
+          diff.layerId,
           'heatmap-weight',
           deriveHeatmapWeight(lyr)
         );
@@ -1043,18 +1086,18 @@ export function dispatchLayerUpdate({
     }
     case 'heatmap-weight-value': {
       ir.update((ir) => {
-        const lyr = ir.layers[layerId] as CartoKitHeatmapLayer;
+        const lyr = ir.layers[diff.layerId] as CartoKitHeatmapLayer;
 
         switch (lyr.style.heatmap.weight.type) {
           case 'Constant':
-            lyr.style.heatmap.weight.value = payload.value;
+            lyr.style.heatmap.weight.value = diff.payload.value;
             break;
           default:
             break;
         }
 
         map.setPaintProperty(
-          layerId,
+          diff.layerId,
           'heatmap-weight',
           deriveHeatmapWeight(lyr)
         );
@@ -1065,12 +1108,6 @@ export function dispatchLayerUpdate({
   }
 
   if (user.userId) {
-    fetch('/diff', {
-      method: 'POST',
-      body: JSON.stringify({
-        userId: user.userId,
-        diff: { type, layerId, payload, llmAvailable: chat.enable }
-      })
-    });
+    diffs.push(diff);
   }
 }
