@@ -18,8 +18,8 @@
 
 <div
   class={[
-    'pointer-events-none absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full',
-    interacting ? 'bg-white/80' : 'bg-transparent'
+    'pointer-events-none absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80',
+    interacting ? 'block' : 'hidden'
   ]}
   bind:this={cursorRef}
   id="cursor"

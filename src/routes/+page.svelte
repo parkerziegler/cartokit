@@ -177,7 +177,7 @@
   });
 </script>
 
-<main class="absolute inset-0">
+<main class="absolute inset-0 overflow-hidden">
   <div
     class={[
       'maplibregl-map relative h-full w-full',
