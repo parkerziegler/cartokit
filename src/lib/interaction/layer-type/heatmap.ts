@@ -46,7 +46,8 @@ export function transitionToHeatmap(layer: CartoKitLayer): {
             intensity: DEFAULT_HEATMAP_INTENSITY,
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           }
-        }
+        },
+        layout: layer.layout
       };
 
       return {
@@ -76,7 +77,8 @@ export function transitionToHeatmap(layer: CartoKitLayer): {
             intensity: DEFAULT_HEATMAP_INTENSITY,
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           }
-        }
+        },
+        layout: layer.layout
       };
 
       return {

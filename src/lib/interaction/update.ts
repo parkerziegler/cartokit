@@ -254,6 +254,20 @@ interface HeatmapWeightValueUpdate extends LayerUpdate {
   };
 }
 
+interface LayerVisibilityUpdate extends LayerUpdate {
+  type: 'layer-visibility';
+  payload: {
+    visibility: 'visible' | 'hidden';
+  };
+}
+
+interface LayerTooltipVisibilityUpdate extends LayerUpdate {
+  type: 'layer-tooltip-visibility';
+  payload: {
+    visible: boolean;
+  };
+}
+
 export type DispatchLayerUpdateParams =
   | LayerTypeUpdate
   | AttributeUpdate
@@ -283,7 +297,9 @@ export type DispatchLayerUpdateParams =
   | HeatmapWeightTypeUpdate
   | HeatmapWeightAttributeUpdate
   | HeatmapWeightBoundsUpdate
-  | HeatmapWeightValueUpdate;
+  | HeatmapWeightValueUpdate
+  | LayerVisibilityUpdate
+  | LayerTooltipVisibilityUpdate;
 
 /**
  * Dispatch standardized updates to specific layers.
@@ -1104,6 +1120,23 @@ export function dispatchLayerUpdate(diff: DispatchLayerUpdateParams): void {
 
         return ir;
       });
+      break;
+    }
+    case 'layer-visibility': {
+      ir.update((ir) => {
+        const lyr = ir.layers[diff.layerId];
+        lyr.layout.visibility = diff.payload.visibility;
+        return ir;
+      });
+      break;
+    }
+    case 'layer-tooltip-visibility': {
+      ir.update((ir) => {
+        const lyr = ir.layers[diff.layerId];
+        lyr.layout.tooltip.visible = diff.payload.visible;
+        return ir;
+      });
+      break;
     }
   }
 

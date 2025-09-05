@@ -273,7 +273,7 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
  */
 export function generateCartoKitLayer(
   featureCollection: FeatureCollection,
-  options: { displayName: string; url?: string; fileName?: string }
+  options: { displayName: string; url?: string; fileName?: string; z: number }
 ): CartoKitLayer {
   const geometryType = getFeatureCollectionGeometryType(featureCollection);
   const color = randomColor();
@@ -305,6 +305,13 @@ export function generateCartoKitLayer(
             width: DEFAULT_STROKE_WIDTH,
             opacity: DEFAULT_STROKE_OPACITY
           }
+        },
+        layout: {
+          visibility: 'visible',
+          z: options.z,
+          tooltip: {
+            visible: true
+          }
         }
       };
     case 'LineString':
@@ -326,6 +333,13 @@ export function generateCartoKitLayer(
             color,
             width: DEFAULT_STROKE_WIDTH,
             opacity: DEFAULT_STROKE_OPACITY
+          }
+        },
+        layout: {
+          visibility: 'visible',
+          z: options.z,
+          tooltip: {
+            visible: true
           }
         }
       };
@@ -353,6 +367,13 @@ export function generateCartoKitLayer(
             color,
             width: DEFAULT_STROKE_WIDTH,
             opacity: DEFAULT_STROKE_OPACITY
+          }
+        },
+        layout: {
+          visibility: 'visible',
+          z: options.z,
+          tooltip: {
+            visible: true
           }
         }
       };
