@@ -6,18 +6,24 @@
     flip,
     shift
   } from '@floating-ui/dom';
-  import type { GeoJsonProperties } from 'geojson';
   import { orderBy } from 'lodash-es';
   import { slide } from 'svelte/transition';
 
   import { popup } from '$lib/state/popup.svelte';
   import { ir } from '$lib/stores/ir';
 
+  const MAX_DISPLAYED_PROPERTIES = 10;
+
   let popupRef: HTMLDivElement;
   let layerId = $derived(identifyTopmostVisibleInteractableLayer());
   let displayName = $derived(layerId ? popup[layerId]?.displayName : '');
-  let properties = $derived<GeoJsonProperties>(
-    layerId ? (popup[layerId]?.properties ?? {}) : {}
+  let properties = $derived<[string, unknown][]>(
+    layerId ? Object.entries(popup[layerId].properties ?? {}) : []
+  );
+  let displayedProperties = $derived(
+    properties.length > MAX_DISPLAYED_PROPERTIES
+      ? properties.slice(0, MAX_DISPLAYED_PROPERTIES)
+      : properties
   );
 
   function identifyTopmostVisibleInteractableLayer(): string | undefined {
@@ -71,13 +77,13 @@
   <p class="px-2 text-sm text-slate-300 uppercase">
     {displayName}
   </p>
-  <table class="w-fit table-fixed border-collapse">
+  <table class="w-full table-fixed border-collapse">
     <colgroup>
       <col />
       <col />
     </colgroup>
     <tbody>
-      {#each Object.entries(properties ?? {}) as [key, value]}
+      {#each displayedProperties as [key, value]}
         <tr class="border-b border-slate-600 last:border-b-0">
           <td
             class="overflow-hidden px-2 py-1 font-mono text-xs text-ellipsis text-slate-400"
@@ -89,6 +95,16 @@
           >
         </tr>
       {/each}
+      {#if properties.length > MAX_DISPLAYED_PROPERTIES}
+        <tr class="border-b border-slate-600 last:border-b-0">
+          <td
+            class="px-2 py-1 text-xs text-ellipsis text-slate-400 italic"
+            colspan={2}
+          >
+            +{properties.length - displayedProperties.length} more attributes...
+          </td>
+        </tr>
+      {/if}
     </tbody>
   </table>
 </div>
