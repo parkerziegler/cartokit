@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '$lib/attachments/tooltip';
   import ChoroplethIcon from '$lib/components/icons/ChoroplethIcon.svelte';
   import DotDensityIcon from '$lib/components/icons/DotDensityIcon.svelte';
   import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
@@ -7,6 +8,8 @@
   import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
+  import TooltipHiddenIcon from '$lib/components/icons/TooltipHiddenIcon.svelte';
+  import TooltipIcon from '$lib/components/icons/TooltipIcon.svelte';
   import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
   import ChoroplethLegend from '$lib/components/legends/ChoroplethLegend.svelte';
   import DotDensityLegend from '$lib/components/legends/DotDensityLegend.svelte';
@@ -15,6 +18,7 @@
   import PointLegend from '$lib/components/legends/PointLegend.svelte';
   import PolygonLegend from '$lib/components/legends/PolygonLegend.svelte';
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
+  import { dispatchLayerUpdate } from '$lib/interaction/update';
   import { map } from '$lib/stores/map';
   import type { CartoKitLayer } from '$lib/types';
 
@@ -24,24 +28,46 @@
 
   let { layer }: Props = $props();
 
-  let layerVisible = $state(true);
-
   function toggleLayerVisibility() {
-    if (layerVisible) {
+    if (layer.layout.visibility === 'visible') {
       $map.setLayoutProperty(layer.id, 'visibility', 'none');
 
       if ($map.getLayer(`${layer.id}-stroke`)) {
         $map.setLayoutProperty(`${layer.id}-stroke`, 'visibility', 'none');
       }
+
+      dispatchLayerUpdate({
+        layerId: layer.id,
+        type: 'layer-visibility',
+        payload: {
+          visibility: 'hidden'
+        }
+      });
     } else {
       $map.setLayoutProperty(layer.id, 'visibility', 'visible');
 
       if ($map.getLayer(`${layer.id}-stroke`)) {
         $map.setLayoutProperty(`${layer.id}-stroke`, 'visibility', 'visible');
       }
-    }
 
-    layerVisible = !layerVisible;
+      dispatchLayerUpdate({
+        layerId: layer.id,
+        type: 'layer-visibility',
+        payload: {
+          visibility: 'visible'
+        }
+      });
+    }
+  }
+
+  function toggleLayerTooltip() {
+    dispatchLayerUpdate({
+      layerId: layer.id,
+      type: 'layer-tooltip-visibility',
+      payload: {
+        visible: !layer.layout.tooltip.visible
+      }
+    });
   }
 </script>
 
@@ -70,15 +96,35 @@
         >{layer.displayName}</span
       >
     </div>
-    {#if layerVisible}
-      <button onclick={toggleLayerVisibility}>
-        <LayerVisibleIcon />
+    <div class="flex items-center gap-2">
+      <button
+        onclick={toggleLayerVisibility}
+        {@attach tooltip({
+          content:
+            layer.layout.visibility === 'visible' ? 'Hide Layer' : 'Show Layer'
+        })}
+      >
+        {#if layer.layout.visibility === 'visible'}
+          <LayerVisibleIcon />
+        {:else}
+          <LayerHiddenIcon />
+        {/if}
       </button>
-    {:else}
-      <button onclick={toggleLayerVisibility}>
-        <LayerHiddenIcon />
+      <button
+        {@attach tooltip({
+          content: layer.layout.tooltip.visible
+            ? 'Hide Layer Tooltip'
+            : 'Show Layer Tooltip'
+        })}
+        onclick={toggleLayerTooltip}
+      >
+        {#if layer.layout.tooltip.visible}
+          <TooltipIcon />
+        {:else}
+          <TooltipHiddenIcon />
+        {/if}
       </button>
-    {/if}
+    </div>
   </div>
   {#if layer.type === 'Choropleth'}
     <ChoroplethLegend {layer} />

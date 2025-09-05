@@ -35,7 +35,8 @@ export function transitionToPolygon(
             opacity: layer.style.fill.opacity
           },
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       // Update the fill-color of the existing layer. All other paint properties
@@ -67,7 +68,8 @@ export function transitionToPolygon(
         style: {
           fill: layer.style.fill,
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       return {
@@ -108,7 +110,8 @@ export function transitionToPolygon(
                   opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
                 },
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       return {

@@ -63,7 +63,8 @@ export function transitionToProportionalSymbol(
           },
           fill: layer.style.fill,
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       return {
@@ -108,7 +109,8 @@ export function transitionToProportionalSymbol(
           },
           fill: layer.style.fill,
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       return {
@@ -142,7 +144,8 @@ export function transitionToProportionalSymbol(
             opacity: DEFAULT_OPACITY,
             width: DEFAULT_STROKE_WIDTH
           }
-        }
+        },
+        layout: layer.layout
       };
 
       return {
@@ -180,7 +183,8 @@ export function transitionToProportionalSymbol(
             opacity: DEFAULT_OPACITY
           },
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       return {
@@ -202,7 +206,8 @@ export function transitionToProportionalSymbol(
           },
           fill: layer.style.fill,
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       // Update the circle-radius of the existing layer. All other paint

@@ -1,3 +1,5 @@
+import { orderBy } from 'lodash-es';
+
 import { codegenLayer } from '$lib/codegen/maplibre/javascript/codegen-layer';
 import { codegenMapStyle } from '$lib/codegen/maplibre/javascript/codegen-map-style';
 import { codegenSource } from '$lib/codegen/maplibre/javascript/codegen-source';
@@ -20,10 +22,18 @@ export function codegenMap(
 ): string {
   const projection = codegenProjection(ir);
 
-  const layerSources = Object.values(ir.layers).reduce((p, layer) => {
+  const layerSources = orderBy(
+    Object.values(ir.layers),
+    'layout.z',
+    'asc'
+  ).reduce((p, layer) => {
     return p.concat('\n\n' + codegenSource(layer, uploadTable));
   }, '');
-  const layerRenders = Object.values(ir.layers).reduce((p, layer) => {
+  const layerRenders = orderBy(
+    Object.values(ir.layers),
+    'layout.z',
+    'asc'
+  ).reduce((p, layer) => {
     return p.concat('\n\n' + codegenLayer(layer));
   }, '');
 

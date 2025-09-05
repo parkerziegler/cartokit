@@ -170,6 +170,21 @@ interface LayerData {
 }
 
 /**
+ * Represents the layout of a layer.
+ *
+ * @property {string} visibility - The visibility of the layer, 'visible' or
+ * 'hidden'.
+ * @property {number} z - The z-index of the layer.
+ */
+interface LayerLayout {
+  visibility: 'visible' | 'hidden';
+  z: number;
+  tooltip: {
+    visible: boolean;
+  };
+}
+
+/**
  * Represents the base structure of a layer in cartokit. All layers extend from
  * this interface.
  *
@@ -178,12 +193,14 @@ interface LayerData {
  * @property {LayerType} type - The type of the layer, @see LayerType.
  * @property {LayerData} data - The data and metadata of the layer, @see
  * LayerData.
+ * @property {LayerLayout} layout - The layout of the layer, @see LayerLayout.
  */
 interface Layer {
   id: string;
   displayName: string;
   type: LayerType;
   data: LayerData;
+  layout: LayerLayout;
 }
 
 /**

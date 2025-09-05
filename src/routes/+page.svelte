@@ -4,6 +4,7 @@
 
   import type { PageData } from './$types';
 
+  import Cursor from '$lib/components/cursor/Cursor.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
@@ -12,6 +13,7 @@
   import DataTable from '$lib/components/shared/DataTable.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
+  import Popup from '$lib/components/shared/Popup.svelte';
   import StudyAdvertisement from '$lib/components/study/StudyAdvertisement.svelte';
   import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
@@ -240,4 +242,6 @@
       <Alert kind="error" message="A map rendering error occurred." />
     </div>
   {/if}
+  <Cursor />
+  <Popup />
 </main>

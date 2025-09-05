@@ -50,7 +50,8 @@ export function transitionToLine(layer: CartoKitLayer): {
             width: DEFAULT_STROKE_WIDTH,
             opacity: DEFAULT_OPACITY
           }
-        }
+        },
+        layout: layer.layout
       };
 
       return {
