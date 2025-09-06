@@ -1127,6 +1127,21 @@ export function dispatchLayerUpdate(diff: DispatchLayerUpdateParams): void {
       ir.update((ir) => {
         const lyr = ir.layers[diff.layerId];
         lyr.layout.visibility = diff.payload.visibility;
+
+        if (diff.payload.visibility === 'visible') {
+          map.setLayoutProperty(lyr.id, 'visibility', 'visible');
+
+          if (map.getLayer(`${lyr.id}-stroke`)) {
+            map.setLayoutProperty(`${lyr.id}-stroke`, 'visibility', 'visible');
+          }
+        } else {
+          map.setLayoutProperty(lyr.id, 'visibility', 'none');
+
+          if (map.getLayer(`${lyr.id}-stroke`)) {
+            map.setLayoutProperty(`${lyr.id}-stroke`, 'visibility', 'none');
+          }
+        }
+
         return ir;
       });
       break;

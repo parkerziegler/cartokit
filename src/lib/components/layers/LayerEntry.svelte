@@ -19,7 +19,6 @@
   import PolygonLegend from '$lib/components/legends/PolygonLegend.svelte';
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { map } from '$lib/stores/map';
   import type { CartoKitLayer } from '$lib/types';
 
   interface Props {
@@ -29,35 +28,13 @@
   let { layer }: Props = $props();
 
   function toggleLayerVisibility() {
-    if (layer.layout.visibility === 'visible') {
-      $map.setLayoutProperty(layer.id, 'visibility', 'none');
-
-      if ($map.getLayer(`${layer.id}-stroke`)) {
-        $map.setLayoutProperty(`${layer.id}-stroke`, 'visibility', 'none');
+    dispatchLayerUpdate({
+      layerId: layer.id,
+      type: 'layer-visibility',
+      payload: {
+        visibility: layer.layout.visibility === 'visible' ? 'hidden' : 'visible'
       }
-
-      dispatchLayerUpdate({
-        layerId: layer.id,
-        type: 'layer-visibility',
-        payload: {
-          visibility: 'hidden'
-        }
-      });
-    } else {
-      $map.setLayoutProperty(layer.id, 'visibility', 'visible');
-
-      if ($map.getLayer(`${layer.id}-stroke`)) {
-        $map.setLayoutProperty(`${layer.id}-stroke`, 'visibility', 'visible');
-      }
-
-      dispatchLayerUpdate({
-        layerId: layer.id,
-        type: 'layer-visibility',
-        payload: {
-          visibility: 'visible'
-        }
-      });
-    }
+    });
   }
 
   function toggleLayerTooltip() {
