@@ -78,7 +78,7 @@
   </p>
   <table class="w-full table-fixed border-collapse">
     <tbody>
-      {#each displayedProperties as [key, value]}
+      {#each displayedProperties as [key, value] (key)}
         <tr class="border-b border-slate-600 last:border-b-0">
           <td
             class="overflow-hidden px-2 py-1 font-mono text-xs text-ellipsis text-slate-400"
