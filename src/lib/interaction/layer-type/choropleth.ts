@@ -68,7 +68,8 @@ export function transitionToChoropleth(
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       return {
@@ -124,7 +125,8 @@ export function transitionToChoropleth(
                   opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
                 },
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       return {
@@ -156,7 +158,8 @@ export function transitionToChoropleth(
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       // Set the fill-color of polygons based on the choropleth color scale.

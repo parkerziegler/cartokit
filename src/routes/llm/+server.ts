@@ -496,6 +496,24 @@ function HeatmapWeightValueUpdate(layerIds: string[]) {
   });
 }
 
+const LayerVisibility = z.union([z.literal('visible'), z.literal('hidden')]);
+
+function LayerVisibilityUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('layer-visibility'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({ visibility: LayerVisibility })
+  });
+}
+
+function LayerTooltipVisibilityUpdate(layerIds: string[]) {
+  return z.object({
+    type: z.literal('layer-tooltip-visibility'),
+    layerId: makeLayerIdSchema(layerIds),
+    payload: z.object({ visible: z.boolean() })
+  });
+}
+
 function UnknownUpdate(layerIds: string[]) {
   return z.object({
     type: z.literal('unknown'),
@@ -539,6 +557,8 @@ function makeSchema(
         HeatmapWeightAttributeUpdate(layerIds, layerIdsToAttributes),
         HeatmapWeightBoundsUpdate(layerIds),
         HeatmapWeightValueUpdate(layerIds),
+        LayerVisibilityUpdate(layerIds),
+        LayerTooltipVisibilityUpdate(layerIds),
         UnknownUpdate(layerIds)
       ])
     )

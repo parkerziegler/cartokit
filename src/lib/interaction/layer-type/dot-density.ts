@@ -66,7 +66,8 @@ export function transitionToDotDensity(layer: CartoKitLayer): {
             opacity: layer.style.fill.opacity
           },
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       return {
@@ -142,7 +143,8 @@ export function transitionToDotDensity(layer: CartoKitLayer): {
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       return {
@@ -206,7 +208,8 @@ export function transitionToDotDensity(layer: CartoKitLayer): {
             opacity: layer.style.fill?.opacity ?? DEFAULT_OPACITY
           },
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       return {
@@ -257,7 +260,8 @@ export function transitionToDotDensity(layer: CartoKitLayer): {
           },
           fill: layer.style.fill,
           stroke: layer.style.stroke
-        }
+        },
+        layout: layer.layout
       };
 
       return {

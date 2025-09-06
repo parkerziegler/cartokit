@@ -1,6 +1,7 @@
 import type { FeatureCollection } from 'geojson';
 import { kebabCase, uniqueId } from 'lodash-es';
 import type { Map } from 'maplibre-gl';
+import { get } from 'svelte/store';
 
 import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
@@ -14,6 +15,7 @@ import {
   instrumentLineSelect,
   instrumentPolygonSelect
 } from '$lib/interaction/select';
+import { ir } from '$lib/stores/ir';
 import type { CartoKitLayer } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
@@ -305,6 +307,13 @@ export function generateCartoKitLayer(
             width: DEFAULT_STROKE_WIDTH,
             opacity: DEFAULT_STROKE_OPACITY
           }
+        },
+        layout: {
+          visibility: 'visible',
+          z: Object.values(get(ir).layers).length,
+          tooltip: {
+            visible: true
+          }
         }
       };
     case 'LineString':
@@ -326,6 +335,13 @@ export function generateCartoKitLayer(
             color,
             width: DEFAULT_STROKE_WIDTH,
             opacity: DEFAULT_STROKE_OPACITY
+          }
+        },
+        layout: {
+          visibility: 'visible',
+          z: Object.values(get(ir).layers).length,
+          tooltip: {
+            visible: true
           }
         }
       };
@@ -353,6 +369,13 @@ export function generateCartoKitLayer(
             color,
             width: DEFAULT_STROKE_WIDTH,
             opacity: DEFAULT_STROKE_OPACITY
+          }
+        },
+        layout: {
+          visibility: 'visible',
+          z: Object.values(get(ir).layers).length,
+          tooltip: {
+            visible: true
           }
         }
       };
