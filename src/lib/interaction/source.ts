@@ -13,7 +13,6 @@ type AddSourceOptions =
       kind: 'api';
       displayName: string;
       url: string;
-      z: number;
       onSourceLoaded: () => void;
     }
   | {
@@ -21,7 +20,6 @@ type AddSourceOptions =
       displayName: string;
       fileName: string;
       featureCollection: FeatureCollection;
-      z: number;
       onSourceLoaded: () => void;
     };
 

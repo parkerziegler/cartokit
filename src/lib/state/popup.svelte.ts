@@ -1,5 +1,6 @@
-import type { CartoKitLayer } from '$lib/types';
 import type { GeoJsonProperties } from 'geojson';
+
+import type { CartoKitLayer } from '$lib/types';
 
 export const popup = $state<
   Record<

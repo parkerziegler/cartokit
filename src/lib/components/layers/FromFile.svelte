@@ -6,7 +6,6 @@
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { addSource } from '$lib/interaction/source';
-  import { ir } from '$lib/stores/ir';
   import { map } from '$lib/stores/map';
   import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
 
@@ -57,7 +56,6 @@
           displayName,
           fileName: file.name,
           featureCollection,
-          z: Object.values($ir.layers).length,
           onSourceLoaded
         });
 

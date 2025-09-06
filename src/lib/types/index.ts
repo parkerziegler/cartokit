@@ -170,14 +170,19 @@ interface LayerData {
 }
 
 /**
+ * Represents the visibility of a layer.
+ */
+export type LayerVisibility = 'visible' | 'hidden';
+
+/**
  * Represents the layout of a layer.
  *
- * @property {string} visibility - The visibility of the layer, 'visible' or
+ * @property {LayerVisibility} visibility - The visibility of the layer, 'visible' or
  * 'hidden'.
  * @property {number} z - The z-index of the layer.
  */
 interface LayerLayout {
-  visibility: 'visible' | 'hidden';
+  visibility: LayerVisibility;
   z: number;
   tooltip: {
     visible: boolean;

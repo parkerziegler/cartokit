@@ -1,13 +1,12 @@
 <script lang="ts">
   import {
-    computePosition,
-    offset,
     autoUpdate,
+    computePosition,
     flip,
+    offset,
     shift
   } from '@floating-ui/dom';
   import { orderBy } from 'lodash-es';
-  import { slide } from 'svelte/transition';
 
   import { popup } from '$lib/state/popup.svelte';
   import { ir } from '$lib/stores/ir';
@@ -62,6 +61,7 @@
         animationFrame: true
       }
     );
+
     return cleanup;
   });
 </script>
@@ -72,16 +72,11 @@
     { hidden: !layerId || !popup[layerId]?.open }
   ]}
   bind:this={popupRef}
-  transition:slide={{ axis: 'y' }}
 >
   <p class="px-2 text-sm text-slate-300 uppercase">
     {displayName}
   </p>
   <table class="w-full table-fixed border-collapse">
-    <colgroup>
-      <col />
-      <col />
-    </colgroup>
     <tbody>
       {#each displayedProperties as [key, value]}
         <tr class="border-b border-slate-600 last:border-b-0">

@@ -5,7 +5,6 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { addSource } from '$lib/interaction/source';
-  import { ir } from '$lib/stores/ir';
   import { map } from '$lib/stores/map';
 
   const closeModal = getContext<() => void>('close-modal');
@@ -49,7 +48,6 @@
       kind: 'api',
       displayName,
       url: endpoint,
-      z: Object.values($ir.layers).length,
       onSourceLoaded
     });
   }

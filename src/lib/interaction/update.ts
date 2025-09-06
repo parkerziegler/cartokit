@@ -26,6 +26,7 @@ import type {
   ColorRamp,
   ConstantFill,
   LayerType,
+  LayerVisibility,
   QuantitativeColorScheme,
   QuantitativeFill,
   RampDirection,
@@ -257,7 +258,7 @@ interface HeatmapWeightValueUpdate extends LayerUpdate {
 interface LayerVisibilityUpdate extends LayerUpdate {
   type: 'layer-visibility';
   payload: {
-    visibility: 'visible' | 'hidden';
+    visibility: LayerVisibility;
   };
 }
 

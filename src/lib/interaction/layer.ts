@@ -1,6 +1,7 @@
 import type { FeatureCollection } from 'geojson';
 import { kebabCase, uniqueId } from 'lodash-es';
 import type { Map } from 'maplibre-gl';
+import { get } from 'svelte/store';
 
 import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
@@ -14,6 +15,7 @@ import {
   instrumentLineSelect,
   instrumentPolygonSelect
 } from '$lib/interaction/select';
+import { ir } from '$lib/stores/ir';
 import type { CartoKitLayer } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
@@ -273,7 +275,7 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
  */
 export function generateCartoKitLayer(
   featureCollection: FeatureCollection,
-  options: { displayName: string; url?: string; fileName?: string; z: number }
+  options: { displayName: string; url?: string; fileName?: string }
 ): CartoKitLayer {
   const geometryType = getFeatureCollectionGeometryType(featureCollection);
   const color = randomColor();
@@ -308,7 +310,7 @@ export function generateCartoKitLayer(
         },
         layout: {
           visibility: 'visible',
-          z: options.z,
+          z: Object.values(get(ir).layers).length,
           tooltip: {
             visible: true
           }
@@ -337,7 +339,7 @@ export function generateCartoKitLayer(
         },
         layout: {
           visibility: 'visible',
-          z: options.z,
+          z: Object.values(get(ir).layers).length,
           tooltip: {
             visible: true
           }
@@ -371,7 +373,7 @@ export function generateCartoKitLayer(
         },
         layout: {
           visibility: 'visible',
-          z: options.z,
+          z: Object.values(get(ir).layers).length,
           tooltip: {
             visible: true
           }
