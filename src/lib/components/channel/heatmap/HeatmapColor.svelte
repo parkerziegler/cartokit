@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tooltip } from '$lib/attachments/tooltip';
-  import { clickoutside } from '$lib/actions/clickoutside.svelte';
+  import { onClickOutside } from '$lib/attachments/on-click-outside';
   import { focus } from '$lib/actions/focus.svelte';
   import ColorRamp from '$lib/components/channel/shared/ColorRamp.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
@@ -94,8 +94,8 @@
   >
     <button
       onclick={onClickCurrentRamp}
-      use:clickoutside={onClickOutsideCurrentRamp}
       class="flex-1 border border-transparent p-2 focus-within:border-slate-600 hover:border-slate-600"
+      {@attach onClickOutside({ callback: onClickOutsideCurrentRamp })}
     >
       <ColorRamp
         ramp={layer.style.heatmap.ramp.id}

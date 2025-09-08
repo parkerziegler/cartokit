@@ -2,7 +2,6 @@
   import type { FormEventHandler, KeyboardEventHandler } from 'svelte/elements';
 
   import { onClickOutside } from '$lib/attachments/on-click-outside';
-  import { selectText } from '$lib/attachments/select-text';
 
   interface Props {
     value: string;
@@ -27,6 +26,10 @@
     class: className = '',
     selectTextOnRender = false
   }: Props = $props();
+
+  function selectText(element: HTMLInputElement) {
+    element.select();
+  }
 </script>
 
 <input
@@ -37,9 +40,9 @@
   {onblur}
   {onkeydown}
   class={[
-    'border border-slate-600 bg-slate-900 p-2 placeholder:text-slate-400 hover:border-slate-400 focus:border-slate-400',
+    'border border-slate-600 bg-slate-900 p-2 placeholder:text-slate-400 hover:border-slate-400 focus-visible:border-slate-400',
     className
   ]}
   {@attach onClickOutside({ callback: onclickoutside })}
-  {@attach selectText({ enable: selectTextOnRender })}
+  {@attach selectTextOnRender && selectText}
 />

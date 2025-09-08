@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { clickoutside } from '$lib/actions/clickoutside.svelte';
+  import { onClickOutside } from '$lib/attachments/on-click-outside';
   import Chat from '$lib/components/chat/Chat.svelte';
   import ChatIcon from '$lib/components/icons/ChatIcon.svelte';
 
@@ -25,7 +25,7 @@
       'border-white': chatVisible
     }
   ]}
-  use:clickoutside={onClickOutsideChat}
+  {@attach onClickOutside({ callback: onClickOutsideChat })}
 >
   <ChatIcon />
 </button>

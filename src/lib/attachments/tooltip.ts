@@ -14,6 +14,14 @@ interface TooltipOptions {
   offsetValue?: OffsetOptions;
 }
 
+/**
+ * A Svelte attachment to display a tooltip for an element.
+ *
+ * @param options – The options for the attachment, consisting of the content
+ * of the tooltip, the keybinding to display, the placement of the tooltip, and
+ * the offset value of the tooltip.
+ * @returns An @see{Attachment} to be used in a Svelte component.
+ */
 export function tooltip(options: TooltipOptions): Attachment {
   return (element) => {
     const { content, keybinding, placement = 'top', offsetValue = 6 } = options;
