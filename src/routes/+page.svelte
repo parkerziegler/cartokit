@@ -86,7 +86,7 @@
       map?.setProjection({ type: $ir.projection });
     });
 
-    map.on('error', (err) => {
+    map.on('error', () => {
       error.message = 'A map rendering error occurred.';
 
       window.setTimeout(() => {
