@@ -6,6 +6,7 @@
   import LayerVisibleIcon from '$lib/components/icons/LayerVisibleIcon.svelte';
   import LineIcon from '$lib/components/icons/LineIcon.svelte';
   import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
+  import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
   import TooltipHiddenIcon from '$lib/components/icons/TooltipHiddenIcon.svelte';
@@ -46,11 +47,19 @@
       }
     });
   }
+
+  function removeLayer() {
+    dispatchLayerUpdate({
+      layerId: layer.id,
+      type: 'remove-layer',
+      payload: {}
+    });
+  }
 </script>
 
 <li class="flex flex-col gap-2">
   <div class="flex items-center justify-between">
-    <div class="flex items-center">
+    <div class="flex items-center overflow-hidden">
       <span class="shrink-0">
         {#if layer.type === 'Choropleth'}
           <ChoroplethIcon />
@@ -69,7 +78,7 @@
         {/if}
       </span>
       <span
-        class="mr-8 ml-2 truncate font-sans text-sm font-medium tracking-wider"
+        class="mx-2 min-w-[10rem] truncate font-sans text-sm font-medium tracking-wider"
         >{layer.displayName}</span
       >
     </div>
@@ -100,6 +109,14 @@
         {:else}
           <TooltipHiddenIcon />
         {/if}
+      </button>
+      <button
+        {@attach tooltip({
+          content: 'Remove Layer'
+        })}
+        onclick={removeLayer}
+      >
+        <MinusIcon />
       </button>
     </div>
   </div>

@@ -188,7 +188,7 @@
     ]}
     id="map"
   >
-    <Menu class="absolute top-4 left-4 z-10 max-w-lg overflow-auto">
+    <Menu class="absolute top-4 left-4 z-10 max-w-sm overflow-auto">
       <MenuTitle class="mr-4">
         Layers
         {#snippet action()}

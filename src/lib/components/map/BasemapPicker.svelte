@@ -74,7 +74,7 @@
   }
 
   $effect(() => {
-    if (maps.length > 0 && $mapStore && $ir) {
+    if (maps.length > 0 && $mapStore && $ir && picker) {
       updateMapThumbnail(maps[0]);
     }
   });
