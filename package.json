@@ -29,7 +29,7 @@
     "openai": "^5.0.0",
     "prettier": "^3.5.2",
     "simple-statistics": "^7.8.7",
-    "ts-morph": "^26.0.0",
+    "ts-morph": "^27.0.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {
