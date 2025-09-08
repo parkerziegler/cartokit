@@ -87,7 +87,6 @@
     });
 
     map.on('error', (err) => {
-      console.error(err);
       error.message = 'A map rendering error occurred.';
 
       window.setTimeout(() => {
