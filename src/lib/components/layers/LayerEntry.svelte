@@ -62,7 +62,9 @@
     });
   }
 
-  function onLayerKeyDown(event: KeyboardEvent) {
+  function onLayerKeyDown(
+    event: KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement }
+  ) {
     if (event.key === 'Enter') {
       onLayerClick();
     }
@@ -111,7 +113,12 @@
     }
   }
 
-  function onDisplayNameClickOutside() {
+  function onDisplayNameInputBlur() {
+    editingDisplayName = false;
+    lastCommittedDisplayName = layer.displayName;
+  }
+
+  function onDisplayNameInputClickOutside() {
     editingDisplayName = false;
     lastCommittedDisplayName = layer.displayName;
   }
@@ -172,11 +179,11 @@
       {#if editingDisplayName}
         <TextInput
           oninput={onDisplayNameInput}
-          onblur={onDisplayNameClickOutside}
+          onblur={onDisplayNameInputBlur}
           onkeydown={onDisplayNameInputKeyDown}
           value={layer.displayName}
           class="mx-2 w-40 truncate font-sans text-sm font-medium tracking-wider"
-          onclickoutside={onDisplayNameClickOutside}
+          onclickoutside={onDisplayNameInputClickOutside}
           selectTextOnRender={true}
         />
       {:else}
