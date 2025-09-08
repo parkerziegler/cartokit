@@ -544,6 +544,14 @@ function RemoveLayerUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   });
 }
 
+function RenameLayerUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+  return z.object({
+    type: z.literal('rename-layer'),
+    layerId: layerIdSchema,
+    payload: z.object({ displayName: z.string() })
+  });
+}
+
 function UnknownUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   return z.object({
     type: z.literal('unknown'),
@@ -592,6 +600,7 @@ function makeSchema(
         LayerVisibilityUpdate(layerIdSchema),
         LayerTooltipVisibilityUpdate(layerIdSchema),
         RemoveLayerUpdate(layerIdSchema),
+        RenameLayerUpdate(layerIdSchema),
         UnknownUpdate(layerIdSchema)
       ])
     )

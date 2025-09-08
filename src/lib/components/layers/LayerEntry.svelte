@@ -19,14 +19,20 @@
   import PointLegend from '$lib/components/legends/PointLegend.svelte';
   import PolygonLegend from '$lib/components/legends/PolygonLegend.svelte';
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
+  import TextInput from '$lib/components/shared/TextInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { CartoKitLayer } from '$lib/types';
+  import { map } from '$lib/stores/map';
+  import { selectedFeature } from '$lib/stores/selected-feature';
 
   interface Props {
     layer: CartoKitLayer;
   }
 
   let { layer }: Props = $props();
+
+  let editingDisplayName = $state(false);
+  let lastCommittedDisplayName = $state(layer.displayName);
 
   function toggleLayerVisibility() {
     dispatchLayerUpdate({
@@ -55,11 +61,97 @@
       payload: {}
     });
   }
+
+  function onLayerKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      onLayerClick();
+    }
+  }
+
+  function onDisplayNameDoubleClick() {
+    editingDisplayName = true;
+  }
+
+  function onDisplayNameKeyDown(
+    event: KeyboardEvent & { currentTarget: EventTarget & HTMLSpanElement }
+  ) {
+    if (event.key === 'Enter') {
+      editingDisplayName = true;
+    }
+  }
+
+  function onDisplayNameInput(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    dispatchLayerUpdate({
+      layerId: layer.id,
+      type: 'rename-layer',
+      payload: {
+        displayName: event.currentTarget.value
+      }
+    });
+  }
+
+  function onDisplayNameInputKeyDown(
+    event: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    if (event.key === 'Enter') {
+      editingDisplayName = false;
+      lastCommittedDisplayName = event.currentTarget.value;
+    } else if (event.key === 'Escape') {
+      editingDisplayName = false;
+
+      dispatchLayerUpdate({
+        layerId: layer.id,
+        type: 'rename-layer',
+        payload: {
+          displayName: lastCommittedDisplayName
+        }
+      });
+    }
+  }
+
+  function onDisplayNameClickOutside() {
+    editingDisplayName = false;
+    lastCommittedDisplayName = layer.displayName;
+  }
+
+  function onLayerClick() {
+    const randomFeature = $map.queryRenderedFeatures({
+      layers: [layer.id]
+    })[0];
+
+    // If we have a currently selected feature, deselect it.
+    if ($selectedFeature) {
+      $map.setFeatureState(
+        { source: $selectedFeature.layer.id, id: $selectedFeature.id },
+        { selected: false }
+      );
+    }
+
+    selectedFeature.set(randomFeature);
+
+    $map.setFeatureState(
+      { source: layer.id, id: randomFeature.id },
+      { selected: true }
+    );
+  }
 </script>
 
 <li class="flex flex-col gap-2">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center overflow-hidden">
+  <div
+    class={[
+      'relative flex items-center justify-between',
+      $selectedFeature?.layer.id === layer.id
+        ? 'display-name--selected'
+        : 'display-name'
+    ]}
+    onclick={onLayerClick}
+    onkeydown={onLayerKeyDown}
+    role="button"
+    tabindex="0"
+  >
+    <div class="flex items-center">
       <span class="shrink-0">
         {#if layer.type === 'Choropleth'}
           <ChoroplethIcon />
@@ -77,10 +169,25 @@
           <ProportionalSymbolIcon />
         {/if}
       </span>
-      <span
-        class="mx-2 min-w-[10rem] truncate font-sans text-sm font-medium tracking-wider"
-        >{layer.displayName}</span
-      >
+      {#if editingDisplayName}
+        <TextInput
+          oninput={onDisplayNameInput}
+          onblur={onDisplayNameClickOutside}
+          onkeydown={onDisplayNameInputKeyDown}
+          value={layer.displayName}
+          class="mx-2 w-40 truncate font-sans text-sm font-medium tracking-wider"
+          onclickoutside={onDisplayNameClickOutside}
+          selectTextOnRender={true}
+        />
+      {:else}
+        <span
+          class="mx-2 w-40 cursor-default truncate border border-transparent p-2 font-sans text-sm font-medium tracking-wider"
+          ondblclick={onDisplayNameDoubleClick}
+          onkeydown={onDisplayNameKeyDown}
+          role="button"
+          tabindex="0">{layer.displayName}</span
+        >
+      {/if}
     </div>
     <div class="flex items-center gap-2">
       <button
@@ -136,3 +243,19 @@
     <ProportionalSymbolLegend {layer} />
   {/if}
 </li>
+
+<style lang="postcss">
+  @reference 'tailwindcss';
+
+  .display-name:hover::after {
+    @apply absolute -left-4 -z-10 h-full bg-slate-700;
+    width: calc(100% + 2rem);
+    content: '';
+  }
+
+  .display-name--selected::after {
+    @apply absolute -left-4 -z-10 h-full bg-slate-600;
+    width: calc(100% + 2rem);
+    content: '';
+  }
+</style>

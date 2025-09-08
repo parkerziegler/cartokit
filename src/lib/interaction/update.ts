@@ -274,6 +274,13 @@ interface RemoveLayerUpdate extends LayerUpdate {
   payload: Record<string, never>;
 }
 
+interface RenameLayerUpdate extends LayerUpdate {
+  type: 'rename-layer';
+  payload: {
+    displayName: string;
+  };
+}
+
 export type DispatchLayerUpdateParams =
   | LayerTypeUpdate
   | AttributeUpdate
@@ -306,7 +313,8 @@ export type DispatchLayerUpdateParams =
   | HeatmapWeightValueUpdate
   | LayerVisibilityUpdate
   | LayerTooltipVisibilityUpdate
-  | RemoveLayerUpdate;
+  | RemoveLayerUpdate
+  | RenameLayerUpdate;
 
 /**
  * Dispatch standardized updates to specific layers.
@@ -1191,6 +1199,15 @@ export function dispatchLayerUpdate(diff: DispatchLayerUpdateParams): void {
         if (map.getSource(`${diff.layerId}-points`)) {
           map.removeSource(`${diff.layerId}-points`);
         }
+
+        return ir;
+      });
+      break;
+    }
+    case 'rename-layer': {
+      ir.update((ir) => {
+        const lyr = ir.layers[diff.layerId];
+        lyr.displayName = diff.payload.displayName;
 
         return ir;
       });
