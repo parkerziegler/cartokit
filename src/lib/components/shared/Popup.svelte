@@ -73,7 +73,7 @@
   ]}
   bind:this={popupRef}
 >
-  <p class="px-2 text-sm text-slate-300 uppercase">
+  <p class="px-2 text-xs tracking-wider text-slate-300 uppercase">
     {displayName}
   </p>
   <table class="w-full table-fixed border-collapse">

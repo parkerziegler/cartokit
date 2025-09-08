@@ -269,6 +269,11 @@ interface LayerTooltipVisibilityUpdate extends LayerUpdate {
   };
 }
 
+interface RemoveLayerUpdate extends LayerUpdate {
+  type: 'remove-layer';
+  payload: Record<string, never>;
+}
+
 export type DispatchLayerUpdateParams =
   | LayerTypeUpdate
   | AttributeUpdate
@@ -300,7 +305,8 @@ export type DispatchLayerUpdateParams =
   | HeatmapWeightBoundsUpdate
   | HeatmapWeightValueUpdate
   | LayerVisibilityUpdate
-  | LayerTooltipVisibilityUpdate;
+  | LayerTooltipVisibilityUpdate
+  | RemoveLayerUpdate;
 
 /**
  * Dispatch standardized updates to specific layers.
@@ -1150,6 +1156,42 @@ export function dispatchLayerUpdate(diff: DispatchLayerUpdateParams): void {
       ir.update((ir) => {
         const lyr = ir.layers[diff.layerId];
         lyr.layout.tooltip.visible = diff.payload.visible;
+        return ir;
+      });
+      break;
+    }
+    case 'remove-layer': {
+      ir.update((ir) => {
+        delete ir.layers[diff.layerId];
+
+        // Remove the main layer.
+        map.removeLayer(diff.layerId);
+
+        // Remove all instrumented layers.
+        [
+          'stroke',
+          'outlines',
+          'points',
+          'hover',
+          'select',
+          'outlines-hover',
+          'outlines-select',
+          'points-hover',
+          'points-select'
+        ].forEach((modifier) => {
+          if (map.getLayer(`${diff.layerId}-${modifier}`)) {
+            map.removeLayer(`${diff.layerId}-${modifier}`);
+          }
+        });
+
+        // Remove the source.
+        map.removeSource(diff.layerId);
+
+        // Remove the points source for heatmaps.
+        if (map.getSource(`${diff.layerId}-points`)) {
+          map.removeSource(`${diff.layerId}-points`);
+        }
+
         return ir;
       });
       break;
