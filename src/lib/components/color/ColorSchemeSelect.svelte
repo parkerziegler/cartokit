@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tooltip } from '$lib/attachments/tooltip';
-  import { clickoutside } from '$lib/actions/clickoutside.svelte';
+  import { onClickOutside } from '$lib/attachments/on-click-outside';
   import { focus } from '$lib/actions/focus.svelte';
   import ColorPalette from '$lib/components/channel/shared/ColorPalette.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
@@ -123,8 +123,8 @@
   >
     <button
       onclick={onClickCurrentScheme}
-      use:clickoutside={onClickOutsideCurrentScheme}
       class="flex-1"
+      {@attach onClickOutside({ callback: onClickOutsideCurrentScheme })}
     >
       <ColorPalette
         scheme={style.scheme.id}
