@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { zip } from 'lodash-es';
 import type { ExpressionSpecification } from 'maplibre-gl';
 
 import type {
@@ -50,11 +51,12 @@ export function deriveColorScale(
         categories.length
       );
 
-      const stops = colors.reduce<(string | number)[]>(
-        (acc, color, i) =>
-          i === 0 ? acc : acc.concat([categories[i - 1], color]),
-        []
-      );
+      const stops = zip(categories, colors)
+        .filter(
+          (pair): pair is [string, string] =>
+            pair[0] !== undefined && pair[1] !== undefined
+        )
+        .flat();
 
       return [
         'match',
@@ -80,7 +82,7 @@ export function deriveColorScale(
 export function deriveColorRamp(style: HeatmapStyle): ExpressionSpecification {
   const { ramp } = style;
 
-  const colors = materializeColorRamp(ramp.id, ramp.direction, 11);
+  const colors = materializeColorRamp(ramp.id, ramp.direction, 10);
 
   const start = d3.color(colors[0]);
   start!.opacity = 0;
@@ -92,7 +94,7 @@ export function deriveColorRamp(style: HeatmapStyle): ExpressionSpecification {
     0,
     start!.formatRgb(),
     ...colors
-      .slice(1, 11)
+      .slice(1)
       // Prevent floating point precision issues.
       .flatMap((color, i) => [parseFloat((0.1 * (i + 1)).toFixed(1)), color])
   ];
