@@ -81,15 +81,13 @@ function materializeQuantitativeColorScheme(
  *
  * @param scheme A @link{CategoricalColorScheme}.
  * @param direction The @link{SchemeDirection} of the scheme.
- * @param count The number of colors in the color scale.
  * @returns An array of colors in hexadecimal format.
  */
 function materializeCategoricalColorScheme(
   scheme: CategoricalColorScheme,
-  direction: SchemeDirection,
-  count?: number
+  direction: SchemeDirection
 ): string[] {
-  const colors = count ? d3[scheme].slice(0, count) : d3[scheme];
+  const colors = d3[scheme];
 
   return direction === 'Reverse' ? [...colors].reverse() : [...colors];
 }
@@ -109,5 +107,5 @@ export function materializeColorScheme(
 ): string[] {
   return isQuantitativeColorScheme(scheme)
     ? materializeQuantitativeColorScheme(scheme, direction, count)
-    : materializeCategoricalColorScheme(scheme, direction, count);
+    : materializeCategoricalColorScheme(scheme, direction);
 }
