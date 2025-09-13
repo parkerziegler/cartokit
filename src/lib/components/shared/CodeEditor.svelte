@@ -69,8 +69,17 @@
       parent: editor
     });
 
+    function handleKeyDown(event: KeyboardEvent) {
+      event.stopPropagation();
+    }
+
+    // Prevent keydown events from propagating.
+    // This ensures these events won't trigger our global keybindings.
+    view.dom.addEventListener('keydown', handleKeyDown);
+
     return () => {
       view?.destroy();
+      view?.dom.removeEventListener('keydown', handleKeyDown);
     };
   });
 
