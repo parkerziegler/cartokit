@@ -33,10 +33,10 @@ export function materializeColorRamp(
   const interpolate = d3[`interpolate${ramp}`];
   const colors: string[] = [];
 
-  for (let i = 0; i < n; ++i) {
+  for (let i = 0; i <= n; i++) {
     colors.push(
       d3
-        .rgb(interpolate((rampDirection === 'Forward' ? i : n - i) / (n - 1)))
+        .rgb(interpolate((rampDirection === 'Forward' ? i : n - i) / n))
         .formatHex()
     );
   }

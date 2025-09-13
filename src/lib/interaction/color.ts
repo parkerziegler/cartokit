@@ -82,7 +82,7 @@ export function deriveColorScale(
 export function deriveColorRamp(style: HeatmapStyle): ExpressionSpecification {
   const { ramp } = style;
 
-  const colors = materializeColorRamp(ramp.id, ramp.direction, 11);
+  const colors = materializeColorRamp(ramp.id, ramp.direction, 10);
 
   const start = d3.color(colors[0]);
   start!.opacity = 0;
@@ -94,7 +94,7 @@ export function deriveColorRamp(style: HeatmapStyle): ExpressionSpecification {
     0,
     start!.formatRgb(),
     ...colors
-      .slice(1, 11)
+      .slice(1)
       // Prevent floating point precision issues.
       .flatMap((color, i) => [parseFloat((0.1 * (i + 1)).toFixed(1)), color])
   ];
