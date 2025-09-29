@@ -1,11 +1,10 @@
 <script lang="ts">
-  import * as d3 from 'd3';
-
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { dispatchLayerUpdate } from '$lib/interaction/update';
   import type { QuantitativeStyle } from '$lib/types';
   import { catalog } from '$lib/state/catalog.svelte';
   import { history } from '$lib/state/history.svelte';
+  import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
     layerId: string;
@@ -14,6 +13,9 @@
 
   let { layerId, style }: Props = $props();
   let { min, max } = $derived(catalog.value[layerId][style.attribute]);
+  let colors = $derived(
+    materializeColorScheme(style.scheme.id, style.scheme.direction, style.count)
+  );
 
   function onThresholdChange(i: number) {
     return function handleThresholdChange(value: number) {
@@ -51,7 +53,7 @@
       <div class="self-center justify-self-center">
         <span
           class="inline-block h-4 w-4 rounded-xs"
-          style="background-color: {d3[style.scheme.id][style.count][i]};"
+          style="background-color: {colors[i]};"
         ></span>
       </div>
       <NumberInput
