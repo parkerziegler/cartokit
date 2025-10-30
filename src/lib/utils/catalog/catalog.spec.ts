@@ -1,3 +1,9 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import * as url from 'node:url';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
 import type { FeatureCollection } from 'geojson';
 import { get } from 'lodash-es';
 import { expect, test, describe } from 'vitest';
@@ -6,7 +12,15 @@ import type { CartoKitLayer } from '$lib/types';
 import { buildCatalog } from '$lib/utils/catalog';
 import { isPropertyQuantitative } from '$lib/utils/property';
 
-import usCountiesUnemployment1 from '../../../tests/data/all/us-counties-unemployment.json';
+const usCountiesUnemployment1 = JSON.parse(
+  fs.readFileSync(
+    path.join(
+      __dirname,
+      '../../../../tests/data/all/us-counties-unemployment.json'
+    ),
+    'utf8'
+  )
+);
 
 describe('buildCatalog', () => {
   const layer: CartoKitLayer = {
