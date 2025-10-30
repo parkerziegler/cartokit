@@ -15,7 +15,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * - Climate impact regions as demarcated by Carleton et al. (2022).
  * https://academic.oup.com/qje/article/137/4/2037/6571943
  */
-test.only('workflow-6', async ({ page }) => {
+test('workflow-6', async ({ page }) => {
   // Identify the playwright test for application code.
   await page.addInitScript(() => {
     (
