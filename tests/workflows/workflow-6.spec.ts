@@ -15,7 +15,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * - Climate impact regions as demarcated by Carleton et al. (2022).
  * https://academic.oup.com/qje/article/137/4/2037/6571943
  */
-test('workflow-6', async ({ page }) => {
+test.only('workflow-6', async ({ page }) => {
   // Identify the playwright test for application code.
   await page.addInitScript(() => {
     (
@@ -95,7 +95,7 @@ test('workflow-6', async ({ page }) => {
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(10000);
 
   // Click on a page location that will trigger selection of the Climate Impact
   // Regions layer.
