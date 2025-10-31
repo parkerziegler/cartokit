@@ -106,7 +106,7 @@ test('workflow-2', async ({ page }) => {
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(20000);
+  await page.waitForTimeout(30000);
 
   // Click on a page location that will trigger selection of the Spring Leaf
   // Appearance layer.
