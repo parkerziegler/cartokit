@@ -61,7 +61,7 @@ async function loadSource(
 
   // Build the catalog for the layer in a worker thread.
   const catalogWorker = new Worker(
-    new URL('$lib/utils/catalog.ts', import.meta.url),
+    new URL('$lib/utils/catalog/worker.ts', import.meta.url),
     { type: 'module' }
   );
   const buildCatalog =
