@@ -95,7 +95,7 @@ test('workflow-6', async ({ page }) => {
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(10000);
+  await page.waitForTimeout(5000);
 
   // Click on a page location that will trigger selection of the Climate Impact
   // Regions layer.

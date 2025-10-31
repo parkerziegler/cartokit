@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { set, isFinite } from 'lodash-es';
+import { set } from 'lodash-es';
 import { ckmeans } from 'simple-statistics';
 
 import type { CartoKitLayer, Catalog } from '$lib/types';
@@ -15,14 +15,9 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
   const catalog: Catalog = {};
 
   properties.forEach((property) => {
-    const domain = features.reduce<number[]>((acc, feature) => {
-      const value = feature.properties?.[property];
-      if (isFinite(value)) {
-        return [...acc, value];
-      }
-
-      return acc;
-    }, []);
+    const domain = features
+      .map((feature) => feature.properties?.[property])
+      .filter(Number.isFinite);
     const extent = d3.extent(domain);
     const [min, max]: [number, number] =
       typeof extent[0] === 'undefined' || typeof extent[1] === 'undefined'
