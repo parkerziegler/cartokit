@@ -60,4 +60,24 @@ describe('buildCatalog', () => {
       expect(get(catalog, `${layer.id}.${attribute}.max`)).toBeDefined();
     });
   });
+
+  test('should produce defined breaks for quantiles on all attributes', () => {
+    // TODO: Implement this test.
+  });
+
+  test('should produce defined breaks for equal intervals on all attributes', () => {
+    // TODO: Implement this test.
+  });
+
+  test('should produce defined breaks for Jenks natural breaks on all attributes', () => {
+    // TODO: Implement this test.
+  });
+
+  test('should not produce Jenks natural breaks if the number of data values in the domain is less than the number of breaks', () => {
+    // TODO: Implement this test.
+    // Note to Arfa: This will require creating a new "mock" layer (similar to
+    // the one on L26-49) with a very small number of data values (just 2!) in
+    // the domain. You can use the American Crow Range layer in tests/data/all
+    // as a good data source (that just has one feature)!
+  });
 });
