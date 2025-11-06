@@ -22,6 +22,16 @@ const usCountiesUnemployment1 = JSON.parse(
   )
 );
 
+const americanCrowRange = JSON.parse(
+  fs.readFileSync(
+    path.join(
+      __dirname,
+      '../../../../tests/data/all/american-crow-range.json'
+    ),
+    'utf8'
+  )
+);
+
 describe('buildCatalog', () => {
   const layer: CartoKitLayer = {
     id: 'us-counties-unemployment__1',
@@ -48,6 +58,32 @@ describe('buildCatalog', () => {
     }
   };
 
+   const small_layer: CartoKitLayer = {
+    id: 'american-crow-range.json',
+    type: 'Polygon',
+    displayName: 'American Crow Range',
+    layout: {
+      visibility: 'visible',
+      z: 0,
+      tooltip: {
+        visible: true
+      }
+    },
+    data: {
+      geojson: americanCrowRange as FeatureCollection,
+      sourceGeojson: americanCrowRange as FeatureCollection,
+      transformations: []
+    },
+    style: {
+      fill: {
+        type: 'Constant',
+        color: '#000000',
+        opacity: 0.5
+      }
+    }
+    };
+
+
   test('should build a catalog with minimum and maximum values', () => {
     const catalog = buildCatalog(layer);
 
@@ -64,13 +100,12 @@ describe('buildCatalog', () => {
   test('should produce defined breaks for quantiles on all attributes', () => {
     const catalog = buildCatalog(layer);
 
-    const attrributes = Object.keys(
+    const attributes = Object.keys(
       layer.data.geojson.features[0].properties || {}
     ).filter(isPropertyQuantitative);
 
-    attrributes.forEach((attribute) => {
+    attributes.forEach((attribute) => {
       const domain = get(catalog, `${layer.id}.${attribute}.Quantile.domain`);
-
       expect(domain).toBeDefined();
       expect(Array.isArray(domain)).toBe(true);
       expect(domain.length).toBeGreaterThan(0);
@@ -78,18 +113,47 @@ describe('buildCatalog', () => {
   });
 
   test('should produce defined breaks for equal intervals on all attributes', () => {
-    // TODO: Implement this test.
+    const catalog = buildCatalog(layer);
+
+    const attributes = Object.keys(
+      layer.data.geojson.features[0].properties || {}
+    ).filter(isPropertyQuantitative);
+
+    attributes.forEach((attribute) => {
+      const domain = get(catalog, `${layer.id}.${attribute}.EqualInterval.domain`);
+      expect(domain).toBeDefined();
+      expect(Array.isArray(domain)).toBe(true);
+      expect(domain.length).toBeGreaterThan(0);
+    });
   });
 
   test('should produce defined breaks for Jenks natural breaks on all attributes', () => {
-    // TODO: Implement this test.
+    const catalog = buildCatalog(layer);
+
+    const attributes = Object.keys(
+      layer.data.geojson.features[0].properties || {}
+    ).filter(isPropertyQuantitative);
+
+    attributes.forEach((attribute) => {
+      const domain = get(catalog, `${layer.id}.${attribute}.Jenks.domain`);
+      expect(domain).toBeDefined();
+      expect(Array.isArray(domain)).toBe(true);
+      expect(domain.length).toBeGreaterThan(0);
+    });
   });
 
   test('should not produce Jenks natural breaks if the number of data values in the domain is less than the number of breaks', () => {
-    // TODO: Implement this test.
-    // Note to Arfa: This will require creating a new "mock" layer (similar to
-    // the one on L26-49) with a very small number of data values (just 2!) in
-    // the domain. You can use the American Crow Range layer in tests/data/all
-    // as a good data source (that just has one feature)!
+
+    const catalog = buildCatalog(small_layer);
+    const attributes = Object.keys(small_layer.data.geojson.features[0].properties || {})
+      .filter(isPropertyQuantitative);
+
+    attributes.forEach((attribute) => {
+      // Test each possible k value that buildCatalog tries (3 through 9)
+      for (let k = 3; k <= 9; k++) {
+        const breaks = get(catalog, `${small_layer.id}.${attribute}.Jenks.${k}.breaks`);
+        expect(breaks).toBeUndefined();
+      }
+    });
   });
 });
