@@ -24,10 +24,7 @@ const usCountiesUnemployment1 = JSON.parse(
 
 const americanCrowRange = JSON.parse(
   fs.readFileSync(
-    path.join(
-      __dirname,
-      '../../../../tests/data/all/american-crow-range.json'
-    ),
+    path.join(__dirname, '../../../../tests/data/all/american-crow-range.json'),
     'utf8'
   )
 );
@@ -58,7 +55,7 @@ describe('buildCatalog', () => {
     }
   };
 
-   const small_layer: CartoKitLayer = {
+  const small_layer: CartoKitLayer = {
     id: 'american-crow-range.json',
     type: 'Polygon',
     displayName: 'American Crow Range',
@@ -81,8 +78,7 @@ describe('buildCatalog', () => {
         opacity: 0.5
       }
     }
-    };
-
+  };
 
   test('should build a catalog with minimum and maximum values', () => {
     const catalog = buildCatalog(layer);
@@ -120,7 +116,10 @@ describe('buildCatalog', () => {
     ).filter(isPropertyQuantitative);
 
     attributes.forEach((attribute) => {
-      const domain = get(catalog, `${layer.id}.${attribute}.EqualInterval.domain`);
+      const domain = get(
+        catalog,
+        `${layer.id}.${attribute}.EqualInterval.domain`
+      );
       expect(domain).toBeDefined();
       expect(Array.isArray(domain)).toBe(true);
       expect(domain.length).toBeGreaterThan(0);
@@ -143,15 +142,18 @@ describe('buildCatalog', () => {
   });
 
   test('should not produce Jenks natural breaks if the number of data values in the domain is less than the number of breaks', () => {
-
     const catalog = buildCatalog(small_layer);
-    const attributes = Object.keys(small_layer.data.geojson.features[0].properties || {})
-      .filter(isPropertyQuantitative);
+    const attributes = Object.keys(
+      small_layer.data.geojson.features[0].properties || {}
+    ).filter(isPropertyQuantitative);
 
     attributes.forEach((attribute) => {
       // Test each possible k value that buildCatalog tries (3 through 9)
       for (let k = 3; k <= 9; k++) {
-        const breaks = get(catalog, `${small_layer.id}.${attribute}.Jenks.${k}.breaks`);
+        const breaks = get(
+          catalog,
+          `${small_layer.id}.${attribute}.Jenks.${k}.breaks`
+        );
         expect(breaks).toBeUndefined();
       }
     });
