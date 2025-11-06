@@ -62,7 +62,19 @@ describe('buildCatalog', () => {
   });
 
   test('should produce defined breaks for quantiles on all attributes', () => {
-    // TODO: Implement this test.
+    const catalog = buildCatalog(layer);
+
+    const attrributes = Object.keys(
+      layer.data.geojson.features[0].properties || {}
+    ).filter(isPropertyQuantitative);
+
+    attrributes.forEach((attribute) => {
+      const domain = get(catalog, `${layer.id}.${attribute}.Quantile.domain`);
+
+      expect(domain).toBeDefined();
+      expect(Array.isArray(domain)).toBe(true);
+      expect(domain.length).toBeGreaterThan(0);
+    });
   });
 
   test('should produce defined breaks for equal intervals on all attributes', () => {
