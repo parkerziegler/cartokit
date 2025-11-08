@@ -142,7 +142,7 @@ describe('buildCatalog', () => {
   });
 
   test('should not produce Jenks natural breaks if the number of data values in the domain is less than the number of breaks', () => {
-    const catalog = buildCatalog(smallLayer);
+    const catalog = buildCatalog(singleFeatureLayer);
     const attributes = Object.keys(
       smallLayer.data.geojson.features[0].properties || {}
     ).filter(isPropertyQuantitative);
