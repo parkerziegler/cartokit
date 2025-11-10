@@ -64,5 +64,5 @@
     "vitest": "^4.0.0"
   },
   "type": "module",
-  "packageManager": "pnpm@10.20.0"
+  "packageManager": "pnpm@10.21.0"
 }
