@@ -55,7 +55,7 @@ describe('buildCatalog', () => {
     }
   };
 
-  const smallLayer: CartoKitLayer = {
+  const singleFeatureLayer: CartoKitLayer = {
     id: 'american-crow-range.json',
     type: 'Polygon',
     displayName: 'American Crow Range',
@@ -144,7 +144,7 @@ describe('buildCatalog', () => {
   test('should not produce Jenks natural breaks if the number of data values in the domain is less than the number of breaks', () => {
     const catalog = buildCatalog(singleFeatureLayer);
     const attributes = Object.keys(
-      smallLayer.data.geojson.features[0].properties || {}
+      singleFeatureLayer.data.geojson.features[0].properties || {}
     ).filter(isPropertyQuantitative);
 
     attributes.forEach((attribute) => {
@@ -152,7 +152,7 @@ describe('buildCatalog', () => {
       for (let k = 3; k <= 9; k++) {
         const breaks = get(
           catalog,
-          `${smallLayer.id}.${attribute}.Jenks.${k}.breaks`
+          `${singleFeatureLayer.id}.${attribute}.Jenks.${k}.breaks`
         );
         expect(breaks).toBeUndefined();
       }
