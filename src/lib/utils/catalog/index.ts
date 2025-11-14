@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { set } from 'lodash-es';
-import { ckmeans } from 'simple-statistics';
+import { ckmeans , jenks } from 'simple-statistics';
 
 import type { CartoKitLayer, Catalog } from '$lib/types';
 import { CLASSIFICATION_METHODS } from '$lib/utils/classification';
@@ -34,7 +34,7 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
 
           break;
         }
-        case 'Jenks': {
+        case 'Ckmeans': {
           d3.range(3, 10).forEach((k) => {
             // If we have too few features for the number of classes, do not
             // add an entry to the catalog.
@@ -61,6 +61,28 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
         }
         case 'Equal Interval': {
           set(catalog, `${layer.id}.${property}.${method}.domain`, [min, max]);
+          break;
+        }
+        case 'Jenks': {
+          d3.range(3, 10).forEach((k) => {
+            // If we have too few features for the number of classes, do not
+            // add an entry to the catalog.
+            if (domain.length < k) {
+              return;
+            }
+
+            // Derive Jenks breaks.
+            const breaks = jenks(domain, k);
+            
+            // Remove the last break—this corresponds to the max (same as ckmeans).
+            breaks.pop();
+
+            set(
+              catalog,
+              `${layer.id}.${property}.${method}.${k}.breaks`,
+              breaks
+            );
+          });
           break;
         }
         case 'Manual':

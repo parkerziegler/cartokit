@@ -79,6 +79,23 @@ function deriveJenksBreaks({
 }
 
 /**
+ * Derive JeCkmeansnks natural breaks for a given attribute of a GeoJSON FeatureCollection.
+ *
+ * @param params — Input parameters to compute Ckmeans natural breaks over a GeoJSON FeatureCollection.
+ * @param layerId – The ID of the visualized layer.
+ * @param attribute – The data attribute to compute Ckmeans natural breaks over.
+ * @param range – The output range of the Ckmeans scale.
+ * @returns – The Ckmeans breaks of the dataset.
+ */
+function deriveCkmeansBreaks({
+  layerId,
+  attribute,
+  range
+}: DeriveBreaksParams): number[] {
+  return catalog.value[layerId][attribute]['Ckmeans'][range.length].breaks;
+}
+
+/**
  * Derive manual thresholds for a given attribute of a GeoJSON FeatureCollection.
  *
  * @param params – Input parameters to compute manual thresholds over a GeoJSON FeatureCollection.
@@ -171,6 +188,8 @@ export function deriveThresholds({
       return deriveEqualIntervals({ layerId, attribute, range });
     case 'Jenks':
       return deriveJenksBreaks({ layerId, attribute, range });
+    case 'Ckmeans':
+      return deriveCkmeansBreaks({ layerId, attribute, range });
     case 'Manual':
       return deriveManualBreaks({ layerId, attribute, range, thresholds });
   }
