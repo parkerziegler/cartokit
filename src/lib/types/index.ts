@@ -8,6 +8,7 @@ export type ClassificationMethod =
   | 'Quantile'
   | 'Equal Interval'
   | 'Jenks'
+  | 'Ckmeans'
   | 'Manual';
 
 /**
@@ -561,6 +562,7 @@ export type Catalog = Record<
       Quantile: { domain: number[] };
       'Equal Interval': { domain: [number, number] };
       Jenks: Record<number, { breaks: number[] }>;
+      Ckmeans: Record<number, { breaks: number[] }>;
       min: number;
       max: number;
     }

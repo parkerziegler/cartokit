@@ -4,5 +4,6 @@ export const CLASSIFICATION_METHODS: ClassificationMethod[] = [
   'Quantile',
   'Equal Interval',
   'Jenks',
+  'Ckmeans',
   'Manual'
 ];
