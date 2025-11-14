@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { set } from 'lodash-es';
-import { ckmeans , jenks } from 'simple-statistics';
+import { ckmeans, jenks } from 'simple-statistics';
 
 import type { CartoKitLayer, Catalog } from '$lib/types';
 import { CLASSIFICATION_METHODS } from '$lib/utils/classification';
@@ -73,7 +73,7 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
 
             // Derive Jenks breaks.
             const breaks = jenks(domain, k);
-            
+
             // Remove the last break—this corresponds to the max (same as ckmeans).
             breaks.pop();
 
