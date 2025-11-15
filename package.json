@@ -34,7 +34,7 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@eslint/compat": "^1.2.7",
+    "@eslint/compat": "^2.0.0",
     "@eslint/js": "^9.21.0",
     "@playwright/test": "^1.50.1",
     "@sveltejs/adapter-vercel": "^6.0.0",
