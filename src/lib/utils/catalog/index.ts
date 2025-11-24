@@ -17,7 +17,8 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
   properties.forEach((property) => {
     const domain = features
       .map((feature) => feature.properties?.[property])
-      .filter(Number.isFinite);
+      .filter(Number.isFinite)
+      .sort((a, b) => a - b);
     const extent = d3.extent(domain);
     const [min, max]: [number, number] =
       typeof extent[0] === 'undefined' || typeof extent[1] === 'undefined'
@@ -72,10 +73,8 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
             }
 
             // Derive Jenks breaks.
-            const breaks = jenks(domain, k);
-
-            // Remove the last break—this corresponds to the max (same as ckmeans).
-            breaks.pop();
+            const jenksBreaks = jenks(domain, k);
+            const breaks = jenksBreaks.slice(1, jenksBreaks.length - 1);
 
             set(
               catalog,

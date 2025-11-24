@@ -158,4 +158,21 @@ describe('buildCatalog', () => {
       }
     });
   });
+
+
+  test('should produce defined breaks for ckmeans on all attributes', () => {
+    const catalog = buildCatalog(layer);
+
+    const attributes = Object.keys(
+      layer.data.geojson.features[0].properties || {}
+    ).filter(isPropertyQuantitative);
+
+    attributes.forEach((attribute) => {
+      const domain = get(catalog, `${layer.id}.${attribute}.Ck.domain`);
+      expect(domain).toBeDefined();
+      expect(Array.isArray(domain)).toBe(true);
+      expect(domain.length).toBeGreaterThan(0);
+    });
+  });
 });
+
