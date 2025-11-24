@@ -159,7 +159,6 @@ describe('buildCatalog', () => {
     });
   });
 
-
   test('should produce defined breaks for ckmeans on all attributes', () => {
     const catalog = buildCatalog(layer);
 
@@ -175,4 +174,3 @@ describe('buildCatalog', () => {
     });
   });
 });
-
