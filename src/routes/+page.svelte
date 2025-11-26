@@ -14,7 +14,6 @@
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
   import Popup from '$lib/components/shared/Popup.svelte';
-  import StudyAdvertisement from '$lib/components/study/StudyAdvertisement.svelte';
   import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
   import { chat } from '$lib/state/chat.svelte';
@@ -102,19 +101,10 @@
       toggleEditorVisibility
     );
 
-    const timeoutId = window.setTimeout(() => {
-      layout.update((layout) => {
-        layout.studyAdvertisementVisible = true;
-
-        return layout;
-      });
-    }, 5000);
-
     return () => {
       map!.remove();
       destroyHistory();
       unregisterKeybinding();
-      window.clearTimeout(timeoutId);
     };
   });
 
@@ -129,14 +119,6 @@
   function onViewDataClose() {
     layout.update((layout) => {
       layout.dataVisible = false;
-
-      return layout;
-    });
-  }
-
-  function onStudyAdvertisementClose() {
-    layout.update((layout) => {
-      layout.studyAdvertisementVisible = false;
 
       return layout;
     });
@@ -218,9 +200,6 @@
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
       <span class="text-slate-400">E</span>
     </button>
-    {#if $layout.studyAdvertisementVisible && !user.userId}
-      <StudyAdvertisement onClose={onStudyAdvertisementClose} />
-    {/if}
     {#if $layout.dataVisible && $selectedLayer}
       <DataTable
         data={$selectedLayer.data.geojson.features}
