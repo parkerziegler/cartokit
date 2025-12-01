@@ -5,7 +5,7 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { addSource } from '$lib/interaction/source';
-  import { map } from '$lib/stores/map';
+  import { map } from '$lib/state/map.svelte';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -44,7 +44,7 @@
 
     dataLoading = true;
 
-    addSource($map, {
+    addSource(map.value!, {
       kind: 'api',
       displayName,
       url: endpoint,

@@ -3,7 +3,7 @@ import { get } from 'svelte/store';
 
 import { layout } from '$lib/stores/layout';
 import { listeners } from '$lib/stores/listeners';
-import { selectedFeature } from '$lib/stores/selected-feature';
+import { feature } from '$lib/state/feature.svelte';
 import type { CartoKitIR } from '$lib/types';
 
 /**
@@ -115,7 +115,7 @@ const addSelectListeners = (map: Map, layerId: string) => {
         { selected: true }
       );
 
-      selectedFeature.set(event.features[0]);
+      feature.value = event.features[0];
     }
   }
 
@@ -148,11 +148,8 @@ export const onFeatureLeave = (
 ): ((event: MapMouseEvent) => void) => {
   return (event: MapMouseEvent): void => {
     const layerIds = Object.values(layers).map((layer) => {
-      // For dot density layers, we need to deselect the outline layer.
-      if (layer.type === 'Dot Density') {
-        return `${layer.id}-outlines`;
-        // For heatmap layers, we need to deselect the point layer.
-      } else if (layer.type === 'Heatmap') {
+      // For heatmap layers, we need to deselect the point layer.
+      if (layer.type === 'Heatmap') {
         return `${layer.id}-points`;
       }
 
@@ -162,12 +159,10 @@ export const onFeatureLeave = (
     const features = map.queryRenderedFeatures(event.point, {
       layers: layerIds
     });
-    const selFeature = get(selectedFeature);
     const { dataVisible } = get(layout);
 
     // If the mouse event intersects no features and there is a currently selected feature, deselect it.
-    if (features.length === 0 && typeof selFeature?.id !== 'undefined') {
-      selectedFeature.set(null);
+    if (features.length === 0 && typeof feature.value?.id !== 'undefined') {
       if (dataVisible) {
         layout.update((lyt) => {
           lyt.dataVisible = false;
@@ -177,17 +172,19 @@ export const onFeatureLeave = (
       }
 
       map.removeFeatureState(
-        { source: selFeature.layer.id, id: selFeature.id },
+        { source: feature.value.layer.id, id: feature.value.id },
         'selected'
       );
+
+      feature.value = null;
       // If the mouse event intersects features but the selected feature is different, deselect it.
     } else if (
       features.length > 0 &&
-      selFeature &&
-      features[0].id !== selFeature.id
+      feature.value &&
+      features[0].id !== feature.value.id
     ) {
       map.removeFeatureState(
-        { source: selFeature.layer.id, id: selFeature.id },
+        { source: feature.value.layer.id, id: feature.value.id },
         'selected'
       );
     }

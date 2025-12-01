@@ -1,9 +1,8 @@
 <script lang="ts">
   import HexInput from '$lib/components/color/HexInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type { ConstantFill } from '$lib/types';
-  import { history } from '$lib/state/history.svelte';
 
   interface Props {
     layerId: string;
@@ -12,37 +11,26 @@
 
   let { layerId, fill }: Props = $props();
 
-  function dispatchFillUpdate(color: string) {
-    const update = {
-      type: 'fill' as const,
+  function applyFillColorDiff(color: string) {
+    const diff: CartoKitDiff = {
+      type: 'fill-color',
       layerId,
       payload: {
         color
       }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'fill',
-        layerId,
-        payload: {
-          color: fill.color
-        }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 
   function onFillInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
-    dispatchFillUpdate(event.currentTarget.value);
+    applyFillColorDiff(event.currentTarget.value);
   }
 
   function onFillHexChange(hex: string) {
-    dispatchFillUpdate(hex);
+    applyFillColorDiff(hex);
   }
 </script>
 

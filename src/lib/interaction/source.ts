@@ -4,7 +4,7 @@ import type { Map, MapSourceDataEvent } from 'maplibre-gl';
 
 import { addLayer, generateCartoKitLayer } from '$lib/interaction/layer';
 import { catalog } from '$lib/state/catalog.svelte';
-import { ir } from '$lib/stores/ir';
+import { ir } from '$lib/state/ir.svelte';
 import type { CartoKitLayer, Catalog } from '$lib/types';
 import { sourceWorker } from '$lib/utils/worker';
 
@@ -53,11 +53,7 @@ async function loadSource(
     generateId: true
   });
 
-  ir.update((ir) => {
-    ir.layers[layer.id] = layer;
-
-    return ir;
-  });
+  ir.value.layers[layer.id] = layer;
 
   // Build the catalog for the layer in a worker thread.
   const catalogWorker = new Worker(

@@ -2,8 +2,7 @@
   import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { history } from '$lib/state/history.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 
   interface Props {
@@ -12,29 +11,28 @@
 
   let { layer }: Props = $props();
 
-  function onSizeChange(field: 'min' | 'max') {
-    return function handleSizeChange(value: number) {
-      const update = {
-        type: 'size' as const,
-        layerId: layer.id,
-        payload: {
-          [field]: value
-        }
-      };
-
-      history.undo.push({
-        execute: update,
-        invert: {
-          type: 'size',
-          layerId: layer.id,
-          payload: {
-            [field]: layer.style.size[field]
-          }
-        }
-      });
-
-      dispatchLayerUpdate(update);
+  function onMinSizeChange(value: number) {
+    const diff: CartoKitDiff = {
+      type: 'min-size',
+      layerId: layer.id,
+      payload: {
+        minSize: value
+      }
     };
+
+    applyDiff(diff);
+  }
+
+  function onMaxSizeChange(value: number) {
+    const diff: CartoKitDiff = {
+      type: 'max-size',
+      layerId: layer.id,
+      payload: {
+        maxSize: value
+      }
+    };
+
+    applyDiff(diff);
   }
 </script>
 
@@ -52,7 +50,7 @@
       id="min"
       min={1}
       value={layer.style.size.min}
-      onchange={onSizeChange('min')}
+      onchange={onMinSizeChange}
       class="w-10"
     />
   </div>
@@ -62,7 +60,7 @@
       id="max"
       min={1}
       value={layer.style.size.max}
-      onchange={onSizeChange('max')}
+      onchange={onMaxSizeChange}
       class="w-10"
     />
   </div>

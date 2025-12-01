@@ -18,12 +18,12 @@
   import { onFeatureLeave } from '$lib/interaction/select';
   import { chat } from '$lib/state/chat.svelte';
   import { diffs } from '$lib/state/diffs.svelte';
+  import { initHistory } from '$lib/state/history.svelte';
   import { user } from '$lib/state/user.svelte';
-  import { ir } from '$lib/stores/ir';
+  import { ir } from '$lib/state/ir.svelte';
   import { layout } from '$lib/stores/layout';
-  import { map as mapStore } from '$lib/stores/map';
-  import { selectedLayer } from '$lib/stores/selected-layer';
-  import { initHistory } from '$lib/utils/history';
+  import { map as mapState } from '$lib/state/map.svelte';
+  import { layer } from '$lib/state/layer.svelte';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
@@ -44,45 +44,33 @@
     map = new maplibregl.Map({
       container: 'map',
       style: data.basemap.url,
-      center: $ir.center,
-      zoom: $ir.zoom
+      center: ir.value.center,
+      zoom: ir.value.zoom
     });
 
     // Add an event listener to handle feature deselection.
-    map.on('click', onFeatureLeave(map, $ir));
+    map.on('click', onFeatureLeave(map, ir.value));
 
     // When the map first reaches an idle state, set it in the store.
     // This should ensure that the map's styles and data have fully loaded.
-    map.once('idle', () => {
-      mapStore.set(map!);
+    map.once('idle', (e) => {
+      mapState.value = e.target;
 
-      ir.update((ir) => {
-        ir.basemap.url = data.basemap.url;
-        ir.basemap.provider = data.basemap.provider;
-
-        return ir;
-      });
+      ir.value.basemap.url = data.basemap.url;
+      ir.value.basemap.provider = data.basemap.provider;
     });
 
     map.on('move', (event) => {
-      ir.update((ir) => {
-        const { lng, lat } = event.target.getCenter();
-        ir.center = [lng, lat];
-
-        return ir;
-      });
+      const { lng, lat } = event.target.getCenter();
+      ir.value.center = [lng, lat];
     });
 
     map.on('zoom', (event) => {
-      ir.update((ir) => {
-        ir.zoom = event.target.getZoom();
-
-        return ir;
-      });
+      ir.value.zoom = event.target.getZoom();
     });
 
     map.on('style.load', () => {
-      map?.setProjection({ type: $ir.projection });
+      map?.setProjection({ type: ir.value.projection });
     });
 
     map.on('error', (err) => {
@@ -180,8 +168,8 @@
       </MenuTitle>
       <LayerPanel />
     </Menu>
-    {#if $selectedLayer}
-      <PropertiesMenu map={map!} layer={$selectedLayer} />
+    {#if layer.value}
+      <PropertiesMenu map={map!} layer={layer.value} />
     {/if}
     <Toolbar />
     <button
@@ -194,16 +182,16 @@
         }
       ]}
       onclick={toggleEditorVisibility}
-      disabled={!$mapStore}
+      disabled={!mapState.value}
       data-testid="editor-toggle"
     >
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
       <span class="text-slate-400">E</span>
     </button>
-    {#if $layout.dataVisible && $selectedLayer}
+    {#if $layout.dataVisible && layer.value}
       <DataTable
-        data={$selectedLayer.data.geojson.features}
-        tableName={$selectedLayer.displayName}
+        data={layer.value.data.geojson.features}
+        tableName={layer.value.displayName}
         onClose={onViewDataClose}
         class={[
           'ease-cubic-out absolute bottom-0 h-72 transition-all duration-400',

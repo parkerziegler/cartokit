@@ -1,7 +1,6 @@
 <script lang="ts">
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { history } from '$lib/state/history.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type {
     CategoricalStyle,
     Channel,
@@ -35,22 +34,15 @@
   }
 
   function onOpacityChange(opacity: number) {
-    const update = {
-      type: `${channel}-opacity` as const,
+    const diffType = `${channel}-opacity` as const;
+
+    const diff: CartoKitDiff = {
+      type: diffType,
       layerId,
       payload: { opacity }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: `${channel}-opacity`,
-        layerId,
-        payload: { opacity: style.opacity }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 </script>
 

@@ -21,8 +21,8 @@
       y="0"
       width="16"
       height="16"
-      fill={layer.style.fill?.color ?? 'none'}
-      fill-opacity={layer.style.fill?.opacity ?? 0}
+      fill={layer.style.fill.color}
+      fill-opacity={layer.style.fill.opacity}
       stroke={layer.style.stroke?.color ?? 'none'}
       stroke-width={layer.style.stroke?.width ?? 0}
       stroke-opacity={layer.style.stroke?.opacity ?? 0}
