@@ -4,7 +4,6 @@
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import LayerTypeSelect from '$lib/components/layer-types/LayerTypeSelect.svelte';
   import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
-  import DotDensityPropertiesPanel from '$lib/components/properties/DotDensityPropertiesPanel.svelte';
   import DownloadData from '$lib/components/properties/DownloadData.svelte';
   import HeatmapPropertiesPanel from '$lib/components/properties/HeatmapPropertiesPanel.svelte';
   import LinePropertiesPanel from '$lib/components/properties/LinePropertiesPanel.svelte';
@@ -16,7 +15,7 @@
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
   import { layout } from '$lib/stores/layout';
-  import { selectedFeature } from '$lib/stores/selected-feature';
+  import { feature } from '$lib/state/feature.svelte';
   import type { CartoKitLayer } from '$lib/types';
 
   interface Props {
@@ -27,13 +26,13 @@
   let { map, layer }: Props = $props();
 
   function onPropertiesMenuClose() {
-    if ($selectedFeature) {
+    if (feature.value) {
       map.removeFeatureState(
-        { source: $selectedFeature.layer.id, id: $selectedFeature.id },
+        { source: feature.value.layer.id, id: feature.value.id },
         'selected'
       );
 
-      selectedFeature.set(null);
+      feature.value = null;
     }
 
     if ($layout.dataVisible) {
@@ -76,8 +75,6 @@
   </MenuItem>
   {#if layer.type === 'Choropleth'}
     <ChoroplethPropertiesPanel {layer} />
-  {:else if layer.type === 'Dot Density'}
-    <DotDensityPropertiesPanel {layer} />
   {:else if layer.type === 'Heatmap'}
     <HeatmapPropertiesPanel {layer} />
   {:else if layer.type === 'Line'}

@@ -1,5 +1,5 @@
 import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
-import { deriveSize } from '$lib/interaction/geometry';
+import { deriveRadius } from '$lib/interaction/geometry';
 import { deriveHeatmapWeight } from '$lib/interaction/weight';
 import type { CartoKitLayer } from '$lib/types';
 
@@ -29,7 +29,7 @@ const MAPBOX_DEFAULTS = {
 export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Point': {
-      if (!layer.style.fill) {
+      if (!layer.style.fill.visible) {
         return '';
       }
 
@@ -50,13 +50,13 @@ export function codegenFill(layer: CartoKitLayer): string {
         .join(',\n');
     }
     case 'Proportional Symbol': {
-      if (!layer.style.fill) {
+      if (!layer.style.fill.visible) {
         return '';
       }
 
       return [
         `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
-        `'circle-radius': ${JSON.stringify(deriveSize(layer))}`,
+        `'circle-radius': ${JSON.stringify(deriveRadius(layer))}`,
         withDefault(
           'circle-opacity',
           layer.style.fill.opacity,
@@ -66,35 +66,10 @@ export function codegenFill(layer: CartoKitLayer): string {
         .filter(Boolean)
         .join(',\n');
     }
-    case 'Dot Density': {
-      if (!layer.style.fill) {
-        return '';
-      }
-
-      return [
-        withDefault(
-          'circle-color',
-          layer.style.fill.color,
-          MAPBOX_DEFAULTS['circle-color']
-        ),
-        withDefault(
-          'circle-radius',
-          layer.style.dots.size,
-          MAPBOX_DEFAULTS['circle-radius']
-        ),
-        withDefault(
-          'circle-opacity',
-          layer.style.fill.opacity,
-          MAPBOX_DEFAULTS['circle-opacity']
-        )
-      ]
-        .filter(Boolean)
-        .join(',\n');
-    }
     case 'Line':
       return '';
     case 'Polygon': {
-      if (!layer.style.fill) {
+      if (!layer.style.fill.visible) {
         return '';
       }
 
@@ -159,8 +134,7 @@ export function codegenFill(layer: CartoKitLayer): string {
 export function codegenStroke(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Point':
-    case 'Proportional Symbol':
-    case 'Dot Density': {
+    case 'Proportional Symbol': {
       if (!layer.style.stroke) {
         return '';
       }

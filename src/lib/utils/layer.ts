@@ -20,12 +20,6 @@ export function getInstrumentedLayerIds(layer: CartoKitLayer): string[] {
         `${layer.id}-points-hover`,
         `${layer.id}-points-select`
       ];
-    case 'Dot Density':
-      return [
-        `${layer.id}-outlines`,
-        `${layer.id}-outlines-hover`,
-        `${layer.id}-outlines-select`
-      ];
     case 'Polygon':
     case 'Choropleth':
       return [`${layer.id}-stroke`, `${layer.id}-hover`, `${layer.id}-select`];
@@ -38,13 +32,7 @@ export const geometryToLayerTypes = new Map<Geometry['type'], LayerType[]>([
   ['MultiPoint', ['Point', 'Proportional Symbol', 'Heatmap']],
   ['LineString', ['Line', 'Point', 'Proportional Symbol']],
   ['MultiLineString', ['Line', 'Point', 'Proportional Symbol']],
-  [
-    'Polygon',
-    ['Polygon', 'Choropleth', 'Point', 'Proportional Symbol', 'Dot Density']
-  ],
-  [
-    'MultiPolygon',
-    ['Polygon', 'Choropleth', 'Point', 'Proportional Symbol', 'Dot Density']
-  ],
+  ['Polygon', ['Polygon', 'Choropleth', 'Point', 'Proportional Symbol']],
+  ['MultiPolygon', ['Polygon', 'Choropleth', 'Point', 'Proportional Symbol']],
   ['GeometryCollection', []]
 ]);

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { tooltip } from '$lib/attachments/tooltip';
   import ChoroplethIcon from '$lib/components/icons/ChoroplethIcon.svelte';
-  import DotDensityIcon from '$lib/components/icons/DotDensityIcon.svelte';
   import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
   import LayerVisibleIcon from '$lib/components/icons/LayerVisibleIcon.svelte';
   import LineIcon from '$lib/components/icons/LineIcon.svelte';
@@ -13,17 +12,16 @@
   import TooltipIcon from '$lib/components/icons/TooltipIcon.svelte';
   import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
   import ChoroplethLegend from '$lib/components/legends/ChoroplethLegend.svelte';
-  import DotDensityLegend from '$lib/components/legends/DotDensityLegend.svelte';
   import HeatmapLegend from '$lib/components/legends/HeatmapLegend.svelte';
   import LineLegend from '$lib/components/legends/LineLegend.svelte';
   import PointLegend from '$lib/components/legends/PointLegend.svelte';
   import PolygonLegend from '$lib/components/legends/PolygonLegend.svelte';
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import { feature } from '$lib/state/feature.svelte';
+  import { map } from '$lib/state/map.svelte';
   import type { CartoKitLayer } from '$lib/types';
-  import { map } from '$lib/stores/map';
-  import { selectedFeature } from '$lib/stores/selected-feature';
 
   interface Props {
     layer: CartoKitLayer;
@@ -35,31 +33,42 @@
   let lastCommittedDisplayName = $state(layer.displayName);
 
   function toggleLayerVisibility() {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+    const nextVisibility =
+      layer.layout.visibility === 'visible' ? 'hidden' : 'visible';
+
+    const diff: CartoKitDiff = {
       type: 'layer-visibility',
+      layerId: layer.id,
       payload: {
-        visibility: layer.layout.visibility === 'visible' ? 'hidden' : 'visible'
+        visibility: nextVisibility
       }
-    });
+    };
+
+    applyDiff(diff);
   }
 
   function toggleLayerTooltip() {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+    const nextTooltipVisible = !layer.layout.tooltip.visible;
+
+    const diff: CartoKitDiff = {
       type: 'layer-tooltip-visibility',
+      layerId: layer.id,
       payload: {
-        visible: !layer.layout.tooltip.visible
+        visible: nextTooltipVisible
       }
-    });
+    };
+
+    applyDiff(diff);
   }
 
   function removeLayer() {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+    const diff: CartoKitDiff = {
       type: 'remove-layer',
+      layerId: layer.id,
       payload: {}
-    });
+    };
+
+    applyDiff(diff);
   }
 
   function onLayerKeyDown(
@@ -85,13 +94,15 @@
   function onDisplayNameInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+    const diff: CartoKitDiff = {
       type: 'rename-layer',
+      layerId: layer.id,
       payload: {
         displayName: event.currentTarget.value
       }
-    });
+    };
+
+    applyDiff(diff);
   }
 
   function onDisplayNameInputKeyDown(
@@ -103,13 +114,15 @@
     } else if (event.key === 'Escape') {
       editingDisplayName = false;
 
-      dispatchLayerUpdate({
-        layerId: layer.id,
+      const diff: CartoKitDiff = {
         type: 'rename-layer',
+        layerId: layer.id,
         payload: {
           displayName: lastCommittedDisplayName
         }
-      });
+      };
+
+      applyDiff(diff);
     }
   }
 
@@ -124,21 +137,21 @@
   }
 
   function onLayerClick() {
-    const randomFeature = $map.queryRenderedFeatures({
+    const randomFeature = map.value!.queryRenderedFeatures({
       layers: [layer.id]
     })[0];
 
     // If we have a currently selected feature, deselect it.
-    if ($selectedFeature) {
-      $map.setFeatureState(
-        { source: $selectedFeature.layer.id, id: $selectedFeature.id },
+    if (feature.value) {
+      map.value!.setFeatureState(
+        { source: feature.value.layer.id, id: feature.value.id },
         { selected: false }
       );
     }
 
-    selectedFeature.set(randomFeature);
+    feature.value = randomFeature;
 
-    $map.setFeatureState(
+    map.value!.setFeatureState(
       { source: layer.id, id: randomFeature.id },
       { selected: true }
     );
@@ -149,7 +162,7 @@
   <div
     class={[
       'relative flex items-center justify-between',
-      $selectedFeature?.layer.id === layer.id
+      feature.value?.layer.id === layer.id
         ? 'display-name--selected'
         : 'display-name'
     ]}
@@ -162,8 +175,6 @@
       <span class="shrink-0">
         {#if layer.type === 'Choropleth'}
           <ChoroplethIcon />
-        {:else if layer.type === 'Dot Density'}
-          <DotDensityIcon />
         {:else if layer.type === 'Heatmap'}
           <HeatmapIcon />
         {:else if layer.type === 'Line'}
@@ -236,8 +247,6 @@
   </div>
   {#if layer.type === 'Choropleth'}
     <ChoroplethLegend {layer} />
-  {:else if layer.type === 'Dot Density'}
-    <DotDensityLegend {layer} />
   {:else if layer.type === 'Heatmap'}
     <HeatmapLegend {layer} />
   {:else if layer.type === 'Line'}

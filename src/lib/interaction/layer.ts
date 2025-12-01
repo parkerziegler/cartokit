@@ -1,10 +1,9 @@
 import type { FeatureCollection } from 'geojson';
 import { kebabCase, uniqueId } from 'lodash-es';
 import type { Map } from 'maplibre-gl';
-import { get } from 'svelte/store';
 
 import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
-import { deriveSize } from '$lib/interaction/geometry';
+import { deriveRadius } from '$lib/interaction/geometry';
 import {
   instrumentPointHover,
   instrumentLineHover,
@@ -15,7 +14,7 @@ import {
   instrumentLineSelect,
   instrumentPolygonSelect
 } from '$lib/interaction/select';
-import { ir } from '$lib/stores/ir';
+import { ir } from '$lib/state/ir.svelte';
 import type { CartoKitLayer } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
@@ -61,59 +60,6 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 
       instrumentPolygonHover(map, layer.id);
       instrumentPolygonSelect(map, layer.id);
-      break;
-    }
-    case 'Dot Density': {
-      // Add a separate source for the polygon outlines of the dot density layer.
-      // Ensure it does not already exist from a previous transition before adding it.
-      if (!map.getSource(`${layer.id}-outlines`)) {
-        map.addSource(`${layer.id}-outlines`, {
-          type: 'geojson',
-          data: layer.data.sourceGeojson,
-          generateId: true
-        });
-      }
-
-      // Add a transparent layer to the map for the outlines.
-      // This is the layer we'll instrument for hover and select effects.
-      map.addLayer({
-        id: `${layer.id}-outlines`,
-        type: 'fill',
-        source: `${layer.id}-outlines`,
-        paint: {
-          'fill-color': 'transparent',
-          'fill-opacity': 0
-        }
-      });
-
-      // Add the dot density layer to the map.
-      const fillProperties = layer.style.fill
-        ? {
-            'circle-color': layer.style.fill.color,
-            'circle-opacity': layer.style.fill.opacity
-          }
-        : {};
-      const strokeProperties = layer.style.stroke
-        ? {
-            'circle-stroke-color': layer.style.stroke.color,
-            'circle-stroke-width': layer.style.stroke.width,
-            'circle-stroke-opacity': layer.style.stroke.opacity
-          }
-        : {};
-
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        type: 'circle',
-        paint: {
-          ...fillProperties,
-          ...strokeProperties,
-          'circle-radius': layer.style.dots.size
-        }
-      });
-
-      instrumentPolygonHover(map, `${layer.id}-outlines`);
-      instrumentPolygonSelect(map, `${layer.id}-outlines`);
       break;
     }
     case 'Heatmap': {
@@ -254,7 +200,7 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         paint: {
           ...fillProperties,
           ...strokeProperties,
-          'circle-radius': deriveSize(layer)
+          'circle-radius': deriveRadius(layer)
         }
       });
 
@@ -299,18 +245,20 @@ export function generateCartoKitLayer(
           fill: {
             type: 'Constant',
             color,
-            opacity: DEFAULT_OPACITY
+            opacity: DEFAULT_OPACITY,
+            visible: true
           },
           stroke: {
             type: 'Constant',
             color,
             width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY
+            opacity: DEFAULT_STROKE_OPACITY,
+            visible: true
           }
         },
         layout: {
           visibility: 'visible',
-          z: Object.values(get(ir).layers).length,
+          z: Object.values(ir.value.layers).length,
           tooltip: {
             visible: true
           }
@@ -334,12 +282,13 @@ export function generateCartoKitLayer(
             type: 'Constant',
             color,
             width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY
+            opacity: DEFAULT_STROKE_OPACITY,
+            visible: true
           }
         },
         layout: {
           visibility: 'visible',
-          z: Object.values(get(ir).layers).length,
+          z: Object.values(ir.value.layers).length,
           tooltip: {
             visible: true
           }
@@ -362,18 +311,20 @@ export function generateCartoKitLayer(
           fill: {
             type: 'Constant',
             color,
-            opacity: DEFAULT_OPACITY
+            opacity: DEFAULT_OPACITY,
+            visible: true
           },
           stroke: {
             type: 'Constant',
             color,
             width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY
+            opacity: DEFAULT_STROKE_OPACITY,
+            visible: true
           }
         },
         layout: {
           visibility: 'visible',
-          z: Object.values(get(ir).layers).length,
+          z: Object.values(ir.value.layers).length,
           tooltip: {
             visible: true
           }

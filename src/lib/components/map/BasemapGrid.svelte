@@ -4,7 +4,7 @@
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { ir } from '$lib/stores/ir';
+  import { ir } from '$lib/state/ir.svelte';
   import type { BasemapProvider } from '$lib/types';
   import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
   import { switchBasemapWithPreservedLayers } from '$lib/utils/maplibre';
@@ -15,7 +15,7 @@
 
   let { provider }: Props = $props();
   let tileUrl = $state(
-    $ir.basemap.provider === 'Custom' ? $ir.basemap.url : ''
+    ir.value.basemap.provider === 'Custom' ? ir.value.basemap.url : ''
   );
 
   const closeModal = getContext<() => void>('close-modal');
@@ -49,7 +49,7 @@
     <Button
       onclick={onSelectBasemap(tileUrl)}
       class="mt-2 self-end"
-      disabled={!tileUrl || tileUrl === $ir.basemap.url}>Apply</Button
+      disabled={!tileUrl || tileUrl === ir.value.basemap.url}>Apply</Button
     >
   </form>
 {:else}
@@ -58,7 +58,7 @@
       <button
         class={[
           'flex flex-col rounded-sm border p-2 transition-colors hover:border-slate-400',
-          TILE_URLS[provider](basemap.tileId) === $ir.basemap.url
+          TILE_URLS[provider](basemap.tileId) === ir.value.basemap.url
             ? 'border-slate-400'
             : 'border-transparent'
         ]}

@@ -5,9 +5,9 @@
   import ArrowUpIcon from '$lib/components/icons/ArrowUpIcon.svelte';
   import Alert from '$lib/components/shared/Alert.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { applyDiff } from '$lib/core/diff';
   import { user } from '$lib/state/user.svelte';
-  import { ir } from '$lib/stores/ir';
+  import { ir } from '$lib/state/ir.svelte';
 
   interface Props {
     form?: HTMLFormElement;
@@ -21,9 +21,9 @@
   let error = $state(false);
   let textarea: HTMLTextAreaElement | undefined = $state();
 
-  let layerIds = $derived(Object.keys($ir.layers));
+  let layerIds = $derived(Object.keys(ir.value.layers));
   let layerIdsToAttributes = $derived(
-    Object.entries($ir.layers).reduce<Record<string, string[]>>(
+    Object.entries(ir.value.layers).reduce<Record<string, string[]>>(
       (acc, [layerId, layer]) => {
         acc[layerId] = Object.keys(
           layer.data.geojson.features[0].properties ?? {}
@@ -82,7 +82,7 @@
               diffUnknown = false;
             }, 3000);
           } else {
-            dispatchLayerUpdate(diff);
+            applyDiff(diff);
           }
         }
 

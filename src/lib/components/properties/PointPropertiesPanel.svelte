@@ -24,7 +24,7 @@
   />
 </MenuItem>
 <MenuItem title="Fill">
-  {#if layer.style.fill}
+  {#if layer.style.fill.visible}
     <ColorControls
       layerId={layer.id}
       layerType="Point"
@@ -37,7 +37,7 @@
   {/snippet}
 </MenuItem>
 <MenuItem title="Stroke">
-  {#if layer.style.stroke}
+  {#if layer.style.stroke.visible}
     <StrokePicker layerId={layer.id} stroke={layer.style.stroke} />
     <OpacityInput
       layerId={layer.id}

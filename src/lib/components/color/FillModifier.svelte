@@ -2,8 +2,7 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { history } from '$lib/state/history.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type {
     CategoricalFill,
     ConstantFill,
@@ -12,51 +11,33 @@
 
   interface Props {
     layerId: string;
-    fill?: CategoricalFill | ConstantFill | QuantitativeFill;
+    fill: CategoricalFill | ConstantFill | QuantitativeFill;
   }
 
   let { layerId, fill }: Props = $props();
 
   function onRemoveFill() {
-    const update = {
-      type: 'remove-fill' as const,
+    const diff: CartoKitDiff = {
+      type: 'remove-fill',
       layerId,
       payload: {}
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'add-fill',
-        layerId,
-        payload: {}
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 
   function onAddFill() {
-    const update = {
-      type: 'add-fill' as const,
+    const diff: CartoKitDiff = {
+      type: 'add-fill',
       layerId,
       payload: {}
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'remove-fill',
-        layerId,
-        payload: {}
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 </script>
 
-{#if fill}
+{#if fill.visible}
   <button
     onclick={onRemoveFill}
     {@attach tooltip({

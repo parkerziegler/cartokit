@@ -22,7 +22,7 @@
   />
 </MenuItem>
 <MenuItem title="Stroke">
-  {#if layer.style.stroke}
+  {#if layer.style.stroke.visible}
     <StrokePicker layerId={layer.id} stroke={layer.style.stroke} />
     <OpacityInput
       layerId={layer.id}

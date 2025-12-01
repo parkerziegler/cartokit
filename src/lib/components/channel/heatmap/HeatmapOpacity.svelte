@@ -1,8 +1,7 @@
 <script lang="ts">
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import OpacityInput from '$lib/components/channel/shared/OpacityInput.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { history } from '$lib/state/history.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type { CartoKitHeatmapLayer } from '$lib/types';
 
   interface Props {
@@ -12,22 +11,13 @@
   let { layer }: Props = $props();
 
   function onOpacityChange(opacity: number) {
-    const update = {
-      type: 'heatmap-opacity' as const,
+    const diff: CartoKitDiff = {
+      type: 'heatmap-opacity',
       layerId: layer.id,
       payload: { opacity }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'heatmap-opacity',
-        layerId: layer.id,
-        payload: { opacity: layer.style.heatmap.opacity }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 </script>
 

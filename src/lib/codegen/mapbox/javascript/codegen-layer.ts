@@ -13,8 +13,7 @@ import type { CartoKitLayer } from '$lib/types';
 export function codegenLayer(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Point':
-    case 'Proportional Symbol':
-    case 'Dot Density': {
+    case 'Proportional Symbol': {
       const fill = codegenFill(layer);
       const stroke = codegenStroke(layer);
 
@@ -47,7 +46,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
       let fillLayer = '';
       let strokeLayer = '';
 
-      if (layer.style.fill) {
+      if (layer.style.fill.visible) {
         const fill = codegenFill(layer);
         fillLayer = `map.addLayer({
           id: '${layer.id}',

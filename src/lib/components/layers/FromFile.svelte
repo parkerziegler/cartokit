@@ -6,7 +6,7 @@
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { addSource } from '$lib/interaction/source';
-  import { map } from '$lib/stores/map';
+  import { map } from '$lib/state/map.svelte';
   import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
 
   const closeModal = getContext<() => void>('close-modal');
@@ -51,7 +51,7 @@
           JSON.parse(theFile.target.result)
         );
 
-        addSource($map, {
+        addSource(map.value!, {
           kind: 'file',
           displayName,
           fileName: file.name,

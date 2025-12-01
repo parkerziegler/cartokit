@@ -2,57 +2,38 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { history } from '$lib/state/history.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type { ConstantStroke } from '$lib/types';
 
   interface Props {
     layerId: string;
-    stroke?: ConstantStroke;
+    stroke: ConstantStroke;
   }
 
   let { layerId, stroke }: Props = $props();
 
   function onRemoveStroke() {
-    const update = {
+    const diff: CartoKitDiff = {
       type: 'remove-stroke' as const,
       layerId,
       payload: {}
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'add-stroke',
-        layerId,
-        payload: {}
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 
   function onAddStroke() {
-    const update = {
+    const diff: CartoKitDiff = {
       type: 'add-stroke' as const,
       layerId,
       payload: {}
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'remove-stroke',
-        layerId,
-        payload: {}
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 </script>
 
-{#if stroke}
+{#if stroke.visible}
   <button
     onclick={onRemoveStroke}
     data-testid="remove-stroke-button"

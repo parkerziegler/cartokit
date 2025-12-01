@@ -7,7 +7,7 @@
   import FromFile from '$lib/components/layers/FromFile.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
-  import { map } from '$lib/stores/map';
+  import { map } from '$lib/state/map.svelte';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   setContext('close-modal', () => {
@@ -37,7 +37,7 @@
   class="cursor-pointer disabled:cursor-not-allowed"
   data-testid="add-layer-button"
   aria-label="Add Layer"
-  disabled={!$map}
+  disabled={!map.value}
   {@attach tooltip({
     content: 'Add Layer',
     keybinding: 'L',

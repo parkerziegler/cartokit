@@ -19,7 +19,7 @@
   );
 
   let attrs = $derived(
-    layer.style.fill?.type === 'Constant'
+    layer.style.fill.type === 'Constant'
       ? {
           fill: layer.style.fill.color,
           'fill-opacity': layer.style.fill.opacity ?? 0,
@@ -56,13 +56,13 @@
       {pluralize(geometryType, layer.data.geojson.features.length)}</span
     >
   </div>
-  {#if layer.style.fill?.type === 'Categorical'}
+  {#if layer.style.fill.visible && layer.style.fill.type === 'Categorical'}
     <CategoricalLegend
       layerType="Point"
       fill={layer.style.fill}
       stroke={layer.style.stroke}
     />
-  {:else if layer.style.fill?.type === 'Quantitative'}
+  {:else if layer.style.fill.visible && layer.style.fill.type === 'Quantitative'}
     <QuantitativeLegend
       fill={layer.style.fill}
       stroke={layer.style.stroke}

@@ -7,9 +7,9 @@
   import BasemapGrid from '$lib/components/map/BasemapGrid.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
-  import { ir } from '$lib/stores/ir';
+  import { ir } from '$lib/state/ir.svelte';
   import { layout } from '$lib/stores/layout';
-  import { map as mapStore } from '$lib/stores/map';
+  import { map } from '$lib/state/map.svelte';
   import type { BasemapProvider } from '$lib/types';
   import { BASEMAPS } from '$lib/utils/basemap';
   import { registerKeybinding } from '$lib/utils/keybinding';
@@ -35,8 +35,8 @@
       const map = new maplibregl.Map({
         container: `inset-${style}`,
         style: `https://api.maptiler.com/maps/${style}/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
-        center: $ir.center,
-        zoom: $ir.zoom
+        center: ir.value.center,
+        zoom: ir.value.zoom
       });
 
       map.scrollZoom.disable();
@@ -57,8 +57,8 @@
 
   function updateMapThumbnail(map: maplibregl.Map) {
     const { top, left } = picker.getBoundingClientRect();
-    map.setCenter($mapStore.unproject([left + 20, top + 20]));
-    map.setZoom($ir.zoom);
+    map.setCenter(map.unproject([left + 20, top + 20]));
+    map.setZoom(ir.value.zoom);
   }
 
   function onMouseEnter() {
@@ -74,7 +74,7 @@
   }
 
   $effect(() => {
-    if (maps.length > 0 && $mapStore && $ir && picker) {
+    if (maps.length > 0 && map.value && ir.value && picker) {
       updateMapThumbnail(maps[0]);
     }
   });
@@ -83,7 +83,7 @@
   // This is a small perf optimization to avoid updating all three
   // thumbnails while two are out of view.
   $effect(() => {
-    if (hovered && $mapStore && $ir) {
+    if (hovered && map.value && ir.value) {
       maps.slice(1).forEach(updateMapThumbnail);
     }
   });
@@ -91,7 +91,7 @@
   let timeoutId = $state<number | null>(null);
 
   layout.subscribe(() => {
-    if (maps.length > 0 && $mapStore && $ir) {
+    if (maps.length > 0 && map.value && ir.value) {
       if (timeoutId) {
         window.clearTimeout(timeoutId);
       }
