@@ -2,11 +2,8 @@
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import Select from '$lib/components/shared/Select.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { history } from '$lib/state/history.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type { CartoKitHeatmapLayer } from '$lib/types';
-  import { DEFAULT_HEATMAP_WEIGHT } from '$lib/utils/constants';
-  import { selectQuantitativeAttribute } from '$lib/utils/geojson';
   import { isPropertyQuantitative } from '$lib/utils/property';
 
   interface Props {
@@ -37,102 +34,57 @@
   function onWeightTypeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    const update = {
-      type: 'heatmap-weight-type' as const,
+    const diff: CartoKitDiff = {
+      type: 'heatmap-weight-type',
       layerId: layer.id,
       payload: {
         weightType: event.currentTarget.value as 'Constant' | 'Quantitative'
       }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'heatmap-weight-type',
-        layerId: layer.id,
-        payload: { weightType: layer.style.heatmap.weight.type }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 
   function onWeightAttributeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    const update = {
-      type: 'heatmap-weight-attribute' as const,
+    const diff: CartoKitDiff = {
+      type: 'heatmap-weight-attribute',
       layerId: layer.id,
       payload: { weightAttribute: event.currentTarget.value }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'heatmap-weight-attribute',
-        layerId: layer.id,
-        payload: {
-          weightAttribute:
-            layer.style.heatmap.weight.type === 'Quantitative'
-              ? layer.style.heatmap.weight.attribute
-              : selectQuantitativeAttribute(layer.data.geojson.features)
-        }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 
-  function onWeightBoundsChange(field: 'min' | 'max') {
-    return function handleWeightBoundsChange(value: number) {
-      const update = {
-        type: 'heatmap-weight-bounds' as const,
-        layerId: layer.id,
-        payload: {
-          [field]: value
-        }
-      };
-
-      history.undo.push({
-        execute: update,
-        invert: {
-          type: 'heatmap-weight-bounds',
-          layerId: layer.id,
-          payload: {
-            [field]:
-              layer.style.heatmap.weight.type === 'Quantitative'
-                ? layer.style.heatmap.weight[field]
-                : DEFAULT_HEATMAP_WEIGHT
-          }
-        }
-      });
-
-      dispatchLayerUpdate(update);
+  function onWeightBoundsMinChange(value: number) {
+    const diff: CartoKitDiff = {
+      type: 'heatmap-weight-min',
+      layerId: layer.id,
+      payload: { min: value }
     };
+
+    applyDiff(diff);
+  }
+
+  function onWeightBoundsMaxChange(value: number) {
+    const diff: CartoKitDiff = {
+      type: 'heatmap-weight-max',
+      layerId: layer.id,
+      payload: { max: value }
+    };
+
+    applyDiff(diff);
   }
 
   function onWeightValueChange(value: number) {
-    const update = {
-      type: 'heatmap-weight-value' as const,
+    const diff: CartoKitDiff = {
+      type: 'heatmap-weight-value',
       layerId: layer.id,
       payload: { value }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'heatmap-weight-value',
-        layerId: layer.id,
-        payload: {
-          value:
-            layer.style.heatmap.weight.type === 'Constant'
-              ? layer.style.heatmap.weight.value
-              : DEFAULT_HEATMAP_WEIGHT
-        }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 </script>
 
@@ -157,7 +109,7 @@
       id="heatmap-weight-min"
       min={0}
       value={layer.style.heatmap.weight.min}
-      onchange={onWeightBoundsChange('min')}
+      onchange={onWeightBoundsMinChange}
       class="w-8"
     />
   </div>
@@ -167,7 +119,7 @@
       id="heatmap-weight-max"
       min={0}
       value={layer.style.heatmap.weight.max}
-      onchange={onWeightBoundsChange('max')}
+      onchange={onWeightBoundsMaxChange}
       class="w-8"
     />
   </div>

@@ -35,7 +35,7 @@
     }
   ]);
   let style = $derived(
-    layer.style.fill?.type === 'Constant'
+    layer.style.fill.type === 'Constant'
       ? `background-color: ${hexWithOpacity(layer.style.fill.color, layer.style.fill.opacity)}; border-color: ${layer.style.stroke ? hexWithOpacity(layer.style.stroke.color, layer.style.stroke.opacity) : 'transparent'}; border-width: ${layer.style.stroke?.width ?? 0}px;`
       : ''
   );
@@ -55,13 +55,13 @@
       </div>
     {/each}
   </div>
-  {#if layer.style.fill?.type === 'Categorical'}
+  {#if layer.style.fill.visible && layer.style.fill.type === 'Categorical'}
     <CategoricalLegend
       fill={layer.style.fill}
       stroke={layer.style.stroke}
       layerType="Proportional Symbol"
     />
-  {:else if layer.style.fill?.type === 'Quantitative'}
+  {:else if layer.style.fill.visible && layer.style.fill.type === 'Quantitative'}
     <QuantitativeLegend
       fill={layer.style.fill}
       stroke={layer.style.stroke}

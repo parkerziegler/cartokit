@@ -1,13 +1,13 @@
 <script lang="ts">
   import type { FeatureCollection } from 'geojson';
 
-  import ClassificationMethodSelect from '$lib/components/classification/ClassificationMethodSelect.svelte';
   import ColorSchemeSelect from '$lib/components/color/ColorSchemeSelect.svelte';
-  import ColorStepsSelect from '$lib/components/color/ColorStepsSelect.svelte';
-  import ColorVisualizationTypeSelect from '$lib/components/color/ColorVisualizationTypeSelect.svelte';
+  import VisualizationTypeSelect from '$lib/components/scale/VisualizationTypeSelect.svelte';
   import FillPicker from '$lib/components/color/FillPicker.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
+  import ClassificationMethodSelect from '$lib/components/scale/ClassificationMethodSelect.svelte';
+  import StepsSelect from '$lib/components/scale/StepsSelect.svelte';
   import type {
     CategoricalFill,
     ConstantFill,
@@ -25,7 +25,7 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <ColorVisualizationTypeSelect
+  <VisualizationTypeSelect
     {layerId}
     {layerType}
     visualizationType={fill.type}
@@ -50,7 +50,7 @@
       channel="fill"
     />
     <ClassificationMethodSelect {layerId} style={fill} />
-    <ColorStepsSelect {layerId} style={fill} />
+    <StepsSelect {layerId} style={fill} />
     <ColorSchemeSelect {layerId} style={fill} />
   {/if}
   <OpacityInput {layerId} channel="fill" style={fill} />

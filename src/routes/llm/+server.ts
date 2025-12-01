@@ -71,7 +71,7 @@ export const POST = (async ({ request }) => {
       ChatCompletionParseParams,
       z.infer<typeof schema>
     >({
-      model: 'gpt-5',
+      model: 'gpt-5.1',
       messages: [
         {
           role: 'system',
@@ -134,7 +134,6 @@ const LayerType = z.union([
   z.literal('Line'),
   z.literal('Polygon'),
   z.literal('Choropleth'),
-  z.literal('Dot Density'),
   z.literal('Heatmap')
 ]);
 
@@ -148,33 +147,28 @@ function LayerTypeUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   });
 }
 
-function AttributeUpdate(
+function FillAttributeUpdate(
   layerIdSchema: z.infer<typeof makeLayerIdSchema>,
   layerIdsToAttributes: Record<string, string[]>
 ) {
   const attrs = Object.values(layerIdsToAttributes).flat();
 
   return z.object({
-    type: z.literal('attribute'),
+    type: z.literal('fill-attribute'),
     layerId: layerIdSchema,
     payload: z.object({
       attribute: z.union([
         z.literal(attrs[0]),
         z.literal(attrs[1]),
         ...attrs.slice(2).map((attr) => z.literal(attr))
-      ]),
-      channel: z.union([
-        z.literal('fill'),
-        z.literal('size'),
-        z.literal('dots')
       ])
     })
   });
 }
 
-function FillUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+function FillColorUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   return z.object({
-    type: z.literal('fill'),
+    type: z.literal('fill-color'),
     layerId: layerIdSchema,
     payload: z.object({
       color: z.string()
@@ -208,12 +202,11 @@ function RemoveFillUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   });
 }
 
-function StrokeUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+function StrokeColorUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   return z.object({
-    type: z.literal('stroke'),
+    type: z.literal('stroke-color'),
     layerId: layerIdSchema,
     payload: z.object({
-      width: z.number().min(0),
       color: z.string()
     })
   });
@@ -255,16 +248,6 @@ function RemoveStrokeUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   });
 }
 
-function PointSizeUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
-  return z.object({
-    type: z.literal('point-size'),
-    layerId: layerIdSchema,
-    payload: z.object({
-      size: z.number().min(0)
-    })
-  });
-}
-
 const ClassificationMethod = z.union([
   z.literal('Quantile'),
   z.literal('Equal Interval'),
@@ -272,11 +255,11 @@ const ClassificationMethod = z.union([
   z.literal('Manual')
 ]);
 
-function ClassificationMethodUpdate(
+function FillClassificationMethodUpdate(
   layerIdSchema: z.infer<typeof makeLayerIdSchema>
 ) {
   return z.object({
-    type: z.literal('classification-method'),
+    type: z.literal('fill-classification-method'),
     layerId: layerIdSchema,
     payload: z.object({
       method: ClassificationMethod
@@ -284,9 +267,11 @@ function ClassificationMethodUpdate(
   });
 }
 
-function ColorSchemeUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+function FillColorSchemeUpdate(
+  layerIdSchema: z.infer<typeof makeLayerIdSchema>
+) {
   return z.object({
-    type: z.literal('color-scheme'),
+    type: z.literal('fill-color-scheme'),
     layerId: layerIdSchema,
     payload: z.object({
       scheme: z.union([
@@ -333,11 +318,11 @@ function ColorSchemeUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   });
 }
 
-function ColorSchemeDirectionUpdate(
+function FillColorSchemeDirectionUpdate(
   layerIdSchema: z.infer<typeof makeLayerIdSchema>
 ) {
   return z.object({
-    type: z.literal('color-scheme-direction'),
+    type: z.literal('fill-color-scheme-direction'),
     layerId: layerIdSchema,
     payload: z.object({
       direction: z.union([z.literal('Forward'), z.literal('Reverse')])
@@ -345,9 +330,9 @@ function ColorSchemeDirectionUpdate(
   });
 }
 
-function ColorCountUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+function FillStepCountUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   return z.object({
-    type: z.literal('color-count'),
+    type: z.literal('fill-step-count'),
     layerId: layerIdSchema,
     payload: z.object({
       count: z.number().min(3).max(9)
@@ -355,15 +340,13 @@ function ColorCountUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   });
 }
 
-function ColorThresholdUpdate(
-  layerIdSchema: z.infer<typeof makeLayerIdSchema>
-) {
+function FillStepValueUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   return z.object({
-    type: z.literal('color-threshold'),
+    type: z.literal('fill-step-value'),
     layerId: layerIdSchema,
     payload: z.object({
-      index: z.number().min(0),
-      threshold: z.number()
+      step: z.number().min(0),
+      value: z.number()
     })
   });
 }
@@ -373,18 +356,46 @@ function SizeUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
     type: z.literal('size'),
     layerId: layerIdSchema,
     payload: z.object({
-      min: z.number().min(0).nullable(),
-      max: z.number().min(0).nullable()
+      size: z.number().min(0)
     })
   });
 }
 
-function DotValueUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+function SizeAttributeUpdate(
+  layerIdSchema: z.infer<typeof makeLayerIdSchema>,
+  layerIdsToAttributes: Record<string, string[]>
+) {
+  const attrs = Object.values(layerIdsToAttributes).flat();
+
   return z.object({
-    type: z.literal('dot-value'),
+    type: z.literal('size-attribute'),
     layerId: layerIdSchema,
     payload: z.object({
-      value: z.number().min(0.000001)
+      attribute: z.union([
+        z.literal(attrs[0]),
+        z.literal(attrs[1]),
+        ...attrs.slice(2).map((attr) => z.literal(attr))
+      ])
+    })
+  });
+}
+
+function MinSizeUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+  return z.object({
+    type: z.literal('min-size'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      minSize: z.number().min(0)
+    })
+  });
+}
+
+function MaxSizeUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+  return z.object({
+    type: z.literal('max-size'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      maxSize: z.number().min(0)
     })
   });
 }
@@ -395,11 +406,11 @@ const VisualizationType = z.union([
   z.literal('Constant')
 ]);
 
-function VisualizationTypeUpdate(
+function FillVisualizationTypeUpdate(
   layerIdSchema: z.infer<typeof makeLayerIdSchema>
 ) {
   return z.object({
-    type: z.literal('visualization-type'),
+    type: z.literal('fill-visualization-type'),
     layerId: layerIdSchema,
     payload: z.object({
       visualizationType: VisualizationType
@@ -482,7 +493,7 @@ function HeatmapWeightAttributeUpdate(
     type: z.literal('heatmap-weight-attribute'),
     layerId: layerIdSchema,
     payload: z.object({
-      attribute: z.union([
+      weightAttribute: z.union([
         z.literal(attrs[0]),
         z.literal(attrs[1]),
         ...attrs.slice(2).map((attr) => z.literal(attr))
@@ -491,15 +502,26 @@ function HeatmapWeightAttributeUpdate(
   });
 }
 
-function HeatmapWeightBoundsUpdate(
+function HeatmapWeightMinUpdate(
   layerIdSchema: z.infer<typeof makeLayerIdSchema>
 ) {
   return z.object({
-    type: z.literal('heatmap-weight-bounds'),
+    type: z.literal('heatmap-weight-min'),
     layerId: layerIdSchema,
     payload: z.object({
-      min: z.number().nullable(),
-      max: z.number().nullable()
+      min: z.number()
+    })
+  });
+}
+
+function HeatmapWeightMaxUpdate(
+  layerIdSchema: z.infer<typeof makeLayerIdSchema>
+) {
+  return z.object({
+    type: z.literal('heatmap-weight-max'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      max: z.number()
     })
   });
 }
@@ -570,32 +592,34 @@ function makeSchema(
     diffs: z.array(
       z.discriminatedUnion('type', [
         LayerTypeUpdate(layerIdSchema),
-        AttributeUpdate(layerIdSchema, layerIdsToAttributes),
-        FillUpdate(layerIdSchema),
+        FillAttributeUpdate(layerIdSchema, layerIdsToAttributes),
+        FillColorUpdate(layerIdSchema),
+        FillColorSchemeUpdate(layerIdSchema),
+        FillColorSchemeDirectionUpdate(layerIdSchema),
+        FillClassificationMethodUpdate(layerIdSchema),
+        FillStepCountUpdate(layerIdSchema),
+        FillStepValueUpdate(layerIdSchema),
+        FillVisualizationTypeUpdate(layerIdSchema),
         FillOpacityUpdate(layerIdSchema),
         AddFillUpdate(layerIdSchema),
         RemoveFillUpdate(layerIdSchema),
-        StrokeUpdate(layerIdSchema),
+        StrokeColorUpdate(layerIdSchema),
         StrokeWidthUpdate(layerIdSchema),
         StrokeOpacityUpdate(layerIdSchema),
         AddStrokeUpdate(layerIdSchema),
         RemoveStrokeUpdate(layerIdSchema),
-        PointSizeUpdate(layerIdSchema),
-        ClassificationMethodUpdate(layerIdSchema),
-        ColorSchemeUpdate(layerIdSchema),
-        ColorSchemeDirectionUpdate(layerIdSchema),
-        ColorCountUpdate(layerIdSchema),
-        ColorThresholdUpdate(layerIdSchema),
+        SizeAttributeUpdate(layerIdSchema, layerIdsToAttributes),
         SizeUpdate(layerIdSchema),
-        DotValueUpdate(layerIdSchema),
-        VisualizationTypeUpdate(layerIdSchema),
+        MinSizeUpdate(layerIdSchema),
+        MaxSizeUpdate(layerIdSchema),
         HeatmapOpacityUpdate(layerIdSchema),
         HeatmapRadiusUpdate(layerIdSchema),
         HeatmapRampUpdate(layerIdSchema),
         HeatmapRampDirectionUpdate(layerIdSchema),
         HeatmapWeightTypeUpdate(layerIdSchema),
         HeatmapWeightAttributeUpdate(layerIdSchema, layerIdsToAttributes),
-        HeatmapWeightBoundsUpdate(layerIdSchema),
+        HeatmapWeightMinUpdate(layerIdSchema),
+        HeatmapWeightMaxUpdate(layerIdSchema),
         HeatmapWeightValueUpdate(layerIdSchema),
         LayerVisibilityUpdate(layerIdSchema),
         LayerTooltipVisibilityUpdate(layerIdSchema),

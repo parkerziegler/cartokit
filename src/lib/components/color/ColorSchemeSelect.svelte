@@ -6,8 +6,7 @@
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { history } from '$lib/state/history.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type {
     CategoricalColorScheme,
     QuantitativeColorScheme,
@@ -54,26 +53,15 @@
   function dispatchSchemeUpdate(
     scheme: CategoricalColorScheme | QuantitativeColorScheme
   ) {
-    const update = {
-      type: 'color-scheme' as const,
+    const diff: CartoKitDiff = {
+      type: 'fill-color-scheme',
       layerId,
       payload: {
         scheme
       }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'color-scheme',
-        layerId,
-        payload: {
-          scheme: style.scheme.id
-        }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 
   function onClickScheme(
@@ -89,26 +77,15 @@
     const nextDirection: SchemeDirection =
       currentDirection === 'Forward' ? 'Reverse' : 'Forward';
 
-    const update = {
-      type: 'color-scheme-direction' as const,
+    const diff: CartoKitDiff = {
+      type: 'fill-color-scheme-direction',
       layerId,
       payload: {
         direction: nextDirection
       }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'color-scheme-direction' as const,
-        layerId,
-        payload: {
-          direction: currentDirection
-        }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 </script>
 
