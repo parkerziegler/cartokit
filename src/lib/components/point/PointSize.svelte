@@ -1,8 +1,7 @@
 <script lang="ts">
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { history } from '$lib/state/history.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
 
   interface Props {
     layerId: string;
@@ -14,26 +13,15 @@
   let { layerId, size, label, fieldId }: Props = $props();
 
   function onPointSizeChange(value: number): void {
-    const update = {
-      type: 'point-size' as const,
+    const diff: CartoKitDiff = {
+      type: 'radius',
       layerId,
       payload: {
-        size: value
+        radius: value
       }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'point-size',
-        layerId,
-        payload: {
-          size: size
-        }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    applyDiff(diff);
   }
 </script>
 

@@ -1,15 +1,12 @@
 import * as d3 from 'd3';
-import type { Polygon, MultiPolygon, FeatureCollection } from 'geojson';
-import type { Map, GeoJSONSource } from 'maplibre-gl';
+import type { Map } from 'maplibre-gl';
 
 import { deriveColorScale } from '$lib/interaction/color';
-import { deriveSize } from '$lib/interaction/geometry';
+import { deriveRadius } from '$lib/interaction/geometry';
 import { deriveThresholds } from '$lib/interaction/scales';
-import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
 import type {
   CartoKitLayer,
   CartoKitChoroplethLayer,
-  CartoKitDotDensityLayer,
   CartoKitProportionalSymbolLayer,
   CartoKitPointLayer,
   Channel
@@ -34,9 +31,6 @@ export function updateLayerChannel(
       break;
     case 'Proportional Symbol':
       updateProportionalSymbolChannel(map, layer, channel);
-      break;
-    case 'Dot Density':
-      updateDotDensityChannel(map, layer, channel);
       break;
     case 'Point':
       updatePointChannel(map, layer, channel);
@@ -89,26 +83,6 @@ function updateProportionalSymbolChannel(
 }
 
 /**
- * Update a visualization channel for a @see{CartoKitDotDensityLayer}.
- *
- * @param {Map} map – The MapLibre GL JS map instance.
- * @param {CartoKitDotDensityLayer} layer – The layer to update.
- * @param {Channel} channel – The visualization channel to update.
- */
-function updateDotDensityChannel(
-  map: Map,
-  layer: CartoKitDotDensityLayer,
-  channel: Channel
-): void {
-  switch (channel) {
-    case 'dots':
-      return updateDotsChannel(map, layer);
-    default:
-      break;
-  }
-}
-
-/**
  * Update a visualization channel for a @see{CartoKitPointLayer}.
  *
  * @param {Map} map – The MapLibre GL JS map instance.
@@ -138,7 +112,7 @@ function updateSizeChannel(
   map: Map,
   layer: CartoKitProportionalSymbolLayer
 ): void {
-  const size = deriveSize(layer);
+  const size = deriveRadius(layer);
 
   map.setPaintProperty(layer.id, 'circle-radius', size);
 }
@@ -192,36 +166,4 @@ function updateFillChannel(
       deriveColorScale(layer.style.fill)
     );
   }
-}
-
-/**
- * Update the dots channel for a @see{CartoKitDotDensityLayer}.
- *
- * @param {Map} map – The MapLibre GL JS map instance.
- * @param {CartoKitDotDensityLayer} layer – The layer to update.
- */
-function updateDotsChannel(map: Map, layer: CartoKitDotDensityLayer): void {
-  const features = generateDotDensityPoints(
-    layer.data.sourceGeojson as FeatureCollection<Polygon | MultiPolygon>,
-    layer.style.dots.attribute,
-    layer.style.dots.value
-  );
-
-  layer.data.geojson = features;
-  // Update the args of the dot density transformation in this layer.
-  //
-  // Find the transformation call for the dot density transformation.
-  const transformationIndex = layer.data.transformations.findIndex(
-    (t) => t.name === 'generateDotDensityPoints'
-  );
-
-  if (transformationIndex > -1) {
-    layer.data.transformations[transformationIndex].args = [
-      layer.style.dots.attribute,
-      layer.style.dots.value
-    ];
-  }
-
-  // Update the source with the new data.
-  (map.getSource(layer.id) as GeoJSONSource).setData(features);
 }

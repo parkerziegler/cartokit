@@ -1,7 +1,5 @@
-import { get } from 'svelte/store';
-
-import { ir as irStore } from '$lib/stores/ir';
-import { map as mapStore } from '$lib/stores/map';
+import { ir } from '$lib/state/ir.svelte';
+import { map } from '$lib/state/map.svelte';
 import type { BasemapProvider } from '$lib/types';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
 
@@ -18,20 +16,13 @@ export function switchBasemapWithPreservedLayers(
   provider: BasemapProvider
 ): void {
   // Update the IR with the new basemap information.
-  irStore.update((ir) => {
-    ir.basemap.url = tileUrl;
-    ir.basemap.provider = provider;
-
-    return ir;
-  });
+  ir.value.basemap.url = tileUrl;
+  ir.value.basemap.provider = provider;
 
   // Preserve all currently rendered layers and sources when calling map.setStyle().
-  const ir = get(irStore);
-  const map = get(mapStore);
-
-  map.setStyle(tileUrl, {
+  map.value!.setStyle(tileUrl, {
     transformStyle: (previousStyle, nextStyle) => {
-      const ids = Object.values(ir.layers).reduce<string[]>(
+      const ids = Object.values(ir.value.layers).reduce<string[]>(
         (acc, layer) => [...acc, layer.id, ...getInstrumentedLayerIds(layer)],
         []
       );
