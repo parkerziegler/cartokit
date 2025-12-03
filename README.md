@@ -30,22 +30,4 @@ First and foremost, cartokit is a direct manipulation programming environment fo
 
 For a deeper dive into how cartokit works—and to see how you can get started programming with cartokit—check out the extended demo.
 
-<div align="center">
-  <video
-    src="assets/cartokit-demo.mp4"
-    controls
-    width="800"
-    style="
-      border: 1.5px solid #0f172b;
-      border-radius: 0.25rem;
-      box-shadow:
-        0px 2.5px 8px 0px rgba(24,37,72,0.09),
-        0px 1.5px 4px 0px rgba(60,60,67,0.045);
-      background: #fff;
-      margin: 0 auto;
-      display: block;
-    "
-  >
-    Your browser does not support the video tag.
-  </video>
-</div>
+https://github.com/user-attachments/assets/1cfb92d5-74d1-4f83-8ed0-07fccafa6a77
