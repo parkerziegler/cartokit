@@ -2,7 +2,7 @@
   <img src="assets/logo.png" alt="cartokit" width="559" height="171">
 </div>
 <div align="center">
-  <img src="assets/banner.png" alt="Example screenshots from cartokit" width="800" />
+  <img src="assets/hero.png" alt="Example screenshots from cartokit" width="800" />
 </div>
 
 ![CI](https://github.com/parkerziegler/cartokit/actions/workflows/ci.yml/badge.svg)
