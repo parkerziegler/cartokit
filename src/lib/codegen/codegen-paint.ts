@@ -3,7 +3,7 @@ import { deriveRadius } from '$lib/interaction/geometry';
 import { deriveHeatmapWeight } from '$lib/interaction/weight';
 import type { CartoKitLayer } from '$lib/types';
 
-const MAPLIBRE_DEFAULTS = {
+const DEFAULTS = {
   'circle-radius': 5,
   'fill-color': '#000000',
   'line-color': '#000000',
@@ -21,16 +21,15 @@ const MAPLIBRE_DEFAULTS = {
 };
 
 /**
- * Generate a MapLibre GL JS program fragment, in TypeScript, representing the
- * layer's fill.
+ * Generate a program fragment representing the layer's fill.
  *
  * @param layer – A @see{CartoKitLayer}.
- * @returns – A MapLibre GL JS program fragment, in TypeScript.
+ * @returns – A program fragment.
  */
 export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Point': {
-      if (!layer.style.fill) {
+      if (!layer.style.fill.visible) {
         return '';
       }
 
@@ -39,19 +38,19 @@ export function codegenFill(layer: CartoKitLayer): string {
         withDefault(
           'circle-radius',
           layer.style.size,
-          MAPLIBRE_DEFAULTS['circle-radius']
+          DEFAULTS['circle-radius']
         ),
         withDefault(
           'circle-opacity',
           layer.style.fill.opacity,
-          MAPLIBRE_DEFAULTS['circle-opacity']
+          DEFAULTS['circle-opacity']
         )
       ]
         .filter(Boolean)
         .join(',\n');
     }
     case 'Proportional Symbol': {
-      if (!layer.style.fill) {
+      if (!layer.style.fill.visible) {
         return '';
       }
 
@@ -61,7 +60,7 @@ export function codegenFill(layer: CartoKitLayer): string {
         withDefault(
           'circle-opacity',
           layer.style.fill.opacity,
-          MAPLIBRE_DEFAULTS['fill-opacity']
+          DEFAULTS['fill-opacity']
         )
       ]
         .filter(Boolean)
@@ -70,7 +69,7 @@ export function codegenFill(layer: CartoKitLayer): string {
     case 'Line':
       return '';
     case 'Polygon': {
-      if (!layer.style.fill) {
+      if (!layer.style.fill.visible) {
         return '';
       }
 
@@ -78,65 +77,66 @@ export function codegenFill(layer: CartoKitLayer): string {
         withDefault(
           'fill-color',
           layer.style.fill.color,
-          MAPLIBRE_DEFAULTS['fill-color']
+          DEFAULTS['fill-color']
         ),
         withDefault(
           'fill-opacity',
           layer.style.fill.opacity,
-          MAPLIBRE_DEFAULTS['fill-opacity']
+          DEFAULTS['fill-opacity']
         )
       ]
         .filter(Boolean)
         .join(',\n');
     }
-    case 'Choropleth':
+    case 'Choropleth': {
       return [
         `'fill-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
         withDefault(
           'fill-opacity',
           layer.style.fill.opacity,
-          MAPLIBRE_DEFAULTS['fill-opacity']
+          DEFAULTS['fill-opacity']
         )
       ]
         .filter(Boolean)
         .join(',\n');
-    case 'Heatmap':
+    }
+    case 'Heatmap': {
       return [
         `'heatmap-color': ${JSON.stringify(deriveColorRamp(layer.style.heatmap))}`,
         withDefault(
           'heatmap-intensity',
           layer.style.heatmap.intensity,
-          MAPLIBRE_DEFAULTS['heatmap-intensity']
+          DEFAULTS['heatmap-intensity']
         ),
         withDefault(
           'heatmap-opacity',
           layer.style.heatmap.opacity,
-          MAPLIBRE_DEFAULTS['heatmap-opacity']
+          DEFAULTS['heatmap-opacity']
         ),
         withDefault(
           'heatmap-radius',
           layer.style.heatmap.radius,
-          MAPLIBRE_DEFAULTS['heatmap-radius']
+          DEFAULTS['heatmap-radius']
         ),
         `'heatmap-weight': ${JSON.stringify(deriveHeatmapWeight(layer))}`
       ]
         .filter(Boolean)
         .join(',\n');
+    }
   }
 }
 
 /**
- * Generate a MapLibre GL JS program fragment, in TypeScript, representing the
- * layer's stroke.
+ * Generate a program fragment representing the layer's stroke.
  *
  * @param layer – A @see{CartoKitLayer}.
- * @returns – A MapLibre GL JS program fragment, in TypeScript.
+ * @returns – A program fragment.
  */
 export function codegenStroke(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Point':
     case 'Proportional Symbol': {
-      if (!layer.style.stroke) {
+      if (!layer.style.stroke.visible) {
         return '';
       }
 
@@ -144,17 +144,17 @@ export function codegenStroke(layer: CartoKitLayer): string {
         withDefault(
           'circle-stroke-color',
           layer.style.stroke.color,
-          MAPLIBRE_DEFAULTS['circle-stroke-color']
+          DEFAULTS['circle-stroke-color']
         ),
         withDefault(
           'circle-stroke-width',
           layer.style.stroke.width,
-          MAPLIBRE_DEFAULTS['circle-stroke-width']
+          DEFAULTS['circle-stroke-width']
         ),
         withDefault(
           'circle-stroke-opacity',
           layer.style.stroke.opacity,
-          MAPLIBRE_DEFAULTS['circle-stroke-opacity']
+          DEFAULTS['circle-stroke-opacity']
         )
       ]
         .filter(Boolean)
@@ -163,7 +163,7 @@ export function codegenStroke(layer: CartoKitLayer): string {
     case 'Line':
     case 'Polygon':
     case 'Choropleth': {
-      if (!layer.style.stroke) {
+      if (!layer.style.stroke.visible) {
         return '';
       }
 
@@ -171,43 +171,44 @@ export function codegenStroke(layer: CartoKitLayer): string {
         withDefault(
           'line-color',
           layer.style.stroke.color,
-          MAPLIBRE_DEFAULTS['line-color']
+          DEFAULTS['line-color']
         ),
         withDefault(
           'line-width',
           layer.style.stroke.width,
-          MAPLIBRE_DEFAULTS['line-width']
+          DEFAULTS['line-width']
         ),
         withDefault(
           'line-opacity',
           layer.style.stroke.opacity,
-          MAPLIBRE_DEFAULTS['line-opacity']
+          DEFAULTS['line-opacity']
         )
       ]
         .filter(Boolean)
         .join(',\n');
     }
-    case 'Heatmap':
+    case 'Heatmap': {
       return '';
+    }
   }
 }
 
 /**
- * Return a MapLibre GL JS program fragment representing a property-value pair,
+ * Return a program fragment representing a property-value pair,
  * unless the value is the same as the default value.
  *
- * @param maplibreProperty – The MapLibre GL JS property name.
+ * @param property – The property name.
  * @param cartokitValue – The value of the property in the CartoKit IR.
- * @param defaultValue – The default MapLibre GL JS value for the property.
- * @returns – A (potentially empty) MapLibre GL JS program fragment.
+ * @param defaultValue – The default value for the property.
+ * @returns – A (potentially empty) program fragment.
  */
 function withDefault<T extends string | number>(
-  maplibreProperty: string,
+  property: string,
   cartokitValue: T,
   defaultValue: T
 ): string {
   return cartokitValue !== defaultValue
-    ? `'${maplibreProperty}': ${
+    ? `'${property}': ${
         typeof cartokitValue === 'string' ? `'${cartokitValue}'` : cartokitValue
       }`
     : '';

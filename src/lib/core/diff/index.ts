@@ -1,6 +1,12 @@
 import type { FeatureCollection } from 'geojson';
 
+import { invertDiff } from '$lib/core/diff/invert';
+import { patch } from '$lib/core/patch';
+import { recon } from '$lib/core/recon';
+import { history } from '$lib/state/history.svelte';
+import { ir } from '$lib/state/ir.svelte';
 import type {
+  BasemapProvider,
   CartoKitLayer,
   CategoricalColorScheme,
   ClassificationMethod,
@@ -13,66 +19,61 @@ import type {
   TransformationCall,
   VisualizationType
 } from '$lib/types';
-import { patch } from '$lib/core/patch';
-import { recon } from '$lib/core/recon';
-import { history } from '$lib/state/history.svelte';
-import { ir } from '$lib/state/ir.svelte';
-import { invertDiff } from './invert';
 
-interface BaseDiff {
+interface LayerDiff {
   layerId: CartoKitLayer['id'];
 }
 
-interface LayerTypeDiff extends BaseDiff {
+interface LayerTypeDiff extends LayerDiff {
   type: 'layer-type';
   payload: {
     layerType: LayerType;
   };
 }
 
-interface FillAttributeDiff extends BaseDiff {
+interface FillAttributeDiff extends LayerDiff {
   type: 'fill-attribute';
   payload: {
     attribute: string;
   };
 }
 
-interface FillColorDiff extends BaseDiff {
+interface FillColorDiff extends LayerDiff {
   type: 'fill-color';
   payload: {
     color: string;
   };
 }
 
-interface FillColorSchemeDiff extends BaseDiff {
+interface FillColorSchemeDiff extends LayerDiff {
   type: 'fill-color-scheme';
   payload: {
     scheme: QuantitativeColorScheme | CategoricalColorScheme;
   };
 }
 
-interface FillColorSchemeDirectionDiff extends BaseDiff {
+interface FillColorSchemeDirectionDiff extends LayerDiff {
   type: 'fill-color-scheme-direction';
   payload: {
     direction: SchemeDirection;
   };
 }
 
-interface FillClassificationMethodDiff extends BaseDiff {
+interface FillClassificationMethodDiff extends LayerDiff {
   type: 'fill-classification-method';
   payload: {
     method: ClassificationMethod;
   };
 }
 
-interface FillStepCountDiff extends BaseDiff {
+interface FillStepCountDiff extends LayerDiff {
   type: 'fill-step-count';
   payload: {
     count: number;
   };
 }
 
-interface FillStepValueDiff extends BaseDiff {
+interface FillStepValueDiff extends LayerDiff {
   type: 'fill-step-value';
   payload: {
     step: number;
@@ -80,90 +81,90 @@ interface FillStepValueDiff extends BaseDiff {
   };
 }
 
-interface FillOpacityDiff extends BaseDiff {
+interface FillOpacityDiff extends LayerDiff {
   type: 'fill-opacity';
   payload: {
     opacity: number;
   };
 }
 
-interface FillVisualizationDiff extends BaseDiff {
+interface FillVisualizationDiff extends LayerDiff {
   type: 'fill-visualization-type';
   payload: {
     visualizationType: VisualizationType;
   };
 }
 
-interface AddFillDiff extends BaseDiff {
+interface AddFillDiff extends LayerDiff {
   type: 'add-fill';
   payload: Record<string, never>;
 }
 
-interface RemoveFillDiff extends BaseDiff {
+interface RemoveFillDiff extends LayerDiff {
   type: 'remove-fill';
   payload: Record<string, never>;
 }
 
-interface StrokeColorDiff extends BaseDiff {
+interface StrokeColorDiff extends LayerDiff {
   type: 'stroke-color';
   payload: {
     color: string;
   };
 }
 
-interface StrokeWidthDiff extends BaseDiff {
+interface StrokeWidthDiff extends LayerDiff {
   type: 'stroke-width';
   payload: {
     strokeWidth: number;
   };
 }
 
-interface StrokeOpacityDiff extends BaseDiff {
+interface StrokeOpacityDiff extends LayerDiff {
   type: 'stroke-opacity';
   payload: {
     opacity: number;
   };
 }
 
-interface AddStrokeDiff extends BaseDiff {
+interface AddStrokeDiff extends LayerDiff {
   type: 'add-stroke';
   payload: Record<string, never>;
 }
 
-interface RemoveStrokeDiff extends BaseDiff {
+interface RemoveStrokeDiff extends LayerDiff {
   type: 'remove-stroke';
   payload: Record<string, never>;
 }
 
-interface SizeAttributeDiff extends BaseDiff {
+interface SizeAttributeDiff extends LayerDiff {
   type: 'size-attribute';
   payload: {
     attribute: string;
   };
 }
 
-interface SizeDiff extends BaseDiff {
+interface SizeDiff extends LayerDiff {
   type: 'size';
   payload: {
     size: number;
   };
 }
 
-interface MinSizeDiff extends BaseDiff {
+interface MinSizeDiff extends LayerDiff {
   type: 'min-size';
   payload: {
     minSize: number;
   };
 }
 
-interface MaxSizeDiff extends BaseDiff {
+interface MaxSizeDiff extends LayerDiff {
   type: 'max-size';
   payload: {
     maxSize: number;
   };
 }
 
-interface AddTransformationDiff extends BaseDiff {
+interface AddTransformationDiff extends LayerDiff {
   type: 'add-transformation';
   payload: {
     geojson: FeatureCollection;
@@ -171,7 +172,7 @@ interface AddTransformationDiff extends BaseDiff {
   };
 }
 
-interface RemoveTransformationDiff extends BaseDiff {
+interface RemoveTransformationDiff extends LayerDiff {
   type: 'remove-transformation';
   payload: {
     geojson: FeatureCollection;
@@ -179,92 +180,129 @@ interface RemoveTransformationDiff extends BaseDiff {
   };
 }
 
-interface HeatmapOpacityDiff extends BaseDiff {
+interface HeatmapOpacityDiff extends LayerDiff {
   type: 'heatmap-opacity';
   payload: {
     opacity: number;
   };
 }
 
-interface HeatmapRadiusDiff extends BaseDiff {
+interface HeatmapRadiusDiff extends LayerDiff {
   type: 'heatmap-radius';
   payload: {
     radius: number;
   };
 }
 
-interface HeatmapRampDiff extends BaseDiff {
+interface HeatmapRampDiff extends LayerDiff {
   type: 'heatmap-ramp';
   payload: {
     ramp: ColorRamp;
   };
 }
 
-interface HeatmapRampDirectionDiff extends BaseDiff {
+interface HeatmapRampDirectionDiff extends LayerDiff {
   type: 'heatmap-ramp-direction';
   payload: {
     direction: RampDirection;
   };
 }
 
-interface HeatmapWeightTypeDiff extends BaseDiff {
+interface HeatmapWeightTypeDiff extends LayerDiff {
   type: 'heatmap-weight-type';
   payload: {
     weightType: 'Constant' | 'Quantitative';
   };
 }
 
-interface HeatmapWeightAttributeDiff extends BaseDiff {
+interface HeatmapWeightAttributeDiff extends LayerDiff {
   type: 'heatmap-weight-attribute';
   payload: {
     weightAttribute: string;
   };
 }
 
-interface HeatmapWeightMinDiff extends BaseDiff {
+interface HeatmapWeightMinDiff extends LayerDiff {
   type: 'heatmap-weight-min';
   payload: {
     min: number;
   };
 }
 
-interface HeatmapWeightMaxDiff extends BaseDiff {
+interface HeatmapWeightMaxDiff extends LayerDiff {
   type: 'heatmap-weight-max';
   payload: {
     max: number;
   };
 }
 
-interface HeatmapWeightValueDiff extends BaseDiff {
+interface HeatmapWeightValueDiff extends LayerDiff {
   type: 'heatmap-weight-value';
   payload: {
     value: number;
   };
 }
 
-interface LayerVisibilityDiff extends BaseDiff {
+interface LayerVisibilityDiff extends LayerDiff {
   type: 'layer-visibility';
   payload: {
     visibility: LayerVisibility;
   };
 }
 
-interface LayerTooltipVisibilityDiff extends BaseDiff {
+interface LayerTooltipVisibilityDiff extends LayerDiff {
   type: 'layer-tooltip-visibility';
   payload: {
     visible: boolean;
   };
 }
 
-interface RemoveLayerDiff extends BaseDiff {
+interface AddLayerDiff extends LayerDiff {
+  type: 'add-layer';
+  payload:
+    | { type: 'api'; displayName: string; url: string }
+    | {
+        type: 'file';
+        displayName: string;
+        fileName: string;
+        featureCollection: FeatureCollection;
+      };
+}
+
+interface RemoveLayerDiff extends LayerDiff {
   type: 'remove-layer';
   payload: Record<string, never>;
 }
 
-interface RenameLayerDiff extends BaseDiff {
+interface RenameLayerDiff extends LayerDiff {
   type: 'rename-layer';
   payload: {
     displayName: string;
+  };
+}
+
+interface BasemapDiff {
+  type: 'basemap';
+  payload: {
+    url: string;
+    provider: BasemapProvider;
+  };
+}
+
+interface ZoomDiff {
+  type: 'zoom';
+  payload: {
+    zoom: number;
+  };
+}
+
+interface CenterDiff {
+  type: 'center';
+  payload: {
+    center: {
+      lng: number;
+      lat: number;
+    };
   };
 }
 
@@ -303,23 +341,27 @@ export type CartoKitDiff =
   | HeatmapWeightValueDiff
   | LayerVisibilityDiff
   | LayerTooltipVisibilityDiff
+  | AddLayerDiff
   | RemoveLayerDiff
-  | RenameLayerDiff;
+  | RenameLayerDiff
+  | BasemapDiff
+  | ZoomDiff
+  | CenterDiff;
 
-export function applyDiff(
+export async function applyDiff(
   execute: CartoKitDiff,
   triggeredByUndo = false
-): void {
+): Promise<void> {
   const sourceIR = ir.value;
 
   // Derive the inverse diff from the execute diff.
   const invert = invertDiff(execute, sourceIR);
 
   // Patch the source IR to get the target IR.
-  const targetIR = patch(execute, sourceIR);
+  const targetIR = await patch(execute, sourceIR);
 
   // Reconcile the map to the target IR.
-  recon(execute, sourceIR, targetIR);
+  await recon(execute, sourceIR, targetIR);
 
   // If the diff was triggered by undo, push the diff to the redo stack.
   // All normally applied diffs are pushed to the undo stack.

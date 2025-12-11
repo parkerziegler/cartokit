@@ -1,9 +1,10 @@
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 
-export function patchTransformationDiffs({
-  diff,
-  ir
-}: PatchFnParams): PatchFnResult {
+export async function patchTransformationDiffs(
+  params: Promise<PatchFnParams>
+): Promise<PatchFnResult> {
+  const { diff, ir } = await params;
+
   switch (diff.type) {
     case 'add-transformation': {
       const layer = ir.layers[diff.layerId];

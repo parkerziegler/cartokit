@@ -7,7 +7,11 @@ import type {
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
 
-export function patchStrokeDiffs({ diff, ir }: PatchFnParams): PatchFnResult {
+export async function patchStrokeDiffs(
+  params: Promise<PatchFnParams>
+): Promise<PatchFnResult> {
+  const { diff, ir } = await params;
+
   switch (diff.type) {
     case 'stroke-color': {
       const layer = ir.layers[diff.layerId] as

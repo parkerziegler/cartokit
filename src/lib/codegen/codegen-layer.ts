@@ -1,15 +1,11 @@
-import {
-  codegenFill,
-  codegenStroke
-} from '$lib/codegen/mapbox/typescript/codegen-paint';
+import { codegenFill, codegenStroke } from '$lib/codegen/codegen-paint';
 import type { CartoKitLayer } from '$lib/types';
 
 /**
- * Generate a Mapbox GL JS program fragment, in TypeScript, for a
- * @see{CartoKitLayer}.
+ * Generate a program fragment for a {@link CartoKitLayer}.
  *
- * @param layer – A @see{CartoKitLayer}.
- * @returns – A Mapbox GL JS program fragment, in TypeScript.
+ * @param layer A {@link CartoKitLayer}.
+ * @returns A program fragment.
  */
 export function codegenLayer(layer: CartoKitLayer): string {
   switch (layer.type) {
@@ -47,7 +43,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
       let fillLayer = '';
       let strokeLayer = '';
 
-      if (layer.style.fill) {
+      if (layer.style.fill.visible) {
         const fill = codegenFill(layer);
         fillLayer = `map.addLayer({
           id: '${layer.id}',
@@ -57,7 +53,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
         });`;
       }
 
-      if (layer.style.stroke) {
+      if (layer.style.stroke.visible) {
         const stroke = codegenStroke(layer);
         strokeLayer = `map.addLayer({
           id: '${layer.id}-stroke',
@@ -80,7 +76,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
 
       let strokeLayer = '';
 
-      if (layer.style.stroke) {
+      if (layer.style.stroke.visible) {
         const stroke = codegenStroke(layer);
         strokeLayer = `map.addLayer({
           id: '${layer.id}-stroke',

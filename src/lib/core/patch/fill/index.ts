@@ -23,7 +23,11 @@ import {
   DEFAULT_THRESHOLDS
 } from '$lib/utils/constants';
 
-export function patchFillDiffs({ diff, ir }: PatchFnParams): PatchFnResult {
+export async function patchFillDiffs(
+  params: Promise<PatchFnParams>
+): Promise<PatchFnResult> {
+  const { diff, ir } = await params;
+
   switch (diff.type) {
     case 'fill-attribute': {
       const layer = ir.layers[diff.layerId] as

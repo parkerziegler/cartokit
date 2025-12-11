@@ -4,7 +4,11 @@ import type {
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
 
-export function patchSizeDiffs({ diff, ir }: PatchFnParams): PatchFnResult {
+export async function patchSizeDiffs(
+  params: Promise<PatchFnParams>
+): Promise<PatchFnResult> {
+  const { diff, ir } = await params;
+
   switch (diff.type) {
     case 'size': {
       const layer = ir.layers[diff.layerId] as CartoKitPointLayer;

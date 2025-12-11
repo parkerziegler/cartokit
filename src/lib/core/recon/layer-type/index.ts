@@ -14,11 +14,11 @@ import type {
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
 
-export function reconLayerTypeDiffs({
-  diff,
-  sourceIR,
-  targetIR
-}: ReconFnParams): ReconFnResult {
+export async function reconLayerTypeDiffs(
+  params: Promise<ReconFnParams>
+): Promise<ReconFnResult> {
+  const { diff, sourceIR, targetIR } = await params;
+
   switch (diff.type) {
     case 'layer-type': {
       switch (diff.payload.layerType) {

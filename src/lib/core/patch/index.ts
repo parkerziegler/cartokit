@@ -5,6 +5,7 @@ import { patchFillDiffs } from '$lib/core/patch/fill';
 import { patchHeatmapDiffs } from '$lib/core/patch/heatmap';
 import { patchLayerDiffs } from '$lib/core/patch/layer';
 import { patchLayerTypeDiffs } from '$lib/core/patch/layer-type';
+import { patchMapDiffs } from '$lib/core/patch/map';
 import { patchSizeDiffs } from '$lib/core/patch/size';
 import { patchStrokeDiffs } from '$lib/core/patch/stroke';
 
@@ -17,16 +18,22 @@ export interface PatchFnParams {
 
 export type PatchFnResult = PatchFnParams;
 
-export function patch(diff: CartoKitDiff, sourceIR: CartoKitIR): CartoKitIR {
+export async function patch(
+  diff: CartoKitDiff,
+  sourceIR: CartoKitIR
+): Promise<CartoKitIR> {
   const patcher = flow(
     patchFillDiffs,
+    patchHeatmapDiffs,
     patchLayerDiffs,
     patchLayerTypeDiffs,
-    patchHeatmapDiffs,
+    patchMapDiffs,
     patchStrokeDiffs,
     patchSizeDiffs
   );
 
-  const { ir: targetIR } = patcher({ diff, ir: sourceIR });
+  const { ir: targetIR } = await patcher(
+    Promise.resolve({ diff, ir: sourceIR })
+  );
   return targetIR;
 }

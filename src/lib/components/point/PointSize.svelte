@@ -14,10 +14,10 @@
 
   function onPointSizeChange(value: number): void {
     const diff: CartoKitDiff = {
-      type: 'radius',
+      type: 'size',
       layerId,
       payload: {
-        radius: value
+        size: value
       }
     };
 

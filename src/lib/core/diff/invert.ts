@@ -464,9 +464,32 @@ export function invertDiff(
         }
       };
     }
+    case 'add-layer': {
+      return {
+        type: 'remove-layer',
+        layerId: diff.layerId,
+        payload: {}
+      };
+    }
     case 'remove-layer': {
-      // Cannot invert remove-layer as we don't have the layer data
-      throw new Error('Cannot invert remove-layer diff');
+      const layer = sourceIR.layers[diff.layerId] as CartoKitLayer;
+
+      return {
+        type: 'add-layer',
+        layerId: diff.layerId,
+        payload: layer.data.url
+          ? {
+              type: 'api',
+              displayName: layer.displayName,
+              url: layer.data.url
+            }
+          : {
+              type: 'file',
+              displayName: layer.displayName,
+              fileName: layer.data.fileName!,
+              featureCollection: layer.data.geojson
+            }
+      };
     }
     case 'rename-layer': {
       const layer = sourceIR.layers[diff.layerId] as CartoKitLayer;

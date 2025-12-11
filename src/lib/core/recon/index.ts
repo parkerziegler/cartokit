@@ -5,6 +5,7 @@ import { reconFillDiffs } from '$lib/core/recon/fill';
 import { reconHeatmapDiffs } from '$lib/core/recon/heatmap';
 import { reconLayerDiffs } from '$lib/core/recon/layer';
 import { reconLayerTypeDiffs } from '$lib/core/recon/layer-type';
+import { reconMapDiffs } from '$lib/core/recon/map';
 import { reconSizeDiffs } from '$lib/core/recon/size';
 import { reconStrokeDiffs } from '$lib/core/recon/stroke';
 import type { CartoKitIR } from '$lib/types';
@@ -17,19 +18,20 @@ export interface ReconFnParams {
 
 export type ReconFnResult = ReconFnParams;
 
-export function recon(
+export async function recon(
   diff: CartoKitDiff,
   sourceIR: CartoKitIR,
   targetIR: CartoKitIR
-): void {
+): Promise<void> {
   const reconciler = flow(
     reconFillDiffs,
     reconHeatmapDiffs,
     reconLayerDiffs,
     reconLayerTypeDiffs,
+    reconMapDiffs,
     reconSizeDiffs,
     reconStrokeDiffs
   );
 
-  reconciler({ diff, sourceIR, targetIR });
+  await reconciler(Promise.resolve({ diff, sourceIR, targetIR }));
 }

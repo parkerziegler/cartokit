@@ -3,12 +3,11 @@ import { camelCase } from 'lodash-es';
 import type { CartoKitLayer } from '$lib/types';
 
 /**
- * Generate a Mapbox GL JS program fragment for the data source
- * for a @see{CartoKitLayer}.
+ * Generate a program fragment for the data source for a {@link CartoKitLayer}.
  *
- * @param layer – A @see{CartoKitLayer}.
- * @param uploadTable – The symbol table tracking file uploads.
- * @returns – A Mapbox GL JS program fragment.
+ * @param layer A {@link CartoKitLayer}.
+ * @param uploadTable The symbol table tracking file uploads.
+ * @returns A program fragment.
  */
 export function codegenSource(
   layer: CartoKitLayer,
@@ -47,7 +46,7 @@ export function codegenSource(
 	});
   `;
     }
-    default: {
+    default:
       return `
   ${fetchData}
   
@@ -66,6 +65,5 @@ export function codegenSource(
     }, '')}
 	});
   `;
-    }
   }
 }

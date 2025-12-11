@@ -548,12 +548,12 @@ type CartoKitLibraryBackend = 'mapbox' | 'maplibre';
 /**
  * Represents the set of identifiers for code generation backends.
  *
- * @property library - The library backend for code generation.
  * @property language - The language backend for code generation.
+ * @property library - The library backend for code generation.
  */
 export interface CartoKitBackend {
-  library: CartoKitLibraryBackend;
   language: CartoKitLanguageBackend;
+  library: CartoKitLibraryBackend;
 }
 
 /**
@@ -567,7 +567,7 @@ export interface CartoKitBackend {
  * @property isGeoJSONNamespaceRequired - A Boolean value indicating whether we
  * need to insert an import of the GeoJSON namespace.
  */
-export interface CartoKitBackendAnalysis {
+export interface CartoKitBackendAnalysis extends CartoKitBackend {
   isTurfRequired: boolean;
   isFetchGeoJSONRequired: boolean;
   isGeoJSONNamespaceRequired: boolean;

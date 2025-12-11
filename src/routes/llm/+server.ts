@@ -7,7 +7,8 @@ import { OPENAI_API_KEY } from '$env/static/private';
 import type { RequestHandler } from './$types';
 
 import { connectToMongoDB } from '$lib/db';
-import type { LayerType } from '$lib/types';
+import type { BasemapProvider, LayerType } from '$lib/types';
+import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
 
 interface PromptDoc {
   userId: string;
@@ -76,7 +77,7 @@ export const POST = (async ({ request }) => {
         {
           role: 'system',
           content:
-            'Generate zero or more updates to the map visualization. Choose the "unknown" update if you cannot easily determine the type of update based on the prompt.'
+            'Generate zero or more updates to the map visualization. Choose the "unknown" update if you cannot easily determine the type of update based on the prompt. When creating new layers with "add-layer", generate friendly layer IDs in kebab-case format with a unqiue hash suffix based on the displayName (e.g., "population-data__a1b2c3" for a layer named "Population Data"). Use the same layer ID when referencing the newly created layer in subsequent diffs within the same request, as appropriate.'
         },
         { role: 'user', content: prompt }
       ],
@@ -119,13 +120,36 @@ export const POST = (async ({ request }) => {
  * @returns – A Zod schema for the layerId field in a diff object.
  */
 function makeLayerIdSchema(layerIds: string[]) {
-  return layerIds.length > 1
-    ? z.union([
-        z.literal(layerIds[0]),
-        z.literal(layerIds[1]),
-        ...layerIds.slice(2).map((id) => z.literal(id))
-      ])
-    : z.literal(layerIds[0]);
+  const freshLayerIdSchema = z
+    .string()
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*__[a-z0-9]+$/);
+
+  if (layerIds.length === 0) {
+    return freshLayerIdSchema;
+  }
+
+  return z.union([
+    z.literal(layerIds[0]),
+    freshLayerIdSchema,
+    ...layerIds.slice(1).map((id) => z.literal(id))
+  ]);
+}
+
+function makeAttrsSchema(layerIdsToAttributes: Record<string, string[]>) {
+  const attrs = Object.values(layerIdsToAttributes).flat();
+
+  switch (attrs.length) {
+    case 0:
+      return z.literal('None');
+    case 1:
+      return z.literal(attrs[0]);
+    default:
+      return z.union([
+        z.literal(attrs[0]),
+        z.literal(attrs[1]),
+        ...attrs.slice(2).map((attr) => z.literal(attr))
+      ]);
+  }
 }
 
 const LayerType = z.union([
@@ -151,17 +175,11 @@ function FillAttributeUpdate(
   layerIdSchema: z.infer<typeof makeLayerIdSchema>,
   layerIdsToAttributes: Record<string, string[]>
 ) {
-  const attrs = Object.values(layerIdsToAttributes).flat();
-
   return z.object({
     type: z.literal('fill-attribute'),
     layerId: layerIdSchema,
     payload: z.object({
-      attribute: z.union([
-        z.literal(attrs[0]),
-        z.literal(attrs[1]),
-        ...attrs.slice(2).map((attr) => z.literal(attr))
-      ])
+      attribute: makeAttrsSchema(layerIdsToAttributes)
     })
   });
 }
@@ -365,17 +383,11 @@ function SizeAttributeUpdate(
   layerIdSchema: z.infer<typeof makeLayerIdSchema>,
   layerIdsToAttributes: Record<string, string[]>
 ) {
-  const attrs = Object.values(layerIdsToAttributes).flat();
-
   return z.object({
     type: z.literal('size-attribute'),
     layerId: layerIdSchema,
     payload: z.object({
-      attribute: z.union([
-        z.literal(attrs[0]),
-        z.literal(attrs[1]),
-        ...attrs.slice(2).map((attr) => z.literal(attr))
-      ])
+      attribute: makeAttrsSchema(layerIdsToAttributes)
     })
   });
 }
@@ -487,17 +499,11 @@ function HeatmapWeightAttributeUpdate(
   layerIdSchema: z.infer<typeof makeLayerIdSchema>,
   layerIdsToAttributes: Record<string, string[]>
 ) {
-  const attrs = Object.values(layerIdsToAttributes).flat();
-
   return z.object({
     type: z.literal('heatmap-weight-attribute'),
     layerId: layerIdSchema,
     payload: z.object({
-      weightAttribute: z.union([
-        z.literal(attrs[0]),
-        z.literal(attrs[1]),
-        ...attrs.slice(2).map((attr) => z.literal(attr))
-      ])
+      weightAttribute: makeAttrsSchema(layerIdsToAttributes)
     })
   });
 }
@@ -558,6 +564,18 @@ function LayerTooltipVisibilityUpdate(
   });
 }
 
+function AddLayerUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+  return z.object({
+    type: z.literal('add-layer'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      type: z.literal('api'),
+      displayName: z.string(),
+      url: z.string()
+    })
+  });
+}
+
 function RemoveLayerUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   return z.object({
     type: z.literal('remove-layer'),
@@ -573,6 +591,37 @@ function RenameLayerUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
     payload: z.object({ displayName: z.string() })
   });
 }
+
+const Basemap = z.union(
+  Object.entries(BASEMAPS).flatMap(([provider, basemaps]) => {
+    return basemaps.map((basemap) =>
+      z.object({
+        provider: z.literal(provider),
+        url: z.literal(TILE_URLS[provider as BasemapProvider](basemap.tileId))
+      })
+    );
+  })
+);
+
+const BasemapUpdate = z.object({
+  type: z.literal('basemap'),
+  payload: Basemap
+});
+
+const ZoomUpdate = z.object({
+  type: z.literal('zoom'),
+  payload: z.object({ zoom: z.number().min(0).max(22) })
+});
+
+const CenterUpdate = z.object({
+  type: z.literal('center'),
+  payload: z.object({
+    center: z.object({
+      lng: z.number().min(-180).max(180),
+      lat: z.number().min(-90).max(90)
+    })
+  })
+});
 
 function UnknownUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   return z.object({
@@ -623,8 +672,12 @@ function makeSchema(
         HeatmapWeightValueUpdate(layerIdSchema),
         LayerVisibilityUpdate(layerIdSchema),
         LayerTooltipVisibilityUpdate(layerIdSchema),
+        AddLayerUpdate(layerIdSchema),
         RemoveLayerUpdate(layerIdSchema),
         RenameLayerUpdate(layerIdSchema),
+        BasemapUpdate,
+        ZoomUpdate,
+        CenterUpdate,
         UnknownUpdate(layerIdSchema)
       ])
     )

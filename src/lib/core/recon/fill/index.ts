@@ -8,11 +8,11 @@ import type {
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
 
-export function reconFillDiffs({
-  diff,
-  sourceIR,
-  targetIR
-}: ReconFnParams): ReconFnResult {
+export async function reconFillDiffs(
+  params: Promise<ReconFnParams>
+): Promise<ReconFnResult> {
+  const { diff, sourceIR, targetIR } = await params;
+
   switch (diff.type) {
     case 'fill-attribute':
     case 'fill-color-scheme':

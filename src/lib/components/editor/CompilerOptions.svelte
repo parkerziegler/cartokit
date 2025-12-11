@@ -32,9 +32,10 @@
   {#if optionsExpanded}
     <div class="flex gap-4" transition:slide={{ axis: 'y', duration: 150 }}>
       <fieldset class="flex flex-col gap-2 text-white">
-        <legend
+        <legend class="sr-only">Language</legend>
+        <span
           class="font-sans text-sm text-slate-400 underline decoration-dotted underline-offset-4"
-          >Language</legend
+          aria-hidden="true">Language</span
         >
         {#each languageBackends as { value, name } (value)}
           <label class="flex items-center gap-2 text-xs">
@@ -50,9 +51,10 @@
         {/each}
       </fieldset>
       <fieldset class="flex flex-col gap-2 text-white">
-        <legend
+        <legend class="sr-only">Library</legend>
+        <span
           class="font-sans text-sm text-slate-400 underline decoration-dotted underline-offset-4"
-          >Library</legend
+          aria-hidden="true">Library</span
         >
         {#each libraryBackends as { value, name } (value)}
           <label class="flex items-center gap-2 text-xs">
