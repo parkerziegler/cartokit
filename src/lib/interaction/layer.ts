@@ -1,5 +1,3 @@
-import type { FeatureCollection } from 'geojson';
-import { kebabCase, uniqueId } from 'lodash-es';
 import type { Map } from 'maplibre-gl';
 
 import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
@@ -14,16 +12,7 @@ import {
   instrumentLineSelect,
   instrumentPolygonSelect
 } from '$lib/interaction/select';
-import { ir } from '$lib/state/ir.svelte';
 import type { CartoKitLayer } from '$lib/types';
-import { randomColor } from '$lib/utils/color';
-import {
-  DEFAULT_OPACITY,
-  DEFAULT_RADIUS,
-  DEFAULT_STROKE_OPACITY,
-  DEFAULT_STROKE_WIDTH
-} from '$lib/utils/constants';
-import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
 
 /**
  * Add a @see{CartoKitLayer} to the map.
@@ -208,129 +197,5 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
       instrumentPointSelect(map, layer.id);
       break;
     }
-  }
-}
-
-/**
- * Generate a CartoKitLayer for a given GeoJSON dataset, using the dataset's
- * Geometry type to select the appropriate member from the CartoKitLayer union.
- *
- * @param {FeatureCollection} featureCollection – The GeoJSON FeatureCollection
- * associated with the layer.
- * @returns – A default CartoKitLayer appropriate for the input geometry type.
- */
-export function generateCartoKitLayer(
-  featureCollection: FeatureCollection,
-  options: { displayName: string; url?: string; fileName?: string }
-): CartoKitLayer {
-  const geometryType = getFeatureCollectionGeometryType(featureCollection);
-  const color = randomColor();
-
-  switch (geometryType) {
-    case 'Point':
-    case 'MultiPoint':
-      return {
-        id: uniqueId(`${kebabCase(options.displayName)}__`),
-        displayName: options.displayName,
-        type: 'Point',
-        data: {
-          geojson: featureCollection,
-          sourceGeojson: featureCollection,
-          fileName: options.fileName,
-          url: options.url,
-          transformations: []
-        },
-        style: {
-          size: DEFAULT_RADIUS,
-          fill: {
-            type: 'Constant',
-            color,
-            opacity: DEFAULT_OPACITY,
-            visible: true
-          },
-          stroke: {
-            type: 'Constant',
-            color,
-            width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY,
-            visible: true
-          }
-        },
-        layout: {
-          visibility: 'visible',
-          z: Object.values(ir.value.layers).length,
-          tooltip: {
-            visible: true
-          }
-        }
-      };
-    case 'LineString':
-    case 'MultiLineString':
-      return {
-        id: uniqueId(`${kebabCase(options.displayName)}__`),
-        displayName: options.displayName,
-        type: 'Line',
-        data: {
-          geojson: featureCollection,
-          sourceGeojson: featureCollection,
-          fileName: options.fileName,
-          url: options.url,
-          transformations: []
-        },
-        style: {
-          stroke: {
-            type: 'Constant',
-            color,
-            width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY,
-            visible: true
-          }
-        },
-        layout: {
-          visibility: 'visible',
-          z: Object.values(ir.value.layers).length,
-          tooltip: {
-            visible: true
-          }
-        }
-      };
-    case 'Polygon':
-    case 'MultiPolygon':
-      return {
-        id: uniqueId(`${kebabCase(options.displayName)}__`),
-        displayName: options.displayName,
-        type: 'Polygon',
-        data: {
-          geojson: featureCollection,
-          sourceGeojson: featureCollection,
-          fileName: options.fileName,
-          url: options.url,
-          transformations: []
-        },
-        style: {
-          fill: {
-            type: 'Constant',
-            color,
-            opacity: DEFAULT_OPACITY,
-            visible: true
-          },
-          stroke: {
-            type: 'Constant',
-            color,
-            width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY,
-            visible: true
-          }
-        },
-        layout: {
-          visibility: 'visible',
-          z: Object.values(ir.value.layers).length,
-          tooltip: {
-            visible: true
-          }
-        }
-      };
-    case 'GeometryCollection':
-      throw new Error('GeometryCollection not supported.');
   }
 }

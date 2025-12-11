@@ -47,7 +47,7 @@
     }
   }
 
-  function onSubmit(
+  async function onSubmit(
     event: Event & {
       currentTarget: EventTarget & (HTMLFormElement | HTMLTextAreaElement);
     }
@@ -60,46 +60,46 @@
       textarea.blur();
     }
 
-    fetch('/llm', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        prompt,
-        layerIds,
-        layerIdsToAttributes,
-        userId: user.userId
-      })
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        for (const diff of data.diffs) {
-          if (diff.type === 'unknown') {
-            diffUnknown = true;
-
-            setTimeout(() => {
-              diffUnknown = false;
-            }, 3000);
-          } else {
-            applyDiff(diff);
-          }
-        }
-
-        fetching = false;
-        if (textarea) {
-          prompt = '';
-        }
-      })
-      .catch(() => {
-        error = true;
-
-        setTimeout(() => {
-          error = false;
-        }, 3000);
-
-        fetching = false;
+    try {
+      const response = await fetch('/llm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt,
+          layerIds,
+          layerIdsToAttributes,
+          userId: user.userId
+        })
       });
+
+      const data = await response.json();
+
+      for (const diff of data.diffs) {
+        if (diff.type === 'unknown') {
+          diffUnknown = true;
+
+          setTimeout(() => {
+            diffUnknown = false;
+          }, 3000);
+        } else {
+          await applyDiff(diff);
+        }
+      }
+
+      if (textarea) {
+        prompt = '';
+      }
+    } catch (err) {
+      error = true;
+
+      setTimeout(() => {
+        error = false;
+      }, 3000);
+    } finally {
+      fetching = false;
+    }
   }
 </script>
 

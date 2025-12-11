@@ -1,11 +1,13 @@
 <script lang="ts">
   import { getContext } from 'svelte';
+  import { uniqueId, kebabCase } from 'lodash-es';
+  import type { MapSourceDataEvent } from 'maplibre-gl';
 
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { addSource } from '$lib/interaction/source';
   import { map } from '$lib/state/map.svelte';
+  import { applyDiff } from '$lib/core/diff';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -25,12 +27,14 @@
     displayName = event.currentTarget.value;
   }
 
-  function onSourceLoaded() {
-    dataLoading = false;
-    endpoint = '';
-    displayName = '';
+  function handleSourceLoaded(event: MapSourceDataEvent, layerId: string) {
+    if (event.sourceId === layerId) {
+      dataLoading = false;
+      endpoint = '';
+      displayName = '';
 
-    closeModal();
+      closeModal();
+    }
   }
 
   function onSubmit(
@@ -44,12 +48,21 @@
 
     dataLoading = true;
 
-    addSource(map.value!, {
-      kind: 'api',
-      displayName,
-      url: endpoint,
-      onSourceLoaded
+    const layerId = uniqueId(`${kebabCase(displayName)}__`);
+
+    applyDiff({
+      type: 'add-layer',
+      layerId,
+      payload: {
+        type: 'api',
+        displayName,
+        url: endpoint
+      }
     });
+
+    map.value!.on('sourcedata', (event: MapSourceDataEvent) =>
+      handleSourceLoaded(event, layerId)
+    );
   }
 </script>
 

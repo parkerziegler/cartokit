@@ -7,7 +7,7 @@
   import { ir } from '$lib/state/ir.svelte';
   import type { BasemapProvider } from '$lib/types';
   import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
-  import { switchBasemapWithPreservedLayers } from '$lib/utils/maplibre';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
 
   interface Props {
     provider: BasemapProvider;
@@ -27,8 +27,17 @@
   }
 
   function onSelectBasemap(tileUrl: string) {
-    return function updateBasemap() {
-      switchBasemapWithPreservedLayers(tileUrl, provider);
+    return async function updateBasemap() {
+      const diff: CartoKitDiff = {
+        type: 'basemap',
+        payload: {
+          url: tileUrl,
+          provider: provider
+        }
+      };
+
+      await applyDiff(diff);
+
       closeModal();
     };
   }

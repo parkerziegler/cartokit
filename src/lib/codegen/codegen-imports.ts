@@ -1,16 +1,16 @@
 import { camelCase } from 'lodash-es';
 
-import { codegenFns } from '$lib/codegen/mapbox/typescript/codegen-fns';
-import { codegenMap } from '$lib/codegen/mapbox/typescript/codegen-map';
+import { codegenFns } from '$lib/codegen/codegen-fns';
+import { codegenMap } from '$lib/codegen/codegen-map';
 import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
 
 /**
- * Generate a TypeScript program fragment for all library and data source
+ * Generate a program fragment for all library and data source
  * imports.
  *
- * @param ir – The CartoKit IR.
- * @param analysis – The analysis of the CartoKit IR.
- * @returns – A TypeScript program fragment.
+ * @param ir The CartoKit IR.
+ * @param analysis The analysis of the CartoKit IR.
+ * @returns A program fragment.
  */
 export function codegenImports(
   ir: CartoKitIR,
@@ -21,9 +21,9 @@ export function codegenImports(
   const uploadTable = new Map<string, string>();
 
   const libraryImports = [
-    "import mapboxgl from 'mapbox-gl';",
+    `import ${analysis.library}gl from '${analysis.library}-gl';`,
     analysis.isTurfRequired ? "import * as turf from '@turf/turf';" : '',
-    analysis.isGeoJSONNamespaceRequired
+    analysis.language === 'typescript' && analysis.isGeoJSONNamespaceRequired
       ? "import type * as GeoJSON from 'geojson';"
       : ''
   ]
@@ -43,9 +43,7 @@ export function codegenImports(
 
   const imports = `${libraryImports}
   
-  ${fileImports}
-
-  mapboxgl.accessToken = '<YOUR_MAPBOX_ACCESS_TOKEN>'`;
+  ${fileImports}`;
 
   return `${imports}
 

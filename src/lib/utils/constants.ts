@@ -2,7 +2,6 @@ import { deriveThresholds } from '$lib/interaction/scales';
 import { materializeColorScheme } from '$lib/utils/color/scheme';
 
 // CartoKit default values.
-export const DEFAULT_MAP_TYPE = 'Polygon';
 export const DEFAULT_FILL = '#000000';
 export const DEFAULT_OPACITY = 0.75;
 export const DEFAULT_STROKE = '#000000';
