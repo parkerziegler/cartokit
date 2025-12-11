@@ -4,11 +4,11 @@ import { deriveHeatmapWeight } from '$lib/interaction/weight';
 import { map } from '$lib/state/map.svelte';
 import type { CartoKitHeatmapLayer } from '$lib/types';
 
-export function reconHeatmapDiffs({
-  diff,
-  sourceIR,
-  targetIR
-}: ReconFnParams): ReconFnResult {
+export async function reconHeatmapDiffs(
+  params: Promise<ReconFnParams>
+): Promise<ReconFnResult> {
+  const { diff, sourceIR, targetIR } = await params;
+
   switch (diff.type) {
     case 'heatmap-opacity': {
       map.value!.setPaintProperty(

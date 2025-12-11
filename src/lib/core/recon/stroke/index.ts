@@ -8,11 +8,11 @@ import type {
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
 
-export function reconStrokeDiffs({
-  diff,
-  sourceIR,
-  targetIR
-}: ReconFnParams): ReconFnResult {
+export async function reconStrokeDiffs(
+  params: Promise<ReconFnParams>
+): Promise<ReconFnResult> {
+  const { diff, sourceIR, targetIR } = await params;
+
   switch (diff.type) {
     case 'stroke-color': {
       const layer = targetIR.layers[diff.layerId] as

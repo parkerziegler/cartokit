@@ -7,10 +7,11 @@ import { patchPolygon } from '$lib/core/patch/layer-type/polygon';
 import { patchProportionalSymbol } from '$lib/core/patch/layer-type/proportional-symbol';
 import type { CartoKitLayer } from '$lib/types';
 
-export function patchLayerTypeDiffs({
-  diff,
-  ir
-}: PatchFnParams): PatchFnResult {
+export async function patchLayerTypeDiffs(
+  params: Promise<PatchFnParams>
+): Promise<PatchFnResult> {
+  const { diff, ir } = await params;
+
   let targetLayer: CartoKitLayer;
 
   switch (diff.type) {

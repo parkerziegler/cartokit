@@ -1,27 +1,26 @@
 import { orderBy } from 'lodash-es';
 
-import { codegenLayer } from '$lib/codegen/maplibre/javascript/codegen-layer';
-import { codegenMapStyle } from '$lib/codegen/maplibre/javascript/codegen-map-style';
-import { codegenProjection } from '$lib/codegen/maplibre/javascript/codegen-projection';
-import { codegenSource } from '$lib/codegen/maplibre/javascript/codegen-source';
-import type { CartoKitIR, CartoKitBackendAnalysis } from '$lib/types';
+import { codegenLayer } from '$lib/codegen/codegen-layer';
+import { codegenMapStyle } from '$lib/codegen/codegen-map-style';
+import { codegenProjection } from '$lib/codegen/codegen-projection';
+import { codegenSource } from '$lib/codegen/codegen-source';
+import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
 
 /**
- * Generate a MapLibre GL JS program fragment for layer sources, layer renders,
- * and the top-level map instance.
+ * Generate a program fragment for layer sources, layer renders, and the
+ * top-level map instance.
  *
- * @param ir – The CartoKit IR.
- * @param uploadTable – The symbol table tracking file uploads.
- * @param analysis – The analysis of the CartoKit IR.
- * @returns – A MapLibre GL JS program fragment.
+ * @param ir The CartoKit IR.
+ * @param uploadTable The symbol table tracking file uploads.
+ * @param analysis The analysis of the CartoKit IR.
+ * @returns A program fragment.
  */
 export function codegenMap(
   ir: CartoKitIR,
   uploadTable: Map<string, string>,
   analysis: CartoKitBackendAnalysis
 ): string {
-  const projection = codegenProjection(ir);
-
+  const projection = codegenProjection(ir, analysis.library);
   const layerSources = orderBy(
     Object.values(ir.layers),
     'layout.z',
@@ -40,14 +39,15 @@ export function codegenMap(
   const isLoadAsync = analysis.isFetchGeoJSONRequired;
 
   const program = `
-  const map = new maplibregl.Map({
+  const map = new ${analysis.library}gl.Map({
     container: 'map',
     style: ${codegenMapStyle(ir)},
     center: [${ir.center.join(', ')}],
-    zoom: ${ir.zoom}
+    zoom: ${ir.zoom},
+    ${analysis.library === 'mapbox' ? projection : ''}
   });
 
-  ${projection}
+  ${analysis.library === 'maplibre' ? projection : ''}
 
   map.on('load', ${isLoadAsync ? 'async ' : ''}() => {
     ${layerSources}

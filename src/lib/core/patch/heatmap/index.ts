@@ -1,7 +1,11 @@
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import type { CartoKitHeatmapLayer } from '$lib/types';
 
-export function patchHeatmapDiffs({ diff, ir }: PatchFnParams): PatchFnResult {
+export async function patchHeatmapDiffs(
+  params: Promise<PatchFnParams>
+): Promise<PatchFnResult> {
+  const { diff, ir } = await params;
+
   switch (diff.type) {
     case 'heatmap-opacity': {
       const layer = ir.layers[diff.layerId] as CartoKitHeatmapLayer;

@@ -1,12 +1,12 @@
 <script lang="ts">
   import { getContext } from 'svelte';
+  import { uniqueId, kebabCase } from 'lodash-es';
 
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { addSource } from '$lib/interaction/source';
-  import { map } from '$lib/state/map.svelte';
+  import { applyDiff } from '$lib/core/diff';
   import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
 
   const closeModal = getContext<() => void>('close-modal');
@@ -45,21 +45,26 @@
     dataLoading = true;
     const reader = new FileReader();
 
-    reader.onload = function readGeoJSON(theFile) {
+    reader.onload = async function readGeoJSON(theFile) {
       if (typeof theFile.target?.result === 'string' && file) {
         const featureCollection = normalizeGeoJSONToFeatureCollection(
           JSON.parse(theFile.target.result)
         );
 
-        addSource(map.value!, {
-          kind: 'file',
-          displayName,
-          fileName: file.name,
-          featureCollection,
-          onSourceLoaded
+        const layerId = uniqueId(`${kebabCase(displayName)}__`);
+
+        await applyDiff({
+          type: 'add-layer',
+          layerId,
+          payload: {
+            type: 'file',
+            displayName,
+            fileName: file.name,
+            featureCollection
+          }
         });
 
-        closeModal();
+        onSourceLoaded();
       }
     };
 

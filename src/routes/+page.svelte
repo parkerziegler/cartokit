@@ -171,7 +171,9 @@
     {#if layer.value}
       <PropertiesMenu map={map!} layer={layer.value} />
     {/if}
-    <Toolbar />
+    {#if map}
+      <Toolbar {map} />
+    {/if}
     <button
       class={[
         'ease-cubic-out absolute right-4 bottom-12 z-10 flex items-baseline gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 disabled:cursor-not-allowed',
