@@ -1,5 +1,5 @@
 <script lang="ts">
-  import maplibregl from 'maplibre-gl';
+  import maplibregl, { type Map } from 'maplibre-gl';
   import { onMount, setContext } from 'svelte';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
@@ -9,15 +9,20 @@
   import Tabs from '$lib/components/shared/Tabs.svelte';
   import { ir } from '$lib/state/ir.svelte';
   import { layout } from '$lib/stores/layout';
-  import { map } from '$lib/state/map.svelte';
   import type { BasemapProvider } from '$lib/types';
   import { BASEMAPS } from '$lib/utils/basemap';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
+  interface Props {
+    map: Map;
+  }
+
+  let { map }: Props = $props();
+
   let picker: HTMLButtonElement;
-  let maps = $state<maplibregl.Map[]>([]);
-  let hovered = $state(false);
+  let thumbnails = $state<maplibregl.Map[]>([]);
   let showModal = $state(false);
+  let timeoutId = $state<number | null>(null);
 
   setContext('close-modal', () => {
     showModal = false;
@@ -31,73 +36,73 @@
   const mapStyles = ['outdoor-v2', 'winter-v2', 'satellite'];
 
   onMount(() => {
-    maps = mapStyles.map((style) => {
-      const map = new maplibregl.Map({
+    const { top, left } = picker.getBoundingClientRect();
+
+    thumbnails = mapStyles.map((style) => {
+      const thumbnail = new maplibregl.Map({
         container: `inset-${style}`,
         style: `https://api.maptiler.com/maps/${style}/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
-        center: ir.value.center,
+        center: map.unproject([left + 20, top + 20]),
         zoom: ir.value.zoom
       });
 
-      map.scrollZoom.disable();
+      updateMapThumbnailCenter(map, thumbnail);
+      thumbnail.scrollZoom.disable();
 
-      return map;
+      return thumbnail;
     });
+
+    map.on('move', (event) =>
+      updateMapThumbnailCenter(event.target, thumbnails[0])
+    );
+    map.on('zoom', (event) =>
+      updateMapThumbnailZoom(event.target, thumbnails[0])
+    );
 
     const unregisterKeybinding = registerKeybinding('b', onClick);
 
     return () => {
-      maps.forEach((map) => {
-        map.remove();
+      thumbnails.forEach((thumbnail) => {
+        thumbnail.remove();
       });
 
       unregisterKeybinding();
+      map.off('move', (event) =>
+        updateMapThumbnailCenter(event.target, thumbnails[0])
+      );
+      map.off('zoom', (event) =>
+        updateMapThumbnailZoom(event.target, thumbnails[0])
+      );
     };
   });
 
-  function updateMapThumbnail(map: maplibregl.Map) {
+  function updateMapThumbnailCenter(
+    map: maplibregl.Map,
+    thumbnail: maplibregl.Map
+  ) {
     const { top, left } = picker.getBoundingClientRect();
-    map.setCenter(map.unproject([left + 20, top + 20]));
-    map.setZoom(ir.value.zoom);
+    thumbnail.setCenter(map.unproject([left + 20, top + 20]));
   }
 
-  function onMouseEnter() {
-    hovered = true;
-  }
-
-  function onMouseLeave() {
-    hovered = false;
+  function updateMapThumbnailZoom(
+    map: maplibregl.Map,
+    thumbnail: maplibregl.Map
+  ) {
+    thumbnail.setZoom(map.getZoom());
   }
 
   function onClick() {
     showModal = true;
   }
 
-  $effect(() => {
-    if (maps.length > 0 && map.value && ir.value && picker) {
-      updateMapThumbnail(maps[0]);
-    }
-  });
-
-  // Only update hidden map thumbnails when the picker is hovered.
-  // This is a small perf optimization to avoid updating all three
-  // thumbnails while two are out of view.
-  $effect(() => {
-    if (hovered && map.value && ir.value) {
-      maps.slice(1).forEach(updateMapThumbnail);
-    }
-  });
-
-  let timeoutId = $state<number | null>(null);
-
   layout.subscribe(() => {
-    if (maps.length > 0 && map.value && ir.value) {
+    if (thumbnails.length > 0) {
       if (timeoutId) {
         window.clearTimeout(timeoutId);
       }
 
       timeoutId = window.setTimeout(() => {
-        updateMapThumbnail(maps[0]);
+        updateMapThumbnailCenter(map, thumbnails[0]);
       }, 400);
     }
   });
@@ -106,8 +111,6 @@
 <button
   class="group relative"
   bind:this={picker}
-  onmouseenter={onMouseEnter}
-  onmouseleave={onMouseLeave}
   onclick={onClick}
   aria-label="Switch basemap"
   {@attach tooltip({
