@@ -118,7 +118,6 @@
   onMount(() => {
     appendRows(0, n);
   });
-
 </script>
 
 <div
@@ -168,8 +167,8 @@
         {#each array as row, i (i)}
           <tr
             class={[
-              "border-t border-dotted border-slate-400 first:border-t-0 hover:bg-slate-600 cursor-pointer",
-              selectedRow === i && "bg-slate-600"
+              'cursor-pointer border-t border-dotted border-slate-400 first:border-t-0 hover:bg-slate-600',
+              selectedRow === i && 'bg-slate-600'
             ]}
             onclick={() => handleRowClick(row, i)}
           >
