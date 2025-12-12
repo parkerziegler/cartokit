@@ -10,6 +10,9 @@
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import { layout } from '$lib/stores/layout';
   import { pluralize } from '$lib/utils/format';
+  import { selectedFeature } from '$lib/stores/selected-feature';
+  import { map } from '$lib/stores/map';
+  import bbox from '@turf/bbox';
 
   interface Props {
     data: Feature[];
