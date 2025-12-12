@@ -13,7 +13,7 @@
 
   import { selectedFeature } from '$lib/stores/selected-feature';
   import { map } from '$lib/stores/map';
-  import bbox from '@turf/bbox';
+  import { bbox } from '@turf/turf';
 
   interface Props {
     data: Feature[];
@@ -23,7 +23,7 @@
   }
 
   let { data, tableName, onClose, class: className = '' }: Props = $props();
-  let selectedRow: number | null = null;
+  let selectedRow = $state<number | null>(null);
 
   const ROW_HEIGHT = 33;
   const rows = 7;
@@ -97,11 +97,10 @@
   function handleRowClick(row: Feature, index: number) {
     selectedRow = index;
 
-    selectedFeature.set(row);
+    // selectedFeature.set(row); // Maybe have to change the type.
     const bounds = bbox(row);
 
     const m = $map;
-    if (!m) return;
 
     m.fitBounds(
       [
@@ -109,7 +108,7 @@
         [bounds[2], bounds[3]]
       ],
       {
-        padding: 50,
+        padding: 200,
         duration: 800
       }
     );
@@ -118,6 +117,7 @@
   onMount(() => {
     appendRows(0, n);
   });
+
 </script>
 
 <div
@@ -167,8 +167,8 @@
         {#each array as row, i (i)}
           <tr
             class={[
-              'cursor-pointer border-t border-dotted border-slate-400 first:border-t-0 hover:bg-slate-600',
-              selectedRow === i && 'bg-slate-600'
+              "border-t border-dotted border-slate-400 first:border-t-0 hover:bg-slate-600 cursor-pointer",
+              selectedRow === i && "bg-slate-600"
             ]}
             onclick={() => handleRowClick(row, i)}
           >
