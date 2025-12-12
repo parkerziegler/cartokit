@@ -10,6 +10,7 @@
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import { layout } from '$lib/stores/layout';
   import { pluralize } from '$lib/utils/format';
+
   import { selectedFeature } from '$lib/stores/selected-feature';
   import { map } from '$lib/stores/map';
   import bbox from '@turf/bbox';
@@ -22,6 +23,7 @@
   }
 
   let { data, tableName, onClose, class: className = '' }: Props = $props();
+  let selectedRow: number | null = null;
 
   const ROW_HEIGHT = 33;
   const rows = 7;
@@ -48,6 +50,9 @@
 
     // Add the first n rows.
     appendRows(0, n);
+
+    // Reset selected row when reload.
+    selectedRow = null;
 
     // Scroll to the top.
     root.scrollTo(root.scrollLeft, 0);
@@ -89,9 +94,31 @@
     }
   }
 
+  function handleRowClick(row: Feature, index: number) {
+    selectedRow = index;
+
+    selectedFeature.set(row);
+    const bounds = bbox(row);
+
+    const m = $map;
+    if (!m) return;
+
+    m.fitBounds(
+      [
+        [bounds[0], bounds[1]],
+        [bounds[2], bounds[3]]
+      ],
+      {
+        padding: 50,
+        duration: 800
+      }
+    );
+  }
+
   onMount(() => {
     appendRows(0, n);
   });
+
 </script>
 
 <div
@@ -139,7 +166,13 @@
       </thead>
       <tbody>
         {#each array as row, i (i)}
-          <tr class="border-t border-dotted border-slate-400 first:border-t-0">
+          <tr
+            class={[
+              "border-t border-dotted border-slate-400 first:border-t-0 hover:bg-slate-600 cursor-pointer",
+              selectedRow === i && "bg-slate-600"
+            ]}
+            onclick={() => handleRowClick(row, i)}
+          >
             {#each cols as col (col)}
               <td class="cell truncate px-4 py-2"
                 >{row.properties?.[col] ?? ''}</td
