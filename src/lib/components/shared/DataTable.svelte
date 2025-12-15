@@ -1,6 +1,7 @@
 <!-- Inspiration for this implementation courtesy of Observable:
      https://github.com/observablehq/inputs/blob/main/src/table.js -->
 <script lang="ts">
+  import { bbox } from '@turf/turf';
   import type { Feature } from 'geojson';
   import { orderBy } from 'lodash-es';
   import { onMount } from 'svelte';
@@ -9,11 +10,8 @@
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import { layout } from '$lib/stores/layout';
-  import { pluralize } from '$lib/utils/format';
-
-  // import { selectedFeature } from '$lib/stores/selected-feature';
   import { map } from '$lib/stores/map';
-  import { bbox } from '@turf/turf';
+  import { pluralize } from '$lib/utils/format';
 
   interface Props {
     data: Feature[];
@@ -96,20 +94,16 @@
 
   function handleRowClick(row: Feature, index: number) {
     selectedRow = index;
-
-    // selectedFeature.set(row); // Maybe have to change the type.
     const bounds = bbox(row);
 
-    const m = $map;
-
-    m.fitBounds(
+    $map.fitBounds(
       [
         [bounds[0], bounds[1]],
         [bounds[2], bounds[3]]
       ],
       {
         padding: 200,
-        duration: 800
+        duration: 1000
       }
     );
   }
@@ -166,8 +160,10 @@
         {#each array as row, i (i)}
           <tr
             class={[
-              'cursor-pointer border-t border-dotted border-slate-400 first:border-t-0 hover:bg-slate-600',
-              selectedRow === i && 'bg-slate-600'
+              'cursor-pointer border-t border-dotted border-slate-400 first:border-t-0',
+              selectedRow === i
+                ? 'bg-slate-600 hover:bg-slate-600'
+                : 'hover:bg-slate-700'
             ]}
             onclick={() => handleRowClick(row, i)}
           >
