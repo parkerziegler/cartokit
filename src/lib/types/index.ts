@@ -501,7 +501,7 @@ export type BasemapProvider =
 /**
  * Represents the set of possible projections in cartokit.
  */
-type Projection = 'mercator' | 'globe';
+export type Projection = 'mercator' | 'globe';
 
 /**
  * Represents the cartokit IR.

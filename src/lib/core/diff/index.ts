@@ -13,6 +13,7 @@ import type {
   ColorRamp,
   LayerType,
   LayerVisibility,
+  Projection,
   QuantitativeColorScheme,
   RampDirection,
   SchemeDirection,
@@ -306,6 +307,13 @@ interface CenterDiff {
   };
 }
 
+interface ProjectionDiff {
+  type: 'projection';
+  payload: {
+    projection: Projection;
+  };
+}
+
 export type CartoKitDiff =
   | LayerTypeDiff
   | AddTransformationDiff
@@ -346,7 +354,8 @@ export type CartoKitDiff =
   | RenameLayerDiff
   | BasemapDiff
   | ZoomDiff
-  | CenterDiff;
+  | CenterDiff
+  | ProjectionDiff;
 
 export async function applyDiff(
   execute: CartoKitDiff,

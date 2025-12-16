@@ -72,7 +72,7 @@ export const POST = (async ({ request }) => {
       ChatCompletionParseParams,
       z.infer<typeof schema>
     >({
-      model: 'gpt-5.1',
+      model: 'gpt-5',
       messages: [
         {
           role: 'system',
@@ -623,6 +623,13 @@ const CenterUpdate = z.object({
   })
 });
 
+const ProjectionUpdate = z.object({
+  type: z.literal('projection'),
+  payload: z.object({
+    projection: z.union([z.literal('mercator'), z.literal('globe')])
+  })
+});
+
 function UnknownUpdate(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   return z.object({
     type: z.literal('unknown'),
@@ -678,6 +685,7 @@ function makeSchema(
         BasemapUpdate,
         ZoomUpdate,
         CenterUpdate,
+        ProjectionUpdate,
         UnknownUpdate(layerIdSchema)
       ])
     )
