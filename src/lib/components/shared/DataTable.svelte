@@ -1,6 +1,7 @@
 <!-- Inspiration for this implementation courtesy of Observable:
      https://github.com/observablehq/inputs/blob/main/src/table.js -->
 <script lang="ts">
+  import { bbox } from '@turf/turf';
   import type { Feature } from 'geojson';
   import { orderBy } from 'lodash-es';
   import { onMount } from 'svelte';
@@ -9,6 +10,7 @@
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import { layout } from '$lib/stores/layout';
+  import { map } from '$lib/stores/map';
   import { pluralize } from '$lib/utils/format';
 
   interface Props {
@@ -19,6 +21,7 @@
   }
 
   let { data, tableName, onClose, class: className = '' }: Props = $props();
+  let selectedRow = $state<number | null>(null);
 
   const ROW_HEIGHT = 33;
   const rows = 7;
@@ -45,6 +48,9 @@
 
     // Add the first n rows.
     appendRows(0, n);
+
+    // Reset selected row when reload.
+    selectedRow = null;
 
     // Scroll to the top.
     root.scrollTo(root.scrollLeft, 0);
@@ -84,6 +90,22 @@
     ) {
       appendRows(n, (n = minlengthof(n + rows)));
     }
+  }
+
+  function handleRowClick(row: Feature, index: number) {
+    selectedRow = index;
+    const bounds = bbox(row);
+
+    $map.fitBounds(
+      [
+        [bounds[0], bounds[1]],
+        [bounds[2], bounds[3]]
+      ],
+      {
+        padding: 200,
+        duration: 1000
+      }
+    );
   }
 
   onMount(() => {
@@ -136,7 +158,15 @@
       </thead>
       <tbody>
         {#each array as row, i (i)}
-          <tr class="border-t border-dotted border-slate-400 first:border-t-0">
+          <tr
+            class={[
+              'cursor-pointer border-t border-dotted border-slate-400 first:border-t-0',
+              selectedRow === i
+                ? 'bg-slate-600 hover:bg-slate-600'
+                : 'hover:bg-slate-700'
+            ]}
+            onclick={() => handleRowClick(row, i)}
+          >
             {#each cols as col (col)}
               <td class="cell truncate px-4 py-2"
                 >{row.properties?.[col] ?? ''}</td
