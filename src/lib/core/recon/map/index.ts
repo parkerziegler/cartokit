@@ -1,6 +1,6 @@
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
 import { map } from '$lib/state/map.svelte';
-import { switchBasemapWithPreservedLayers } from '$lib/utils/maplibre';
+import { getInstrumentedLayerIds } from '$lib/utils/layer';
 
 export async function reconMapDiffs(
   params: Promise<ReconFnParams>
@@ -9,7 +9,37 @@ export async function reconMapDiffs(
 
   switch (diff.type) {
     case 'basemap': {
-      switchBasemapWithPreservedLayers(diff.payload.url, diff.payload.provider);
+      // Preserve all currently rendered layers and sources when calling map.setStyle().
+      // By default, map.setStyle() will not preserve custom layers.
+      // See: https://github.com/maplibre/maplibre-gl-js/issues/2587.
+      map.value!.setStyle(diff.payload.url, {
+        transformStyle: (previousStyle, nextStyle) => {
+          const ids = Object.values(targetIR.layers).reduce<string[]>(
+            (acc, layer) => [
+              ...acc,
+              layer.id,
+              ...getInstrumentedLayerIds(layer)
+            ],
+            []
+          );
+
+          const customLayers =
+            previousStyle?.layers?.filter((layer) => ids.includes(layer.id)) ??
+            [];
+          const layers = nextStyle.layers.concat(customLayers);
+
+          const sources = nextStyle.sources;
+          if (previousStyle?.sources) {
+            for (const [id, value] of Object.entries(previousStyle.sources)) {
+              if (ids.includes(id)) {
+                sources[id] = value;
+              }
+            }
+          }
+
+          return { ...nextStyle, layers, sources };
+        }
+      });
       break;
     }
     case 'zoom': {
@@ -18,6 +48,10 @@ export async function reconMapDiffs(
     }
     case 'center': {
       map.value!.setCenter(diff.payload.center);
+      break;
+    }
+    case 'projection': {
+      map.value!.setProjection({ type: diff.payload.projection });
       break;
     }
   }

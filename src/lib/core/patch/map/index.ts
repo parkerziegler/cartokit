@@ -19,6 +19,10 @@ export async function patchMapDiffs(
       ir.center = [diff.payload.center.lng, diff.payload.center.lat];
       break;
     }
+    case 'projection': {
+      ir.projection = diff.payload.projection;
+      break;
+    }
   }
 
   return {

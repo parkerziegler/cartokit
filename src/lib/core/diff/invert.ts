@@ -345,7 +345,6 @@ export function invertDiff(
         }
       };
     }
-
     case 'heatmap-radius': {
       const layer = sourceIR.layers[diff.layerId] as CartoKitHeatmapLayer;
 
@@ -357,7 +356,6 @@ export function invertDiff(
         }
       };
     }
-
     case 'heatmap-ramp': {
       const layer = sourceIR.layers[diff.layerId] as CartoKitHeatmapLayer;
 
@@ -369,7 +367,6 @@ export function invertDiff(
         }
       };
     }
-
     case 'heatmap-ramp-direction': {
       const layer = sourceIR.layers[diff.layerId] as CartoKitHeatmapLayer;
 
@@ -381,7 +378,6 @@ export function invertDiff(
         }
       };
     }
-
     case 'heatmap-weight-type': {
       const layer = sourceIR.layers[diff.layerId] as CartoKitHeatmapLayer;
 
@@ -393,7 +389,6 @@ export function invertDiff(
         }
       };
     }
-
     case 'heatmap-weight-attribute': {
       const layer = sourceIR.layers[diff.layerId] as CartoKitHeatmapLayer;
 
@@ -407,7 +402,6 @@ export function invertDiff(
         }
       };
     }
-
     case 'heatmap-weight-min': {
       const layer = sourceIR.layers[diff.layerId] as CartoKitHeatmapLayer;
 
@@ -499,6 +493,42 @@ export function invertDiff(
         layerId: diff.layerId,
         payload: {
           displayName: layer.displayName
+        }
+      };
+    }
+    case 'basemap': {
+      return {
+        type: 'basemap',
+        payload: {
+          url: sourceIR.basemap.url,
+          provider: sourceIR.basemap.provider
+        }
+      };
+    }
+    case 'zoom': {
+      return {
+        type: 'zoom',
+        payload: {
+          zoom: sourceIR.zoom
+        }
+      };
+    }
+    case 'center': {
+      return {
+        type: 'center',
+        payload: {
+          center: {
+            lng: sourceIR.center[0],
+            lat: sourceIR.center[1]
+          }
+        }
+      };
+    }
+    case 'projection': {
+      return {
+        type: 'projection',
+        payload: {
+          projection: sourceIR.projection
         }
       };
     }
