@@ -2,7 +2,7 @@ import type { Map, MapLayerMouseEvent } from 'maplibre-gl';
 
 import { popup } from '$lib/state/popup.svelte';
 import { ir } from '$lib/state/ir.svelte';
-import { listeners } from '$lib/stores/listeners';
+import { listeners } from '$lib/state/listeners.svelte';
 
 /**
  * Add a hover effect to all features in a point layer.
@@ -146,17 +146,11 @@ const addHoverListeners = (map: Map, layerId: string): void => {
   map.on('mousemove', layerId, onMouseMove);
   map.on('mouseleave', layerId, onMouseLeave);
 
-  listeners.update((ls) => {
-    const layerListeners = ls.get(layerId) ?? {
-      click: () => {},
-      mousemove: () => {},
-      mouseleave: () => {}
-    };
+  const layerListeners = listeners.value.get(layerId)!;
 
-    return ls.set(layerId, {
-      ...layerListeners,
-      mousemove: onMouseMove,
-      mouseleave: onMouseLeave
-    });
+  listeners.value.set(layerId, {
+    ...layerListeners,
+    mousemove: onMouseMove,
+    mouseleave: onMouseLeave
   });
 };

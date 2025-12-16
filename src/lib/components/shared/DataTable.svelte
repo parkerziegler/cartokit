@@ -9,8 +9,8 @@
   import { slide } from 'svelte/transition';
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
+  import { map } from '$lib/state/map.svelte';
   import { layout } from '$lib/stores/layout';
-  import { map } from '$lib/stores/map';
   import { pluralize } from '$lib/utils/format';
 
   interface Props {
@@ -96,7 +96,7 @@
     selectedRow = index;
     const bounds = bbox(row);
 
-    $map.fitBounds(
+    map.value!.fitBounds(
       [
         [bounds[0], bounds[1]],
         [bounds[2], bounds[3]]
