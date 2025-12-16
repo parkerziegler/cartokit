@@ -12,7 +12,7 @@
 
   let { layerId, size, label, fieldId }: Props = $props();
 
-  function onPointSizeChange(value: number): void {
+  async function onPointSizeChange(value: number) {
     const diff: CartoKitDiff = {
       type: 'size',
       layerId,
@@ -21,7 +21,7 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

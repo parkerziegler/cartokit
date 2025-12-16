@@ -37,7 +37,7 @@
     }
   }
 
-  function onSubmit(
+  async function onSubmit(
     event: Event & { currentTarget: EventTarget & HTMLFormElement }
   ) {
     event.preventDefault();
@@ -50,7 +50,7 @@
 
     const layerId = uniqueId(`${kebabCase(displayName)}__`);
 
-    applyDiff({
+    await applyDiff({
       type: 'add-layer',
       layerId,
       payload: {

@@ -62,7 +62,7 @@
   function onClick() {
     const program = view?.state.doc.toString() ?? '';
 
-    transformationWorker(program, geojson, (message) => {
+    transformationWorker(program, geojson, async (message) => {
       switch (message.type) {
         case 'data': {
           const diff: CartoKitDiff = {
@@ -77,7 +77,7 @@
             }
           };
 
-          applyDiff(diff);
+          await applyDiff(diff);
 
           success = true;
           // Clear any errors on successful transformation.

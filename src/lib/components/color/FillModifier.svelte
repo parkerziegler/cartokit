@@ -16,24 +16,24 @@
 
   let { layerId, fill }: Props = $props();
 
-  function onRemoveFill() {
+  async function onRemoveFill() {
     const diff: CartoKitDiff = {
       type: 'remove-fill',
       layerId,
       payload: {}
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onAddFill() {
+  async function onAddFill() {
     const diff: CartoKitDiff = {
       type: 'add-fill',
       layerId,
       payload: {}
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

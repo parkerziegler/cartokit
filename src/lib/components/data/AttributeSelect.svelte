@@ -44,7 +44,7 @@
     }))
   );
 
-  function onAttributeChange(
+  async function onAttributeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     // Convert channel-based attribute to specific diff type.
@@ -58,7 +58,7 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
   function onClickComputedAttribute() {

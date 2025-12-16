@@ -11,7 +11,7 @@
 
   let { layerId, fill }: Props = $props();
 
-  function applyFillColorDiff(color: string) {
+  async function applyFillColorDiff(color: string) {
     const diff: CartoKitDiff = {
       type: 'fill-color',
       layerId,
@@ -20,17 +20,17 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onFillInput(
+  async function onFillInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
-    applyFillColorDiff(event.currentTarget.value);
+    await applyFillColorDiff(event.currentTarget.value);
   }
 
-  function onFillHexChange(hex: string) {
-    applyFillColorDiff(hex);
+  async function onFillHexChange(hex: string) {
+    await applyFillColorDiff(hex);
   }
 </script>
 

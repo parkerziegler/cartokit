@@ -17,7 +17,7 @@
     label: `${i + 3}`
   }));
 
-  function onStepsChange(
+  async function onStepsChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     const diff: CartoKitDiff = {
@@ -28,7 +28,7 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

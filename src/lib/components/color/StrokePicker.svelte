@@ -11,7 +11,7 @@
 
   let { layerId, stroke }: Props = $props();
 
-  function dispatchStrokeUpdate(color: string) {
+  async function dispatchStrokeUpdate(color: string) {
     const diff: CartoKitDiff = {
       type: 'stroke-color' as const,
       layerId,
@@ -20,20 +20,20 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onStrokeInput(
+  async function onStrokeInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
-    dispatchStrokeUpdate(event.currentTarget.value);
+    await dispatchStrokeUpdate(event.currentTarget.value);
   }
 
-  function onStrokeHexChange(hex: string) {
-    dispatchStrokeUpdate(hex);
+  async function onStrokeHexChange(hex: string) {
+    await dispatchStrokeUpdate(hex);
   }
 
-  function onStrokeWidthChange(value: number) {
+  async function onStrokeWidthChange(value: number) {
     const diff: CartoKitDiff = {
       type: 'stroke-width' as const,
       layerId,
@@ -42,7 +42,7 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 
