@@ -50,7 +50,7 @@
     showOptions = false;
   }
 
-  function dispatchSchemeUpdate(
+  async function dispatchSchemeUpdate(
     scheme: CategoricalColorScheme | QuantitativeColorScheme
   ) {
     const diff: CartoKitDiff = {
@@ -61,18 +61,18 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onClickScheme(
+  async function onClickScheme(
     scheme: CategoricalColorScheme | QuantitativeColorScheme
   ) {
     showOptions = false;
 
-    dispatchSchemeUpdate(scheme);
+    await dispatchSchemeUpdate(scheme);
   }
 
-  function onSchemeReverse() {
+  async function onSchemeReverse() {
     const currentDirection = style.scheme.direction;
     const nextDirection: SchemeDirection =
       currentDirection === 'Forward' ? 'Reverse' : 'Forward';
@@ -85,7 +85,7 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

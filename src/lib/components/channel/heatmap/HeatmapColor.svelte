@@ -39,17 +39,17 @@
     showOptions = false;
   }
 
-  function onClickRamp(ramp: ColorRampType) {
+  async function onClickRamp(ramp: ColorRampType) {
     const diff: CartoKitDiff = {
       type: 'heatmap-ramp',
       layerId: layer.id,
       payload: { ramp }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onRampReverse() {
+  async function onRampReverse() {
     const currentDirection = layer.style.heatmap.ramp.direction;
     const nextDirection: RampDirection =
       currentDirection === 'Forward' ? 'Reverse' : 'Forward';
@@ -60,7 +60,7 @@
       payload: { direction: nextDirection }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

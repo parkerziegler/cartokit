@@ -10,14 +10,14 @@
 
   let { layer }: Props = $props();
 
-  function onHeatmapRadiusChange(value: number): void {
+  async function onHeatmapRadiusChange(value: number) {
     const diff: CartoKitDiff = {
       type: 'heatmap-radius',
       layerId: layer.id,
       payload: { radius: value }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

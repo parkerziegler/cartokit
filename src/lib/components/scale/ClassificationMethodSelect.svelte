@@ -31,7 +31,7 @@
     displayBreaksEditor = false;
   }
 
-  function onClassificationMethodChange(
+  async function onClassificationMethodChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     if (event.currentTarget.value === 'Manual') {
@@ -48,7 +48,7 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

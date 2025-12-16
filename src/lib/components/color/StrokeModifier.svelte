@@ -12,24 +12,24 @@
 
   let { layerId, stroke }: Props = $props();
 
-  function onRemoveStroke() {
+  async function onRemoveStroke() {
     const diff: CartoKitDiff = {
       type: 'remove-stroke' as const,
       layerId,
       payload: {}
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onAddStroke() {
+  async function onAddStroke() {
     const diff: CartoKitDiff = {
       type: 'add-stroke' as const,
       layerId,
       payload: {}
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

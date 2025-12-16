@@ -10,6 +10,12 @@
   }
 
   let { layerId, layerType, visualizationType }: Props = $props();
+  let options = $derived(
+    deriveOptions(layerType).map(({ label, value }) => ({
+      value,
+      label
+    }))
+  );
 
   function deriveOptions(
     layerType: LayerType
@@ -34,7 +40,7 @@
     }
   }
 
-  function onVisualizationTypeChange(
+  async function onVisualizationTypeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     const diff: CartoKitDiff = {
@@ -45,15 +51,8 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
-
-  let options = $derived(
-    deriveOptions(layerType).map(({ label, value }) => ({
-      value,
-      label
-    }))
-  );
 </script>
 
 <Select

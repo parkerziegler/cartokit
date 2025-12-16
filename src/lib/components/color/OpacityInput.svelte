@@ -33,7 +33,7 @@
     }
   }
 
-  function onOpacityChange(opacity: number) {
+  async function onOpacityChange(opacity: number) {
     const diffType = `${channel}-opacity` as const;
 
     const diff: CartoKitDiff = {
@@ -42,7 +42,7 @@
       payload: { opacity }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 
