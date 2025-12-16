@@ -1,7 +1,7 @@
 import type { Map, GeoJSONSource } from 'maplibre-gl';
 
 import { addLayer } from '$lib/interaction/layer';
-import { listeners, type LayerListeners } from '$lib/stores/listeners';
+import { listeners, type LayerListeners } from '$lib/state/listeners.svelte';
 import type { CartoKitLayer } from '$lib/types';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
 
@@ -11,18 +11,15 @@ export function redraw(
   targetLayer: CartoKitLayer
 ) {
   // Remove all event listeners for the existing layer.
-  listeners.update((ls) => {
-    if (ls.has(sourceLayer.id)) {
-      // This is a safe non-null assertion — we know the listeners exist via the call to .has.
-      Object.entries(ls.get(sourceLayer.id)!).forEach(([event, listener]) => {
+  if (listeners.value.has(sourceLayer.id)) {
+    Object.entries(listeners.value.get(sourceLayer.id)!).forEach(
+      ([event, listener]) => {
         map.off(event as keyof LayerListeners, sourceLayer.id, listener);
-      });
-    }
+      }
+    );
 
-    ls.delete(sourceLayer.id);
-
-    return ls;
-  });
+    listeners.value.delete(sourceLayer.id);
+  }
 
   // Remove the existing layer and all instrumented layers.
   map.removeLayer(sourceLayer.id);

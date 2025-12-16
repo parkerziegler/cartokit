@@ -1,9 +1,9 @@
 import type { Map, MapLayerMouseEvent, MapMouseEvent } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
-import { layout } from '$lib/stores/layout';
-import { listeners } from '$lib/stores/listeners';
 import { feature } from '$lib/state/feature.svelte';
+import { listeners } from '$lib/state/listeners.svelte';
+import { layout } from '$lib/stores/layout';
 import type { CartoKitIR } from '$lib/types';
 
 /**
@@ -121,17 +121,11 @@ const addSelectListeners = (map: Map, layerId: string) => {
 
   map.on('click', layerId, onClick);
 
-  listeners.update((ls) => {
-    const layerListeners = ls.get(layerId) ?? {
-      click: () => {},
-      mousemove: () => {},
-      mouseleave: () => {}
-    };
+  const layerListeners = listeners.value.get(layerId)!;
 
-    return ls.set(layerId, {
-      ...layerListeners,
-      click: onClick
-    });
+  listeners.value.set(layerId, {
+    ...layerListeners,
+    click: onClick
   });
 };
 
@@ -159,15 +153,14 @@ export const onFeatureLeave = (
     const features = map.queryRenderedFeatures(event.point, {
       layers: layerIds
     });
-    const { dataVisible } = get(layout);
 
     // If the mouse event intersects no features and there is a currently selected feature, deselect it.
     if (features.length === 0 && typeof feature.value?.id !== 'undefined') {
-      if (dataVisible) {
-        layout.update((lyt) => {
-          lyt.dataVisible = false;
+      if (get(layout).dataVisible) {
+        layout.update((layout) => {
+          layout.dataVisible = false;
 
-          return lyt;
+          return layout;
         });
       }
 
