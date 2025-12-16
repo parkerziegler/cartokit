@@ -91,7 +91,7 @@
       if (textarea) {
         prompt = '';
       }
-    } catch (err) {
+    } catch {
       error = true;
 
       setTimeout(() => {
