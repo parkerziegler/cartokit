@@ -17,7 +17,7 @@
   );
 
   function onThresholdChange(i: number) {
-    return function handleThresholdChange(value: number) {
+    return async function handleThresholdChange(value: number) {
       const diff: CartoKitDiff = {
         type: 'fill-step-value',
         layerId,
@@ -27,7 +27,7 @@
         }
       };
 
-      applyDiff(diff);
+      await applyDiff(diff);
     };
   }
 </script>

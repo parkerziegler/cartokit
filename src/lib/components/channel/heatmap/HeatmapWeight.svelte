@@ -31,7 +31,7 @@
       : []
   );
 
-  function onWeightTypeChange(
+  async function onWeightTypeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     const diff: CartoKitDiff = {
@@ -42,10 +42,10 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onWeightAttributeChange(
+  async function onWeightAttributeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     const diff: CartoKitDiff = {
@@ -54,37 +54,37 @@
       payload: { weightAttribute: event.currentTarget.value }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onWeightBoundsMinChange(value: number) {
+  async function onWeightBoundsMinChange(value: number) {
     const diff: CartoKitDiff = {
       type: 'heatmap-weight-min',
       layerId: layer.id,
       payload: { min: value }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onWeightBoundsMaxChange(value: number) {
+  async function onWeightBoundsMaxChange(value: number) {
     const diff: CartoKitDiff = {
       type: 'heatmap-weight-max',
       layerId: layer.id,
       payload: { max: value }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onWeightValueChange(value: number) {
+  async function onWeightValueChange(value: number) {
     const diff: CartoKitDiff = {
       type: 'heatmap-weight-value',
       layerId: layer.id,
       payload: { value }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

@@ -21,7 +21,7 @@
     })) ?? []
   );
 
-  function onLayerTypeChange(
+  async function onLayerTypeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     const diff: CartoKitDiff = {
@@ -30,7 +30,7 @@
       payload: { layerType: event.currentTarget.value as LayerType }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

@@ -10,14 +10,14 @@
 
   let { layer }: Props = $props();
 
-  function onOpacityChange(opacity: number) {
+  async function onOpacityChange(opacity: number) {
     const diff: CartoKitDiff = {
       type: 'heatmap-opacity',
       layerId: layer.id,
       payload: { opacity }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

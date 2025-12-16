@@ -11,7 +11,7 @@
 
   let { layer }: Props = $props();
 
-  function onMinSizeChange(value: number) {
+  async function onMinSizeChange(value: number) {
     const diff: CartoKitDiff = {
       type: 'min-size',
       layerId: layer.id,
@@ -20,10 +20,10 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onMaxSizeChange(value: number) {
+  async function onMaxSizeChange(value: number) {
     const diff: CartoKitDiff = {
       type: 'max-size',
       layerId: layer.id,
@@ -32,7 +32,7 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 </script>
 

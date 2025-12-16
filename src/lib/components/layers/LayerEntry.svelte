@@ -32,7 +32,7 @@
   let editingDisplayName = $state(false);
   let lastCommittedDisplayName = $state(layer.displayName);
 
-  function toggleLayerVisibility() {
+  async function toggleLayerVisibility() {
     const nextVisibility =
       layer.layout.visibility === 'visible' ? 'hidden' : 'visible';
 
@@ -44,10 +44,10 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function toggleLayerTooltip() {
+  async function toggleLayerTooltip() {
     const nextTooltipVisible = !layer.layout.tooltip.visible;
 
     const diff: CartoKitDiff = {
@@ -58,17 +58,17 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function removeLayer() {
+  async function removeLayer() {
     const diff: CartoKitDiff = {
       type: 'remove-layer',
       layerId: layer.id,
       payload: {}
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
   function onLayerKeyDown(
@@ -91,7 +91,7 @@
     }
   }
 
-  function onDisplayNameInput(
+  async function onDisplayNameInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
     const diff: CartoKitDiff = {
@@ -102,10 +102,10 @@
       }
     };
 
-    applyDiff(diff);
+    await applyDiff(diff);
   }
 
-  function onDisplayNameInputKeyDown(
+  async function onDisplayNameInputKeyDown(
     event: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement }
   ) {
     if (event.key === 'Enter') {
@@ -122,7 +122,7 @@
         }
       };
 
-      applyDiff(diff);
+      await applyDiff(diff);
     }
   }
 
