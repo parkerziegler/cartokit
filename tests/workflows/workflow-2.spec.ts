@@ -130,7 +130,7 @@ test('workflow-2', async ({ page }) => {
   await page.locator('#fill-attribute-select').selectOption('trend');
 
   // Set the layer's Steps to 6.
-  await page.locator('#color-steps-select').selectOption('6');
+  await page.locator('#fill-step-count-select').selectOption('6');
 
   // Switch the layer's Color Scheme to PRGn.
   await page.locator('#color-scheme').getByRole('button').click();
@@ -140,7 +140,9 @@ test('workflow-2', async ({ page }) => {
   await page.getByTestId('color-scheme-reverse-button').click();
 
   // Set the layer's Method to Manual.
-  await page.locator('#classification-method-select').selectOption('Manual');
+  await page
+    .locator('#fill-classification-method-select')
+    .selectOption('Manual');
 
   // Set the layer's Breaks to -21, -14, -7, 0, 7.
   const stops = [-21, -14, -7, 0, 7];
