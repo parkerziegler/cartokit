@@ -126,7 +126,9 @@ test('workflow-3', async ({ page }) => {
   await page.locator('#fill-attribute-select').selectOption('decadal_rate');
 
   // Set the layer's Method to Manual.
-  await page.locator('#classification-method-select').selectOption('Manual');
+  await page
+    .locator('#fill-classification-method-select')
+    .selectOption('Manual');
 
   // Set the layer's Breaks to -0.5, 0, 0.5, 1.
   const stops = [-0.5, 0, 0.5, 1];

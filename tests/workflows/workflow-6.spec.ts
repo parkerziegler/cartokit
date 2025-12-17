@@ -126,10 +126,12 @@ test('workflow-6', async ({ page }) => {
   await page.getByTestId('color-scheme-reverse-button').click();
 
   // Set the layer's Steps to 8.
-  await page.locator('#color-steps-select').selectOption('8');
+  await page.locator('#fill-step-count-select').selectOption('8');
 
   // Set the layer's Method to Manual.
-  await page.locator('#classification-method-select').selectOption('Manual');
+  await page
+    .locator('#fill-classification-method-select')
+    .selectOption('Manual');
 
   // Set the layer's Breaks to -200, -100, -50, 0, 50, 100, 200.
   const stops = [-200, -100, -50, 0, 50, 100, 200];
