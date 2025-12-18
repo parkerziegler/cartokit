@@ -4,11 +4,11 @@
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { ir } from '$lib/state/ir.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import { ir } from '$lib/stores/ir';
 
   let tileUrl = $state(
-    ir.value.basemap.provider === 'Custom' ? ir.value.basemap.url : ''
+    $ir.basemap.provider === 'Custom' ? $ir.basemap.url : ''
   );
 
   const closeModal = getContext<() => void>('close-modal');
@@ -48,6 +48,6 @@
   <Button
     onclick={onSubmit}
     class="mt-2 self-end"
-    disabled={!tileUrl || tileUrl === ir.value.basemap.url}>Apply</Button
+    disabled={!tileUrl || tileUrl === $ir.basemap.url}>Apply</Button
   >
 </form>

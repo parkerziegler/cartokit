@@ -65,8 +65,8 @@ export function analyzeIR(
   libraryBackend: CartoKitBackend['library']
 ): CartoKitBackendAnalysis {
   return {
-    library: libraryBackend,
     language: languageBackend,
+    library: libraryBackend,
     isTurfRequired: isTurfRequired(ir),
     isFetchGeoJSONRequired: isFetchGeoJSONRequired(ir),
     isGeoJSONNamespaceRequired: isGeoJSONNamespaceRequired(ir, languageBackend)

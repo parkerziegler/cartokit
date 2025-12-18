@@ -7,7 +7,7 @@
   import BasemapGrid from '$lib/components/map/BasemapGrid.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
-  import { ir } from '$lib/state/ir.svelte';
+  import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import type { BasemapProvider } from '$lib/types';
   import { BASEMAPS } from '$lib/utils/basemap';
@@ -43,7 +43,7 @@
         container: `inset-${style}`,
         style: `https://api.maptiler.com/maps/${style}/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
         center: map.unproject([left + 20, top + 20]),
-        zoom: ir.value.zoom
+        zoom: $ir.zoom
       });
 
       updateMapThumbnailCenter(map, thumbnail);
