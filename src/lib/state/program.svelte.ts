@@ -1,12 +1,14 @@
+import { get } from 'svelte/store';
+
 import { backend } from '$lib/state/backend.svelte';
-import { ir } from '$lib/state/ir.svelte';
+import { ir } from '$lib/stores/ir';
 
 import { codegen } from '$lib/codegen';
 
 const prog = $derived.by(async () => {
   try {
     return await codegen(
-      ir.value,
+      get(ir),
       backend.value.language,
       backend.value.library
     );

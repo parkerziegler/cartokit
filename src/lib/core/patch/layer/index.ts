@@ -1,8 +1,9 @@
 import * as Comlink from 'comlink';
 import type { FeatureCollection } from 'geojson';
+import { get } from 'svelte/store';
 
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
-import { ir } from '$lib/state/ir.svelte';
+import { ir } from '$lib/stores/ir';
 import type { CartoKitLayer } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
@@ -65,7 +66,7 @@ function generateCartoKitLayer(
         },
         layout: {
           visibility: 'visible',
-          z: Object.values(ir.value.layers).length,
+          z: Object.values(get(ir).layers).length,
           tooltip: {
             visible: true
           }
@@ -95,7 +96,7 @@ function generateCartoKitLayer(
         },
         layout: {
           visibility: 'visible',
-          z: Object.values(ir.value.layers).length,
+          z: Object.values(get(ir).layers).length,
           tooltip: {
             visible: true
           }
@@ -131,7 +132,7 @@ function generateCartoKitLayer(
         },
         layout: {
           visibility: 'visible',
-          z: Object.values(ir.value.layers).length,
+          z: Object.values(get(ir).layers).length,
           tooltip: {
             visible: true
           }

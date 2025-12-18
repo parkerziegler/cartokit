@@ -4,7 +4,7 @@ import { invertDiff } from '$lib/core/diff/invert';
 import { patch } from '$lib/core/patch';
 import { recon } from '$lib/core/recon';
 import { history } from '$lib/state/history.svelte';
-import { ir } from '$lib/state/ir.svelte';
+import { ir } from '$lib/stores/ir';
 import type {
   BasemapProvider,
   CartoKitLayer,
@@ -20,6 +20,7 @@ import type {
   TransformationCall,
   VisualizationType
 } from '$lib/types';
+import { get } from 'svelte/store';
 
 interface LayerDiff {
   layerId: CartoKitLayer['id'];
@@ -361,7 +362,7 @@ export async function applyDiff(
   execute: CartoKitDiff,
   triggeredByUndo = false
 ): Promise<void> {
-  const sourceIR = ir.value;
+  const sourceIR = get(ir);
 
   // Derive the inverse diff from the execute diff.
   const invert = invertDiff(execute, sourceIR);
@@ -386,5 +387,5 @@ export async function applyDiff(
     });
   }
 
-  ir.value = targetIR;
+  ir.set(targetIR);
 }
