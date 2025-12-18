@@ -33,9 +33,7 @@ export async function reconLayerDiffs(
       );
       const buildCatalog =
         Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
-      const catalogPatch = await buildCatalog(
-        JSON.parse(JSON.stringify(layer))
-      );
+      const catalogPatch = await buildCatalog(layer);
       catalog.value = { ...catalog.value, ...catalogPatch };
       addLayer(map.value!, layer);
 

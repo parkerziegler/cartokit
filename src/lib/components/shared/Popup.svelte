@@ -9,7 +9,7 @@
   import { orderBy } from 'lodash-es';
 
   import { popup } from '$lib/state/popup.svelte';
-  import { ir } from '$lib/state/ir.svelte';
+  import { ir } from '$lib/stores/ir';
 
   const MAX_DISPLAYED_PROPERTIES = 10;
 
@@ -26,7 +26,7 @@
   );
 
   function identifyTopmostVisibleInteractableLayer(): string | undefined {
-    const interactableLayers = Object.values(ir.value.layers).filter(
+    const interactableLayers = Object.values($ir.layers).filter(
       (layer) =>
         layer.layout.visibility === 'visible' && layer.layout.tooltip.visible
     );

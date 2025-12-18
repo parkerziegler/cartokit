@@ -20,7 +20,7 @@
   import { diffs } from '$lib/state/diffs.svelte';
   import { initHistory } from '$lib/state/history.svelte';
   import { user } from '$lib/state/user.svelte';
-  import { ir } from '$lib/state/ir.svelte';
+  import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import { map as mapState } from '$lib/state/map.svelte';
   import { layer } from '$lib/state/layer.svelte';
@@ -44,33 +44,45 @@
     map = new maplibregl.Map({
       container: 'map',
       style: data.basemap.url,
-      center: ir.value.center,
-      zoom: ir.value.zoom
+      center: $ir.center,
+      zoom: $ir.zoom
     });
 
     // Add an event listener to handle feature deselection.
-    map.on('click', onFeatureLeave(map, ir.value));
+    map.on('click', onFeatureLeave(map, $ir));
 
     // When the map first reaches an idle state, set it in the store.
     // This should ensure that the map's styles and data have fully loaded.
     map.once('idle', (e) => {
       mapState.value = e.target;
 
-      ir.value.basemap.url = data.basemap.url;
-      ir.value.basemap.provider = data.basemap.provider;
+      ir.update((ir) => {
+        ir.basemap.url = data.basemap.url;
+        ir.basemap.provider = data.basemap.provider;
+
+        return ir;
+      });
     });
 
     map.on('move', (event) => {
       const { lng, lat } = event.target.getCenter();
-      ir.value.center = [lng, lat];
+      ir.update((ir) => {
+        ir.center = [lng, lat];
+
+        return ir;
+      });
     });
 
     map.on('zoom', (event) => {
-      ir.value.zoom = event.target.getZoom();
+      ir.update((ir) => {
+        ir.zoom = event.target.getZoom();
+
+        return ir;
+      });
     });
 
     map.on('style.load', () => {
-      map?.setProjection({ type: ir.value.projection });
+      map?.setProjection({ type: $ir.projection });
     });
 
     map.on('error', (err) => {

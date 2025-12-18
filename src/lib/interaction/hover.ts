@@ -1,7 +1,8 @@
 import type { Map, MapLayerMouseEvent } from 'maplibre-gl';
+import { get } from 'svelte/store';
 
 import { popup } from '$lib/state/popup.svelte';
-import { ir } from '$lib/state/ir.svelte';
+import { ir } from '$lib/stores/ir';
 import { listeners } from '$lib/state/listeners.svelte';
 
 /**
@@ -114,10 +115,11 @@ const addHoverListeners = (map: Map, layerId: string): void => {
         );
         map.getCanvas().style.cursor = 'pointer';
 
-        if (ir.value.layers[layerId].layout.tooltip.visible) {
+        const currentIR = get(ir);
+        if (currentIR.layers[layerId].layout.tooltip.visible) {
           popup[layerId] = {
             open: true,
-            displayName: ir.value.layers[layerId].displayName,
+            displayName: currentIR.layers[layerId].displayName,
             properties: event.features[0].properties
           };
         }
