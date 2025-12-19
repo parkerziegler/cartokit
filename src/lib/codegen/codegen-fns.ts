@@ -7,10 +7,10 @@ import type {
 } from '$lib/types';
 
 /**
- * Generate a TypeScript program fragment for a single transformation function.
+ * Generate a program fragment for a single transformation function.
  *
- * @param transformation – A @see{Transformation}.
- * @returns – A TypeScript program fragment.
+ * @param transformation A {@linkTransformation}.
+ * @returns A program fragment for a transformation function definition.
  */
 function codegenTransformationFn(
   transformation: Transformation,
@@ -30,17 +30,18 @@ function codegenTransformationFn(
 }
 
 /**
- * Generate a program fragment for top-level, reusable functions.
+ * Generate a program fragment for top-level functions.
  *
- * @param analysis – The analysis of the CartoKit IR.
- * @returns – A program fragment.
+ * @param ir The current {@link CartoKitIR}.
+ * @param analysis The {@link CartoKitBackendAnalysis} for the current {@link CartoKitIR}.
+ * @returns A program fragment containing the definitions of top-level functions.
  */
 export function codegenFns(
   ir: CartoKitIR,
   analysis: CartoKitBackendAnalysis
 ): string {
-  const fns: string[] = [];
   const typed = analysis.language === 'typescript';
+  const fns: string[] = [];
 
   if (analysis.isFetchGeoJSONRequired) {
     const errorMessage =
@@ -49,7 +50,7 @@ export function codegenFns(
     fns.push(`async function fetchGeoJSON(url${typed ? ': string' : ''})${typed ? ': Promise<GeoJSON.FeatureCollection>' : ''} {
       try {
         const response = await fetch(url);
-        const data = await (response.json())${typed ? ' as GeoJSON.FeatureCollection' : ''};
+        const data = await response.json()${typed ? ' as GeoJSON.FeatureCollection' : ''};
 
         return data;
       } catch (error) {
