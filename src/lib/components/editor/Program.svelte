@@ -8,17 +8,12 @@
   import ClipboardCheckIcon from '$lib/components/icons/ClipboardCheckIcon.svelte';
   import ClipboardIcon from '$lib/components/icons/ClipboardIcon.svelte';
   import CodeEditor from '$lib/components/shared/CodeEditor.svelte';
-  import { backend } from '$lib/state/backend.svelte';
-  import { program } from '$lib/state/program.svelte';
+  import { backend } from '$lib/stores/backend';
+  import { program } from '$lib/stores/program';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   let copyButtonClicked = $state(false);
   let view = $state<EditorView | undefined>(undefined);
-  let doc = $state('');
-
-  $effect(() => {
-    program.value.then((p) => (doc = p));
-  });
 
   function onCopyButtonClick(view?: EditorView) {
     navigator.clipboard.writeText(view?.state.doc.toString() ?? '');
@@ -40,8 +35,8 @@
   <CodeEditor
     config={{
       kind: 'readonly',
-      doc,
-      language: backend.value.language
+      doc: $program,
+      language: $backend.language
     }}
     bind:view
     testId="program-editor"

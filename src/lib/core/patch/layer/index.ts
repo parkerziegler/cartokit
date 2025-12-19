@@ -33,6 +33,7 @@ function generateCartoKitLayer(
 ): CartoKitLayer {
   const geometryType = getFeatureCollectionGeometryType(featureCollection);
   const color = randomColor();
+  const z = Object.values(get(ir).layers).length;
 
   switch (geometryType) {
     case 'Point':
@@ -66,7 +67,7 @@ function generateCartoKitLayer(
         },
         layout: {
           visibility: 'visible',
-          z: Object.values(get(ir).layers).length,
+          z,
           tooltip: {
             visible: true
           }
@@ -96,7 +97,7 @@ function generateCartoKitLayer(
         },
         layout: {
           visibility: 'visible',
-          z: Object.values(get(ir).layers).length,
+          z,
           tooltip: {
             visible: true
           }
@@ -132,7 +133,7 @@ function generateCartoKitLayer(
         },
         layout: {
           visibility: 'visible',
-          z: Object.values(get(ir).layers).length,
+          z,
           tooltip: {
             visible: true
           }
