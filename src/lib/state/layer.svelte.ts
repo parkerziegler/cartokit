@@ -1,4 +1,4 @@
-import { get } from 'svelte/store';
+import { fromStore } from 'svelte/store';
 
 import { feature } from '$lib/state/feature.svelte';
 import { ir } from '$lib/stores/ir';
@@ -7,7 +7,7 @@ import type { CartoKitLayer } from '$lib/types';
 const lyr = $derived.by<{ value: CartoKitLayer | null }>(() => {
   if (feature.value) {
     const layerId = feature.value.layer.id.replace(/-outlines|-points/g, '');
-    return { value: get(ir).layers[layerId] };
+    return { value: fromStore(ir).current.layers[layerId] };
   }
 
   return { value: null };

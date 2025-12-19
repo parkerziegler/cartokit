@@ -3,7 +3,7 @@
 
   import ChevronIcon from '$lib/components/icons/ChevronIcon.svelte';
   import GearIcon from '$lib/components/icons/GearIcon.svelte';
-  import { backend } from '$lib/state/backend.svelte';
+  import { backend } from '$lib/stores/backend';
 
   let optionsExpanded = $state(false);
 
@@ -43,7 +43,7 @@
               type="radio"
               name="Language"
               {value}
-              bind:group={backend.value.language}
+              bind:group={$backend.language}
               style="color-scheme: dark;"
             />
             {name}</label
@@ -62,7 +62,7 @@
               type="radio"
               name="Library"
               {value}
-              bind:group={backend.value.library}
+              bind:group={$backend.library}
               style="color-scheme: dark;"
             />
             {name}</label
