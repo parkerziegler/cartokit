@@ -93,16 +93,8 @@ test('workflow-3', async ({ page }) => {
     .getByRole('button', { name: 'Add' })
     .click();
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible({
-    timeout: 60000
+    timeout: 90000 // Wait for data to load and tile on the client.
   });
-
-  // Wait for MapLibre to render the Winter Temperature Change layer.
-  //
-  // Tiles are generated on the fly by MapLibre, so we need to wait for them to
-  // load. In theory, we'd like to hook into MapLibre's event system to deter-
-  // mine when the map is idle; however, we don't want to attach the map inst-
-  // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(60000);
 
   // Click on a page location that will trigger selection of the Winter Tempera-
   // ture Change layer.
@@ -126,7 +118,9 @@ test('workflow-3', async ({ page }) => {
   await page.locator('#fill-attribute-select').selectOption('decadal_rate');
 
   // Set the layer's Method to Manual.
-  await page.locator('#classification-method-select').selectOption('Manual');
+  await page
+    .locator('#fill-classification-method-select')
+    .selectOption('Manual');
 
   // Set the layer's Breaks to -0.5, 0, 0.5, 1.
   const stops = [-0.5, 0, 0.5, 1];

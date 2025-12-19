@@ -134,14 +134,16 @@ test('workflow-4', async ({ page }) => {
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's Steps to 8.
-  await page.locator('#color-steps-select').selectOption('8');
+  await page.locator('#fill-step-count-select').selectOption('8');
 
   // Set the layer's Color Scheme to RdYlBu.
   await page.locator('#color-scheme').getByRole('button').click();
   await page.locator('li:nth-child(25)').getByRole('button').click();
 
   // Set the layer's Method to Manual.
-  await page.locator('#classification-method-select').selectOption('Manual');
+  await page
+    .locator('#fill-classification-method-select')
+    .selectOption('Manual');
 
   // Set the layer's Breaks to 614.791, 973.836, 1228.582, 1426.178, 1587.626,
   // 1724.178, 1842.373.

@@ -5,7 +5,7 @@
   import ArrowUpIcon from '$lib/components/icons/ArrowUpIcon.svelte';
   import Alert from '$lib/components/shared/Alert.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { applyDiff } from '$lib/core/diff';
   import { user } from '$lib/state/user.svelte';
   import { ir } from '$lib/stores/ir';
 
@@ -47,7 +47,7 @@
     }
   }
 
-  function onSubmit(
+  async function onSubmit(
     event: Event & {
       currentTarget: EventTarget & (HTMLFormElement | HTMLTextAreaElement);
     }
@@ -60,46 +60,46 @@
       textarea.blur();
     }
 
-    fetch('/llm', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        prompt,
-        layerIds,
-        layerIdsToAttributes,
-        userId: user.userId
-      })
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        for (const diff of data.diffs) {
-          if (diff.type === 'unknown') {
-            diffUnknown = true;
-
-            setTimeout(() => {
-              diffUnknown = false;
-            }, 3000);
-          } else {
-            dispatchLayerUpdate(diff);
-          }
-        }
-
-        fetching = false;
-        if (textarea) {
-          prompt = '';
-        }
-      })
-      .catch(() => {
-        error = true;
-
-        setTimeout(() => {
-          error = false;
-        }, 3000);
-
-        fetching = false;
+    try {
+      const response = await fetch('/llm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt,
+          layerIds,
+          layerIdsToAttributes,
+          userId: user.userId
+        })
       });
+
+      const data = await response.json();
+
+      for (const diff of data.diffs) {
+        if (diff.type === 'unknown') {
+          diffUnknown = true;
+
+          setTimeout(() => {
+            diffUnknown = false;
+          }, 3000);
+        } else {
+          await applyDiff(diff);
+        }
+      }
+
+      if (textarea) {
+        prompt = '';
+      }
+    } catch {
+      error = true;
+
+      setTimeout(() => {
+        error = false;
+      }, 3000);
+    } finally {
+      fetching = false;
+    }
   }
 </script>
 

@@ -61,9 +61,12 @@ export function isGeoJSONNamespaceRequired(
  */
 export function analyzeIR(
   ir: CartoKitIR,
-  languageBackend: CartoKitBackend['language']
+  languageBackend: CartoKitBackend['language'],
+  libraryBackend: CartoKitBackend['library']
 ): CartoKitBackendAnalysis {
   return {
+    language: languageBackend,
+    library: libraryBackend,
     isTurfRequired: isTurfRequired(ir),
     isFetchGeoJSONRequired: isFetchGeoJSONRequired(ir),
     isGeoJSONNamespaceRequired: isGeoJSONNamespaceRequired(ir, languageBackend)

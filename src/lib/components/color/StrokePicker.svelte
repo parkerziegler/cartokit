@@ -2,9 +2,8 @@
   import HexInput from '$lib/components/color/HexInput.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type { ConstantStroke } from '$lib/types';
-  import { history } from '$lib/state/history.svelte';
   interface Props {
     layerId: string;
     stroke: ConstantStroke;
@@ -12,41 +11,30 @@
 
   let { layerId, stroke }: Props = $props();
 
-  function dispatchStrokeUpdate(color: string) {
-    const update = {
-      type: 'stroke' as const,
+  async function dispatchStrokeUpdate(color: string) {
+    const diff: CartoKitDiff = {
+      type: 'stroke-color' as const,
       layerId,
       payload: {
         color
       }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'stroke',
-        layerId,
-        payload: {
-          color: stroke.color
-        }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    await applyDiff(diff);
   }
 
-  function onStrokeInput(
+  async function onStrokeInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
-    dispatchStrokeUpdate(event.currentTarget.value);
+    await dispatchStrokeUpdate(event.currentTarget.value);
   }
 
-  function onStrokeHexChange(hex: string) {
-    dispatchStrokeUpdate(hex);
+  async function onStrokeHexChange(hex: string) {
+    await dispatchStrokeUpdate(hex);
   }
 
-  function onStrokeWidthChange(value: number) {
-    const update = {
+  async function onStrokeWidthChange(value: number) {
+    const diff: CartoKitDiff = {
       type: 'stroke-width' as const,
       layerId,
       payload: {
@@ -54,18 +42,7 @@
       }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'stroke-width',
-        layerId,
-        payload: {
-          strokeWidth: stroke.width
-        }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    await applyDiff(diff);
   }
 </script>
 

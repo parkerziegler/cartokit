@@ -4,8 +4,8 @@
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import { ir } from '$lib/stores/ir';
-  import { switchBasemapWithPreservedLayers } from '$lib/utils/maplibre';
 
   let tileUrl = $state(
     $ir.basemap.provider === 'Custom' ? $ir.basemap.url : ''
@@ -19,8 +19,17 @@
     tileUrl = event.currentTarget.value;
   }
 
-  function onSubmit() {
-    switchBasemapWithPreservedLayers(tileUrl, 'Custom');
+  async function onSubmit() {
+    const diff: CartoKitDiff = {
+      type: 'basemap',
+      payload: {
+        url: tileUrl,
+        provider: 'Custom'
+      }
+    };
+
+    await applyDiff(diff);
+
     closeModal();
   }
 </script>

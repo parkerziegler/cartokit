@@ -1,8 +1,7 @@
 <script lang="ts">
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { history } from '$lib/state/history.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type { CartoKitHeatmapLayer } from '$lib/types';
 
   interface Props {
@@ -11,23 +10,14 @@
 
   let { layer }: Props = $props();
 
-  function onHeatmapRadiusChange(value: number): void {
-    const update = {
-      type: 'heatmap-radius' as const,
+  async function onHeatmapRadiusChange(value: number) {
+    const diff: CartoKitDiff = {
+      type: 'heatmap-radius',
       layerId: layer.id,
       payload: { radius: value }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'heatmap-radius',
-        layerId: layer.id,
-        payload: { radius: layer.style.heatmap.radius }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    await applyDiff(diff);
   }
 </script>
 
