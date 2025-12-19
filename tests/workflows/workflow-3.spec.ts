@@ -93,16 +93,8 @@ test('workflow-3', async ({ page }) => {
     .getByRole('button', { name: 'Add' })
     .click();
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible({
-    timeout: 90000
+    timeout: 90000 // Wait for data to load and tile on the client.
   });
-
-  // Wait for MapLibre to render the Winter Temperature Change layer.
-  //
-  // Tiles are generated on the fly by MapLibre, so we need to wait for them to
-  // load. In theory, we'd like to hook into MapLibre's event system to deter-
-  // mine when the map is idle; however, we don't want to attach the map inst-
-  // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(90000);
 
   // Click on a page location that will trigger selection of the Winter Tempera-
   // ture Change layer.
