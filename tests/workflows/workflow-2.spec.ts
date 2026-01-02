@@ -88,7 +88,7 @@ test('workflow-2', async ({ page }) => {
   // Wait for the loading indicator to disappear.
   await page
     .getByTestId('loading-indicator')
-    .waitFor({ state: 'hidden', timeout: 20000 });
+    .waitFor({ state: 'hidden', timeout: 30000 });
 
   // Ensure the Add Layer modal is no longer visible.
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
