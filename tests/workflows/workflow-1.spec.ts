@@ -104,14 +104,8 @@ test('workflow-1', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the Penumbra Paths
-  // layer.
-  await page.locator('#map').click({
-    position: {
-      x: 550,
-      y: 375
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
@@ -198,14 +192,8 @@ test('workflow-1', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the Path of Total-
-  // ity layer.
-  await page.locator('#map').click({
-    position: {
-      x: 500,
-      y: 680
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();

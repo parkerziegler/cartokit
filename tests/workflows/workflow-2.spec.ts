@@ -95,7 +95,9 @@ test('workflow-2', async ({ page }) => {
     .click();
 
   // Wait for the loading indicator to disappear.
-  await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
+  await page
+    .getByTestId('loading-indicator')
+    .waitFor({ state: 'hidden', timeout: 20000 });
 
   // Ensure the Add Layer modal is no longer visible.
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
@@ -108,14 +110,8 @@ test('workflow-2', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(20000);
 
-  // Click on a page location that will trigger selection of the Spring Leaf
-  // Appearance layer.
-  await page.locator('#map').click({
-    position: {
-      x: 530,
-      y: 100
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();

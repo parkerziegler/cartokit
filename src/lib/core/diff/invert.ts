@@ -12,7 +12,8 @@ import type {
   CartoKitLineLayer,
   CartoKitHeatmapLayer,
   QuantitativeHeatmapWeight,
-  ConstantHeatmapWeight
+  ConstantHeatmapWeight,
+  CartoKitDotDensityLayer
 } from '$lib/types';
 import type { CartoKitDiff } from '$lib/core/diff';
 
@@ -331,6 +332,17 @@ export function invertDiff(
         payload: {
           geojson: layer.data.geojson,
           transformation: transformation
+        }
+      };
+    }
+    case 'dot-value': {
+      const layer = sourceIR.layers[diff.layerId] as CartoKitDotDensityLayer;
+
+      return {
+        type: 'dot-value',
+        layerId: diff.layerId,
+        payload: {
+          value: layer.style.dots.value
         }
       };
     }

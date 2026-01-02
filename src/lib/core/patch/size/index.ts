@@ -1,8 +1,10 @@
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import type {
+  CartoKitDotDensityLayer,
   CartoKitPointLayer,
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
+import type {} from '$lib/types';
 
 export async function patchSizeDiffs(
   params: Promise<PatchFnParams>
@@ -11,7 +13,9 @@ export async function patchSizeDiffs(
 
   switch (diff.type) {
     case 'size': {
-      const layer = ir.layers[diff.layerId] as CartoKitPointLayer;
+      const layer = ir.layers[diff.layerId] as
+        | CartoKitPointLayer
+        | CartoKitDotDensityLayer;
 
       layer.style.size = diff.payload.size;
 

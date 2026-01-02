@@ -5,16 +5,16 @@ import { randomColor } from '$lib/utils/color';
 import { parseStringToTransformation } from '$lib/utils/parse';
 import {
   DEFAULT_OPACITY,
-  DEFAULT_RADIUS,
+  DEFAULT_SIZE,
   DEFAULT_STROKE,
   DEFAULT_STROKE_WIDTH
 } from '$lib/utils/constants';
 
 /**
- * Patch (transform) a {@link CartoKitLayer} to a {@link CartoKitPointLayer}.
+ * Patch a {@link CartoKitLayer} to a {@link CartoKitPointLayer}.
  *
- * @param {CartoKitLayer} layer The {@link CartoKitLayer} to patch (transform).
- * @returns {CartoKitPointLayer} The transformed {@link CartoKitPointLayer}.
+ * @param layer The {@link CartoKitLayer} to patch.
+ * @returns The patched {@link CartoKitPointLayer}.
  */
 export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
   switch (layer.type) {
@@ -38,7 +38,45 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
           ]
         },
         style: {
-          size: DEFAULT_RADIUS,
+          size: DEFAULT_SIZE,
+          fill: layer.style.fill,
+          stroke: layer.style.stroke
+        },
+        layout: layer.layout
+      };
+
+      return targetLayer;
+    }
+    case 'Dot Density': {
+      // Replace the dot density transformation with a centroid transformation.
+      const deriveCentroidsTransformation = {
+        ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+        args: []
+      };
+
+      const generateDotDensityPointsTransformationIndex =
+        layer.data.transformations.findIndex(
+          (transformation) => transformation.name === 'generateDotDensityPoints'
+        );
+      const transformations = [...layer.data.transformations].splice(
+        generateDotDensityPointsTransformationIndex,
+        1,
+        deriveCentroidsTransformation
+      );
+
+      const targetLayer: CartoKitPointLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Point',
+        data: {
+          url: layer.data.url,
+          fileName: layer.data.fileName,
+          sourceGeojson: layer.data.sourceGeojson,
+          geojson: deriveCentroids(layer.data.sourceGeojson),
+          transformations
+        },
+        style: {
+          size: layer.style.size,
           fill: layer.style.fill,
           stroke: layer.style.stroke
         },
@@ -54,7 +92,7 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
         type: 'Point',
         data: layer.data,
         style: {
-          size: DEFAULT_RADIUS,
+          size: DEFAULT_SIZE,
           fill: {
             type: 'Constant',
             color: randomColor(),
@@ -93,7 +131,7 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
           ]
         },
         style: {
-          size: DEFAULT_RADIUS,
+          size: DEFAULT_SIZE,
           fill: {
             type: 'Constant',
             color: randomColor(),
@@ -118,7 +156,7 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
         style: {
           fill: layer.style.fill,
           stroke: layer.style.stroke,
-          size: DEFAULT_RADIUS
+          size: DEFAULT_SIZE
         },
         layout: layer.layout
       };

@@ -7,15 +7,11 @@ import type {
 } from '$lib/types';
 
 /**
- * Reconcile a {@link CartoKitLayer} to a
- * {@link CartoKitProportionalSymbolLayer}.
+ * Reconcile a {@link CartoKitLayer} to a {@link CartoKitProportionalSymbolLayer}.
  *
- * This function mirrors the redraw and MapLibre side‑effects previously handled
- * by {@link transitionToProportionalSymbol}.
  *
- * @param {CartoKitLayer} sourceLayer The {@link CartoKitLayer} to reconcile.
- * @param {CartoKitProportionalSymbolLayer} targetLayer The
- * {@link CartoKitProportionalSymbolLayer} to reconcile to.
+ * @param sourceLayer The {@link CartoKitLayer} to reconcile.
+ * @param targetLayer The definition of the target {@link CartoKitProportionalSymbolLayer}.
  */
 export function reconProportionalSymbol(
   sourceLayer: CartoKitLayer,
@@ -23,6 +19,7 @@ export function reconProportionalSymbol(
 ): void {
   switch (sourceLayer.type) {
     case 'Choropleth':
+    case 'Dot Density':
     case 'Heatmap':
     case 'Line':
     case 'Polygon':

@@ -2,6 +2,7 @@ import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
 import { map } from '$lib/state/map.svelte';
 import type {
   CartoKitChoroplethLayer,
+  CartoKitDotDensityLayer,
   CartoKitLineLayer,
   CartoKitPointLayer,
   CartoKitPolygonLayer,
@@ -17,6 +18,7 @@ export async function reconStrokeDiffs(
     case 'stroke-color': {
       const layer = targetIR.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitLineLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
@@ -31,6 +33,7 @@ export async function reconStrokeDiffs(
             diff.payload.color
           );
           break;
+        case 'Dot Density':
         case 'Point':
         case 'Proportional Symbol':
           map.value!.setPaintProperty(
@@ -52,12 +55,22 @@ export async function reconStrokeDiffs(
     case 'stroke-width': {
       const layer = targetIR.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitLineLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
         | CartoKitProportionalSymbolLayer;
 
       switch (layer.type) {
+        case 'Choropleth':
+        case 'Polygon':
+          map.value!.setPaintProperty(
+            `${diff.layerId}-stroke`,
+            'line-width',
+            diff.payload.strokeWidth
+          );
+          break;
+        case 'Dot Density':
         case 'Point':
         case 'Proportional Symbol':
           map.value!.setPaintProperty(
@@ -73,20 +86,13 @@ export async function reconStrokeDiffs(
             diff.payload.strokeWidth
           );
           break;
-        case 'Polygon':
-        case 'Choropleth':
-          map.value!.setPaintProperty(
-            `${diff.layerId}-stroke`,
-            'line-width',
-            diff.payload.strokeWidth
-          );
-          break;
       }
       break;
     }
     case 'stroke-opacity': {
       const layer = targetIR.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitLineLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
@@ -101,6 +107,7 @@ export async function reconStrokeDiffs(
             diff.payload.opacity
           );
           break;
+        case 'Dot Density':
         case 'Point':
         case 'Proportional Symbol':
           map.value!.setPaintProperty(
@@ -122,6 +129,7 @@ export async function reconStrokeDiffs(
     case 'add-stroke': {
       const layer = targetIR.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
         | CartoKitProportionalSymbolLayer;
@@ -135,6 +143,7 @@ export async function reconStrokeDiffs(
             layer.style.stroke.opacity
           );
           break;
+        case 'Dot Density':
         case 'Point':
         case 'Proportional Symbol':
           map.value!.setPaintProperty(
@@ -149,6 +158,7 @@ export async function reconStrokeDiffs(
     case 'remove-stroke': {
       const layer = targetIR.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
         | CartoKitProportionalSymbolLayer;
@@ -162,6 +172,7 @@ export async function reconStrokeDiffs(
             0
           );
           break;
+        case 'Dot Density':
         case 'Point':
         case 'Proportional Symbol':
           map.value!.setPaintProperty(diff.layerId, 'circle-stroke-opacity', 0);

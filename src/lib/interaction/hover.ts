@@ -116,10 +116,11 @@ const addHoverListeners = (map: Map, layerId: string): void => {
         map.getCanvas().style.cursor = 'pointer';
 
         const currentIR = get(ir);
-        if (currentIR.layers[layerId].layout.tooltip.visible) {
-          popup[layerId] = {
+        const lId = layerId.replace(/-outlines/g, '');
+        if (currentIR.layers[lId].layout.tooltip.visible) {
+          popup[lId] = {
             open: true,
-            displayName: currentIR.layers[layerId].displayName,
+            displayName: currentIR.layers[lId].displayName,
             properties: event.features[0].properties
           };
         }

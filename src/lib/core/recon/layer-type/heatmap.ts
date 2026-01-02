@@ -14,11 +14,9 @@ export function reconHeatmap(
 ): void {
   switch (sourceLayer.type) {
     case 'Choropleth':
+    case 'Dot Density':
     case 'Line':
     case 'Polygon':
-      throw new Error(
-        `Unsupported geometry transition. Transition initiated from ${sourceLayer.type} to Heatmap.`
-      );
     case 'Heatmap':
       break;
     case 'Point':

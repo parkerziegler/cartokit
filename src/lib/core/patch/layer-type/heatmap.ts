@@ -15,6 +15,7 @@ import {
 export function patchHeatmap(layer: CartoKitLayer): CartoKitHeatmapLayer {
   switch (layer.type) {
     case 'Choropleth':
+    case 'Dot Density':
     case 'Line':
     case 'Polygon':
       throw new Error(

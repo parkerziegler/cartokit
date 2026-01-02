@@ -153,12 +153,13 @@ function makeAttrsSchema(layerIdsToAttributes: Record<string, string[]>) {
 }
 
 const LayerType = z.union([
-  z.literal('Point'),
-  z.literal('Proportional Symbol'),
-  z.literal('Line'),
-  z.literal('Polygon'),
   z.literal('Choropleth'),
-  z.literal('Heatmap')
+  z.literal('Dot Density'),
+  z.literal('Heatmap'),
+  z.literal('Line'),
+  z.literal('Point'),
+  z.literal('Polygon'),
+  z.literal('Proportional Symbol')
 ]);
 
 function LayerTypeDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {

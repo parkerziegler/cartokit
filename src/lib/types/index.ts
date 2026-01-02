@@ -98,12 +98,13 @@ export type LayerType =
   | 'Polygon'
   | 'Choropleth'
   | 'Proportional Symbol'
+  | 'Dot Density'
   | 'Heatmap';
 
 /**
  * Represents the encoding channels of a layer.
  */
-export type Channel = 'fill' | 'stroke' | 'size';
+export type Channel = 'fill' | 'stroke' | 'size' | 'dots';
 
 /**
  * Represents the visualization type for a given channel.
@@ -264,7 +265,7 @@ export interface CartoKitPolygonLayer extends Layer {
 export interface CartoKitProportionalSymbolLayer extends Layer {
   type: 'Proportional Symbol';
   style: {
-    size: ProportionalSymbolSize;
+    size: ProportionalSymbolStyle;
     fill: QuantitativeFill | CategoricalFill | ConstantFill;
     stroke: ConstantStroke;
   };
@@ -282,6 +283,24 @@ export interface CartoKitChoroplethLayer extends Layer {
   type: 'Choropleth';
   style: {
     fill: QuantitativeFill | CategoricalFill;
+    stroke: ConstantStroke;
+  };
+}
+
+/**
+ * Represents a Dot Density layer in cartokit. Dot Density layers map a data
+ * value to a specific number of dots within a region. The size of the dots is
+ * constant.
+ *
+ * @property {'Dot Density'} type - The type of the layer, 'Dot Density'.
+ * @property {Object} style - The style of the layer.
+ */
+export interface CartoKitDotDensityLayer extends Layer {
+  type: 'Dot Density';
+  style: {
+    dots: DotDensityStyle;
+    size: number;
+    fill: ConstantStyle;
     stroke: ConstantStroke;
   };
 }
@@ -305,12 +324,13 @@ export interface CartoKitHeatmapLayer extends Layer {
  * possible layer types.
  */
 export type CartoKitLayer =
-  | CartoKitPointLayer
-  | CartoKitProportionalSymbolLayer
-  | CartoKitLineLayer
-  | CartoKitPolygonLayer
   | CartoKitChoroplethLayer
-  | CartoKitHeatmapLayer;
+  | CartoKitDotDensityLayer
+  | CartoKitHeatmapLayer
+  | CartoKitLineLayer
+  | CartoKitPointLayer
+  | CartoKitPolygonLayer
+  | CartoKitProportionalSymbolLayer;
 
 /**
  * Represents a constant style object. A constant style applies a uniform color
@@ -419,10 +439,26 @@ export type QuantitativeFill = QuantitativeStyle;
  * @property {number} min - The minimum size of the points.
  * @property {number} max - The maximum size of the points.
  */
-interface ProportionalSymbolSize {
+interface ProportionalSymbolStyle {
   attribute: string;
   min: number;
   max: number;
+}
+
+/**
+ * Represents a dot density dot style object. A dot density dot style object
+ * specifies the attribute of the GeoJSON data to divide by the dot value of the
+ * layer to produce a discrete number of dots. The size of the dots is constant.
+ *
+ * @property {string} attribute - The attribute of the GeoJSON data to map to
+ * the number of dots.
+ * @property {number} size - The size of the dots.
+ * @property {number} value - The dot value, representing the ratio of source
+ * data units to number of dots.
+ */
+export interface DotDensityStyle {
+  attribute: string;
+  value: number;
 }
 
 /**

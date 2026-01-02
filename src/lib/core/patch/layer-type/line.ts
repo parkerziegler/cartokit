@@ -1,19 +1,15 @@
 import type { CartoKitLayer, CartoKitLineLayer } from '$lib/types';
-import {
-  DEFAULT_STROKE,
-  DEFAULT_STROKE_WIDTH,
-  DEFAULT_OPACITY
-} from '$lib/utils/constants';
 
 /**
- * Patch (transform) a {@link CartoKitLayer} to a {@link CartoKitLineLayer}.
+ * Patch a {@link CartoKitLayer} to a {@link CartoKitLineLayer}.
  *
- * @param {CartoKitLayer} layer — The {@link CartoKitLayer} to patch (transform).
- * @returns {CartoKitLineLayer} The transformed {@link CartoKitLineLayer}.
+ * @param layer The {@link CartoKitLayer} to patch.
+ * @returns The patched {@link CartoKitLineLayer}.
  */
 export function patchLine(layer: CartoKitLayer): CartoKitLineLayer {
   switch (layer.type) {
     case 'Choropleth':
+    case 'Dot Density':
     case 'Heatmap':
     case 'Polygon':
       throw new Error(
@@ -35,12 +31,7 @@ export function patchLine(layer: CartoKitLayer): CartoKitLineLayer {
           transformations: layer.data.transformations
         },
         style: {
-          stroke: layer.style.stroke ?? {
-            type: 'Constant',
-            color: DEFAULT_STROKE,
-            width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_OPACITY
-          }
+          stroke: layer.style.stroke
         },
         layout: layer.layout
       };
