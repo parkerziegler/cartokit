@@ -6,11 +6,12 @@ import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 /**
  * Derive a MapLibre GL JS expression for a proportional symbol radius scale.
  *
- * @param layer – The CartoKitProportionalSymbolLayer to derive a radius scale for.
+ * @param layer – The {@link CartoKitProportionalSymbolLayer} to derive a radius
+ * scale for.
  *
  * @returns – A MapLibre GL JS expression for a proportional symbol radius scale.
  */
-export function deriveRadius(
+export function deriveSize(
   layer: CartoKitProportionalSymbolLayer
 ): ExpressionSpecification {
   const {

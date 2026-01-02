@@ -1,4 +1,4 @@
-import { deriveRadius } from '$lib/interaction/geometry';
+import { deriveSize } from '$lib/interaction/geometry';
 import { redraw } from '$lib/core/recon/layer-type/redraw';
 import { map } from '$lib/state/map.svelte';
 import type {
@@ -31,7 +31,7 @@ export function reconProportionalSymbol(
       map.value?.setPaintProperty(
         targetLayer.id,
         'circle-radius',
-        deriveRadius(targetLayer)
+        deriveSize(targetLayer)
       );
       break;
     case 'Proportional Symbol':

@@ -2,10 +2,10 @@ import type { CartoKitBackend, CartoKitIR } from '$lib/types';
 
 /**
  * Generate a program fragment for the map's projection.
- * projection.
  *
- * @param ir – The CartoKit IR.
- * @returns – A program fragment.
+ * @param ir The {@link CartoKitIR}.
+ * @param libraryBackend The backend library for the current {@link CartoKitIR}.
+ * @returns A program fragment containing the definition of the map's projection.
  */
 export function codegenProjection(
   ir: CartoKitIR,
@@ -23,9 +23,6 @@ export function codegenProjection(
         });
       `
         : '';
-    }
-    default: {
-      return '';
     }
   }
 }

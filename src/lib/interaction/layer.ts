@@ -1,7 +1,7 @@
 import type { Map } from 'maplibre-gl';
 
 import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
-import { deriveRadius } from '$lib/interaction/geometry';
+import { deriveSize } from '$lib/interaction/geometry';
 import {
   instrumentPointHover,
   instrumentLineHover,
@@ -203,7 +203,7 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
           'circle-stroke-color': layer.style.stroke.color,
           'circle-stroke-width': layer.style.stroke.width,
           'circle-stroke-opacity': layer.style.stroke.opacity,
-          'circle-radius': deriveRadius(layer)
+          'circle-radius': deriveSize(layer)
         }
       });
 

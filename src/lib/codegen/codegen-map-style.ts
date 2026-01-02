@@ -3,12 +3,11 @@ import type { CartoKitIR } from '$lib/types';
 const allAfterEqualRegex = /=.+$/;
 
 /**
- * Generate a MapLibre GL JS program fragment, in TypeScript, for the map inst-
- * ance's style property. The style property must be a url to a valid MapLibre
- * GL JS style specification.
+ * Generate a program fragment for the map instance's style property. The style
+ * property must be a url to a valid MapLibre GL JS style specification.
  *
- * @param ir – The CartoKit IR.
- * @returns – A MapLibre GL JS program fragment, in TypeScript.
+ * @param ir – The {@link CartoKitIR}.
+ * @returns – A program fragment containing the URL of the map style.
  */
 export function codegenMapStyle(ir: CartoKitIR): string {
   return `'${ir.basemap.url.replace(
