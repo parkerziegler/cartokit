@@ -19,7 +19,8 @@ describe('deriveColorScale', () => {
         method: 'Quantile',
         count: STOPS,
         thresholds: [1.6, 2.8, 5, 10.8, 42, 151.63],
-        opacity: 1
+        opacity: 1,
+        visible: true
       });
 
       expect(result).toEqual([
@@ -52,7 +53,8 @@ describe('deriveColorScale', () => {
         method: 'Quantile',
         count: STOPS,
         thresholds: [1.6, 2.8, 5, 10.8, 42, 151.63],
-        opacity: 1
+        opacity: 1,
+        visible: true
       });
 
       expect(result).toEqual([
@@ -94,7 +96,8 @@ describe('deriveColorScale', () => {
           id: 'schemeCategory10',
           direction: 'Forward'
         },
-        opacity: 1
+        opacity: 1,
+        visible: true
       });
 
       expect(result).toEqual([
@@ -145,7 +148,8 @@ describe('deriveColorScale', () => {
           id: 'schemeCategory10',
           direction: 'Forward'
         },
-        opacity: 1
+        opacity: 1,
+        visible: true
       });
 
       expect(result).toEqual([
@@ -193,7 +197,8 @@ describe('deriveColorScale', () => {
           id: 'schemeCategory10',
           direction: 'Reverse'
         },
-        opacity: 1
+        opacity: 1,
+        visible: true
       });
 
       expect(result).toEqual([
@@ -225,7 +230,8 @@ describe('deriveColorScale', () => {
       const result = deriveColorScale({
         type: 'Constant',
         color: '#c6abdd',
-        opacity: 1
+        opacity: 1,
+        visible: true
       });
 
       expect(result).toEqual('#c6abdd');
@@ -246,7 +252,8 @@ describe('deriveColorRamp', () => {
       },
       radius: 10,
       intensity: 1,
-      opacity: 1
+      opacity: 1,
+      visible: true
     });
 
     const start = d3.color(d3.interpolateSpectral(0));
@@ -293,7 +300,8 @@ describe('deriveColorRamp', () => {
       },
       radius: 10,
       intensity: 1,
-      opacity: 1
+      opacity: 1,
+      visible: true
     });
 
     const start = d3.color(d3.interpolateSpectral(1));

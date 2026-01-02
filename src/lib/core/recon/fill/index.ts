@@ -78,19 +78,19 @@ export async function reconFillDiffs(
         | CartoKitProportionalSymbolLayer;
 
       switch (layer.type) {
+        case 'Choropleth':
+        case 'Polygon':
+          map.value!.setPaintProperty(
+            diff.layerId,
+            'fill-opacity',
+            diff.payload.opacity
+          );
+          break;
         case 'Point':
         case 'Proportional Symbol':
           map.value!.setPaintProperty(
             diff.layerId,
             'circle-opacity',
-            diff.payload.opacity
-          );
-          break;
-        case 'Polygon':
-        case 'Choropleth':
-          map.value!.setPaintProperty(
-            diff.layerId,
-            'fill-opacity',
             diff.payload.opacity
           );
           break;

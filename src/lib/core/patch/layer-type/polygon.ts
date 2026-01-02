@@ -2,10 +2,10 @@ import type { CartoKitLayer, CartoKitPolygonLayer } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 
 /**
- * Patch (transform) a {@link CartoKitLayer} to a {@link CartoKitPolygonLayer}.
+ * Patch a {@link CartoKitLayer} to a {@link CartoKitPolygonLayer}.
  *
- * @param {CartoKitLayer} layer The {@link CartoKitLayer} to patch (transform).
- * @returns {CartoKitPolygonLayer} The transformed {@link CartoKitPolygonLayer}.
+ * @param layer The {@link CartoKitLayer} to patch.
+ * @returns The patched {@link CartoKitPolygonLayer}.
  */
 export function patchPolygon(layer: CartoKitLayer): CartoKitPolygonLayer {
   switch (layer.type) {
@@ -24,6 +24,32 @@ export function patchPolygon(layer: CartoKitLayer): CartoKitPolygonLayer {
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
           },
+          stroke: layer.style.stroke
+        },
+        layout: layer.layout
+      };
+
+      return targetLayer;
+    }
+    case 'Dot Density': {
+      // Remove the dot density transformation.
+      const transformations = layer.data.transformations.filter(
+        (transformation) => transformation.name !== 'generateDotDensityPoints'
+      );
+
+      const targetLayer: CartoKitPolygonLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Polygon',
+        data: {
+          url: layer.data.url,
+          fileName: layer.data.fileName,
+          geojson: layer.data.sourceGeojson,
+          sourceGeojson: layer.data.sourceGeojson,
+          transformations
+        },
+        style: {
+          fill: layer.style.fill,
           stroke: layer.style.stroke
         },
         layout: layer.layout

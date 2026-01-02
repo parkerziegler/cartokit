@@ -115,14 +115,8 @@ test('workflow-4', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the Fishing Boat
-  // Transponder Gaps layer.
-  await page.locator('#map').click({
-    position: {
-      x: 180,
-      y: 300
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();

@@ -98,14 +98,8 @@ test('workflow-5', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the American Crow
-  // Range layer.
-  await page.locator('#map').click({
-    position: {
-      x: 600,
-      y: 400
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
@@ -170,14 +164,8 @@ test('workflow-5', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the American Crow
-  // Population Change layer.
-  await page.locator('#map').click({
-    position: {
-      x: 773,
-      y: 569
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();

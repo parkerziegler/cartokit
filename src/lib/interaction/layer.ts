@@ -34,21 +34,61 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
       });
 
       // Add a separate layer for the stroke.
-      if (layer.style.stroke) {
-        map.addLayer({
-          id: `${layer.id}-stroke`,
-          source: layer.id,
-          type: 'line',
-          paint: {
-            'line-color': layer.style.stroke.color,
-            'line-width': layer.style.stroke.width,
-            'line-opacity': layer.style.stroke.opacity
-          }
-        });
-      }
+      map.addLayer({
+        id: `${layer.id}-stroke`,
+        source: layer.id,
+        type: 'line',
+        paint: {
+          'line-color': layer.style.stroke.color,
+          'line-width': layer.style.stroke.width,
+          'line-opacity': layer.style.stroke.opacity
+        }
+      });
 
       instrumentPolygonHover(map, layer.id);
       instrumentPolygonSelect(map, layer.id);
+      break;
+    }
+    case 'Dot Density': {
+      // Add a separate source for the polygon outlines of the dot density layer.
+      // Ensure it does not already exist from a previous transition before adding it.
+      if (!map.getSource(`${layer.id}-outlines`)) {
+        map.addSource(`${layer.id}-outlines`, {
+          type: 'geojson',
+          data: layer.data.sourceGeojson,
+          generateId: true
+        });
+      }
+
+      // Add a transparent layer to the map for the outlines.
+      // This is the layer we'll instrument for hover and select effects.
+      map.addLayer({
+        id: `${layer.id}-outlines`,
+        type: 'fill',
+        source: `${layer.id}-outlines`,
+        paint: {
+          'fill-color': 'transparent',
+          'fill-opacity': 0
+        }
+      });
+
+      // Add the dot density layer to the map.
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'circle',
+        paint: {
+          'circle-color': layer.style.fill.color,
+          'circle-opacity': layer.style.fill.opacity,
+          'circle-stroke-color': layer.style.stroke.color,
+          'circle-stroke-width': layer.style.stroke.width,
+          'circle-stroke-opacity': layer.style.stroke.opacity,
+          'circle-radius': layer.style.size
+        }
+      });
+
+      instrumentPolygonHover(map, `${layer.id}-outlines`);
+      instrumentPolygonSelect(map, `${layer.id}-outlines`);
       break;
     }
     case 'Heatmap': {
@@ -107,27 +147,16 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
       break;
     }
     case 'Point': {
-      const fillProperties = layer.style.fill
-        ? {
-            'circle-color': deriveColorScale(layer.style.fill),
-            'circle-opacity': layer.style.fill.opacity
-          }
-        : {};
-      const strokeProperties = layer.style.stroke
-        ? {
-            'circle-stroke-color': layer.style.stroke.color,
-            'circle-stroke-width': layer.style.stroke.width,
-            'circle-stroke-opacity': layer.style.stroke.opacity
-          }
-        : {};
-
       map.addLayer({
         id: layer.id,
         source: layer.id,
         type: 'circle',
         paint: {
-          ...fillProperties,
-          ...strokeProperties,
+          'circle-color': deriveColorScale(layer.style.fill),
+          'circle-opacity': layer.style.fill.opacity,
+          'circle-stroke-color': layer.style.stroke.color,
+          'circle-stroke-width': layer.style.stroke.width,
+          'circle-stroke-opacity': layer.style.stroke.opacity,
           'circle-radius': layer.style.size
         }
       });
@@ -137,58 +166,43 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
       break;
     }
     case 'Polygon': {
-      if (layer.style.fill) {
-        map.addLayer({
-          id: layer.id,
-          source: layer.id,
-          type: 'fill',
-          paint: {
-            'fill-color': layer.style.fill.color,
-            'fill-opacity': layer.style.fill.opacity
-          }
-        });
-      }
+      map.addLayer({
+        id: layer.id,
+        source: layer.id,
+        type: 'fill',
+        paint: {
+          'fill-color': layer.style.fill.color,
+          'fill-opacity': layer.style.fill.opacity
+        }
+      });
 
-      // Add a separate layer for the stroke, if a stroke exists.
-      if (layer.style.stroke) {
-        map.addLayer({
-          id: `${layer.id}-stroke`,
-          source: layer.id,
-          type: 'line',
-          paint: {
-            'line-color': layer.style.stroke.color,
-            'line-width': layer.style.stroke.width,
-            'line-opacity': layer.style.stroke.opacity
-          }
-        });
-      }
+      // Add a separate layer for the stroke.
+      map.addLayer({
+        id: `${layer.id}-stroke`,
+        source: layer.id,
+        type: 'line',
+        paint: {
+          'line-color': layer.style.stroke.color,
+          'line-width': layer.style.stroke.width,
+          'line-opacity': layer.style.stroke.opacity
+        }
+      });
 
       instrumentPolygonHover(map, layer.id);
       instrumentPolygonSelect(map, layer.id);
       break;
     }
     case 'Proportional Symbol': {
-      const fillProperties = layer.style.fill
-        ? {
-            'circle-color': deriveColorScale(layer.style.fill),
-            'circle-opacity': layer.style.fill.opacity
-          }
-        : {};
-      const strokeProperties = layer.style.stroke
-        ? {
-            'circle-stroke-color': layer.style.stroke.color,
-            'circle-stroke-width': layer.style.stroke.width,
-            'circle-stroke-opacity': layer.style.stroke.opacity
-          }
-        : {};
-
       map.addLayer({
         id: layer.id,
         source: layer.id,
         type: 'circle',
         paint: {
-          ...fillProperties,
-          ...strokeProperties,
+          'circle-color': deriveColorScale(layer.style.fill),
+          'circle-opacity': layer.style.fill.opacity,
+          'circle-stroke-color': layer.style.stroke.color,
+          'circle-stroke-width': layer.style.stroke.width,
+          'circle-stroke-opacity': layer.style.stroke.opacity,
           'circle-radius': deriveRadius(layer)
         }
       });

@@ -8,7 +8,7 @@ import type { CartoKitLayer } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_OPACITY,
-  DEFAULT_RADIUS,
+  DEFAULT_SIZE,
   DEFAULT_STROKE_OPACITY,
   DEFAULT_STROKE_WIDTH
 } from '$lib/utils/constants';
@@ -50,7 +50,7 @@ function generateCartoKitLayer(
           transformations: []
         },
         style: {
-          size: DEFAULT_RADIUS,
+          size: DEFAULT_SIZE,
           fill: {
             type: 'Constant',
             color,

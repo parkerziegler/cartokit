@@ -1,5 +1,6 @@
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { patchChoropleth } from '$lib/core/patch/layer-type/choropleth';
+import { patchDotDensity } from '$lib/core/patch/layer-type/dot-density';
 import { patchHeatmap } from '$lib/core/patch/layer-type/heatmap';
 import { patchLine } from '$lib/core/patch/layer-type/line';
 import { patchPoint } from '$lib/core/patch/layer-type/point';
@@ -21,6 +22,9 @@ export async function patchLayerTypeDiffs(
       switch (diff.payload.layerType) {
         case 'Choropleth':
           targetLayer = patchChoropleth(sourceLayer);
+          break;
+        case 'Dot Density':
+          targetLayer = patchDotDensity(sourceLayer);
           break;
         case 'Heatmap':
           targetLayer = patchHeatmap(sourceLayer);

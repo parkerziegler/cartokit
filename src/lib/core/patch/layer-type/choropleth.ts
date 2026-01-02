@@ -9,22 +9,60 @@ import {
 } from '$lib/utils/constants';
 
 /**
- * Patch (transform) a {@link CartoKitLayer} to a {@link CartoKitChoroplethLayer}.
+ * Patch a {@link CartoKitLayer} to a {@link CartoKitChoroplethLayer}.
  *
- * @param {CartoKitLayer} layer The {@link CartoKitLayer} to patch (transform).
- * @returns {CartoKitChoroplethLayer} The transformed {@link CartoKitChoroplethLayer}.
+ * @param layer The {@link CartoKitLayer} to patch.
+ * @returns The patched {@link CartoKitChoroplethLayer}.
  */
 export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
   switch (layer.type) {
     case 'Choropleth':
       return layer;
-    case 'Heatmap':
-      throw new Error(
-        'Unsupported geometry transition. Transition initiated from Heatmap to Choropleth.'
+    case 'Dot Density': {
+      // Remove the dot density transformation.
+      const transformations = layer.data.transformations.filter(
+        (transformation) => transformation.name !== 'generateDotDensityPoints'
       );
+
+      const targetLayer: CartoKitChoroplethLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Choropleth',
+        data: {
+          url: layer.data.url,
+          fileName: layer.data.fileName,
+          geojson: layer.data.sourceGeojson,
+          sourceGeojson: layer.data.sourceGeojson,
+          transformations
+        },
+        style: {
+          fill: {
+            type: 'Quantitative',
+            attribute: layer.style.dots.attribute,
+            method: DEFAULT_METHOD,
+            scheme: {
+              id: DEFAULT_QUANTITATIVE_SCHEME,
+              direction: DEFAULT_SCHEME_DIRECTION
+            },
+            count: DEFAULT_COUNT,
+            thresholds: DEFAULT_THRESHOLDS(
+              layer.id,
+              layer.style.dots.attribute
+            ),
+            opacity: layer.style.fill.opacity,
+            visible: layer.style.fill.visible
+          },
+          stroke: layer.style.stroke
+        },
+        layout: layer.layout
+      };
+
+      return targetLayer;
+    }
+    case 'Heatmap':
     case 'Line':
       throw new Error(
-        'Unsupported geometry transition. Transition initiated from Line to Choropleth.'
+        `Unsupported geometry transition. Transition initiated from ${layer.type} to Choropleth.`
       );
     case 'Point':
     case 'Proportional Symbol': {

@@ -1,5 +1,6 @@
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
 import { reconChoropleth } from '$lib/core/recon/layer-type/choropleth';
+import { reconDotDensity } from '$lib/core/recon/layer-type/dot-density';
 import { reconHeatmap } from '$lib/core/recon/layer-type/heatmap';
 import { reconLine } from '$lib/core/recon/layer-type/line';
 import { reconPoint } from '$lib/core/recon/layer-type/point';
@@ -7,6 +8,7 @@ import { reconPolygon } from '$lib/core/recon/layer-type/polygon';
 import { reconProportionalSymbol } from '$lib/core/recon/layer-type/proportional-symbol';
 import type {
   CartoKitChoroplethLayer,
+  CartoKitDotDensityLayer,
   CartoKitHeatmapLayer,
   CartoKitLineLayer,
   CartoKitPointLayer,
@@ -14,6 +16,14 @@ import type {
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
 
+/**
+ * Reconcile the 'layer-type' diff. This function is pipelined with other
+ * reconciliation functions; thus, it simply forwards its parameters in the
+ * return value, which become parameters for the next function in the pipeline.
+ *
+ * @param params The diff, sourceIR, and targetIR to reconcile.
+ * @returns The diff, sourceIR, and targetIR after reconciliation.
+ */
 export async function reconLayerTypeDiffs(
   params: Promise<ReconFnParams>
 ): Promise<ReconFnResult> {
@@ -26,6 +36,13 @@ export async function reconLayerTypeDiffs(
           reconChoropleth(
             sourceIR.layers[diff.layerId],
             targetIR.layers[diff.layerId] as CartoKitChoroplethLayer
+          );
+          break;
+        }
+        case 'Dot Density': {
+          reconDotDensity(
+            sourceIR.layers[diff.layerId],
+            targetIR.layers[diff.layerId] as CartoKitDotDensityLayer
           );
           break;
         }

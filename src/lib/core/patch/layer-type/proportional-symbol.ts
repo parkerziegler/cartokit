@@ -17,12 +17,10 @@ import { parseStringToTransformation } from '$lib/utils/parse';
 import { randomColor } from '$lib/utils/color';
 
 /**
- * Patch (transform) a {@link CartoKitLayer} to a
- * {@link CartoKitProportionalSymbolLayer}.
+ * Patch a {@link CartoKitLayer} to a {@link CartoKitProportionalSymbolLayer}.
  *
- * @param {CartoKitLayer} layer The {@link CartoKitLayer} to patch (transform).
- * @returns {CartoKitProportionalSymbolLayer} The transformed
- * {@link CartoKitProportionalSymbolLayer}.
+ * @param layer The {@link CartoKitLayer} to patch.
+ * @returns The patched {@link CartoKitProportionalSymbolLayer}.
  */
 export function patchProportionalSymbol(
   layer: CartoKitLayer
@@ -50,6 +48,49 @@ export function patchProportionalSymbol(
         style: {
           size: {
             attribute: selectQuantitativeAttribute(layer.data.geojson.features),
+            min: DEFAULT_MIN_SIZE,
+            max: DEFAULT_MAX_SIZE
+          },
+          fill: layer.style.fill,
+          stroke: layer.style.stroke
+        },
+        layout: layer.layout
+      };
+
+      return targetLayer;
+    }
+    case 'Dot Density': {
+      // Replace the dot density transformation with a centroid transformation.
+      const deriveCentroidsTransformation = {
+        ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+        args: []
+      };
+
+      const generateDotDensityPointsTransformationIndex =
+        layer.data.transformations.findIndex(
+          (transformation) => transformation.name === 'generateDotDensityPoints'
+        );
+
+      const transformations = [...layer.data.transformations].splice(
+        generateDotDensityPointsTransformationIndex,
+        1,
+        deriveCentroidsTransformation
+      );
+
+      const targetLayer: CartoKitProportionalSymbolLayer = {
+        id: layer.id,
+        displayName: layer.displayName,
+        type: 'Proportional Symbol',
+        data: {
+          url: layer.data.url,
+          fileName: layer.data.fileName,
+          sourceGeojson: layer.data.sourceGeojson,
+          geojson: deriveCentroids(layer.data.sourceGeojson),
+          transformations
+        },
+        style: {
+          size: {
+            attribute: layer.style.dots.attribute,
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
