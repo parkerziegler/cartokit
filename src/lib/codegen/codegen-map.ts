@@ -10,10 +10,12 @@ import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
  * Generate a program fragment for layer sources, layer renders, and the
  * top-level map instance.
  *
- * @param ir The CartoKit IR.
+ * @param ir The {@link CartoKitIR}.
  * @param uploadTable The symbol table tracking file uploads.
- * @param analysis The analysis of the CartoKit IR.
- * @returns A program fragment.
+ * @param analysis The {@link CartoKitBackendAnalysis} for the current
+ * {@link CartoKitIR}.
+ * @returns A program fragment containing the definition of the map instance,
+ * with accompanying calls to add data sources and layers to the map.
  */
 export function codegenMap(
   ir: CartoKitIR,
@@ -36,9 +38,7 @@ export function codegenMap(
     return p.concat('\n\n' + codegenLayer(layer));
   }, '');
 
-  const isLoadAsync = analysis.isFetchGeoJSONRequired;
-
-  const program = `
+  return `
   const map = new ${analysis.library}gl.Map({
     container: 'map',
     style: ${codegenMapStyle(ir)},
@@ -49,12 +49,10 @@ export function codegenMap(
 
   ${analysis.library === 'maplibre' ? projection : ''}
 
-  map.on('load', ${isLoadAsync ? 'async ' : ''}() => {
+  map.on('load', ${analysis.isFetchGeoJSONRequired ? 'async ' : ''}() => {
     ${layerSources}
 
     ${layerRenders}
   });
   `;
-
-  return program;
 }

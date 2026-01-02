@@ -8,10 +8,12 @@ import { codegenImports } from '$lib/codegen/codegen-imports';
 import type { CartoKitBackend, CartoKitIR } from '$lib/types';
 
 /**
- * Generate a program from the CartoKit IR.
+ * Generate a program from the current {@link CartoKitIR}.
  *
- * @param ir – The CartoKit IR.
- * @returns – A program.
+ * @param ir The {@link CartoKitIR}.
+ * @param language The language backend to use for code generation.
+ * @param library The library backend to use for code generation.
+ * @returns A Promise resolving to the current program.
  */
 export async function codegen(
   ir: CartoKitIR,

@@ -5,7 +5,8 @@ import type { CartoKitLayer } from '$lib/types';
  * Generate a program fragment for a {@link CartoKitLayer}.
  *
  * @param layer A {@link CartoKitLayer}.
- * @returns A program fragment.
+ * @returns A program fragment containing the definition of a layer, with an
+ * accompanying call to add the layer to the map.
  */
 export function codegenLayer(layer: CartoKitLayer): string {
   switch (layer.type) {

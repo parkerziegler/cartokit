@@ -1,5 +1,5 @@
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
-import { deriveRadius } from '$lib/interaction/geometry';
+import { deriveSize } from '$lib/interaction/geometry';
 import { map } from '$lib/state/map.svelte';
 import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 
@@ -26,7 +26,7 @@ export async function reconSizeDiffs(
       map.value!.setPaintProperty(
         diff.layerId,
         'circle-radius',
-        deriveRadius(layer)
+        deriveSize(layer)
       );
       break;
     }

@@ -5,12 +5,13 @@ import { codegenMap } from '$lib/codegen/codegen-map';
 import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
 
 /**
- * Generate a program fragment for all library and data source
- * imports.
+ * Generate a program fragment for all library and data source imports.
  *
- * @param ir The CartoKit IR.
- * @param analysis The analysis of the CartoKit IR.
- * @returns A program fragment.
+ * @param ir The {@link CartoKitIR}.
+ * @param analysis The {@link CartoKitBackendAnalysis} for the current
+ * {@link CartoKitIR}.
+ * @returns A program fragment containing all modules and file imports for the
+ * program.
  */
 export function codegenImports(
   ir: CartoKitIR,

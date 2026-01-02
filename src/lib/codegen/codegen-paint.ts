@@ -1,5 +1,5 @@
 import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
-import { deriveRadius } from '$lib/interaction/geometry';
+import { deriveSize } from '$lib/interaction/geometry';
 import { deriveHeatmapWeight } from '$lib/interaction/weight';
 import type { CartoKitLayer } from '$lib/types';
 
@@ -23,16 +23,12 @@ const DEFAULTS = {
 /**
  * Generate a program fragment representing the layer's fill.
  *
- * @param layer – A @see{CartoKitLayer}.
- * @returns – A program fragment.
+ * @param layer A {@link CartoKitLayer}.
+ * @returns A program fragment containing the definition of the layer's fill.
  */
 export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Point': {
-      if (!layer.style.fill.visible) {
-        return '';
-      }
-
       return [
         `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
         withDefault(
@@ -42,7 +38,7 @@ export function codegenFill(layer: CartoKitLayer): string {
         ),
         withDefault(
           'circle-opacity',
-          layer.style.fill.opacity,
+          layer.style.fill.visible ? layer.style.fill.opacity : 0,
           DEFAULTS['circle-opacity']
         )
       ]
@@ -51,15 +47,15 @@ export function codegenFill(layer: CartoKitLayer): string {
     }
     case 'Proportional Symbol': {
       if (!layer.style.fill.visible) {
-        return '';
+        return `'circle-opacity': 0`;
       }
 
       return [
         `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
-        `'circle-radius': ${JSON.stringify(deriveRadius(layer))}`,
+        `'circle-radius': ${JSON.stringify(deriveSize(layer))}`,
         withDefault(
           'circle-opacity',
-          layer.style.fill.opacity,
+          layer.style.fill.visible ? layer.style.fill.opacity : 0,
           DEFAULTS['fill-opacity']
         )
       ]
@@ -68,7 +64,7 @@ export function codegenFill(layer: CartoKitLayer): string {
     }
     case 'Dot Density': {
       if (!layer.style.fill) {
-        return '';
+        return `'circle-opacity': 0`;
       }
 
       return [
@@ -84,7 +80,7 @@ export function codegenFill(layer: CartoKitLayer): string {
         ),
         withDefault(
           'circle-opacity',
-          layer.style.fill.opacity,
+          layer.style.fill.visible ? layer.style.fill.opacity : 0,
           DEFAULTS['circle-opacity']
         )
       ]
@@ -154,8 +150,8 @@ export function codegenFill(layer: CartoKitLayer): string {
 /**
  * Generate a program fragment representing the layer's stroke.
  *
- * @param layer – A @see{CartoKitLayer}.
- * @returns – A program fragment.
+ * @param layer A {@link CartoKitLayer}.
+ * @returns A program fragment containing the definition of the layer's stroke.
  */
 export function codegenStroke(layer: CartoKitLayer): string {
   switch (layer.type) {
@@ -242,10 +238,10 @@ export function codegenStroke(layer: CartoKitLayer): string {
  * Return a program fragment representing a property-value pair,
  * unless the value is the same as the default value.
  *
- * @param property – The property name.
- * @param cartokitValue – The value of the property in the CartoKit IR.
- * @param defaultValue – The default value for the property.
- * @returns – A (potentially empty) program fragment.
+ * @param property The property name.
+ * @param cartokitValue The value of the property in the {@link CartoKitIR}.
+ * @param defaultValue The default value for the property.
+ * @returns A (potentially empty) program fragment.
  */
 function withDefault<T extends string | number>(
   property: string,

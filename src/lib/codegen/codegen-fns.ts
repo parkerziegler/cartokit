@@ -9,7 +9,8 @@ import type {
 /**
  * Generate a program fragment for a single transformation function.
  *
- * @param transformation A {@linkTransformation}.
+ * @param transformation A {@link Transformation}.
+ * @param analysis The {@link CartoKitBackendAnalysis} for the current {@link CartoKitIR}.
  * @returns A program fragment for a transformation function definition.
  */
 function codegenTransformationFn(
