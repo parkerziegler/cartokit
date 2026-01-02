@@ -11,13 +11,6 @@ import { test, expect } from '@playwright/test';
  * location in geographic space from 1980-2024.
  */
 test('workflow-3', async ({ page }) => {
-  // Identify the playwright test for application code.
-  await page.addInitScript(() => {
-    (
-      window as unknown as Window & { playwrightWorkflowId: string }
-    ).playwrightWorkflowId = 'workflow-3';
-  });
-
   // Mark workflow tests as slow.
   test.setTimeout(150000);
 
@@ -73,7 +66,6 @@ test('workflow-3', async ({ page }) => {
   }
 
   // Open the Add Layer modal.
-  await expect(page.getByTestId('add-layer-button')).toBeEnabled();
   await page.getByTestId('add-layer-button').click();
   await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
@@ -106,7 +98,7 @@ test('workflow-3', async ({ page }) => {
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(90000);
+  await page.waitForTimeout(5000);
 
   // Click on the layer entry in the Layers Panel.
   await page.getByTestId('layer-entry').first().click();
