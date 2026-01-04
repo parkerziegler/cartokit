@@ -1,3 +1,3 @@
-import type { DispatchLayerUpdateParams } from '$lib/interaction/update';
+import type { CartoKitDiff } from '$lib/core/diff';
 
-export const diffs = $state<DispatchLayerUpdateParams[]>([]);
+export const diffs = $state<CartoKitDiff[]>([]);

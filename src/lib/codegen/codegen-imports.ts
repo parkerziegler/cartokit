@@ -1,0 +1,54 @@
+import { camelCase } from 'lodash-es';
+
+import { codegenFns } from '$lib/codegen/codegen-fns';
+import { codegenMap } from '$lib/codegen/codegen-map';
+import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
+
+/**
+ * Generate a program fragment for all library and data source imports.
+ *
+ * @param ir The {@link CartoKitIR}.
+ * @param analysis The {@link CartoKitBackendAnalysis} for the current
+ * {@link CartoKitIR}.
+ * @returns A program fragment containing all modules and file imports for the
+ * program.
+ */
+export function codegenImports(
+  ir: CartoKitIR,
+  analysis: CartoKitBackendAnalysis
+): string {
+  // Create a symbol table mapping layer ids to identifiers referencing imported
+  // source data.
+  const uploadTable = new Map<string, string>();
+
+  const libraryImports = [
+    `import ${analysis.library}gl from '${analysis.library}-gl';`,
+    analysis.isTurfRequired ? "import * as turf from '@turf/turf';" : '',
+    analysis.language === 'typescript' && analysis.isGeoJSONNamespaceRequired
+      ? "import type * as GeoJSON from 'geojson';"
+      : ''
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const fileImports = Object.values(ir.layers).reduce((acc, layer) => {
+    if (layer.data.fileName) {
+      const dataIdent = camelCase(layer.displayName);
+      uploadTable.set(layer.id, dataIdent);
+
+      return acc.concat(`import ${dataIdent} from './${layer.data.fileName}';`);
+    }
+
+    return acc;
+  }, '');
+
+  const imports = `${libraryImports}
+  
+  ${fileImports}`;
+
+  return `${imports}
+
+  ${codegenFns(ir, analysis)}
+
+  ${codegenMap(ir, uploadTable, analysis)}`;
+}

@@ -2,10 +2,10 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import ChoroplethIcon from '$lib/components/icons/ChoroplethIcon.svelte';
   import DotDensityIcon from '$lib/components/icons/DotDensityIcon.svelte';
+  import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
   import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
   import LayerVisibleIcon from '$lib/components/icons/LayerVisibleIcon.svelte';
   import LineIcon from '$lib/components/icons/LineIcon.svelte';
-  import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
   import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
@@ -20,10 +20,10 @@
   import PolygonLegend from '$lib/components/legends/PolygonLegend.svelte';
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import { feature } from '$lib/state/feature.svelte';
+  import { map } from '$lib/state/map.svelte';
   import type { CartoKitLayer } from '$lib/types';
-  import { map } from '$lib/stores/map';
-  import { selectedFeature } from '$lib/stores/selected-feature';
 
   interface Props {
     layer: CartoKitLayer;
@@ -32,34 +32,47 @@
   let { layer }: Props = $props();
 
   let editingDisplayName = $state(false);
+  // In this instance, we just want to capture the initial value of the display name.
+  // svelte-ignore state_referenced_locally
   let lastCommittedDisplayName = $state(layer.displayName);
 
-  function toggleLayerVisibility() {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+  async function toggleLayerVisibility() {
+    const nextVisibility =
+      layer.layout.visibility === 'visible' ? 'hidden' : 'visible';
+
+    const diff: CartoKitDiff = {
       type: 'layer-visibility',
+      layerId: layer.id,
       payload: {
-        visibility: layer.layout.visibility === 'visible' ? 'hidden' : 'visible'
+        visibility: nextVisibility
       }
-    });
+    };
+
+    await applyDiff(diff);
   }
 
-  function toggleLayerTooltip() {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+  async function toggleLayerTooltip() {
+    const nextTooltipVisible = !layer.layout.tooltip.visible;
+
+    const diff: CartoKitDiff = {
       type: 'layer-tooltip-visibility',
+      layerId: layer.id,
       payload: {
-        visible: !layer.layout.tooltip.visible
+        visible: nextTooltipVisible
       }
-    });
+    };
+
+    await applyDiff(diff);
   }
 
-  function removeLayer() {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+  async function removeLayer() {
+    const diff: CartoKitDiff = {
       type: 'remove-layer',
+      layerId: layer.id,
       payload: {}
-    });
+    };
+
+    await applyDiff(diff);
   }
 
   function onLayerKeyDown(
@@ -82,19 +95,21 @@
     }
   }
 
-  function onDisplayNameInput(
+  async function onDisplayNameInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+    const diff: CartoKitDiff = {
       type: 'rename-layer',
+      layerId: layer.id,
       payload: {
         displayName: event.currentTarget.value
       }
-    });
+    };
+
+    await applyDiff(diff);
   }
 
-  function onDisplayNameInputKeyDown(
+  async function onDisplayNameInputKeyDown(
     event: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement }
   ) {
     if (event.key === 'Enter') {
@@ -103,13 +118,15 @@
     } else if (event.key === 'Escape') {
       editingDisplayName = false;
 
-      dispatchLayerUpdate({
-        layerId: layer.id,
+      const diff: CartoKitDiff = {
         type: 'rename-layer',
+        layerId: layer.id,
         payload: {
           displayName: lastCommittedDisplayName
         }
-      });
+      };
+
+      await applyDiff(diff);
     }
   }
 
@@ -124,21 +141,21 @@
   }
 
   function onLayerClick() {
-    const randomFeature = $map.queryRenderedFeatures({
+    const randomFeature = map.value!.queryRenderedFeatures({
       layers: [layer.id]
     })[0];
 
     // If we have a currently selected feature, deselect it.
-    if ($selectedFeature) {
-      $map.setFeatureState(
-        { source: $selectedFeature.layer.id, id: $selectedFeature.id },
+    if (feature.value) {
+      map.value!.setFeatureState(
+        { source: feature.value.layer.id, id: feature.value.id },
         { selected: false }
       );
     }
 
-    selectedFeature.set(randomFeature);
+    feature.value = randomFeature;
 
-    $map.setFeatureState(
+    map.value!.setFeatureState(
       { source: layer.id, id: randomFeature.id },
       { selected: true }
     );
@@ -149,7 +166,7 @@
   <div
     class={[
       'relative flex items-center justify-between',
-      $selectedFeature?.layer.id === layer.id
+      feature.value?.layer.id === layer.id
         ? 'display-name--selected'
         : 'display-name'
     ]}
@@ -157,6 +174,7 @@
     onkeydown={onLayerKeyDown}
     role="button"
     tabindex="0"
+    data-testid="layer-entry"
   >
     <div class="flex items-center">
       <span class="shrink-0">

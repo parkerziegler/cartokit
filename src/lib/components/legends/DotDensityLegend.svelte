@@ -7,7 +7,7 @@
 
   let { layer }: Props = $props();
   let dimension = $derived(
-    layer.style.dots.size * 2 + (layer.style.stroke?.width ?? 0) * 2
+    layer.style.size * 2 + (layer.style.stroke?.width ?? 0) * 2
   );
 </script>
 
@@ -22,7 +22,7 @@
       <circle
         cx={dimension / 2}
         cy={dimension / 2}
-        r={layer.style.dots.size}
+        r={layer.style.size}
         fill={layer.style.fill?.color ?? 'none'}
         fill-opacity={layer.style.fill?.opacity ?? '0'}
         stroke={layer.style.stroke?.color ?? 'none'}

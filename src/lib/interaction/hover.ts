@@ -3,7 +3,7 @@ import { get } from 'svelte/store';
 
 import { popup } from '$lib/state/popup.svelte';
 import { ir } from '$lib/stores/ir';
-import { listeners } from '$lib/stores/listeners';
+import { listeners } from '$lib/state/listeners.svelte';
 
 /**
  * Add a hover effect to all features in a point layer.
@@ -97,6 +97,8 @@ export const instrumentPolygonHover = (map: Map, layerId: string): void => {
 const addHoverListeners = (map: Map, layerId: string): void => {
   let hoveredFeatureId: string | null = null;
 
+  const canonicalLayerId = layerId.replace(/-outlines|-points/g, '');
+
   const onMouseMove = (event: MapLayerMouseEvent): void => {
     if (event.features && event.features.length > 0) {
       if (hoveredFeatureId !== null) {
@@ -115,10 +117,11 @@ const addHoverListeners = (map: Map, layerId: string): void => {
         );
         map.getCanvas().style.cursor = 'pointer';
 
-        if (get(ir).layers[layerId].layout.tooltip.visible) {
-          popup[layerId] = {
+        const currentIR = get(ir);
+        if (currentIR.layers[canonicalLayerId].layout.tooltip.visible) {
+          popup[canonicalLayerId] = {
             open: true,
-            displayName: get(ir).layers[layerId].displayName,
+            displayName: currentIR.layers[canonicalLayerId].displayName,
             properties: event.features[0].properties
           };
         }
@@ -134,7 +137,7 @@ const addHoverListeners = (map: Map, layerId: string): void => {
       );
       map.getCanvas().style.cursor = '';
 
-      popup[layerId] = {
+      popup[canonicalLayerId] = {
         open: false,
         displayName: '',
         properties: {}
@@ -147,17 +150,11 @@ const addHoverListeners = (map: Map, layerId: string): void => {
   map.on('mousemove', layerId, onMouseMove);
   map.on('mouseleave', layerId, onMouseLeave);
 
-  listeners.update((ls) => {
-    const layerListeners = ls.get(layerId) ?? {
-      click: () => {},
-      mousemove: () => {},
-      mouseleave: () => {}
-    };
+  const layerListeners = listeners.value.get(layerId)!;
 
-    return ls.set(layerId, {
-      ...layerListeners,
-      mousemove: onMouseMove,
-      mouseleave: onMouseLeave
-    });
+  listeners.value.set(layerId, {
+    ...layerListeners,
+    mousemove: onMouseMove,
+    mouseleave: onMouseLeave
   });
 };
