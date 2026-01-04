@@ -102,7 +102,7 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         });
       }
 
-      // Add a transparent layer to the map for the outlines.
+      // Add a transparent layer to the map for the points.
       // This is the layer we'll instrument for hover and select effects.
       map.addLayer({
         id: `${layer.id}-points`,

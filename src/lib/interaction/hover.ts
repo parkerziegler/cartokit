@@ -97,6 +97,8 @@ export const instrumentPolygonHover = (map: Map, layerId: string): void => {
 const addHoverListeners = (map: Map, layerId: string): void => {
   let hoveredFeatureId: string | null = null;
 
+  const canonicalLayerId = layerId.replace(/-outlines|-points/g, '');
+
   const onMouseMove = (event: MapLayerMouseEvent): void => {
     if (event.features && event.features.length > 0) {
       if (hoveredFeatureId !== null) {
@@ -116,11 +118,10 @@ const addHoverListeners = (map: Map, layerId: string): void => {
         map.getCanvas().style.cursor = 'pointer';
 
         const currentIR = get(ir);
-        const lId = layerId.replace(/-outlines/g, '');
-        if (currentIR.layers[lId].layout.tooltip.visible) {
-          popup[lId] = {
+        if (currentIR.layers[canonicalLayerId].layout.tooltip.visible) {
+          popup[canonicalLayerId] = {
             open: true,
-            displayName: currentIR.layers[lId].displayName,
+            displayName: currentIR.layers[canonicalLayerId].displayName,
             properties: event.features[0].properties
           };
         }
@@ -136,7 +137,7 @@ const addHoverListeners = (map: Map, layerId: string): void => {
       );
       map.getCanvas().style.cursor = '';
 
-      popup[layerId] = {
+      popup[canonicalLayerId] = {
         open: false,
         displayName: '',
         properties: {}

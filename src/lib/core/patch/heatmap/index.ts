@@ -1,5 +1,6 @@
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import type { CartoKitHeatmapLayer } from '$lib/types';
+import { selectQuantitativeAttribute } from '$lib/utils/geojson';
 
 export async function patchHeatmapDiffs(
   params: Promise<PatchFnParams>
@@ -38,7 +39,19 @@ export async function patchHeatmapDiffs(
     case 'heatmap-weight-type': {
       const layer = ir.layers[diff.layerId] as CartoKitHeatmapLayer;
 
-      layer.style.heatmap.weight.type = diff.payload.weightType;
+      if (diff.payload.weightType === 'Constant') {
+        layer.style.heatmap.weight = {
+          type: 'Constant',
+          value: 1
+        };
+      } else if (diff.payload.weightType === 'Quantitative') {
+        layer.style.heatmap.weight = {
+          type: 'Quantitative',
+          attribute: selectQuantitativeAttribute(layer.data.geojson.features),
+          min: 0,
+          max: 1
+        };
+      }
 
       break;
     }
