@@ -61,7 +61,7 @@
     }
 
     try {
-      const response = await fetch('/llm', {
+      const data = await fetch('/llm', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -72,9 +72,7 @@
           layerIdsToAttributes,
           userId: user.userId
         })
-      });
-
-      const data = await response.json();
+      }).then((response) => response.json());
 
       for (const diff of data.diffs) {
         if (diff.type === 'unknown') {
@@ -88,9 +86,7 @@
         }
       }
 
-      if (textarea) {
-        prompt = '';
-      }
+      prompt = '';
     } catch {
       error = true;
 
