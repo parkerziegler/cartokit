@@ -7,7 +7,8 @@ import type { CartoKitLayer } from '$lib/types';
  *
  * @param layer A {@link CartoKitLayer}.
  * @param uploadTable The symbol table tracking file uploads.
- * @returns A program fragment.
+ * @returns A program fragment containing the definition of the data source
+ * for the {@link CartoKitLayer}.
  */
 export function codegenSource(
   layer: CartoKitLayer,
