@@ -375,6 +375,14 @@ export type CartoKitDiff =
   | CenterDiff
   | ProjectionDiff;
 
+/**
+ * Apply a {@link CartoKitDiff} to the current {@link CartoKitIR}, triggering
+ * the patch-reconciliation procedure.
+ *
+ * @param execute The {@link CartoKitDiff} to apply.
+ * @param triggeredByUndo Whether the active {@link CartoKitDiff} was triggered
+ * by an undo operation.
+ */
 export async function applyDiff(
   execute: CartoKitDiff,
   triggeredByUndo = false

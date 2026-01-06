@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Map } from 'maplibre-gl';
+  import type maplibregl from 'maplibre-gl';
 
   import BasemapPicker from '$lib/components/map/BasemapPicker.svelte';
   import ProjectionPicker from '$lib/components/map/ProjectionPicker.svelte';
@@ -8,7 +8,7 @@
   import { layout } from '$lib/stores/layout';
 
   interface Props {
-    map: Map;
+    map: maplibregl.Map;
   }
 
   let { map }: Props = $props();

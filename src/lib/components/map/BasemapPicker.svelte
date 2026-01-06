@@ -1,5 +1,5 @@
 <script lang="ts">
-  import maplibregl, { type Map } from 'maplibre-gl';
+  import maplibregl from 'maplibre-gl';
   import { onMount, setContext } from 'svelte';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
@@ -14,7 +14,7 @@
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
-    map: Map;
+    map: maplibregl.Map;
   }
 
   let { map }: Props = $props();
@@ -46,7 +46,6 @@
         zoom: $ir.zoom
       });
 
-      updateMapThumbnailCenter(map, thumbnail);
       thumbnail.scrollZoom.disable();
 
       return thumbnail;
