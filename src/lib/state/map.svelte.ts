@@ -1,3 +1,5 @@
-import type { Map } from 'maplibre-gl';
+import type maplibregl from 'maplibre-gl';
 
-export const map = $state<{ value: Map | undefined }>({ value: undefined });
+export const map = $state<{ value: maplibregl.Map | undefined }>({
+  value: undefined
+});

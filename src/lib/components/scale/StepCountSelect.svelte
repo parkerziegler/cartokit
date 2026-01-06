@@ -17,7 +17,7 @@
     label: `${i + 3}`
   }));
 
-  async function onStepsChange(
+  async function onStepCountChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     const diff: CartoKitDiff = {
@@ -37,5 +37,5 @@
   selected={style.count}
   title="Steps"
   id="fill-step-count-select"
-  onchange={onStepsChange}
+  onchange={onStepCountChange}
 />

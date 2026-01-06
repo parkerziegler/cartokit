@@ -1,4 +1,4 @@
-import type { Map } from 'maplibre-gl';
+import type maplibregl from 'maplibre-gl';
 
 import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
 import { deriveSize } from '$lib/interaction/geometry';
@@ -15,12 +15,12 @@ import {
 import type { CartoKitLayer } from '$lib/types';
 
 /**
- * Add a @see{CartoKitLayer} to the map.
+ * Add a {@link CartoKitLayer} to the map.
  *
- * @param {Map} map – The top-level MapLibre GL map instance.
- * @param {CartoKitLayer} layer – The @see{CartoKitLayer} to add to the map.
+ * @param map The top-level MapLibre GL map instance.
+ * @param layer The {@link CartoKitLayer} to add to the map.
  */
-export function addLayer(map: Map, layer: CartoKitLayer): void {
+export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
   switch (layer.type) {
     case 'Choropleth': {
       map.addLayer({

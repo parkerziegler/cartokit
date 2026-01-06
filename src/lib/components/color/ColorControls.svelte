@@ -6,7 +6,7 @@
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
   import ClassificationMethodSelect from '$lib/components/scale/ClassificationMethodSelect.svelte';
-  import StepsSelect from '$lib/components/scale/StepsSelect.svelte';
+  import StepsSelect from '$lib/components/scale/StepCountSelect.svelte';
   import VisualizationTypeSelect from '$lib/components/scale/VisualizationTypeSelect.svelte';
   import type {
     CategoricalFill,
