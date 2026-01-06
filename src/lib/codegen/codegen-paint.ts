@@ -30,16 +30,13 @@ export function codegenFill(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Point': {
       return [
-        `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
-        withDefault(
-          'circle-radius',
-          layer.style.size,
-          DEFAULTS['circle-radius']
-        ),
+        layer.style.fill.type === 'Constant'
+          ? withDefault('circle-color', layer.style.fill.color)
+          : `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
+        withDefault('circle-radius', layer.style.size),
         withDefault(
           'circle-opacity',
-          layer.style.fill.visible ? layer.style.fill.opacity : 0,
-          DEFAULTS['circle-opacity']
+          layer.style.fill.visible ? layer.style.fill.opacity : 0
         )
       ]
         .filter(Boolean)
@@ -51,12 +48,13 @@ export function codegenFill(layer: CartoKitLayer): string {
       }
 
       return [
-        `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
+        layer.style.fill.type === 'Constant'
+          ? withDefault('circle-color', layer.style.fill.color)
+          : `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
         `'circle-radius': ${JSON.stringify(deriveSize(layer))}`,
         withDefault(
           'circle-opacity',
-          layer.style.fill.visible ? layer.style.fill.opacity : 0,
-          DEFAULTS['fill-opacity']
+          layer.style.fill.visible ? layer.style.fill.opacity : 0
         )
       ]
         .filter(Boolean)
@@ -68,20 +66,11 @@ export function codegenFill(layer: CartoKitLayer): string {
       }
 
       return [
-        withDefault(
-          'circle-color',
-          layer.style.fill.color,
-          DEFAULTS['circle-color']
-        ),
-        withDefault(
-          'circle-radius',
-          layer.style.size,
-          DEFAULTS['circle-radius']
-        ),
+        withDefault('circle-color', layer.style.fill.color),
+        withDefault('circle-radius', layer.style.size),
         withDefault(
           'circle-opacity',
-          layer.style.fill.visible ? layer.style.fill.opacity : 0,
-          DEFAULTS['circle-opacity']
+          layer.style.fill.visible ? layer.style.fill.opacity : 0
         )
       ]
         .filter(Boolean)
@@ -95,16 +84,8 @@ export function codegenFill(layer: CartoKitLayer): string {
       }
 
       return [
-        withDefault(
-          'fill-color',
-          layer.style.fill.color,
-          DEFAULTS['fill-color']
-        ),
-        withDefault(
-          'fill-opacity',
-          layer.style.fill.opacity,
-          DEFAULTS['fill-opacity']
-        )
+        withDefault('fill-color', layer.style.fill.color),
+        withDefault('fill-opacity', layer.style.fill.opacity)
       ]
         .filter(Boolean)
         .join(',\n');
@@ -112,11 +93,7 @@ export function codegenFill(layer: CartoKitLayer): string {
     case 'Choropleth': {
       return [
         `'fill-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
-        withDefault(
-          'fill-opacity',
-          layer.style.fill.opacity,
-          DEFAULTS['fill-opacity']
-        )
+        withDefault('fill-opacity', layer.style.fill.opacity)
       ]
         .filter(Boolean)
         .join(',\n');
@@ -124,21 +101,9 @@ export function codegenFill(layer: CartoKitLayer): string {
     case 'Heatmap': {
       return [
         `'heatmap-color': ${JSON.stringify(deriveColorRamp(layer.style.heatmap))}`,
-        withDefault(
-          'heatmap-intensity',
-          layer.style.heatmap.intensity,
-          DEFAULTS['heatmap-intensity']
-        ),
-        withDefault(
-          'heatmap-opacity',
-          layer.style.heatmap.opacity,
-          DEFAULTS['heatmap-opacity']
-        ),
-        withDefault(
-          'heatmap-radius',
-          layer.style.heatmap.radius,
-          DEFAULTS['heatmap-radius']
-        ),
+        withDefault('heatmap-intensity', layer.style.heatmap.intensity),
+        withDefault('heatmap-opacity', layer.style.heatmap.opacity),
+        withDefault('heatmap-radius', layer.style.heatmap.radius),
         `'heatmap-weight': ${JSON.stringify(deriveHeatmapWeight(layer))}`
       ]
         .filter(Boolean)
@@ -163,42 +128,18 @@ export function codegenStroke(layer: CartoKitLayer): string {
       }
 
       return [
-        withDefault(
-          'circle-stroke-color',
-          layer.style.stroke.color,
-          DEFAULTS['circle-stroke-color']
-        ),
-        withDefault(
-          'circle-stroke-width',
-          layer.style.stroke.width,
-          DEFAULTS['circle-stroke-width']
-        ),
-        withDefault(
-          'circle-stroke-opacity',
-          layer.style.stroke.opacity,
-          DEFAULTS['circle-stroke-opacity']
-        )
+        withDefault('circle-stroke-color', layer.style.stroke.color),
+        withDefault('circle-stroke-width', layer.style.stroke.width),
+        withDefault('circle-stroke-opacity', layer.style.stroke.opacity)
       ]
         .filter(Boolean)
         .join(',\n');
     }
     case 'Line':
       return [
-        withDefault(
-          'line-color',
-          layer.style.stroke.color,
-          DEFAULTS['line-color']
-        ),
-        withDefault(
-          'line-width',
-          layer.style.stroke.width,
-          DEFAULTS['line-width']
-        ),
-        withDefault(
-          'line-opacity',
-          layer.style.stroke.opacity,
-          DEFAULTS['line-opacity']
-        )
+        withDefault('line-color', layer.style.stroke.color),
+        withDefault('line-width', layer.style.stroke.width),
+        withDefault('line-opacity', layer.style.stroke.opacity)
       ]
         .filter(Boolean)
         .join(',\n');
@@ -209,21 +150,9 @@ export function codegenStroke(layer: CartoKitLayer): string {
       }
 
       return [
-        withDefault(
-          'line-color',
-          layer.style.stroke.color,
-          DEFAULTS['line-color']
-        ),
-        withDefault(
-          'line-width',
-          layer.style.stroke.width,
-          DEFAULTS['line-width']
-        ),
-        withDefault(
-          'line-opacity',
-          layer.style.stroke.opacity,
-          DEFAULTS['line-opacity']
-        )
+        withDefault('line-color', layer.style.stroke.color),
+        withDefault('line-width', layer.style.stroke.width),
+        withDefault('line-opacity', layer.style.stroke.opacity)
       ]
         .filter(Boolean)
         .join(',\n');
@@ -240,15 +169,13 @@ export function codegenStroke(layer: CartoKitLayer): string {
  *
  * @param property The property name.
  * @param cartokitValue The value of the property in the {@link CartoKitIR}.
- * @param defaultValue The default value for the property.
  * @returns A (potentially empty) program fragment.
  */
 function withDefault<T extends string | number>(
-  property: string,
-  cartokitValue: T,
-  defaultValue: T
+  property: keyof typeof DEFAULTS,
+  cartokitValue: T
 ): string {
-  return cartokitValue !== defaultValue
+  return cartokitValue !== DEFAULTS[property]
     ? `'${property}': ${
         typeof cartokitValue === 'string' ? `'${cartokitValue}'` : cartokitValue
       }`
