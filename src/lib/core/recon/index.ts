@@ -1,6 +1,7 @@
 import { flow } from 'lodash-es';
 
 import type { CartoKitDiff } from '$lib/core/diff';
+import { reconDotDensityDiffs } from '$lib/core/recon/dot-density';
 import { reconFillDiffs } from '$lib/core/recon/fill';
 import { reconHeatmapDiffs } from '$lib/core/recon/heatmap';
 import { reconLayerDiffs } from '$lib/core/recon/layer';
@@ -24,6 +25,7 @@ export async function recon(
   targetIR: CartoKitIR
 ): Promise<void> {
   const reconciler = flow(
+    reconDotDensityDiffs,
     reconFillDiffs,
     reconHeatmapDiffs,
     reconLayerDiffs,

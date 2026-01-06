@@ -11,8 +11,13 @@
   );
 </script>
 
-<div class="ml-8 flex flex-col gap-2">
-  <span>{layer.style.dots.attribute}</span>
+<div
+  class={[
+    'ml-8 flex flex-col gap-2',
+    layer.layout.visible ? 'opacity-100' : 'opacity-75'
+  ]}
+>
+  <span>{layer.style.dot.attribute}</span>
   <div class="flex items-center gap-2">
     <svg
       viewBox="0 0 {dimension} {dimension}"
@@ -30,6 +35,6 @@
         stroke-opacity={layer.style.stroke?.opacity ?? '0'}
       />
     </svg>
-    <span class="text-3xs">1 dot = {layer.style.dots.value} units</span>
+    <span class="text-3xs">1 dot = {layer.style.dot.value} units</span>
   </div>
 </div>

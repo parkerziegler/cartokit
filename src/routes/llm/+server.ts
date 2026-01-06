@@ -195,6 +195,125 @@ function FillColorDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   });
 }
 
+function FillColorSchemeDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+  return z.object({
+    type: z.literal('fill-color-scheme'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      scheme: z.union([
+        z.literal('schemeBlues'),
+        z.literal('schemeGreens'),
+        z.literal('schemeGreys'),
+        z.literal('schemeOranges'),
+        z.literal('schemePurples'),
+        z.literal('schemeReds'),
+        z.literal('schemeBuGn'),
+        z.literal('schemeBuPu'),
+        z.literal('schemeGnBu'),
+        z.literal('schemeOrRd'),
+        z.literal('schemePuBuGn'),
+        z.literal('schemePuBu'),
+        z.literal('schemePuRd'),
+        z.literal('schemeRdPu'),
+        z.literal('schemeYlGnBu'),
+        z.literal('schemeYlGn'),
+        z.literal('schemeYlOrBr'),
+        z.literal('schemeYlOrRd'),
+        z.literal('schemeBrBG'),
+        z.literal('schemePRGn'),
+        z.literal('schemePiYG'),
+        z.literal('schemePuOr'),
+        z.literal('schemeRdBu'),
+        z.literal('schemeRdGy'),
+        z.literal('schemeRdYlBu'),
+        z.literal('schemeRdYlGn'),
+        z.literal('schemeSpectral'),
+        z.literal('schemeCategory10'),
+        z.literal('schemeAccent'),
+        z.literal('schemeDark2'),
+        z.literal('schemeObservable10'),
+        z.literal('schemePaired'),
+        z.literal('schemePastel1'),
+        z.literal('schemePastel2'),
+        z.literal('schemeSet1'),
+        z.literal('schemeSet2'),
+        z.literal('schemeSet3'),
+        z.literal('schemeTableau10')
+      ])
+    })
+  });
+}
+
+function FillColorSchemeDirectionDiff(
+  layerIdSchema: z.infer<typeof makeLayerIdSchema>
+) {
+  return z.object({
+    type: z.literal('fill-color-scheme-direction'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      direction: z.union([z.literal('Forward'), z.literal('Reverse')])
+    })
+  });
+}
+
+const ClassificationMethod = z.union([
+  z.literal('Quantile'),
+  z.literal('Equal Interval'),
+  z.literal('Jenks'),
+  z.literal('Manual')
+]);
+
+function FillClassificationMethodDiff(
+  layerIdSchema: z.infer<typeof makeLayerIdSchema>
+) {
+  return z.object({
+    type: z.literal('fill-classification-method'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      method: ClassificationMethod
+    })
+  });
+}
+
+function FillStepCountDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+  return z.object({
+    type: z.literal('fill-step-count'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      count: z.number().min(3).max(9)
+    })
+  });
+}
+
+function FillStepValueDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+  return z.object({
+    type: z.literal('fill-step-value'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      step: z.number().min(0),
+      value: z.number()
+    })
+  });
+}
+
+const VisualizationType = z.union([
+  z.literal('Quantitative'),
+  z.literal('Categorical'),
+  z.literal('Constant')
+]);
+
+function FillVisualizationTypeDiff(
+  layerIdSchema: z.infer<typeof makeLayerIdSchema>
+) {
+  return z.object({
+    type: z.literal('fill-visualization-type'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      visualizationType: VisualizationType
+    })
+  });
+}
+
 function FillOpacityDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   return z.object({
     type: z.literal('fill-opacity'),
@@ -267,103 +386,15 @@ function RemoveStrokeDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   });
 }
 
-const ClassificationMethod = z.union([
-  z.literal('Quantile'),
-  z.literal('Equal Interval'),
-  z.literal('Jenks'),
-  z.literal('Manual')
-]);
-
-function FillClassificationMethodDiff(
-  layerIdSchema: z.infer<typeof makeLayerIdSchema>
+function SizeAttributeDiff(
+  layerIdSchema: z.infer<typeof makeLayerIdSchema>,
+  layerIdsToAttributes: Record<string, string[]>
 ) {
   return z.object({
-    type: z.literal('fill-classification-method'),
+    type: z.literal('size-attribute'),
     layerId: layerIdSchema,
     payload: z.object({
-      method: ClassificationMethod
-    })
-  });
-}
-
-function FillColorSchemeDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
-  return z.object({
-    type: z.literal('fill-color-scheme'),
-    layerId: layerIdSchema,
-    payload: z.object({
-      scheme: z.union([
-        z.literal('schemeBlues'),
-        z.literal('schemeGreens'),
-        z.literal('schemeGreys'),
-        z.literal('schemeOranges'),
-        z.literal('schemePurples'),
-        z.literal('schemeReds'),
-        z.literal('schemeBuGn'),
-        z.literal('schemeBuPu'),
-        z.literal('schemeGnBu'),
-        z.literal('schemeOrRd'),
-        z.literal('schemePuBuGn'),
-        z.literal('schemePuBu'),
-        z.literal('schemePuRd'),
-        z.literal('schemeRdPu'),
-        z.literal('schemeYlGnBu'),
-        z.literal('schemeYlGn'),
-        z.literal('schemeYlOrBr'),
-        z.literal('schemeYlOrRd'),
-        z.literal('schemeBrBG'),
-        z.literal('schemePRGn'),
-        z.literal('schemePiYG'),
-        z.literal('schemePuOr'),
-        z.literal('schemeRdBu'),
-        z.literal('schemeRdGy'),
-        z.literal('schemeRdYlBu'),
-        z.literal('schemeRdYlGn'),
-        z.literal('schemeSpectral'),
-        z.literal('schemeCategory10'),
-        z.literal('schemeAccent'),
-        z.literal('schemeDark2'),
-        z.literal('schemeObservable10'),
-        z.literal('schemePaired'),
-        z.literal('schemePastel1'),
-        z.literal('schemePastel2'),
-        z.literal('schemeSet1'),
-        z.literal('schemeSet2'),
-        z.literal('schemeSet3'),
-        z.literal('schemeTableau10')
-      ])
-    })
-  });
-}
-
-function FillColorSchemeDirectionDiff(
-  layerIdSchema: z.infer<typeof makeLayerIdSchema>
-) {
-  return z.object({
-    type: z.literal('fill-color-scheme-direction'),
-    layerId: layerIdSchema,
-    payload: z.object({
-      direction: z.union([z.literal('Forward'), z.literal('Reverse')])
-    })
-  });
-}
-
-function FillStepCountDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
-  return z.object({
-    type: z.literal('fill-step-count'),
-    layerId: layerIdSchema,
-    payload: z.object({
-      count: z.number().min(3).max(9)
-    })
-  });
-}
-
-function FillStepValueDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
-  return z.object({
-    type: z.literal('fill-step-value'),
-    layerId: layerIdSchema,
-    payload: z.object({
-      step: z.number().min(0),
-      value: z.number()
+      attribute: makeAttrsSchema(layerIdsToAttributes)
     })
   });
 }
@@ -374,19 +405,6 @@ function SizeDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
     layerId: layerIdSchema,
     payload: z.object({
       size: z.number().min(0)
-    })
-  });
-}
-
-function SizeAttributeDiff(
-  layerIdSchema: z.infer<typeof makeLayerIdSchema>,
-  layerIdsToAttributes: Record<string, string[]>
-) {
-  return z.object({
-    type: z.literal('size-attribute'),
-    layerId: layerIdSchema,
-    payload: z.object({
-      attribute: makeAttrsSchema(layerIdsToAttributes)
     })
   });
 }
@@ -411,21 +429,22 @@ function MaxSizeDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   });
 }
 
-const VisualizationType = z.union([
-  z.literal('Quantitative'),
-  z.literal('Categorical'),
-  z.literal('Constant')
-]);
+function DotValueDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+  return z.object({
+    type: z.literal('dot-value'),
+    layerId: layerIdSchema,
+    payload: z.object({ value: z.number().min(0) })
+  });
+}
 
-function FillVisualizationTypeDiff(
-  layerIdSchema: z.infer<typeof makeLayerIdSchema>
+function DotAttributeDiff(
+  layerIdSchema: z.infer<typeof makeLayerIdSchema>,
+  layerIdsToAttributes: Record<string, string[]>
 ) {
   return z.object({
-    type: z.literal('fill-visualization-type'),
+    type: z.literal('dot-attribute'),
     layerId: layerIdSchema,
-    payload: z.object({
-      visualizationType: VisualizationType
-    })
+    payload: z.object({ attribute: makeAttrsSchema(layerIdsToAttributes) })
   });
 }
 
@@ -539,13 +558,11 @@ function HeatmapWeightValueDiff(
   });
 }
 
-const LayerVisibility = z.union([z.literal('visible'), z.literal('hidden')]);
-
 function LayerVisibilityDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   return z.object({
     type: z.literal('layer-visibility'),
     layerId: layerIdSchema,
-    payload: z.object({ visibility: LayerVisibility })
+    payload: z.object({ visible: z.boolean() })
   });
 }
 
@@ -663,6 +680,8 @@ function makeSchema(
         SizeDiff(layerIdSchema),
         MinSizeDiff(layerIdSchema),
         MaxSizeDiff(layerIdSchema),
+        DotValueDiff(layerIdSchema),
+        DotAttributeDiff(layerIdSchema, layerIdsToAttributes),
         HeatmapOpacityDiff(layerIdSchema),
         HeatmapRadiusDiff(layerIdSchema),
         HeatmapRampDiff(layerIdSchema),

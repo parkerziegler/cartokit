@@ -50,9 +50,11 @@
     showOptions = false;
   }
 
-  async function dispatchSchemeUpdate(
+  async function onClickScheme(
     scheme: CategoricalColorScheme | QuantitativeColorScheme
   ) {
+    showOptions = false;
+
     const diff: CartoKitDiff = {
       type: 'fill-color-scheme',
       layerId,
@@ -62,14 +64,6 @@
     };
 
     await applyDiff(diff);
-  }
-
-  async function onClickScheme(
-    scheme: CategoricalColorScheme | QuantitativeColorScheme
-  ) {
-    showOptions = false;
-
-    await dispatchSchemeUpdate(scheme);
   }
 
   async function onSchemeReverse() {

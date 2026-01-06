@@ -90,7 +90,7 @@ export function patchProportionalSymbol(
         },
         style: {
           size: {
-            attribute: layer.style.dots.attribute,
+            attribute: layer.style.dot.attribute,
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },

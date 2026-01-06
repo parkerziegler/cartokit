@@ -270,7 +270,6 @@ export function invertDiff(
         }
       };
     }
-
     case 'min-size': {
       const layer = sourceIR.layers[
         diff.layerId
@@ -284,7 +283,6 @@ export function invertDiff(
         }
       };
     }
-
     case 'max-size': {
       const layer = sourceIR.layers[
         diff.layerId
@@ -298,40 +296,14 @@ export function invertDiff(
         }
       };
     }
-    case 'add-transformation': {
-      const layer = sourceIR.layers[diff.layerId] as CartoKitLayer;
-
-      const transformationName = diff.payload.transformation.name;
+    case 'dot-attribute': {
+      const layer = sourceIR.layers[diff.layerId] as CartoKitDotDensityLayer;
 
       return {
-        type: 'remove-transformation',
+        type: 'dot-attribute',
         layerId: diff.layerId,
         payload: {
-          geojson: layer.data.geojson,
-          transformationName: transformationName
-        }
-      };
-    }
-    case 'remove-transformation': {
-      const layer = sourceIR.layers[diff.layerId] as CartoKitLayer;
-      const transformationName = diff.payload.transformationName;
-
-      const transformation = layer.data.transformations.find(
-        (t) => t.name === transformationName
-      );
-
-      if (!transformation) {
-        throw new Error(
-          `Transformation ${transformationName} not found in layer`
-        );
-      }
-
-      return {
-        type: 'add-transformation',
-        layerId: diff.layerId,
-        payload: {
-          geojson: layer.data.geojson,
-          transformation: transformation
+          attribute: layer.style.dot.attribute
         }
       };
     }
@@ -342,7 +314,7 @@ export function invertDiff(
         type: 'dot-value',
         layerId: diff.layerId,
         payload: {
-          value: layer.style.dots.value
+          value: layer.style.dot.value
         }
       };
     }
@@ -447,7 +419,43 @@ export function invertDiff(
         }
       };
     }
+    case 'add-transformation': {
+      const layer = sourceIR.layers[diff.layerId] as CartoKitLayer;
 
+      const transformationName = diff.payload.transformation.name;
+
+      return {
+        type: 'remove-transformation',
+        layerId: diff.layerId,
+        payload: {
+          geojson: layer.data.geojson,
+          transformationName: transformationName
+        }
+      };
+    }
+    case 'remove-transformation': {
+      const layer = sourceIR.layers[diff.layerId] as CartoKitLayer;
+      const transformationName = diff.payload.transformationName;
+
+      const transformation = layer.data.transformations.find(
+        (t) => t.name === transformationName
+      );
+
+      if (!transformation) {
+        throw new Error(
+          `Transformation ${transformationName} not found in layer`
+        );
+      }
+
+      return {
+        type: 'add-transformation',
+        layerId: diff.layerId,
+        payload: {
+          geojson: layer.data.geojson,
+          transformation: transformation
+        }
+      };
+    }
     case 'layer-visibility': {
       const layer = sourceIR.layers[diff.layerId] as CartoKitLayer;
 
@@ -455,7 +463,7 @@ export function invertDiff(
         type: 'layer-visibility',
         layerId: diff.layerId,
         payload: {
-          visibility: layer.layout.visibility
+          visible: layer.layout.visible
         }
       };
     }

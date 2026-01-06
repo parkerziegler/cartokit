@@ -41,7 +41,12 @@
   );
 </script>
 
-<div class="ml-8 flex flex-col gap-2">
+<div
+  class={[
+    'ml-8 flex flex-col gap-2',
+    layer.layout.visible ? 'opacity-100' : 'opacity-75'
+  ]}
+>
   <span class="text-xs font-semibold">{layer.style.size.attribute} →</span>
   <div class="flex gap-2">
     {#each circles as circle (circle.value)}
@@ -60,6 +65,7 @@
       fill={layer.style.fill}
       stroke={layer.style.stroke}
       layerType="Proportional Symbol"
+      visible={layer.layout.visible}
     />
   {:else if layer.style.fill.visible && layer.style.fill.type === 'Quantitative'}
     <QuantitativeLegend
@@ -67,6 +73,7 @@
       stroke={layer.style.stroke}
       layerId={layer.id}
       layerType="Proportional Symbol"
+      visible={layer.layout.visible}
     />
   {/if}
 </div>

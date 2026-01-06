@@ -14,7 +14,12 @@
   );
 </script>
 
-<div class="ml-8 flex items-center gap-2">
+<div
+  class={[
+    'ml-8 flex items-center gap-2',
+    layer.layout.visible ? 'opacity-100' : 'opacity-75'
+  ]}
+>
   <svg viewBox="0 0 16 16" width="16" height="16">
     <rect
       x="0"

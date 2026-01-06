@@ -16,6 +16,7 @@
       fill={layer.style.fill}
       stroke={layer.style.stroke}
       layerType="Choropleth"
+      visible={layer.layout.visible}
     />
   {:else if layer.style.fill.visible && layer.style.fill.type === 'Quantitative'}
     <QuantitativeLegend
@@ -23,6 +24,7 @@
       stroke={layer.style.stroke}
       layerId={layer.id}
       layerType="Choropleth"
+      visible={layer.layout.visible}
     />
   {/if}
 </div>

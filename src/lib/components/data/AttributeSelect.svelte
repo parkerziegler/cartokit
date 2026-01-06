@@ -18,7 +18,7 @@
     layerId: string;
     visualizationType: VisualizationType;
     geojson: FeatureCollection;
-    channel: Channel;
+    channel: Exclude<Channel, 'stroke'>;
   }
 
   let { selected, layerId, visualizationType, geojson, channel }: Props =
@@ -47,11 +47,8 @@
   async function onAttributeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    // Convert channel-based attribute to specific diff type.
-    const diffType = channel === 'fill' ? 'fill-attribute' : 'size-attribute';
-
     const diff: CartoKitDiff = {
-      type: diffType,
+      type: `${channel}-attribute`,
       layerId,
       payload: {
         attribute: event.currentTarget.value

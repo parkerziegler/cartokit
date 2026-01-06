@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { deriveThresholds } from '$lib/interaction/scales';
 import type {
@@ -23,6 +24,34 @@ import {
   DEFAULT_THRESHOLDS
 } from '$lib/utils/constants';
 
+/**
+ * Recompute the quantitative breaks for a given layer and fill style.
+ *
+ * @param layerId The ID of the {@link CartoKitLayer}.
+ * @param fill The current {@link QuantitativeFill} style.
+ * @returns The new breaks for the given layer and fill style.
+ */
+function recomputeBreaks(layerId: string, fill: QuantitativeFill) {
+  const colors = d3[fill.scheme.id][fill.count];
+
+  return deriveThresholds({
+    method: fill.method,
+    layerId,
+    attribute: fill.attribute,
+    range:
+      fill.scheme.direction === 'Reverse' ? [...colors].reverse() : [...colors],
+    thresholds: fill.thresholds
+  });
+}
+
+/**
+ * Patch fill-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
+ *
+ * @param params A promise that resolves to the {@link PatchFnParams}, including
+ * the current {@link CartoKitDiff} and {@link CartoKitIR}.
+ * @returns A promiise that resolves to the {@link PatchFnResult}, including
+ * the current {@link CartoKitDiff} and patched {@link CartoKitIR}.
+ */
 export async function patchFillDiffs(
   params: Promise<PatchFnParams>
 ): Promise<PatchFnResult> {
@@ -35,11 +64,20 @@ export async function patchFillDiffs(
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
 
-      if (
-        layer.style.fill.type === 'Categorical' ||
-        layer.style.fill.type === 'Quantitative'
-      ) {
+      if (layer.style.fill.type === 'Quantitative') {
         layer.style.fill.attribute = diff.payload.attribute;
+
+        layer.style.fill.thresholds = recomputeBreaks(
+          layer.id,
+          layer.style.fill
+        );
+      } else if (layer.style.fill.type === 'Categorical') {
+        layer.style.fill.attribute = diff.payload.attribute;
+
+        layer.style.fill.categories = enumerateAttributeCategories(
+          layer.data.geojson.features,
+          layer.style.fill.attribute
+        );
       }
       break;
     }
@@ -94,17 +132,10 @@ export async function patchFillDiffs(
       if (layer.style.fill.type === 'Quantitative') {
         layer.style.fill.method = diff.payload.method;
 
-        const colors = d3[layer.style.fill.scheme.id][layer.style.fill.count];
-        layer.style.fill.thresholds = deriveThresholds({
-          method: diff.payload.method,
-          layerId: layer.id,
-          attribute: layer.style.fill.attribute,
-          range:
-            layer.style.fill.scheme.direction === 'Reverse'
-              ? [...colors].reverse()
-              : [...colors],
-          thresholds: layer.style.fill.thresholds
-        });
+        layer.style.fill.thresholds = recomputeBreaks(
+          layer.id,
+          layer.style.fill
+        );
       }
 
       break;
@@ -118,17 +149,10 @@ export async function patchFillDiffs(
       if (layer.style.fill.type === 'Quantitative') {
         layer.style.fill.count = diff.payload.count;
 
-        const colors = d3[layer.style.fill.scheme.id][layer.style.fill.count];
-        layer.style.fill.thresholds = deriveThresholds({
-          method: layer.style.fill.method,
-          layerId: layer.id,
-          attribute: layer.style.fill.attribute,
-          range:
-            layer.style.fill.scheme.direction === 'Reverse'
-              ? [...colors].reverse()
-              : [...colors],
-          thresholds: layer.style.fill.thresholds
-        });
+        layer.style.fill.thresholds = recomputeBreaks(
+          layer.id,
+          layer.style.fill
+        );
       }
 
       break;
@@ -142,17 +166,10 @@ export async function patchFillDiffs(
       if (layer.style.fill.type === 'Quantitative') {
         layer.style.fill.thresholds[diff.payload.step] = diff.payload.value;
 
-        const colors = d3[layer.style.fill.scheme.id][layer.style.fill.count];
-        layer.style.fill.thresholds = deriveThresholds({
-          method: layer.style.fill.method,
-          layerId: layer.id,
-          attribute: layer.style.fill.attribute,
-          range:
-            layer.style.fill.scheme.direction === 'Reverse'
-              ? [...colors].reverse()
-              : [...colors],
-          thresholds: layer.style.fill.thresholds
-        });
+        layer.style.fill.thresholds = recomputeBreaks(
+          layer.id,
+          layer.style.fill
+        );
       }
 
       break;
