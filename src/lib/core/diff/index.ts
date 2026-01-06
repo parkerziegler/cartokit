@@ -14,7 +14,6 @@ import type {
   ClassificationMethod,
   ColorRamp,
   LayerType,
-  LayerVisibility,
   Projection,
   QuantitativeColorScheme,
   RampDirection,
@@ -168,26 +167,17 @@ interface MaxSizeDiff extends LayerDiff {
   };
 }
 
-interface AddTransformationDiff extends LayerDiff {
-  type: 'add-transformation';
-  payload: {
-    geojson: FeatureCollection;
-    transformation: TransformationCall;
-  };
-}
-
-interface RemoveTransformationDiff extends LayerDiff {
-  type: 'remove-transformation';
-  payload: {
-    geojson: FeatureCollection;
-    transformationName: string;
-  };
-}
-
 interface DotValueDiff extends LayerDiff {
   type: 'dot-value';
   payload: {
     value: number;
+  };
+}
+
+interface DotAttributeDiff extends LayerDiff {
+  type: 'dot-attribute';
+  payload: {
+    attribute: string;
   };
 }
 
@@ -254,10 +244,26 @@ interface HeatmapWeightValueDiff extends LayerDiff {
   };
 }
 
+interface AddTransformationDiff extends LayerDiff {
+  type: 'add-transformation';
+  payload: {
+    geojson: FeatureCollection;
+    transformation: TransformationCall;
+  };
+}
+
+interface RemoveTransformationDiff extends LayerDiff {
+  type: 'remove-transformation';
+  payload: {
+    geojson: FeatureCollection;
+    transformationName: string;
+  };
+}
+
 interface LayerVisibilityDiff extends LayerDiff {
   type: 'layer-visibility';
   payload: {
-    visibility: LayerVisibility;
+    visible: boolean;
   };
 }
 
@@ -326,8 +332,6 @@ interface ProjectionDiff {
 
 export type CartoKitDiff =
   | LayerTypeDiff
-  | AddTransformationDiff
-  | RemoveTransformationDiff
   | FillAttributeDiff
   | FillColorDiff
   | FillColorSchemeDiff
@@ -349,6 +353,7 @@ export type CartoKitDiff =
   | MinSizeDiff
   | MaxSizeDiff
   | DotValueDiff
+  | DotAttributeDiff
   | HeatmapOpacityDiff
   | HeatmapRadiusDiff
   | HeatmapRampDiff
@@ -358,6 +363,8 @@ export type CartoKitDiff =
   | HeatmapWeightMinDiff
   | HeatmapWeightMaxDiff
   | HeatmapWeightValueDiff
+  | AddTransformationDiff
+  | RemoveTransformationDiff
   | LayerVisibilityDiff
   | LayerTooltipVisibilityDiff
   | AddLayerDiff

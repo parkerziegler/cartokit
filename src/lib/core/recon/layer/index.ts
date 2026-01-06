@@ -49,7 +49,7 @@ export async function reconLayerDiffs(
     case 'layer-visibility': {
       const layer = targetIR.layers[diff.layerId];
 
-      if (diff.payload.visibility === 'visible') {
+      if (diff.payload.visible) {
         map.value!.setLayoutProperty(layer.id, 'visibility', 'visible');
 
         // Ensure the stroke layer, if present, is made visible.

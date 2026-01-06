@@ -66,7 +66,7 @@ function generateCartoKitLayer(
           }
         },
         layout: {
-          visibility: 'visible',
+          visible: true,
           z,
           tooltip: {
             visible: true
@@ -96,7 +96,7 @@ function generateCartoKitLayer(
           }
         },
         layout: {
-          visibility: 'visible',
+          visible: true,
           z,
           tooltip: {
             visible: true
@@ -132,7 +132,7 @@ function generateCartoKitLayer(
           }
         },
         layout: {
-          visibility: 'visible',
+          visible: true,
           z,
           tooltip: {
             visible: true
@@ -184,7 +184,7 @@ export async function patchLayerDiffs(
     case 'layer-visibility': {
       const layer = ir.layers[diff.layerId];
 
-      layer.layout.visibility = diff.payload.visibility;
+      layer.layout.visible = diff.payload.visible;
 
       break;
     }

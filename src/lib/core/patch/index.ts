@@ -1,6 +1,7 @@
 import { flow } from 'lodash-es';
 
 import type { CartoKitDiff } from '$lib/core/diff';
+import { patchDotDensityDiffs } from '$lib/core/patch/dot-density';
 import { patchFillDiffs } from '$lib/core/patch/fill';
 import { patchHeatmapDiffs } from '$lib/core/patch/heatmap';
 import { patchLayerDiffs } from '$lib/core/patch/layer';
@@ -23,6 +24,7 @@ export async function patch(
   sourceIR: CartoKitIR
 ): Promise<CartoKitIR> {
   const patcher = flow(
+    patchDotDensityDiffs,
     patchFillDiffs,
     patchHeatmapDiffs,
     patchLayerDiffs,

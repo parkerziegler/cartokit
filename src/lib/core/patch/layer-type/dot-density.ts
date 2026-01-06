@@ -19,7 +19,8 @@ import { DEFAULT_SIZE } from '$lib/utils/constants';
  * the maximum value of the data attribute.
  *
  * @param features The features of the {@link CartoKitDotDensityLayer}.
- * @param attribute The attribute of the {@link CartoKitDotDensityLayer} to use for the starting dot value.
+ * @param attribute The attribute of the {@link CartoKitDotDensityLayer} to use
+ * for the starting dot value.
  * @returns The starting dot value.
  */
 function deriveDotDensityStartingValue(
@@ -74,7 +75,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
           ]
         },
         style: {
-          dots: {
+          dot: {
             attribute,
             value: dotValue
           },
@@ -146,7 +147,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
           transformations
         },
         style: {
-          dots: {
+          dot: {
             attribute,
             value: dotValue
           },
@@ -200,7 +201,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
           ]
         },
         style: {
-          dots: {
+          dot: {
             attribute,
             value: dotValue
           },
@@ -258,7 +259,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
           transformations
         },
         style: {
-          dots: {
+          dot: {
             attribute,
             value: dotValue
           },

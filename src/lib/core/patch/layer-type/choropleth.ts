@@ -38,17 +38,14 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
         style: {
           fill: {
             type: 'Quantitative',
-            attribute: layer.style.dots.attribute,
+            attribute: layer.style.dot.attribute,
             method: DEFAULT_METHOD,
             scheme: {
               id: DEFAULT_QUANTITATIVE_SCHEME,
               direction: DEFAULT_SCHEME_DIRECTION
             },
             count: DEFAULT_COUNT,
-            thresholds: DEFAULT_THRESHOLDS(
-              layer.id,
-              layer.style.dots.attribute
-            ),
+            thresholds: DEFAULT_THRESHOLDS(layer.id, layer.style.dot.attribute),
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
           },

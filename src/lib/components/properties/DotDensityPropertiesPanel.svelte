@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DotValue from '$lib/components/channel/dot-density/DotValue.svelte';
+  import DotValue from '$lib/components/channel/dot/DotValue.svelte';
   import FillModifier from '$lib/components/color/FillModifier.svelte';
   import FillPicker from '$lib/components/color/FillPicker.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
@@ -22,8 +22,8 @@
     layerId={layer.id}
     visualizationType="Quantitative"
     geojson={layer.data.geojson}
-    selected={layer.style.dots.attribute}
-    channel="dots"
+    selected={layer.style.dot.attribute}
+    channel="dot"
   />
   <PointSize
     layerId={layer.id}

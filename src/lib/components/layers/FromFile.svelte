@@ -25,14 +25,6 @@
     displayName = event.currentTarget.value;
   }
 
-  function onSourceLoaded() {
-    dataLoading = false;
-    file = null;
-    displayName = '';
-
-    closeModal();
-  }
-
   function onSubmit(
     event: Event & { currentTarget: EventTarget & HTMLFormElement }
   ) {
@@ -64,7 +56,11 @@
           }
         });
 
-        onSourceLoaded();
+        dataLoading = false;
+        file = null;
+        displayName = '';
+
+        closeModal();
       }
     };
 

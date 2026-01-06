@@ -104,7 +104,7 @@ export type LayerType =
 /**
  * Represents the encoding channels of a layer.
  */
-export type Channel = 'fill' | 'stroke' | 'size' | 'dots';
+export type Channel = 'fill' | 'stroke' | 'size' | 'dot';
 
 /**
  * Represents the visualization type for a given channel.
@@ -170,19 +170,14 @@ interface LayerData {
 }
 
 /**
- * Represents the visibility of a layer.
- */
-export type LayerVisibility = 'visible' | 'hidden';
-
-/**
  * Represents the layout of a layer.
  *
- * @property {LayerVisibility} visibility - The visibility of the layer, 'visible' or
- * 'hidden'.
+ * @property {boolean} visible - Whether the layer is visible.
  * @property {number} z - The z-index of the layer.
+ * @property {boolean} tooltip.visible - Whether the layer's tooltip is visible.
  */
 interface LayerLayout {
-  visibility: LayerVisibility;
+  visible: boolean;
   z: number;
   tooltip: {
     visible: boolean;
@@ -298,7 +293,7 @@ export interface CartoKitChoroplethLayer extends Layer {
 export interface CartoKitDotDensityLayer extends Layer {
   type: 'Dot Density';
   style: {
-    dots: DotDensityStyle;
+    dot: DotDensityStyle;
     size: number;
     fill: ConstantStyle;
     stroke: ConstantStroke;

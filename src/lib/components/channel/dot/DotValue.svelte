@@ -26,7 +26,7 @@
   <NumberInput
     id="dot-value"
     min={0.000001}
-    value={layer.style.dots.value}
+    value={layer.style.dot.value}
     onchange={onDotValueChange}
     class="w-10"
   />

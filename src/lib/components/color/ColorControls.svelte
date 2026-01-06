@@ -2,12 +2,12 @@
   import type { FeatureCollection } from 'geojson';
 
   import ColorSchemeSelect from '$lib/components/color/ColorSchemeSelect.svelte';
-  import VisualizationTypeSelect from '$lib/components/scale/VisualizationTypeSelect.svelte';
   import FillPicker from '$lib/components/color/FillPicker.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
   import ClassificationMethodSelect from '$lib/components/scale/ClassificationMethodSelect.svelte';
   import StepsSelect from '$lib/components/scale/StepsSelect.svelte';
+  import VisualizationTypeSelect from '$lib/components/scale/VisualizationTypeSelect.svelte';
   import type {
     CategoricalFill,
     ConstantFill,

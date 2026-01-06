@@ -37,7 +37,12 @@
   );
 </script>
 
-<div class="ml-8 flex flex-col gap-2">
+<div
+  class={[
+    'ml-8 flex flex-col gap-2',
+    layer.layout.visible ? 'opacity-100' : 'opacity-75'
+  ]}
+>
   <div class="flex items-center gap-2">
     <svg
       viewBox="0 0 {dimension} {dimension}"
@@ -61,6 +66,7 @@
       layerType="Point"
       fill={layer.style.fill}
       stroke={layer.style.stroke}
+      visible={layer.layout.visible}
     />
   {:else if layer.style.fill.visible && layer.style.fill.type === 'Quantitative'}
     <QuantitativeLegend
@@ -68,6 +74,7 @@
       stroke={layer.style.stroke}
       layerId={layer.id}
       layerType="Point"
+      visible={layer.layout.visible}
     />
   {/if}
 </div>

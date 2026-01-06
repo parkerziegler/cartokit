@@ -27,8 +27,7 @@
 
   function identifyTopmostVisibleInteractableLayer(): string | undefined {
     const interactableLayers = Object.values($ir.layers).filter(
-      (layer) =>
-        layer.layout.visibility === 'visible' && layer.layout.tooltip.visible
+      (layer) => layer.layout.visible && layer.layout.tooltip.visible
     );
     const orderedLayers = orderBy(interactableLayers, 'layout.z', 'desc');
 

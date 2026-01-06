@@ -6,8 +6,8 @@
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { map } from '$lib/state/map.svelte';
   import { applyDiff } from '$lib/core/diff';
+  import { map } from '$lib/state/map.svelte';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -27,14 +27,17 @@
     displayName = event.currentTarget.value;
   }
 
-  function handleSourceLoaded(event: MapSourceDataEvent, layerId: string) {
-    if (event.sourceId === layerId) {
-      dataLoading = false;
-      endpoint = '';
-      displayName = '';
+  function handleSourceLoaded(layerId: string) {
+    return (event: MapSourceDataEvent) => {
+      if (event.sourceId === layerId) {
+        dataLoading = false;
+        endpoint = '';
+        displayName = '';
 
-      closeModal();
-    }
+        closeModal();
+        map.value!.off('sourcedata', handleSourceLoaded(layerId));
+      }
+    };
   }
 
   async function onSubmit(
@@ -60,9 +63,7 @@
       }
     });
 
-    map.value!.on('sourcedata', (event: MapSourceDataEvent) =>
-      handleSourceLoaded(event, layerId)
-    );
+    map.value!.on('sourcedata', handleSourceLoaded(layerId));
   }
 </script>
 

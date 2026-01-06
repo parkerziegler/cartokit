@@ -35,16 +35,14 @@
   // In this instance, we just want to capture the initial value of the display name.
   // svelte-ignore state_referenced_locally
   let lastCommittedDisplayName = $state(layer.displayName);
+  let entry: HTMLDivElement;
 
   async function toggleLayerVisibility() {
-    const nextVisibility =
-      layer.layout.visibility === 'visible' ? 'hidden' : 'visible';
-
     const diff: CartoKitDiff = {
       type: 'layer-visibility',
       layerId: layer.id,
       payload: {
-        visibility: nextVisibility
+        visible: !layer.layout.visible
       }
     };
 
@@ -52,13 +50,11 @@
   }
 
   async function toggleLayerTooltip() {
-    const nextTooltipVisible = !layer.layout.tooltip.visible;
-
     const diff: CartoKitDiff = {
       type: 'layer-tooltip-visibility',
       layerId: layer.id,
       payload: {
-        visible: nextTooltipVisible
+        visible: !layer.layout.tooltip.visible
       }
     };
 
@@ -79,7 +75,14 @@
     event: KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement }
   ) {
     if (event.key === 'Enter') {
-      onLayerClick();
+      const event = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true
+      }) as MouseEvent & {
+        currentTarget: EventTarget & HTMLDivElement;
+      };
+
+      entry.dispatchEvent(event);
     }
   }
 
@@ -140,7 +143,16 @@
     lastCommittedDisplayName = layer.displayName;
   }
 
-  function onLayerClick() {
+  function onLayerClick(
+    event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
+  ) {
+    // If the user clicked one of the buttons contained in the layer entry
+    // (Layer Visibility, Layer Tooltip Visibility, or Remove Layer), or the
+    // layer is hidden, do nothing.
+    if (event.target instanceof HTMLButtonElement || !layer.layout.visible) {
+      return;
+    }
+
     const randomFeature = map.value!.queryRenderedFeatures({
       layers: [layer.id]
     })[0];
@@ -166,15 +178,15 @@
   <div
     class={[
       'relative flex items-center justify-between',
-      feature.value?.layer.id === layer.id
-        ? 'display-name--selected'
-        : 'display-name'
+      layer.layout.visible ? 'display-name--visible' : 'display-name--hidden',
+      feature.value?.layer.id === layer.id && 'display-name--selected'
     ]}
     onclick={onLayerClick}
     onkeydown={onLayerKeyDown}
     role="button"
     tabindex="0"
     data-testid="layer-entry"
+    bind:this={entry}
   >
     <div class="flex items-center">
       <span class="shrink-0">
@@ -214,15 +226,15 @@
         >
       {/if}
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1">
       <button
-        onclick={toggleLayerVisibility}
         {@attach tooltip({
-          content:
-            layer.layout.visibility === 'visible' ? 'Hide Layer' : 'Show Layer'
+          content: layer.layout.visible ? 'Hide Layer' : 'Show Layer'
         })}
+        onclick={toggleLayerVisibility}
+        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500"
       >
-        {#if layer.layout.visibility === 'visible'}
+        {#if layer.layout.visible}
           <LayerVisibleIcon />
         {:else}
           <LayerHiddenIcon />
@@ -235,6 +247,7 @@
             : 'Show Layer Tooltip'
         })}
         onclick={toggleLayerTooltip}
+        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500"
       >
         {#if layer.layout.tooltip.visible}
           <TooltipIcon />
@@ -247,6 +260,7 @@
           content: 'Remove Layer'
         })}
         onclick={removeLayer}
+        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500"
       >
         <MinusIcon />
       </button>
@@ -272,10 +286,14 @@
 <style lang="postcss">
   @reference 'tailwindcss';
 
-  .display-name:hover::after {
+  .display-name--visible:hover::after {
     @apply absolute -left-4 -z-10 h-full bg-slate-700;
     width: calc(100% + 2rem);
     content: '';
+  }
+
+  .display-name--hidden {
+    @apply opacity-75;
   }
 
   .display-name--selected::after {

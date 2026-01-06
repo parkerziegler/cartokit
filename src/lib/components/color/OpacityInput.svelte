@@ -11,7 +11,7 @@
 
   interface Props {
     layerId: string;
-    channel: Exclude<Channel, 'size' | 'dots'>;
+    channel: Exclude<Channel, 'size' | 'dot'>;
     style: QuantitativeStyle | CategoricalStyle | ConstantStyle;
   }
 
@@ -34,10 +34,8 @@
   }
 
   async function onOpacityChange(opacity: number) {
-    const diffType = `${channel}-opacity` as const;
-
     const diff: CartoKitDiff = {
-      type: diffType,
+      type: `${channel}-opacity`,
       layerId,
       payload: { opacity }
     };

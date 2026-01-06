@@ -5,12 +5,13 @@
 
   interface Props {
     fill: QuantitativeFill;
-    stroke: ConstantStroke | undefined;
+    stroke: ConstantStroke;
     layerId: string;
     layerType: LayerType;
+    visible: boolean;
   }
 
-  let { fill, stroke, layerId, layerType }: Props = $props();
+  let { fill, stroke, layerId, layerType, visible }: Props = $props();
   let { min, max } = $derived(catalog.value[layerId][fill.attribute]);
 
   let colors = $derived(
@@ -18,7 +19,7 @@
   );
 </script>
 
-<div class="flex flex-col gap-2 text-white">
+<div class={['flex flex-col gap-2', visible ? 'opacity-100' : 'opacity-75']}>
   <p class="font-semibold">{fill.attribute} ↓</p>
   <div class="flex gap-2 rounded-md bg-slate-900">
     <ul class="mt-3 flex flex-col gap-2">
