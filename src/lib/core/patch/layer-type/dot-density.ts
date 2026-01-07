@@ -1,37 +1,15 @@
-import * as d3 from 'd3';
-import type {
-  Feature,
-  FeatureCollection,
-  MultiPolygon,
-  Polygon
-} from 'geojson';
+import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
-import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
+import {
+  generateDotDensityPoints,
+  deriveDotDensityStartingValue
+} from '$lib/stdlib/dot-density';
 import generateDotDensityPointsSrc from '$lib/stdlib/dot-density?raw';
 import type { CartoKitDotDensityLayer, CartoKitLayer } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import { DEFAULT_SIZE } from '$lib/utils/constants';
 import { selectQuantitativeAttribute } from '$lib/utils/geojson';
 import { parseStringToTransformation } from '$lib/utils/parse';
-
-/**
- * Obtain a starting dot value for a {@link CartoKitDotDensityLayer} based on
- * the maximum value of the data attribute.
- *
- * @param features The features of the {@link CartoKitDotDensityLayer}.
- * @param attribute The attribute of the {@link CartoKitDotDensityLayer} to use
- * for the starting dot value.
- * @returns The starting dot value.
- */
-function deriveDotDensityStartingValue(
-  features: Feature[],
-  attribute: string
-): number {
-  const [min, max] = d3.extent(features, (d) => d.properties?.[attribute] ?? 0);
-
-  // Aim for a ratio where the number of dots is 10% of the range.
-  return (max - min) * 0.1 || 1;
-}
 
 /**
  * Patch a {@link CartoKitLayer} to a {@link CartoKitDotDensityLayer}.
@@ -68,7 +46,8 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
             {
               ...parseStringToTransformation(
                 generateDotDensityPointsSrc,
-                'geometric'
+                'geometric',
+                'generateDotDensityPoints'
               ),
               args: [attribute, dotValue]
             }
@@ -113,7 +92,8 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
       const generateDotDensityPointsTransformation = {
         ...parseStringToTransformation(
           generateDotDensityPointsSrc,
-          'geometric'
+          'geometric',
+          'generateDotDensityPoints'
         ),
         args: [attribute, dotValue]
       };
@@ -194,7 +174,8 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
             {
               ...parseStringToTransformation(
                 generateDotDensityPointsSrc,
-                'geometric'
+                'geometric',
+                'generateDotDensityPoints'
               ),
               args: [attribute, dotValue]
             }
@@ -225,7 +206,8 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
       const generateDotDensityPointsTransformation = {
         ...parseStringToTransformation(
           generateDotDensityPointsSrc,
-          'geometric'
+          'geometric',
+          'generateDotDensityPoints'
         ),
         args: [attribute, dotValue]
       };

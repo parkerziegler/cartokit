@@ -1,7 +1,10 @@
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
-import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
+import {
+  deriveDotDensityStartingValue,
+  generateDotDensityPoints
+} from '$lib/stdlib/dot-density';
 import type { CartoKitDotDensityLayer } from '$lib/types';
 
 /**
@@ -47,13 +50,21 @@ export async function patchDotDiffs(
     case 'dot-attribute': {
       const layer = ir.layers[diff.layerId] as CartoKitDotDensityLayer;
 
+      // Rederive a starting dot value based on the range of the new attribute.
+      const dotValue = deriveDotDensityStartingValue(
+        layer.data.sourceGeojson.features,
+        diff.payload.attribute
+      );
+
+      // Generate the new dot density points.
       const features = generateDotDensityPoints(
         layer.data.sourceGeojson as FeatureCollection<Polygon | MultiPolygon>,
         diff.payload.attribute,
-        layer.style.dot.value
+        dotValue
       );
 
       layer.style.dot.attribute = diff.payload.attribute;
+      layer.style.dot.value = dotValue;
       layer.data.geojson = features;
 
       // Update the args of the dot density transformation in this layer.
@@ -64,7 +75,7 @@ export async function patchDotDiffs(
       if (transformationIndex > -1) {
         layer.data.transformations[transformationIndex].args = [
           diff.payload.attribute,
-          layer.style.dot.value
+          dotValue
         ];
       }
 
