@@ -19,6 +19,11 @@ export function patchLine(layer: CartoKitLayer): CartoKitLineLayer {
       return layer;
     case 'Point':
     case 'Proportional Symbol': {
+      // Remove the centroid transformation.
+      const transformations = layer.data.transformations.filter(
+        (transformation) => transformation.name !== 'deriveCentroids'
+      );
+
       const targetLayer: CartoKitLineLayer = {
         id: layer.id,
         displayName: layer.displayName,
@@ -28,7 +33,7 @@ export function patchLine(layer: CartoKitLayer): CartoKitLineLayer {
           fileName: layer.data.fileName,
           geojson: layer.data.sourceGeojson,
           sourceGeojson: layer.data.sourceGeojson,
-          transformations: layer.data.transformations
+          transformations
         },
         style: {
           stroke: layer.style.stroke

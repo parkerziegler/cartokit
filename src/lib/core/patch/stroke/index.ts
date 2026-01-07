@@ -7,6 +7,14 @@ import type {
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
 
+/**
+ * Patch stroke-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
+ *
+ * @param params A promise that resolves to the {@link PatchFnParams}, including
+ * the current {@link CartoKitDiff} and {@link CartoKitIR}.
+ * @returns A promise that resolves to the {@link PatchFnResult}, including
+ * the current {@link CartoKitDiff} and patched {@link CartoKitIR}.
+ */
 export async function patchStrokeDiffs(
   params: Promise<PatchFnParams>
 ): Promise<PatchFnResult> {

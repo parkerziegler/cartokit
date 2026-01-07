@@ -15,12 +15,17 @@ import {
 import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
 
 /**
- * Generate a CartoKitLayer for a given GeoJSON dataset, using the dataset's
- * Geometry type to select the appropriate member from the CartoKitLayer union.
+ * Generate a {@link CartoKitLayer} for a given GeoJSON dataset, using the
+ * dataset's geometry type to select the appropriate member from the
+ * {@link CartoKitLayer} union.
  *
- * @param {FeatureCollection} featureCollection – The GeoJSON FeatureCollection
- * associated with the layer.
- * @returns – A default CartoKitLayer appropriate for the input geometry type.
+ * @param featureCollection The GeoJSON FeatureCollection associated with the layer.
+ * @param options The options for the {@link CartoKitLayer}.
+ * @param options.displayName The display name of the {@link CartoKitLayer}.
+ * @param options.layerId The ID of the {@link CartoKitLayer}.
+ * @param options.url The URL of the GeoJSON dataset.
+ * @param options.fileName The file name of the GeoJSON dataset.
+ * @returns A default {@link CartoKitLayer} appropriate for the input geometry type.
  */
 function generateCartoKitLayer(
   featureCollection: FeatureCollection,
@@ -144,6 +149,14 @@ function generateCartoKitLayer(
   }
 }
 
+/**
+ * Patch layer-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
+ *
+ * @param params A promise that resolves to the {@link PatchFnParams}, including
+ * the current {@link CartoKitDiff} and {@link CartoKitIR}.
+ * @returns A promise that resolves to the {@link PatchFnResult}, including
+ * the current {@link CartoKitDiff} and patched {@link CartoKitIR}.
+ */
 export async function patchLayerDiffs(
   params: Promise<PatchFnParams>
 ): Promise<PatchFnResult> {
@@ -169,7 +182,7 @@ export async function patchLayerDiffs(
         });
 
         ir.layers[diff.layerId] = layer;
-      } else {
+      } else if (diff.payload.type === 'file') {
         const layer = generateCartoKitLayer(diff.payload.featureCollection, {
           displayName: diff.payload.displayName,
           layerId: diff.layerId,

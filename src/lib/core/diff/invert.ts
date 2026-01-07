@@ -1,6 +1,5 @@
 import type {
   CartoKitIR,
-  VisualizationType,
   ConstantFill,
   CategoricalFill,
   QuantitativeFill,
@@ -17,6 +16,14 @@ import type {
 } from '$lib/types';
 import type { CartoKitDiff } from '$lib/core/diff';
 
+/**
+ * Produce the inverse {@link CartoKitDiff} for a given {@link CartoKitDiff}.
+ *
+ * @param diff The {@link CartoKitDiff} to invert.
+ * @param sourceIR The source {@link CartoKitIR} prior to applying the
+ * {@link CartoKitDiff}.
+ * @returns The inverse {@link CartoKitDiff}.
+ */
 export function invertDiff(
   diff: CartoKitDiff,
   sourceIR: CartoKitIR
@@ -24,6 +31,7 @@ export function invertDiff(
   switch (diff.type) {
     case 'layer-type': {
       const layer = sourceIR.layers[diff.layerId] as CartoKitLayer;
+
       return {
         type: 'layer-type',
         layerId: diff.layerId,
@@ -49,6 +57,7 @@ export function invertDiff(
     }
     case 'fill-color': {
       const layer = sourceIR.layers[diff.layerId] as
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
@@ -146,18 +155,14 @@ export function invertDiff(
         type: 'fill-visualization-type',
         layerId: diff.layerId,
         payload: {
-          visualizationType: (
-            layer.style.fill as
-              | QuantitativeFill
-              | CategoricalFill
-              | ConstantFill
-          ).type as VisualizationType
+          visualizationType: layer.style.fill.type
         }
       };
     }
     case 'fill-opacity': {
       const layer = sourceIR.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
@@ -187,6 +192,7 @@ export function invertDiff(
     case 'stroke-color': {
       const layer = sourceIR.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitLineLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
@@ -203,6 +209,7 @@ export function invertDiff(
     case 'stroke-width': {
       const layer = sourceIR.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitLineLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
@@ -219,6 +226,7 @@ export function invertDiff(
     case 'stroke-opacity': {
       const layer = sourceIR.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitLineLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
@@ -296,17 +304,6 @@ export function invertDiff(
         }
       };
     }
-    case 'dot-attribute': {
-      const layer = sourceIR.layers[diff.layerId] as CartoKitDotDensityLayer;
-
-      return {
-        type: 'dot-attribute',
-        layerId: diff.layerId,
-        payload: {
-          attribute: layer.style.dot.attribute
-        }
-      };
-    }
     case 'dot-value': {
       const layer = sourceIR.layers[diff.layerId] as CartoKitDotDensityLayer;
 
@@ -315,6 +312,17 @@ export function invertDiff(
         layerId: diff.layerId,
         payload: {
           value: layer.style.dot.value
+        }
+      };
+    }
+    case 'dot-attribute': {
+      const layer = sourceIR.layers[diff.layerId] as CartoKitDotDensityLayer;
+
+      return {
+        type: 'dot-attribute',
+        layerId: diff.layerId,
+        payload: {
+          attribute: layer.style.dot.attribute
         }
       };
     }
@@ -429,7 +437,7 @@ export function invertDiff(
         layerId: diff.layerId,
         payload: {
           geojson: layer.data.geojson,
-          transformationName: transformationName
+          transformationName
         }
       };
     }
@@ -452,7 +460,7 @@ export function invertDiff(
         layerId: diff.layerId,
         payload: {
           geojson: layer.data.geojson,
-          transformation: transformation
+          transformation
         }
       };
     }
