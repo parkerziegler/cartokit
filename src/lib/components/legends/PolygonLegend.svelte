@@ -26,11 +26,15 @@
       y="0"
       width="16"
       height="16"
-      fill={layer.style.fill.color}
-      fill-opacity={layer.style.fill.opacity}
-      stroke={layer.style.stroke?.color ?? 'none'}
-      stroke-width={layer.style.stroke?.width ?? 0}
-      stroke-opacity={layer.style.stroke?.opacity ?? 0}
+      fill={layer.style.fill.visible ? layer.style.fill.color : 'transparent'}
+      fill-opacity={layer.style.fill.visible ? layer.style.fill.opacity : 0}
+      stroke={layer.style.stroke.visible
+        ? layer.style.stroke.color
+        : 'transparent'}
+      stroke-width={layer.style.stroke.visible ? layer.style.stroke.width : 0}
+      stroke-opacity={layer.style.stroke.visible
+        ? layer.style.stroke.opacity
+        : 0}
     />
   </svg>
   <span
