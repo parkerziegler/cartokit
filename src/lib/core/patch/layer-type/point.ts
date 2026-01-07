@@ -32,7 +32,11 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
           transformations: [
             ...layer.data.transformations,
             {
-              ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+              ...parseStringToTransformation(
+                deriveCentroidsSrc,
+                'geometric',
+                'deriveCentroids'
+              ),
               args: []
             }
           ]
@@ -50,7 +54,11 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
     case 'Dot Density': {
       // Replace the dot density transformation with a centroid transformation.
       const deriveCentroidsTransformation = {
-        ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+        ...parseStringToTransformation(
+          deriveCentroidsSrc,
+          'geometric',
+          'deriveCentroids'
+        ),
         args: []
       };
 
@@ -125,7 +133,11 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
           transformations: [
             ...layer.data.transformations,
             {
-              ...parseStringToTransformation(deriveCentroidsSrc, 'geometric'),
+              ...parseStringToTransformation(
+                deriveCentroidsSrc,
+                'geometric',
+                'deriveCentroids'
+              ),
               args: []
             }
           ]

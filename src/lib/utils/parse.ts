@@ -5,14 +5,17 @@ import type { Transformation, TransformationKind } from '$lib/types';
 /**
  * Parse a string of TypeScript code into a transformation.
  *
- * @param sourceCode – The string of TypeScript code to parse.
- * @param type – The type of the transformation, either 'geometric' or 'tabular'.
+ * @param sourceCode The string of TypeScript code to parse.
+ * @param name The name of the {@link Transformation} to parse.
+ * @param kind The type of the {@link Transformation}, either 'geometric' or
+ * 'tabular'.
  *
- * @returns – A @see Transformation.
+ * @returns A {@link Transformation}.
  */
 export function parseStringToTransformation(
   sourceCode: string,
-  kind: TransformationKind
+  kind: TransformationKind,
+  name?: string
 ): Transformation {
   // Create a new project using ts-morph to parse the source code for TypeScript.
   const project = new Project({
@@ -24,8 +27,11 @@ export function parseStringToTransformation(
   });
   const tsSourceFile = project.createSourceFile('tmp.ts', sourceCode);
 
-  // Get the first function in the source file.
-  const fnTs = tsSourceFile.getFunctions()[0];
+  // Get the function in the source file with the given name,
+  // or the first function if no name is provided.
+  const fnTs = name
+    ? tsSourceFile.getFunctions().find((fn) => fn.getName() === name)!
+    : tsSourceFile.getFunctions()[0];
 
   // Get the body of the function.
   const definitionTS = fnTs.getBody()?.getText() ?? '';
