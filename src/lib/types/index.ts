@@ -501,7 +501,6 @@ export interface HeatmapStyle {
   radius: number;
   intensity: number;
   opacity: number;
-  visible: boolean;
 }
 
 /**

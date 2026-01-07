@@ -10,9 +10,9 @@ import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
 import generateDotDensityPointsSrc from '$lib/stdlib/dot-density?raw';
 import type { CartoKitDotDensityLayer, CartoKitLayer } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
+import { DEFAULT_SIZE } from '$lib/utils/constants';
 import { selectQuantitativeAttribute } from '$lib/utils/geojson';
 import { parseStringToTransformation } from '$lib/utils/parse';
-import { DEFAULT_SIZE } from '$lib/utils/constants';
 
 /**
  * Obtain a starting dot value for a {@link CartoKitDotDensityLayer} based on
@@ -27,10 +27,10 @@ function deriveDotDensityStartingValue(
   features: Feature[],
   attribute: string
 ): number {
-  const max = d3.max(features, (d) => d.properties?.[attribute] ?? 0);
+  const [min, max] = d3.extent(features, (d) => d.properties?.[attribute] ?? 0);
 
-  // Aim for a ratio where the number of dots is 1% of the max data value.
-  return max * 0.01 || 1;
+  // Aim for a ratio where the number of dots is 10% of the range.
+  return (max - min) * 0.1 || 1;
 }
 
 /**

@@ -97,7 +97,7 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
             type: 'Constant',
             color: randomColor(),
             opacity: layer.style.heatmap.opacity,
-            visible: layer.style.heatmap.visible
+            visible: true
           },
           stroke: {
             type: 'Constant',
@@ -136,7 +136,7 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
             type: 'Constant',
             color: randomColor(),
             opacity: DEFAULT_OPACITY,
-            visible: layer.style.stroke.visible
+            visible: true
           },
           stroke: layer.style.stroke
         },

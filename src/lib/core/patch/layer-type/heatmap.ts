@@ -7,10 +7,10 @@ import {
 } from '$lib/utils/constants';
 
 /**
- * Patch (transform) a {@link CartoKitLayer} to a {@link CartoKitHeatmapLayer}.
+ * Patch a {@link CartoKitLayer} to a {@link CartoKitHeatmapLayer}.
  *
- * @param {CartoKitLayer} layer The {@link CartoKitLayer} to patch (transform).
- * @returns {CartoKitHeatmapLayer} The transformed {@link CartoKitHeatmapLayer}.
+ * @param layer The {@link CartoKitLayer} to patch.
+ * @returns The patched {@link CartoKitHeatmapLayer}.
  */
 export function patchHeatmap(layer: CartoKitLayer): CartoKitHeatmapLayer {
   switch (layer.type) {
@@ -39,8 +39,7 @@ export function patchHeatmap(layer: CartoKitLayer): CartoKitHeatmapLayer {
             },
             radius: DEFAULT_HEATMAP_RADIUS,
             intensity: DEFAULT_HEATMAP_INTENSITY,
-            opacity: layer.style.fill.opacity,
-            visible: layer.style.fill.visible
+            opacity: layer.style.fill.opacity
           }
         },
         layout: layer.layout
@@ -68,8 +67,7 @@ export function patchHeatmap(layer: CartoKitLayer): CartoKitHeatmapLayer {
             },
             radius: DEFAULT_HEATMAP_RADIUS,
             intensity: DEFAULT_HEATMAP_INTENSITY,
-            opacity: layer.style.fill.opacity,
-            visible: layer.style.fill.visible
+            opacity: layer.style.fill.opacity
           }
         },
         layout: layer.layout
