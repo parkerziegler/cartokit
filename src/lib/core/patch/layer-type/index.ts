@@ -8,6 +8,14 @@ import { patchPolygon } from '$lib/core/patch/layer-type/polygon';
 import { patchProportionalSymbol } from '$lib/core/patch/layer-type/proportional-symbol';
 import type { CartoKitLayer } from '$lib/types';
 
+/**
+ * Patch layer-type-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
+ *
+ * @param params A promise that resolves to the {@link PatchFnParams}, including
+ * the current {@link CartoKitDiff} and {@link CartoKitIR}.
+ * @returns A promise that resolves to the {@link PatchFnResult}, including
+ * the current {@link CartoKitDiff} and patched {@link CartoKitIR}.
+ */
 export async function patchLayerTypeDiffs(
   params: Promise<PatchFnParams>
 ): Promise<PatchFnResult> {

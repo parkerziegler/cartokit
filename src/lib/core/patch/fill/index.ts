@@ -49,7 +49,7 @@ function recomputeBreaks(layerId: string, fill: QuantitativeFill) {
  *
  * @param params A promise that resolves to the {@link PatchFnParams}, including
  * the current {@link CartoKitDiff} and {@link CartoKitIR}.
- * @returns A promiise that resolves to the {@link PatchFnResult}, including
+ * @returns A promise that resolves to the {@link PatchFnResult}, including
  * the current {@link CartoKitDiff} and patched {@link CartoKitIR}.
  */
 export async function patchFillDiffs(
