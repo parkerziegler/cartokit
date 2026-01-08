@@ -5,8 +5,8 @@ import type { CartoKitHeatmapLayer, CartoKitLayer } from '$lib/types';
 /**
  * Reconcile a {@link CartoKitLayer} to a {@link CartoKitHeatmapLayer}.
  *
- * @param {CartoKitLayer} sourceLayer The {@link CartoKitLayer} to reconcile.
- * @param {CartoKitHeatmapLayer} targetLayer The {@link CartoKitHeatmapLayer} to reconcile to.
+ * @param sourceLayer The {@link CartoKitLayer} to reconcile.
+ * @param targetLayer The definition of the target {@link CartoKitHeatmapLayer}.
  */
 export function reconHeatmap(
   sourceLayer: CartoKitLayer,

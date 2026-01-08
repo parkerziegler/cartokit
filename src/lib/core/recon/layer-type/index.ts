@@ -17,12 +17,12 @@ import type {
 } from '$lib/types';
 
 /**
- * Reconcile the 'layer-type' diff. This function is pipelined with other
- * reconciliation functions; thus, it simply forwards its parameters in the
- * return value, which become parameters for the next function in the pipeline.
+ * Reconcile layer type-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
  *
- * @param params The diff, sourceIR, and targetIR to reconcile.
- * @returns The diff, sourceIR, and targetIR after reconciliation.
+ * @param params A promise that resolves to the {@link ReconFnParams}, including
+ * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ * @returns A promise that resolves to the {@link ReconFnResult}, including
+ * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
  */
 export async function reconLayerTypeDiffs(
   params: Promise<ReconFnParams>
