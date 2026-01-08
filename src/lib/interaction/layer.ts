@@ -17,7 +17,7 @@ import type { CartoKitLayer } from '$lib/types';
 /**
  * Add a {@link CartoKitLayer} to the map.
  *
- * @param map The top-level MapLibre GL map instance.
+ * @param map The top-level {@link maplibregl.Map} instance.
  * @param layer The {@link CartoKitLayer} to add to the map.
  */
 export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {

@@ -1,10 +1,8 @@
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
-import {
-  deriveDotDensityStartingValue,
-  generateDotDensityPoints
-} from '$lib/stdlib/dot-density';
+import { deriveDotDensityStartingValue } from '$lib/interaction/geometry';
+import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
 import type { CartoKitDotDensityLayer } from '$lib/types';
 
 /**

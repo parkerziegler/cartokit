@@ -1,4 +1,4 @@
-import type { Map, MapLayerMouseEvent, MapMouseEvent } from 'maplibre-gl';
+import type maplibregl from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { feature } from '$lib/state/feature.svelte';
@@ -9,10 +9,13 @@ import type { CartoKitIR } from '$lib/types';
 /**
  * Add a selection indicator to a feature in a point layer.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param layerId – The id of the layer to instrument.
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param layerId The id of the layer to instrument.
  */
-export const instrumentPointSelect = (map: Map, layerId: string): void => {
+export function instrumentPointSelect(
+  map: maplibregl.Map,
+  layerId: string
+): void {
   const currentStrokeWidth = map.getPaintProperty(
     layerId,
     'circle-stroke-width'
@@ -36,15 +39,18 @@ export const instrumentPointSelect = (map: Map, layerId: string): void => {
   ]);
 
   addSelectListeners(map, layerId);
-};
+}
 
 /**
  * Add a selection indicator to a feature in a line layer.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param layerId — The id of the layer to instrument.
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param layerId The id of the layer to instrument.
  */
-export const instrumentLineSelect = (map: Map, layerId: string): void => {
+export function instrumentLineSelect(
+  map: maplibregl.Map,
+  layerId: string
+): void {
   const currentStrokeWidth = map.getPaintProperty(layerId, 'line-width');
   const currentStrokeColor = map.getPaintProperty(layerId, 'line-color');
 
@@ -62,15 +68,18 @@ export const instrumentLineSelect = (map: Map, layerId: string): void => {
   ]);
 
   addSelectListeners(map, layerId);
-};
+}
 
 /**
  * Add a selection indicator to a feature in a polygon layer.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param layerId — The id of the layer to instrument.
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param layerId The id of the layer to instrument.
  */
-export const instrumentPolygonSelect = (map: Map, layerId: string): void => {
+export function instrumentPolygonSelect(
+  map: maplibregl.Map,
+  layerId: string
+): void {
   map.addLayer({
     id: `${layerId}-select`,
     type: 'line',
@@ -87,18 +96,18 @@ export const instrumentPolygonSelect = (map: Map, layerId: string): void => {
   });
 
   addSelectListeners(map, layerId);
-};
+}
 
 /**
  * Wire up event listeners for select effects.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param layerId – The id of the layer to instrument.
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param layerId The id of the layer to add event listeners to.
  */
-const addSelectListeners = (map: Map, layerId: string) => {
+function addSelectListeners(map: maplibregl.Map, layerId: string): void {
   let selectedFeatureId: string | null = null;
 
-  function onClick(event: MapLayerMouseEvent): void {
+  function onClick(event: maplibregl.MapLayerMouseEvent): void {
     if (event.features && event.features.length > 0) {
       if (selectedFeatureId !== null) {
         map.setFeatureState(
@@ -127,22 +136,27 @@ const addSelectListeners = (map: Map, layerId: string) => {
     ...layerListeners,
     click: onClick
   });
-};
+}
 
 /**
  * A global event listener for deselecting features.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param ir – The CartoKit IR.
- * @returns – deselectFeature, a callback to run when a map mouse event intersects no features.
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param ir The {@link CartoKitIR}.
+ * @returns A callback to run when a map mouse event intersects no features.
  */
-export const onFeatureLeave = (
-  map: Map,
+export function onFeatureLeave(
+  map: maplibregl.Map,
   { layers }: CartoKitIR
-): ((event: MapMouseEvent) => void) => {
-  return (event: MapMouseEvent): void => {
+): (event: maplibregl.MapMouseEvent) => void {
+  return (event: maplibregl.MapMouseEvent): void => {
     const layerIds = Object.values(layers).map((layer) => {
-      // For heatmap layers, we need to deselect the point layer.
+      // For dot density layers, we need to deselect the outlines layer.
+      if (layer.type === 'Dot Density') {
+        return `${layer.id}-outlines`;
+      }
+
+      // For heatmap layers, we need to deselect the points layer.
       if (layer.type === 'Heatmap') {
         return `${layer.id}-points`;
       }
@@ -182,4 +196,4 @@ export const onFeatureLeave = (
       );
     }
   };
-};
+}
