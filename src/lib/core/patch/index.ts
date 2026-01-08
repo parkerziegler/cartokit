@@ -44,5 +44,6 @@ export async function patch(
   const { ir: targetIR } = await patcher(
     Promise.resolve({ diff, ir: sourceIR })
   );
+
   return targetIR;
 }
