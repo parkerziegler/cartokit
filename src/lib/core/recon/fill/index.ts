@@ -9,6 +9,14 @@ import type {
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
 
+/**
+ * Reconcile fill-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
+ *
+ * @param params A promise that resolves to the {@link ReconFnParams}, including
+ * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ * @returns A promise that resolves to the {@link ReconFnResult}, including
+ * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ */
 export async function reconFillDiffs(
   params: Promise<ReconFnParams>
 ): Promise<ReconFnResult> {

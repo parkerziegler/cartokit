@@ -2,11 +2,21 @@ import * as Comlink from 'comlink';
 
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
 import { addLayer } from '$lib/interaction/layer';
-import { map } from '$lib/state/map.svelte';
 import { catalog } from '$lib/state/catalog.svelte';
-import type { CartoKitLayer, Catalog } from '$lib/types';
 import { feature } from '$lib/state/feature.svelte';
+import { listeners, type LayerListeners } from '$lib/state/listeners.svelte';
+import { map } from '$lib/state/map.svelte';
+import type { CartoKitLayer, Catalog } from '$lib/types';
+import { getInstrumentedLayerIds } from '$lib/utils/layer';
 
+/**
+ * Reconcile layer-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
+ *
+ * @param params A promise that resolves to the {@link ReconFnParams}, including
+ * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ * @returns A promise that resolves to the {@link ReconFnResult}, including
+ * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ */
 export async function reconLayerDiffs(
   params: Promise<ReconFnParams>
 ): Promise<ReconFnResult> {
@@ -79,7 +89,22 @@ export async function reconLayerDiffs(
       break;
     }
     case 'remove-layer': {
-      // Remove the main layer.
+      // Remove all event listeners for the layer.
+      if (listeners.value.has(diff.layerId)) {
+        Object.entries(listeners.value.get(diff.layerId)!).forEach(
+          ([event, listener]) => {
+            map.value!.off(
+              event as keyof LayerListeners,
+              diff.layerId,
+              listener
+            );
+          }
+        );
+
+        listeners.value.delete(diff.layerId);
+      }
+
+      // Remove the layer.
       map.value!.removeLayer(diff.layerId);
 
       // If the selected feature belongs to the removed layer, set the feature to null.
@@ -88,19 +113,9 @@ export async function reconLayerDiffs(
       }
 
       // Remove all instrumented layers.
-      [
-        'stroke',
-        'outlines',
-        'points',
-        'hover',
-        'select',
-        'outlines-hover',
-        'outlines-select',
-        'points-hover',
-        'points-select'
-      ].forEach((modifier) => {
-        if (map.value!.getLayer(`${diff.layerId}-${modifier}`)) {
-          map.value!.removeLayer(`${diff.layerId}-${modifier}`);
+      getInstrumentedLayerIds(sourceIR.layers[diff.layerId]).forEach((id) => {
+        if (map.value!.getLayer(id)) {
+          map.value!.removeLayer(id);
         }
       });
 

@@ -9,7 +9,6 @@ import type {
 /**
  * Reconcile a {@link CartoKitLayer} to a {@link CartoKitProportionalSymbolLayer}.
  *
- *
  * @param sourceLayer The {@link CartoKitLayer} to reconcile.
  * @param targetLayer The definition of the target {@link CartoKitProportionalSymbolLayer}.
  */

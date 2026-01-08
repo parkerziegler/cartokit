@@ -5,6 +5,13 @@ import { listeners, type LayerListeners } from '$lib/state/listeners.svelte';
 import type { CartoKitLayer } from '$lib/types';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
 
+/**
+ * Redraw a layer on the map given the source and target layer definitions.
+ *
+ * @param map The MapLibre GL map instance.
+ * @param sourceLayer The {@link CartoKitLayer} to remove.
+ * @param targetLayer The {@link CartoKitLayer} to add.
+ */
 export function redraw(
   map: Map,
   sourceLayer: CartoKitLayer,

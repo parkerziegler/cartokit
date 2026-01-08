@@ -14,14 +14,14 @@ export function reconDotDensity(
 ): void {
   switch (sourceLayer.type) {
     case 'Choropleth':
-    case 'Heatmap':
-    case 'Line':
     case 'Polygon':
     case 'Point':
     case 'Proportional Symbol':
       redraw(map.value!, sourceLayer, targetLayer);
       break;
     case 'Dot Density':
+    case 'Heatmap':
+    case 'Line':
       break;
   }
 }
