@@ -3,6 +3,7 @@ import { deriveColorScale } from '$lib/interaction/color';
 import { map } from '$lib/state/map.svelte';
 import type {
   CartoKitChoroplethLayer,
+  CartoKitDotDensityLayer,
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer
@@ -47,11 +48,13 @@ export async function reconFillDiffs(
     }
     case 'fill-color': {
       const layer = targetIR.layers[diff.layerId] as
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
 
       switch (layer.type) {
+        case 'Dot Density':
         case 'Point':
         case 'Proportional Symbol':
           map.value!.setPaintProperty(
@@ -73,6 +76,7 @@ export async function reconFillDiffs(
     case 'fill-opacity': {
       const layer = targetIR.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
         | CartoKitProportionalSymbolLayer;
@@ -86,6 +90,7 @@ export async function reconFillDiffs(
             diff.payload.opacity
           );
           break;
+        case 'Dot Density':
         case 'Point':
         case 'Proportional Symbol':
           map.value!.setPaintProperty(
@@ -99,11 +104,13 @@ export async function reconFillDiffs(
     }
     case 'add-fill': {
       const layer = targetIR.layers[diff.layerId] as
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
 
       switch (layer.type) {
+        case 'Dot Density':
         case 'Point':
         case 'Proportional Symbol':
           map.value!.setPaintProperty(
@@ -134,11 +141,13 @@ export async function reconFillDiffs(
     }
     case 'remove-fill': {
       const layer = targetIR.layers[diff.layerId] as
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
 
       switch (layer.type) {
+        case 'Dot Density':
         case 'Point':
         case 'Proportional Symbol':
           map.value!.setPaintProperty(
