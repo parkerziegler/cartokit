@@ -1,10 +1,12 @@
 <script lang="ts">
+  import DotValue from '$lib/components/channel/dot/DotValue.svelte';
   import FillModifier from '$lib/components/color/FillModifier.svelte';
   import FillPicker from '$lib/components/color/FillPicker.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
   import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
   import StrokePicker from '$lib/components/color/StrokePicker.svelte';
-  import DotControls from '$lib/components/dots/DotControls.svelte';
+  import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
+  import PointSize from '$lib/components/point/PointSize.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import type { CartoKitDotDensityLayer } from '$lib/types';
 
@@ -16,10 +18,23 @@
 </script>
 
 <MenuItem title="Dots">
-  <DotControls {layer} />
+  <AttributeSelect
+    layerId={layer.id}
+    visualizationType="Quantitative"
+    geojson={layer.data.geojson}
+    selected={layer.style.dot.attribute}
+    channel="dot"
+  />
+  <PointSize
+    layerId={layer.id}
+    size={layer.style.size}
+    fieldId="dot-size"
+    label="Dot Size"
+  />
+  <DotValue {layer} />
 </MenuItem>
 <MenuItem title="Fill">
-  {#if layer.style.fill}
+  {#if layer.style.fill.visible}
     <FillPicker layerId={layer.id} fill={layer.style.fill} />
     <OpacityInput layerId={layer.id} channel="fill" style={layer.style.fill} />
   {/if}
@@ -28,7 +43,7 @@
   {/snippet}
 </MenuItem>
 <MenuItem title="Stroke">
-  {#if layer.style.stroke}
+  {#if layer.style.stroke.visible}
     <StrokePicker layerId={layer.id} stroke={layer.style.stroke} />
     <OpacityInput
       layerId={layer.id}

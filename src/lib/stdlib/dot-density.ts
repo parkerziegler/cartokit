@@ -4,11 +4,11 @@ import type * as GeoJSON from 'geojson';
 /**
  * Generate dots for a dot density layer.
  *
- * @param geojson – The input GeoJSON FeatureCollection.
- * @param attribute – The attribute being visualized.
- * @param dotValue – The dot value of the dot density layer.
+ * @param geojson The input {@link GeoJSON.FeatureCollection}.
+ * @param attribute The attribute being visualized.
+ * @param dotValue The dot value of the dot density layer.
  *
- * @returns – A GeoJSON FeatureCollection of dots.
+ * @returns A {@link GeoJSON.FeatureCollection} of dots.
  */
 export function generateDotDensityPoints(
   geojson: GeoJSON.FeatureCollection<GeoJSON.Polygon | GeoJSON.MultiPolygon>,

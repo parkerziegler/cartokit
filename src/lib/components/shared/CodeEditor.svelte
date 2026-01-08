@@ -3,7 +3,7 @@
   import { json } from '@codemirror/lang-json';
   import { syntaxHighlighting } from '@codemirror/language';
   import { basicSetup, EditorView } from 'codemirror';
-  import { onMount, type Snippet } from 'svelte';
+  import { onMount } from 'svelte';
   import { syntaxTheme, editorTheme } from '$lib/utils/codemirror';
 
   interface ReadonlyCodeEditorConfig {
@@ -26,15 +26,13 @@
     view?: EditorView;
     class?: string;
     testId?: string;
-    copyButton?: Snippet<[EditorView | undefined]>;
   }
 
   let {
     config,
     view = $bindable(undefined),
     class: className = '',
-    testId = undefined,
-    copyButton
+    testId = undefined
   }: Props = $props();
 
   let editor: HTMLDivElement;
@@ -103,9 +101,7 @@
     className
   ]}
   data-testid={testId}
->
-  {@render copyButton?.(view)}
-</div>
+></div>
 
 <style lang="postcss">
   @reference 'tailwindcss';

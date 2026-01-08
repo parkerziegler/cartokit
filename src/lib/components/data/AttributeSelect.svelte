@@ -6,20 +6,19 @@
   import MoreIcon from '$lib/components/icons/MoreIcon.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type { Channel, VisualizationType } from '$lib/types';
   import {
     isPropertyCategorical,
     isPropertyQuantitative
   } from '$lib/utils/property';
-  import { history } from '$lib/state/history.svelte';
 
   interface Props {
     selected: string;
     layerId: string;
     visualizationType: VisualizationType;
     geojson: FeatureCollection;
-    channel: Channel;
+    channel: Exclude<Channel, 'stroke'>;
   }
 
   let { selected, layerId, visualizationType, geojson, channel }: Props =
@@ -45,31 +44,18 @@
     }))
   );
 
-  function onAttributeChange(
+  async function onAttributeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    const update = {
-      type: 'attribute' as const,
+    const diff: CartoKitDiff = {
+      type: `${channel}-attribute`,
       layerId,
       payload: {
-        attribute: event.currentTarget.value,
-        channel
+        attribute: event.currentTarget.value
       }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'attribute',
-        layerId,
-        payload: {
-          attribute: selected,
-          channel
-        }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    await applyDiff(diff);
   }
 
   function onClickComputedAttribute() {

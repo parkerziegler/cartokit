@@ -1,11 +1,13 @@
 <script lang="ts">
   import { getContext } from 'svelte';
+  import { uniqueId, kebabCase } from 'lodash-es';
+  import type { MapSourceDataEvent } from 'maplibre-gl';
 
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { addSource } from '$lib/interaction/source';
-  import { map } from '$lib/stores/map';
+  import { applyDiff } from '$lib/core/diff';
+  import { map } from '$lib/state/map.svelte';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -25,15 +27,20 @@
     displayName = event.currentTarget.value;
   }
 
-  function onSourceLoaded() {
-    dataLoading = false;
-    endpoint = '';
-    displayName = '';
+  function handleSourceLoaded(layerId: string) {
+    return (event: MapSourceDataEvent) => {
+      if (event.sourceId === layerId) {
+        dataLoading = false;
+        endpoint = '';
+        displayName = '';
 
-    closeModal();
+        closeModal();
+        map.value!.off('sourcedata', handleSourceLoaded(layerId));
+      }
+    };
   }
 
-  function onSubmit(
+  async function onSubmit(
     event: Event & { currentTarget: EventTarget & HTMLFormElement }
   ) {
     event.preventDefault();
@@ -44,12 +51,19 @@
 
     dataLoading = true;
 
-    addSource($map, {
-      kind: 'api',
-      displayName,
-      url: endpoint,
-      onSourceLoaded
+    const layerId = uniqueId(`${kebabCase(displayName)}__`);
+
+    await applyDiff({
+      type: 'add-layer',
+      layerId,
+      payload: {
+        type: 'api',
+        displayName,
+        url: endpoint
+      }
     });
+
+    map.value!.on('sourcedata', handleSourceLoaded(layerId));
   }
 </script>
 

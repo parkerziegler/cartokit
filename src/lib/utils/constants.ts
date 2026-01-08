@@ -2,7 +2,6 @@ import { deriveThresholds } from '$lib/interaction/scales';
 import { materializeColorScheme } from '$lib/utils/color/scheme';
 
 // CartoKit default values.
-export const DEFAULT_MAP_TYPE = 'Polygon';
 export const DEFAULT_FILL = '#000000';
 export const DEFAULT_OPACITY = 0.75;
 export const DEFAULT_STROKE = '#000000';
@@ -28,7 +27,7 @@ export const DEFAULT_THRESHOLDS = (layerId: string, attribute: string) =>
   });
 export const DEFAULT_MIN_SIZE = 1;
 export const DEFAULT_MAX_SIZE = 25;
-export const DEFAULT_RADIUS = 3;
+export const DEFAULT_SIZE = 3;
 export const DEFAULT_HEATMAP_RADIUS = 10;
 export const DEFAULT_HEATMAP_INTENSITY = 1;
 export const DEFAULT_HEATMAP_WEIGHT = 1;

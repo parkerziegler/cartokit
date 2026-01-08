@@ -5,9 +5,8 @@
   import ColorRamp from '$lib/components/channel/shared/ColorRamp.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import Portal from '$lib/components/shared/Portal.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { history } from '$lib/state/history.svelte';
   import type {
     CartoKitHeatmapLayer,
     ColorRamp as ColorRampType,
@@ -40,46 +39,28 @@
     showOptions = false;
   }
 
-  function onClickRamp(ramp: ColorRampType) {
-    const update = {
-      type: 'heatmap-ramp' as const,
+  async function onClickRamp(ramp: ColorRampType) {
+    const diff: CartoKitDiff = {
+      type: 'heatmap-ramp',
       layerId: layer.id,
       payload: { ramp }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'heatmap-ramp',
-        layerId: layer.id,
-        payload: { ramp: layer.style.heatmap.ramp.id }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    await applyDiff(diff);
   }
 
-  function onRampReverse() {
+  async function onRampReverse() {
     const currentDirection = layer.style.heatmap.ramp.direction;
     const nextDirection: RampDirection =
       currentDirection === 'Forward' ? 'Reverse' : 'Forward';
 
-    const update = {
-      type: 'heatmap-ramp-direction' as const,
+    const diff: CartoKitDiff = {
+      type: 'heatmap-ramp-direction',
       layerId: layer.id,
       payload: { direction: nextDirection }
     };
 
-    history.undo.push({
-      execute: update,
-      invert: {
-        type: 'heatmap-ramp-direction',
-        layerId: layer.id,
-        payload: { direction: currentDirection }
-      }
-    });
-
-    dispatchLayerUpdate(update);
+    await applyDiff(diff);
   }
 </script>
 

@@ -9,7 +9,12 @@
   let { layer }: Props = $props();
 </script>
 
-<div class="ml-8 flex max-w-48 flex-col gap-2">
+<div
+  class={[
+    'ml-8 flex max-w-48 flex-col gap-2',
+    layer.layout.visible ? 'opacity-100' : 'opacity-75'
+  ]}
+>
   {#if layer.style.heatmap.weight.type === 'Quantitative'}
     <span class="text-xs font-semibold"
       >{layer.style.heatmap.weight.attribute} →</span

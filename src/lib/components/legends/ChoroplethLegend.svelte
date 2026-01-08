@@ -11,18 +11,20 @@
 </script>
 
 <div class="ml-8 flex flex-col gap-2">
-  {#if layer.style.fill?.type === 'Categorical'}
+  {#if layer.style.fill.visible && layer.style.fill.type === 'Categorical'}
     <CategoricalLegend
       fill={layer.style.fill}
       stroke={layer.style.stroke}
       layerType="Choropleth"
+      visible={layer.layout.visible}
     />
-  {:else if layer.style.fill?.type === 'Quantitative'}
+  {:else if layer.style.fill.visible && layer.style.fill.type === 'Quantitative'}
     <QuantitativeLegend
       fill={layer.style.fill}
       stroke={layer.style.stroke}
       layerId={layer.id}
       layerType="Choropleth"
+      visible={layer.layout.visible}
     />
   {/if}
 </div>
