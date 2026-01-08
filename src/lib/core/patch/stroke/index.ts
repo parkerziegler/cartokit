@@ -1,6 +1,7 @@
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import type {
   CartoKitChoroplethLayer,
+  CartoKitDotDensityLayer,
   CartoKitLineLayer,
   CartoKitPointLayer,
   CartoKitPolygonLayer,
@@ -24,6 +25,7 @@ export async function patchStrokeDiffs(
     case 'stroke-color': {
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitLineLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
@@ -36,6 +38,7 @@ export async function patchStrokeDiffs(
     case 'stroke-width': {
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitLineLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
@@ -48,6 +51,7 @@ export async function patchStrokeDiffs(
     case 'stroke-opacity': {
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitLineLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
@@ -60,6 +64,7 @@ export async function patchStrokeDiffs(
     case 'add-stroke': {
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
         | CartoKitProportionalSymbolLayer;
@@ -71,6 +76,7 @@ export async function patchStrokeDiffs(
     case 'remove-stroke': {
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
         | CartoKitProportionalSymbolLayer;
