@@ -165,13 +165,13 @@ export async function patchLayerDiffs(
   switch (diff.type) {
     case 'add-layer': {
       if (diff.payload.type === 'api') {
-        const fetchGeoJSONWorker = new Worker(
+        const sourceWorker = new Worker(
           new URL('$lib/utils/source/worker.ts', import.meta.url),
           { type: 'module' }
         );
         const fetchGeoJSON =
           Comlink.wrap<(url: string) => Promise<FeatureCollection>>(
-            fetchGeoJSONWorker
+            sourceWorker
           );
 
         const featureCollection = await fetchGeoJSON(diff.payload.url);
