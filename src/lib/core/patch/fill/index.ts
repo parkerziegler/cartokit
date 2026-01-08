@@ -4,6 +4,7 @@ import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { deriveThresholds } from '$lib/interaction/scales';
 import type {
   CartoKitChoroplethLayer,
+  CartoKitDotDensityLayer,
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer,
@@ -83,6 +84,7 @@ export async function patchFillDiffs(
     }
     case 'fill-color': {
       const layer = ir.layers[diff.layerId] as
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
@@ -246,6 +248,7 @@ export async function patchFillDiffs(
     case 'fill-opacity': {
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitPolygonLayer
         | CartoKitProportionalSymbolLayer;
@@ -256,6 +259,7 @@ export async function patchFillDiffs(
     }
     case 'add-fill': {
       const layer = ir.layers[diff.layerId] as
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
@@ -266,6 +270,7 @@ export async function patchFillDiffs(
     }
     case 'remove-fill': {
       const layer = ir.layers[diff.layerId] as
+        | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
