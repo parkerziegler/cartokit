@@ -1,9 +1,7 @@
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
-import {
-  generateDotDensityPoints,
-  deriveDotDensityStartingValue
-} from '$lib/stdlib/dot-density';
+import { deriveDotDensityStartingValue } from '$lib/interaction/geometry';
+import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
 import generateDotDensityPointsSrc from '$lib/stdlib/dot-density?raw';
 import type { CartoKitDotDensityLayer, CartoKitLayer } from '$lib/types';
 import { randomColor } from '$lib/utils/color';

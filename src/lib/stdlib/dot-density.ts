@@ -1,15 +1,14 @@
 import * as turf from '@turf/turf';
-import * as d3 from 'd3';
 import type * as GeoJSON from 'geojson';
 
 /**
  * Generate dots for a dot density layer.
  *
- * @param geojson – The input GeoJSON FeatureCollection.
- * @param attribute – The attribute being visualized.
- * @param dotValue – The dot value of the dot density layer.
+ * @param geojson The input {@link GeoJSON.FeatureCollection}.
+ * @param attribute The attribute being visualized.
+ * @param dotValue The dot value of the dot density layer.
  *
- * @returns – A GeoJSON FeatureCollection of dots.
+ * @returns A {@link GeoJSON.FeatureCollection} of dots.
  */
 export function generateDotDensityPoints(
   geojson: GeoJSON.FeatureCollection<GeoJSON.Polygon | GeoJSON.MultiPolygon>,
@@ -54,23 +53,4 @@ export function generateDotDensityPoints(
   );
 
   return turf.featureCollection(dots);
-}
-
-/**
- * Obtain a starting dot value for a {@link CartoKitDotDensityLayer} based on
- * the maximum value of the data attribute.
- *
- * @param features The features of the {@link CartoKitDotDensityLayer}.
- * @param attribute The attribute of the {@link CartoKitDotDensityLayer} to use
- * for the starting dot value.
- * @returns The starting dot value.
- */
-export function deriveDotDensityStartingValue(
-  features: GeoJSON.Feature[],
-  attribute: string
-): number {
-  const [min, max] = d3.extent(features, (d) => d.properties?.[attribute] ?? 0);
-
-  // Aim for a ratio where the number of dots is 10% of the range.
-  return (max - min) * 0.1 || 1;
 }

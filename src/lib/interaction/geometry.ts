@@ -6,10 +6,9 @@ import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 /**
  * Derive a MapLibre GL JS expression for a proportional symbol radius scale.
  *
- * @param layer – The {@link CartoKitProportionalSymbolLayer} to derive a radius
+ * @param layer The {@link CartoKitProportionalSymbolLayer} to derive a radius
  * scale for.
- *
- * @returns – A MapLibre GL JS expression for a proportional symbol radius scale.
+ * @returns An {@link ExpressionSpecification} for a proportional symbol radius scale.
  */
 export function deriveSize(
   layer: CartoKitProportionalSymbolLayer
@@ -36,4 +35,23 @@ export function deriveSize(
     max,
     rMax
   ];
+}
+
+/**
+ * Obtain a starting dot value for a {@link CartoKitDotDensityLayer} based on
+ * the maximum value of the data attribute.
+ *
+ * @param features The features of the {@link CartoKitDotDensityLayer}.
+ * @param attribute The attribute of the {@link CartoKitDotDensityLayer} to use
+ * for the starting dot value.
+ * @returns The starting dot value.
+ */
+export function deriveDotDensityStartingValue(
+  features: GeoJSON.Feature[],
+  attribute: string
+): number {
+  const [min, max] = d3.extent(features, (d) => d.properties?.[attribute] ?? 0);
+
+  // Aim for a ratio where the number of dots is 10% of the range.
+  return (max - min) * 0.1 || 1;
 }

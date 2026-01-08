@@ -1,4 +1,4 @@
-import type { Map, MapLayerMouseEvent } from 'maplibre-gl';
+import type maplibregl from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { popup } from '$lib/state/popup.svelte';
@@ -8,10 +8,13 @@ import { listeners } from '$lib/state/listeners.svelte';
 /**
  * Add a hover effect to all features in a point layer.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param layer – The id of the layer to instrument.
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param layerId The id of the layer to instrument.
  */
-export const instrumentPointHover = (map: Map, layerId: string): void => {
+export function instrumentPointHover(
+  map: maplibregl.Map,
+  layerId: string
+): void {
   const currentStrokeWidth = map.getPaintProperty(
     layerId,
     'circle-stroke-width'
@@ -35,15 +38,18 @@ export const instrumentPointHover = (map: Map, layerId: string): void => {
   ]);
 
   addHoverListeners(map, layerId);
-};
+}
 
 /**
  * Add a hover effect to all features in a line layer.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param layerId – The id of the layer to instrument.
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param layerId The id of the layer to instrument.
  */
-export const instrumentLineHover = (map: Map, layerId: string): void => {
+export function instrumentLineHover(
+  map: maplibregl.Map,
+  layerId: string
+): void {
   const currentStrokeWidth = map.getPaintProperty(layerId, 'line-width');
   const currentStrokeColor = map.getPaintProperty(layerId, 'line-color');
 
@@ -61,15 +67,18 @@ export const instrumentLineHover = (map: Map, layerId: string): void => {
   ]);
 
   addHoverListeners(map, layerId);
-};
+}
 
 /**
  * Add a hover effect to all features in a polygon layer.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param layerId – The id of the layer to instrument.
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param layerId The id of the layer to instrument.
  */
-export const instrumentPolygonHover = (map: Map, layerId: string): void => {
+export function instrumentPolygonHover(
+  map: maplibregl.Map,
+  layerId: string
+): void {
   map.addLayer({
     id: `${layerId}-hover`,
     type: 'line',
@@ -86,20 +95,19 @@ export const instrumentPolygonHover = (map: Map, layerId: string): void => {
   });
 
   addHoverListeners(map, layerId);
-};
+}
 
 /**
  * Wire up event listeners for hover effects.
  *
- * @param map – The top-level MapLibre GL map instance.
- * @param layerId – The id of the layer to instrument.
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param layerId The id of the layer to add event listeners to.
  */
-const addHoverListeners = (map: Map, layerId: string): void => {
+function addHoverListeners(map: maplibregl.Map, layerId: string): void {
   let hoveredFeatureId: string | null = null;
-
   const canonicalLayerId = layerId.replace(/-outlines|-points/g, '');
 
-  const onMouseMove = (event: MapLayerMouseEvent): void => {
+  function onMouseMove(event: maplibregl.MapLayerMouseEvent): void {
     if (event.features && event.features.length > 0) {
       if (hoveredFeatureId !== null) {
         map.setFeatureState(
@@ -118,6 +126,7 @@ const addHoverListeners = (map: Map, layerId: string): void => {
         map.getCanvas().style.cursor = 'pointer';
 
         const currentIR = get(ir);
+
         if (currentIR.layers[canonicalLayerId].layout.tooltip.visible) {
           popup[canonicalLayerId] = {
             open: true,
@@ -127,9 +136,9 @@ const addHoverListeners = (map: Map, layerId: string): void => {
         }
       }
     }
-  };
+  }
 
-  const onMouseLeave = (): void => {
+  function onMouseLeave(): void {
     if (hoveredFeatureId !== null) {
       map.setFeatureState(
         { source: layerId, id: hoveredFeatureId },
@@ -145,7 +154,7 @@ const addHoverListeners = (map: Map, layerId: string): void => {
     }
 
     hoveredFeatureId = null;
-  };
+  }
 
   map.on('mousemove', layerId, onMouseMove);
   map.on('mouseleave', layerId, onMouseLeave);
@@ -157,4 +166,4 @@ const addHoverListeners = (map: Map, layerId: string): void => {
     mousemove: onMouseMove,
     mouseleave: onMouseLeave
   });
-};
+}
