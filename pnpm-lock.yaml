@@ -46,7 +46,7 @@ importers:
         version: 4.17.22
       maplibre-gl:
         specifier: ^5.1.1
-        version: 5.15.0
+        version: 5.16.0
       mongodb:
         specifier: ^7.0.0
         version: 7.0.0
@@ -2413,8 +2413,8 @@ packages:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
     engines: {node: '>=10'}
 
-  maplibre-gl@5.15.0:
-    resolution: {integrity: sha512-pPeu/t4yPDX/+Uf9ibLUdmaKbNMlGxMAX+tBednYukol2qNk2TZXAlhdohWxjVvTO3is8crrUYv3Ok02oAaKzA==}
+  maplibre-gl@5.16.0:
+    resolution: {integrity: sha512-/VDY89nr4jgLJyzmhy325cG6VUI02WkZ/UfVuDbG/piXzo6ODnM+omDFIwWY8tsEsBG26DNDmNMn3Y2ikHsBiA==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
   memory-pager@1.5.0:
@@ -5969,7 +5969,7 @@ snapshots:
     dependencies:
       semver: 7.7.3
 
-  maplibre-gl@5.15.0:
+  maplibre-gl@5.16.0:
     dependencies:
       '@mapbox/geojson-rewind': 0.5.2
       '@mapbox/jsonlint-lines-primitives': 2.0.2
