@@ -1,10 +1,10 @@
+import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import type {
   CartoKitDotDensityLayer,
   CartoKitPointLayer,
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
-import type {} from '$lib/types';
 
 /**
  * Patch size-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
@@ -17,7 +17,9 @@ import type {} from '$lib/types';
 export async function patchSizeDiffs(
   params: Promise<PatchFnParams>
 ): Promise<PatchFnResult> {
-  const { diff, ir } = await params;
+  const { diff, ir, inverseDiff } = await params;
+
+  let inverse: CartoKitDiff = inverseDiff;
 
   switch (diff.type) {
     case 'size': {
@@ -25,6 +27,16 @@ export async function patchSizeDiffs(
         | CartoKitPointLayer
         | CartoKitDotDensityLayer;
 
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'size',
+        layerId: diff.layerId,
+        payload: {
+          size: layer.style.size
+        }
+      };
+
+      // Apply the patch.
       layer.style.size = diff.payload.size;
 
       break;
@@ -32,6 +44,16 @@ export async function patchSizeDiffs(
     case 'min-size': {
       const layer = ir.layers[diff.layerId] as CartoKitProportionalSymbolLayer;
 
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'min-size',
+        layerId: diff.layerId,
+        payload: {
+          minSize: layer.style.size.min
+        }
+      };
+
+      // Apply the patch.
       layer.style.size.min = diff.payload.minSize;
 
       break;
@@ -39,6 +61,16 @@ export async function patchSizeDiffs(
     case 'max-size': {
       const layer = ir.layers[diff.layerId] as CartoKitProportionalSymbolLayer;
 
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'max-size',
+        layerId: diff.layerId,
+        payload: {
+          maxSize: layer.style.size.max
+        }
+      };
+
+      // Apply the patch.
       layer.style.size.max = diff.payload.maxSize;
 
       break;
@@ -47,6 +79,7 @@ export async function patchSizeDiffs(
 
   return {
     diff,
-    ir
+    ir,
+    inverseDiff: inverse
   };
 }

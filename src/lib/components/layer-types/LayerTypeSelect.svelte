@@ -27,7 +27,10 @@
     const diff: CartoKitDiff = {
       type: 'layer-type',
       layerId: layer.id,
-      payload: { layerType: event.currentTarget.value as LayerType }
+      payload: {
+        sourceLayerType: layer.type,
+        targetLayerType: event.currentTarget.value as LayerType
+      }
     };
 
     await applyDiff(diff);

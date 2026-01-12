@@ -1,5 +1,6 @@
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
+import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { deriveDotDensityStartingValue } from '$lib/interaction/geometry';
 import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
@@ -16,12 +17,24 @@ import type { CartoKitDotDensityLayer } from '$lib/types';
 export async function patchDotDiffs(
   params: Promise<PatchFnParams>
 ): Promise<PatchFnResult> {
-  const { diff, ir } = await params;
+  const { diff, ir, inverseDiff } = await params;
+
+  let inverse: CartoKitDiff = inverseDiff;
 
   switch (diff.type) {
     case 'dot-value': {
       const layer = ir.layers[diff.layerId] as CartoKitDotDensityLayer;
 
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'dot-value',
+        layerId: diff.layerId,
+        payload: {
+          value: layer.style.dot.value
+        }
+      };
+
+      // Apply the patch.
       const features = generateDotDensityPoints(
         layer.data.sourceGeojson as FeatureCollection<Polygon | MultiPolygon>,
         layer.style.dot.attribute,
@@ -47,6 +60,15 @@ export async function patchDotDiffs(
     }
     case 'dot-attribute': {
       const layer = ir.layers[diff.layerId] as CartoKitDotDensityLayer;
+
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'dot-attribute',
+        layerId: diff.layerId,
+        payload: {
+          attribute: layer.style.dot.attribute
+        }
+      };
 
       // Rederive a starting dot value based on the range of the new attribute.
       const dotValue = deriveDotDensityStartingValue(
@@ -83,6 +105,7 @@ export async function patchDotDiffs(
 
   return {
     diff,
-    ir
+    ir,
+    inverseDiff: inverse
   };
 }

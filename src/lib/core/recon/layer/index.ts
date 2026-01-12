@@ -13,14 +13,14 @@ import { getInstrumentedLayerIds } from '$lib/utils/layer';
  * Reconcile layer-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
  *
  * @param params A promise that resolves to the {@link ReconFnParams}, including
- * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ * the current {@link CartoKitDiff} and target {@link CartoKitIR}.
  * @returns A promise that resolves to the {@link ReconFnResult}, including
- * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ * the current {@link CartoKitDiff} and target {@link CartoKitIR}.
  */
 export async function reconLayerDiffs(
   params: Promise<ReconFnParams>
 ): Promise<ReconFnResult> {
-  const { diff, sourceIR, targetIR } = await params;
+  const { diff, targetIR } = await params;
 
   switch (diff.type) {
     case 'add-layer': {
@@ -113,7 +113,7 @@ export async function reconLayerDiffs(
       }
 
       // Remove all instrumented layers.
-      getInstrumentedLayerIds(sourceIR.layers[diff.layerId]).forEach((id) => {
+      getInstrumentedLayerIds(diff.layerId, diff.payload.sourceLayerType).forEach((id) => {
         if (map.value!.getLayer(id)) {
           map.value!.removeLayer(id);
         }
@@ -136,7 +136,6 @@ export async function reconLayerDiffs(
 
   return {
     diff,
-    sourceIR,
     targetIR
   };
 }

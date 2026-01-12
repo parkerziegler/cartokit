@@ -24,6 +24,7 @@ import {
   DEFAULT_QUANTITATIVE_SCHEME,
   DEFAULT_THRESHOLDS
 } from '$lib/utils/constants';
+import type { CartoKitDiff } from '$lib/core/diff';
 
 /**
  * Recompute the quantitative breaks for a given layer and fill style.
@@ -56,7 +57,9 @@ function recomputeBreaks(layerId: string, fill: QuantitativeFill) {
 export async function patchFillDiffs(
   params: Promise<PatchFnParams>
 ): Promise<PatchFnResult> {
-  const { diff, ir } = await params;
+  const { diff, ir, inverseDiff } = await params;
+
+  let inverse: CartoKitDiff = inverseDiff;
 
   switch (diff.type) {
     case 'fill-attribute': {
@@ -66,15 +69,33 @@ export async function patchFillDiffs(
         | CartoKitPolygonLayer;
 
       if (layer.style.fill.type === 'Quantitative') {
-        layer.style.fill.attribute = diff.payload.attribute;
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-attribute',
+          layerId: diff.layerId,
+          payload: {
+            attribute: layer.style.fill.attribute
+          }
+        };
 
+        // Apply the patch.
+        layer.style.fill.attribute = diff.payload.attribute;
         layer.style.fill.thresholds = recomputeBreaks(
           layer.id,
           layer.style.fill
         );
       } else if (layer.style.fill.type === 'Categorical') {
-        layer.style.fill.attribute = diff.payload.attribute;
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-attribute',
+          layerId: diff.layerId,
+          payload: {
+            attribute: layer.style.fill.attribute
+          }
+        };
 
+        // Apply the patch.
+        layer.style.fill.attribute = diff.payload.attribute;
         layer.style.fill.categories = enumerateAttributeCategories(
           layer.data.geojson.features,
           layer.style.fill.attribute
@@ -90,6 +111,16 @@ export async function patchFillDiffs(
         | CartoKitPolygonLayer;
 
       if (layer.style.fill.type === 'Constant') {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-color',
+          layerId: diff.layerId,
+          payload: {
+            color: layer.style.fill.color
+          }
+        };
+
+        // Apply the patch.
         layer.style.fill.color = diff.payload.color;
       }
 
@@ -105,6 +136,16 @@ export async function patchFillDiffs(
         layer.style.fill.type === 'Quantitative' ||
         layer.style.fill.type === 'Categorical'
       ) {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-color-scheme',
+          layerId: diff.layerId,
+          payload: {
+            scheme: layer.style.fill.scheme.id
+          }
+        };
+
+        // Apply the patch.
         layer.style.fill.scheme.id = diff.payload.scheme;
       }
 
@@ -120,6 +161,16 @@ export async function patchFillDiffs(
         layer.style.fill.type === 'Quantitative' ||
         layer.style.fill.type === 'Categorical'
       ) {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-color-scheme-direction',
+          layerId: diff.layerId,
+          payload: {
+            direction: layer.style.fill.scheme.direction
+          }
+        };
+
+        // Apply the patch.
         layer.style.fill.scheme.direction = diff.payload.direction;
       }
 
@@ -132,8 +183,17 @@ export async function patchFillDiffs(
         | CartoKitProportionalSymbolLayer;
 
       if (layer.style.fill.type === 'Quantitative') {
-        layer.style.fill.method = diff.payload.method;
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-classification-method',
+          layerId: diff.layerId,
+          payload: {
+            method: layer.style.fill.method
+          }
+        };
 
+        // Apply the patch.
+        layer.style.fill.method = diff.payload.method;
         layer.style.fill.thresholds = recomputeBreaks(
           layer.id,
           layer.style.fill
@@ -149,8 +209,17 @@ export async function patchFillDiffs(
         | CartoKitProportionalSymbolLayer;
 
       if (layer.style.fill.type === 'Quantitative') {
-        layer.style.fill.count = diff.payload.count;
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-step-count',
+          layerId: diff.layerId,
+          payload: {
+            count: layer.style.fill.count
+          }
+        };
 
+        // Apply the patch.
+        layer.style.fill.count = diff.payload.count;
         layer.style.fill.thresholds = recomputeBreaks(
           layer.id,
           layer.style.fill
@@ -166,8 +235,18 @@ export async function patchFillDiffs(
         | CartoKitProportionalSymbolLayer;
 
       if (layer.style.fill.type === 'Quantitative') {
-        layer.style.fill.thresholds[diff.payload.step] = diff.payload.value;
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-step-value',
+          layerId: diff.layerId,
+          payload: {
+            step: diff.payload.step,
+            value: layer.style.fill.thresholds[diff.payload.step]
+          }
+        };
 
+        // Apply the patch.
+        layer.style.fill.thresholds[diff.payload.step] = diff.payload.value;
         layer.style.fill.thresholds = recomputeBreaks(
           layer.id,
           layer.style.fill
@@ -183,6 +262,16 @@ export async function patchFillDiffs(
 
       let fill: QuantitativeFill | CategoricalFill | ConstantFill;
 
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'fill-visualization-type',
+        layerId: diff.layerId,
+        payload: {
+          visualizationType: layer.style.fill.type
+        }
+      };
+
+      // Apply the patch.
       switch (diff.payload.visualizationType) {
         case 'Categorical': {
           const attribute = selectCategoricalAttribute(
@@ -240,7 +329,6 @@ export async function patchFillDiffs(
           };
           break;
       }
-
       layer.style.fill = fill;
 
       break;
@@ -253,6 +341,16 @@ export async function patchFillDiffs(
         | CartoKitPolygonLayer
         | CartoKitProportionalSymbolLayer;
 
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'fill-opacity',
+        layerId: diff.layerId,
+        payload: {
+          opacity: layer.style.fill.opacity
+        }
+      };
+
+      // Apply the patch.
       layer.style.fill.opacity = diff.payload.opacity;
 
       break;
@@ -264,6 +362,14 @@ export async function patchFillDiffs(
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
 
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'remove-fill',
+        layerId: diff.layerId,
+        payload: {}
+      };
+
+      // Apply the patch.
       layer.style.fill.visible = true;
 
       break;
@@ -275,6 +381,14 @@ export async function patchFillDiffs(
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
 
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'add-fill',
+        layerId: diff.layerId,
+        payload: {}
+      };
+
+      // Apply the patch.
       layer.style.fill.visible = false;
 
       break;
@@ -283,6 +397,7 @@ export async function patchFillDiffs(
 
   return {
     diff,
-    ir
+    ir,
+    inverseDiff: inverse
   };
 }

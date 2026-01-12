@@ -13,23 +13,19 @@ import type { CartoKitIR } from '$lib/types';
 
 export interface ReconFnParams {
   diff: CartoKitDiff;
-  sourceIR: CartoKitIR;
   targetIR: CartoKitIR;
 }
 
 export type ReconFnResult = ReconFnParams;
 
 /**
- * Reconcile the map based on the {@link CartoKitDiff}, source {@link CartoKitIR},
- * and target {@link CartoKitIR}.
+ * Reconcile the map based on the {@link CartoKitDiff} and target {@link CartoKitIR}.
  *
  * @param diff The {@link CartoKitDiff} to reconcile.
- * @param sourceIR The source {@link CartoKitIR} before patching.
- * @param targetIR The target {@link CartoKitIR} after patching.
+ * @param targetIR The target {@link CartoKitIR} to reconcile to.
  */
 export async function recon(
   diff: CartoKitDiff,
-  sourceIR: CartoKitIR,
   targetIR: CartoKitIR
 ): Promise<void> {
   const reconciler = flow(
@@ -43,5 +39,5 @@ export async function recon(
     reconStrokeDiffs
   );
 
-  await reconciler(Promise.resolve({ diff, sourceIR, targetIR }));
+  await reconciler(Promise.resolve({ diff, targetIR }));
 }

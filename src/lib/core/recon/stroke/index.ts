@@ -13,14 +13,14 @@ import type {
  * Reconcile stroke-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
  *
  * @param params A promise that resolves to the {@link ReconFnParams}, including
- * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ * the current {@link CartoKitDiff} and target {@link CartoKitIR}.
  * @returns A promise that resolves to the {@link ReconFnResult}, including
- * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ * the current {@link CartoKitDiff} and target {@link CartoKitIR}.
  */
 export async function reconStrokeDiffs(
   params: Promise<ReconFnParams>
 ): Promise<ReconFnResult> {
-  const { diff, sourceIR, targetIR } = await params;
+  const { diff, targetIR } = await params;
 
   switch (diff.type) {
     case 'stroke-color': {
@@ -192,7 +192,6 @@ export async function reconStrokeDiffs(
 
   return {
     diff,
-    sourceIR,
     targetIR
   };
 }

@@ -65,7 +65,9 @@
     const diff: CartoKitDiff = {
       type: 'remove-layer',
       layerId: layer.id,
-      payload: {}
+      payload: {
+        sourceLayerType: layer.type
+      }
     };
 
     await applyDiff(diff);

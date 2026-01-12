@@ -1,3 +1,4 @@
+import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 
 /**
@@ -11,11 +12,25 @@ import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 export async function patchTransformationDiffs(
   params: Promise<PatchFnParams>
 ): Promise<PatchFnResult> {
-  const { diff, ir } = await params;
+  const { diff, ir, inverseDiff } = await params;
+
+  let inverse: CartoKitDiff = inverseDiff;
 
   switch (diff.type) {
     case 'add-transformation': {
       const layer = ir.layers[diff.layerId];
+
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'remove-transformation',
+        layerId: diff.layerId,
+        payload: {
+          geojson: layer.data.geojson,
+          transformationName: diff.payload.transformation.name
+        }
+      };
+
+      // Apply the patch.
       layer.data.geojson = diff.payload.geojson;
 
       const tIdx = layer.data.transformations.findIndex(
@@ -34,13 +49,27 @@ export async function patchTransformationDiffs(
     }
     case 'remove-transformation': {
       const layer = ir.layers[diff.layerId];
-      layer.data.geojson = diff.payload.geojson;
 
+      // Find the transformation before removing it so we can create the inverse.
       const tIdx = layer.data.transformations.findIndex(
         (t) => t.name === diff.payload.transformationName
       );
 
       if (tIdx > -1) {
+        const transformation = layer.data.transformations[tIdx];
+
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'add-transformation',
+          layerId: diff.layerId,
+          payload: {
+            geojson: layer.data.geojson,
+            transformation
+          }
+        };
+
+        // Apply the patch.
+        layer.data.geojson = diff.payload.geojson;
         layer.data.transformations.splice(tIdx, 1);
       }
 
@@ -50,6 +79,7 @@ export async function patchTransformationDiffs(
 
   return {
     diff,
-    ir
+    ir,
+    inverseDiff: inverse
   };
 }

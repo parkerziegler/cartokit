@@ -1,34 +1,39 @@
 import type { Geometry } from 'geojson';
 
-import type { CartoKitLayer, LayerType } from '$lib/types';
+import type { LayerType } from '$lib/types';
 
 /**
  * Get the layer ids for all instrumented layers associated with a given layer.
  *
- * @param layer — The @see{CartoKitLayer} that the instrumented layers are associated with.
- *
- * @returns – An array of instrumented layer ids.
+ * @param layerId The id of the layer that the instrumented layers are
+ * associated with.
+ * @param layerType The {@link LayerType} of the layer that the instrumented
+ * layers are associated with.
+ * @returns An array of instrumented layer ids.
  */
-export function getInstrumentedLayerIds(layer: CartoKitLayer): string[] {
-  switch (layer.type) {
+export function getInstrumentedLayerIds(
+  layerId: string,
+  layerType: LayerType
+): string[] {
+  switch (layerType) {
     case 'Point':
     case 'Proportional Symbol':
     case 'Line':
     case 'Heatmap':
       return [
-        `${layer.id}-points`,
-        `${layer.id}-points-hover`,
-        `${layer.id}-points-select`
+        `${layerId}-points`,
+        `${layerId}-points-hover`,
+        `${layerId}-points-select`
       ];
     case 'Dot Density':
       return [
-        `${layer.id}-outlines`,
-        `${layer.id}-outlines-hover`,
-        `${layer.id}-outlines-select`
+        `${layerId}-outlines`,
+        `${layerId}-outlines-hover`,
+        `${layerId}-outlines-select`
       ];
     case 'Polygon':
     case 'Choropleth':
-      return [`${layer.id}-stroke`, `${layer.id}-hover`, `${layer.id}-select`];
+      return [`${layerId}-stroke`, `${layerId}-hover`, `${layerId}-select`];
   }
 }
 

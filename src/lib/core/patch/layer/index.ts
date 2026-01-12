@@ -2,6 +2,7 @@ import * as Comlink from 'comlink';
 import type { FeatureCollection } from 'geojson';
 import { get } from 'svelte/store';
 
+import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { ir } from '$lib/stores/ir';
 import type { CartoKitLayer } from '$lib/types';
@@ -160,7 +161,9 @@ function generateCartoKitLayer(
 export async function patchLayerDiffs(
   params: Promise<PatchFnParams>
 ): Promise<PatchFnResult> {
-  const { diff, ir } = await params;
+  const { diff, ir, inverseDiff } = await params;
+
+  let inverse: CartoKitDiff = inverseDiff;
 
   switch (diff.type) {
     case 'add-layer': {
@@ -181,6 +184,16 @@ export async function patchLayerDiffs(
           url: diff.payload.url
         });
 
+        // Derive the inverse diff after creating the layer.
+        inverse = {
+          type: 'remove-layer',
+          layerId: diff.layerId,
+          payload: {
+            sourceLayerType: layer.type
+          }
+        };
+
+        // Apply the patch.
         ir.layers[diff.layerId] = layer;
       } else if (diff.payload.type === 'file') {
         const layer = generateCartoKitLayer(diff.payload.featureCollection, {
@@ -189,6 +202,16 @@ export async function patchLayerDiffs(
           fileName: diff.payload.fileName
         });
 
+        // Derive the inverse diff after creating the layer.
+        inverse = {
+          type: 'remove-layer',
+          layerId: diff.layerId,
+          payload: {
+            sourceLayerType: layer.type
+          }
+        };
+
+        // Apply the patch.
         ir.layers[diff.layerId] = layer;
       }
 
@@ -197,6 +220,16 @@ export async function patchLayerDiffs(
     case 'layer-visibility': {
       const layer = ir.layers[diff.layerId];
 
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'layer-visibility',
+        layerId: diff.layerId,
+        payload: {
+          visible: layer.layout.visible
+        }
+      };
+
+      // Apply the patch.
       layer.layout.visible = diff.payload.visible;
 
       break;
@@ -204,17 +237,59 @@ export async function patchLayerDiffs(
     case 'layer-tooltip-visibility': {
       const layer = ir.layers[diff.layerId];
 
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'layer-tooltip-visibility',
+        layerId: diff.layerId,
+        payload: {
+          visible: layer.layout.tooltip.visible
+        }
+      };
+
+      // Apply the patch.
       layer.layout.tooltip.visible = diff.payload.visible;
 
       break;
     }
     case 'remove-layer': {
+      const layer = ir.layers[diff.layerId];
+
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'add-layer',
+        layerId: diff.layerId,
+        payload: layer.data.url
+          ? {
+              type: 'api',
+              displayName: layer.displayName,
+              url: layer.data.url
+            }
+          : {
+              type: 'file',
+              displayName: layer.displayName,
+              fileName: layer.data.fileName!,
+              featureCollection: layer.data.sourceGeojson
+            }
+      };
+
+      // Apply the patch.
       delete ir.layers[diff.layerId];
+
       break;
     }
     case 'rename-layer': {
       const layer = ir.layers[diff.layerId];
 
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'rename-layer',
+        layerId: diff.layerId,
+        payload: {
+          displayName: layer.displayName
+        }
+      };
+
+      // Apply the patch.
       layer.displayName = diff.payload.displayName;
 
       break;
@@ -223,6 +298,7 @@ export async function patchLayerDiffs(
 
   return {
     diff,
-    ir
+    ir,
+    inverseDiff: inverse
   };
 }

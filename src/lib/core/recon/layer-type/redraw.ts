@@ -1,44 +1,49 @@
-import type { Map, GeoJSONSource } from 'maplibre-gl';
+import type * as maplibregl from 'maplibre-gl';
 
 import { addLayer } from '$lib/interaction/layer';
 import { listeners, type LayerListeners } from '$lib/state/listeners.svelte';
-import type { CartoKitLayer } from '$lib/types';
+import type { CartoKitLayer, LayerType } from '$lib/types';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
+
+interface RedrawParams {
+  map: maplibregl.Map;
+  sourceLayerId: string;
+  sourceLayerType: LayerType;
+  targetLayer: CartoKitLayer;
+}
 
 /**
  * Redraw a layer on the map given the source and target layer definitions.
  *
- * @param map The MapLibre GL map instance.
- * @param sourceLayer The {@link CartoKitLayer} to remove.
- * @param targetLayer The {@link CartoKitLayer} to add.
+ * @param params A promise that resolves to the {@link RedrawParams}, including
+ * the MapLibre GL map instance, the id of the source layer, the type of the
+ * source layer, and the definition of the target layer.
  */
-export function redraw(
-  map: Map,
-  sourceLayer: CartoKitLayer,
-  targetLayer: CartoKitLayer
-) {
+export function redraw(params: RedrawParams): void {
+  const { map, sourceLayerId, sourceLayerType, targetLayer } = params;
+
   // Remove all event listeners for the existing layer.
-  if (listeners.value.has(sourceLayer.id)) {
-    Object.entries(listeners.value.get(sourceLayer.id)!).forEach(
+  if (listeners.value.has(sourceLayerId)) {
+    Object.entries(listeners.value.get(sourceLayerId)!).forEach(
       ([event, listener]) => {
-        map.off(event as keyof LayerListeners, sourceLayer.id, listener);
+        map.off(event as keyof LayerListeners, sourceLayerId, listener);
       }
     );
 
-    listeners.value.delete(sourceLayer.id);
+    listeners.value.delete(sourceLayerId);
   }
 
   // Remove the existing layer and all instrumented layers.
-  map.removeLayer(sourceLayer.id);
+  map.removeLayer(sourceLayerId);
 
-  getInstrumentedLayerIds(sourceLayer).forEach((id) => {
+  getInstrumentedLayerIds(sourceLayerId, sourceLayerType).forEach((id) => {
     if (map.getLayer(id)) {
       map.removeLayer(id);
     }
   });
 
   // Update the source with the new data.
-  (map.getSource(sourceLayer.id) as GeoJSONSource).setData(
+  (map.getSource(sourceLayerId) as maplibregl.GeoJSONSource).setData(
     targetLayer.data.geojson
   );
 

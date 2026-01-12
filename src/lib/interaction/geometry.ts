@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import type * as GeoJSON from 'geojson';
 import type { ExpressionSpecification } from 'maplibre-gl';
 
 import type { CartoKitProportionalSymbolLayer } from '$lib/types';

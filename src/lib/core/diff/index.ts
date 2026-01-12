@@ -1,6 +1,5 @@
 import type { FeatureCollection } from 'geojson';
 
-import { invertDiff } from '$lib/core/diff/invert';
 import { patch } from '$lib/core/patch';
 import { recon } from '$lib/core/recon';
 import { diffs } from '$lib/state/diffs.svelte';
@@ -30,7 +29,8 @@ interface LayerDiff {
 interface LayerTypeDiff extends LayerDiff {
   type: 'layer-type';
   payload: {
-    layerType: LayerType;
+    sourceLayerType: LayerType;
+    targetLayerType: LayerType;
   };
 }
 
@@ -288,7 +288,9 @@ interface AddLayerDiff extends LayerDiff {
 
 interface RemoveLayerDiff extends LayerDiff {
   type: 'remove-layer';
-  payload: Record<string, never>;
+  payload: {
+    sourceLayerType: LayerType;
+  };
 }
 
 interface RenameLayerDiff extends LayerDiff {
@@ -387,16 +389,15 @@ export async function applyDiff(
   execute: CartoKitDiff,
   triggeredByUndo = false
 ): Promise<void> {
-  const sourceIR = get(ir);
+  const draftIR = get(ir);
 
-  // Derive the inverse diff from the execute diff.
-  const invert = invertDiff(execute, sourceIR);
+  // Patch the draft IR. We use in-place mutation to avoid deep copying the IR,
+  // which would involve copying all GeoJSON data on every update. In addition,
+  // we derive the inverse diff as part of the patch operation.
+  const invert = await patch(execute, draftIR);
 
-  // Patch the source IR to get the target IR.
-  const targetIR = await patch(execute, sourceIR);
-
-  // Reconcile the map to the target IR.
-  await recon(execute, sourceIR, targetIR);
+  // Reconcile the map based on the patched IR.
+  await recon(execute, draftIR);
 
   // If the diff was triggered by undo, push the diff to the redo stack.
   // All normally applied diffs are pushed to the undo stack.
@@ -412,7 +413,7 @@ export async function applyDiff(
     });
   }
 
-  ir.set(targetIR);
+  ir.set(draftIR);
 
   // Track diffs for user study.
   if (user.userId) {

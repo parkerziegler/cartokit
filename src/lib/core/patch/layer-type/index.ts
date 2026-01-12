@@ -1,3 +1,4 @@
+import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { patchChoropleth } from '$lib/core/patch/layer-type/choropleth';
 import { patchDotDensity } from '$lib/core/patch/layer-type/dot-density';
@@ -19,15 +20,27 @@ import type { CartoKitLayer } from '$lib/types';
 export async function patchLayerTypeDiffs(
   params: Promise<PatchFnParams>
 ): Promise<PatchFnResult> {
-  const { diff, ir } = await params;
+  const { diff, ir, inverseDiff } = await params;
 
+  let inverse: CartoKitDiff = inverseDiff;
   let targetLayer: CartoKitLayer;
 
   switch (diff.type) {
     case 'layer-type': {
       const sourceLayer = ir.layers[diff.layerId];
 
-      switch (diff.payload.layerType) {
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'layer-type',
+        layerId: diff.layerId,
+        payload: {
+          sourceLayerType: diff.payload.targetLayerType,
+          targetLayerType: sourceLayer.type
+        }
+      };
+
+      // Apply the patch.
+      switch (diff.payload.targetLayerType) {
         case 'Choropleth':
           targetLayer = patchChoropleth(sourceLayer);
           break;
@@ -51,21 +64,14 @@ export async function patchLayerTypeDiffs(
           break;
       }
 
-      return {
-        diff,
-        ir: {
-          ...ir,
-          layers: {
-            ...ir.layers,
-            [diff.layerId]: targetLayer
-          }
-        }
-      };
+      ir.layers[diff.layerId] = targetLayer;
+      break;
     }
   }
 
   return {
     diff,
-    ir
+    ir,
+    inverseDiff: inverse
   };
 }

@@ -1,18 +1,20 @@
 import { redraw } from '$lib/core/recon/layer-type/redraw';
 import { map } from '$lib/state/map.svelte';
-import type { CartoKitHeatmapLayer, CartoKitLayer } from '$lib/types';
+import type { CartoKitHeatmapLayer, LayerType } from '$lib/types';
 
 /**
  * Reconcile a {@link CartoKitLayer} to a {@link CartoKitHeatmapLayer}.
  *
- * @param sourceLayer The {@link CartoKitLayer} to reconcile.
+ * @param sourceLayerId The id of the source layer.
+ * @param sourceLayerType The type of the source layer.
  * @param targetLayer The definition of the target {@link CartoKitHeatmapLayer}.
  */
 export function reconHeatmap(
-  sourceLayer: CartoKitLayer,
+  sourceLayerId: string,
+  sourceLayerType: LayerType,
   targetLayer: CartoKitHeatmapLayer
 ): void {
-  switch (sourceLayer.type) {
+  switch (sourceLayerType) {
     case 'Choropleth':
     case 'Dot Density':
     case 'Line':
@@ -21,7 +23,12 @@ export function reconHeatmap(
       break;
     case 'Point':
     case 'Proportional Symbol':
-      redraw(map.value!, sourceLayer, targetLayer);
+      redraw({
+        map: map.value!,
+        sourceLayerId,
+        sourceLayerType,
+        targetLayer
+      });
       break;
   }
 }

@@ -20,63 +20,70 @@ import type {
  * Reconcile layer type-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
  *
  * @param params A promise that resolves to the {@link ReconFnParams}, including
- * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ * the current {@link CartoKitDiff} and target {@link CartoKitIR}.
  * @returns A promise that resolves to the {@link ReconFnResult}, including
- * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ * the current {@link CartoKitDiff} and target {@link CartoKitIR}.
  */
 export async function reconLayerTypeDiffs(
   params: Promise<ReconFnParams>
 ): Promise<ReconFnResult> {
-  const { diff, sourceIR, targetIR } = await params;
+  const { diff, targetIR } = await params;
 
   switch (diff.type) {
     case 'layer-type': {
-      switch (diff.payload.layerType) {
+      switch (diff.payload.targetLayerType) {
         case 'Choropleth': {
           reconChoropleth(
-            sourceIR.layers[diff.layerId],
+            diff.layerId,
+            diff.payload.sourceLayerType,
             targetIR.layers[diff.layerId] as CartoKitChoroplethLayer
           );
           break;
         }
         case 'Dot Density': {
           reconDotDensity(
-            sourceIR.layers[diff.layerId],
+            diff.layerId,
+            diff.payload.sourceLayerType,
             targetIR.layers[diff.layerId] as CartoKitDotDensityLayer
           );
           break;
         }
         case 'Heatmap': {
           reconHeatmap(
-            sourceIR.layers[diff.layerId],
+            diff.layerId,
+            diff.payload.sourceLayerType,
             targetIR.layers[diff.layerId] as CartoKitHeatmapLayer
           );
           break;
         }
         case 'Line': {
           reconLine(
-            sourceIR.layers[diff.layerId],
+            diff.layerId,
+            diff.payload.sourceLayerType,
             targetIR.layers[diff.layerId] as CartoKitLineLayer
           );
           break;
         }
         case 'Point': {
           reconPoint(
-            sourceIR.layers[diff.layerId],
+            diff.layerId,
+            diff.payload.sourceLayerType,
             targetIR.layers[diff.layerId] as CartoKitPointLayer
           );
           break;
         }
         case 'Polygon': {
           reconPolygon(
-            sourceIR.layers[diff.layerId],
+            diff.layerId,
+            diff.payload.sourceLayerType,
             targetIR.layers[diff.layerId] as CartoKitPolygonLayer
           );
           break;
         }
         case 'Proportional Symbol': {
           reconProportionalSymbol(
-            sourceIR.layers[diff.layerId],
+            diff.layerId,
+            diff.payload.sourceLayerType,
             targetIR.layers[diff.layerId] as CartoKitProportionalSymbolLayer
           );
           break;
@@ -89,7 +96,6 @@ export async function reconLayerTypeDiffs(
 
   return {
     diff,
-    sourceIR,
     targetIR
   };
 }

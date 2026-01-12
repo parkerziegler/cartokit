@@ -15,6 +15,7 @@ import type { CartoKitIR } from '$lib/types';
 export interface PatchFnParams {
   diff: CartoKitDiff;
   ir: CartoKitIR;
+  inverseDiff: CartoKitDiff;
 }
 
 export type PatchFnResult = PatchFnParams;
@@ -23,13 +24,13 @@ export type PatchFnResult = PatchFnParams;
  * Patch a {@link CartoKitDiff} onto a source {@link CartoKitIR}.
  *
  * @param diff The {@link CartoKitDiff} to apply.
- * @param sourceIR The source {@link CartoKitIR} to patch.
+ * @param draftIR The draft {@link CartoKitIR} to patch.
  * @returns A promise that resolves to the patched {@link CartoKitIR}.
  */
 export async function patch(
   diff: CartoKitDiff,
-  sourceIR: CartoKitIR
-): Promise<CartoKitIR> {
+  draftIR: CartoKitIR
+): Promise<CartoKitDiff> {
   const patcher = flow(
     patchDotDiffs,
     patchFillDiffs,
@@ -41,9 +42,9 @@ export async function patch(
     patchSizeDiffs
   );
 
-  const { ir: targetIR } = await patcher(
-    Promise.resolve({ diff, ir: sourceIR })
+  const { inverseDiff } = await patcher(
+    Promise.resolve({ diff, ir: draftIR, inverseDiff: diff })
   );
 
-  return targetIR;
+  return inverseDiff;
 }

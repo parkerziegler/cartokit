@@ -7,14 +7,14 @@ import type { CartoKitProportionalSymbolLayer } from '$lib/types';
  * Reconcile size-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
  *
  * @param params A promise that resolves to the {@link ReconFnParams}, including
- * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ * the current {@link CartoKitDiff} and target {@link CartoKitIR}.
  * @returns A promise that resolves to the {@link ReconFnResult}, including
- * the current {@link CartoKitDiff}, source {@link CartoKitIR}, and target {@link CartoKitIR}.
+ * the current {@link CartoKitDiff} and target {@link CartoKitIR}.
  */
 export async function reconSizeDiffs(
   params: Promise<ReconFnParams>
 ): Promise<ReconFnResult> {
-  const { diff, sourceIR, targetIR } = await params;
+  const { diff, targetIR } = await params;
 
   switch (diff.type) {
     case 'size': {
@@ -42,7 +42,6 @@ export async function reconSizeDiffs(
 
   return {
     diff,
-    sourceIR,
     targetIR
   };
 }
