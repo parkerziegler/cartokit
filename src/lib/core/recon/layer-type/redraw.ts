@@ -15,9 +15,10 @@ interface RedrawParams {
 /**
  * Redraw a layer on the map given the source and target layer definitions.
  *
- * @param params A promise that resolves to the {@link RedrawParams}, including
- * the MapLibre GL map instance, the id of the source layer, the type of the
- * source layer, and the definition of the target layer.
+ * @param params.map The {@link maplibregl.Map} instance.
+ * @param params.sourceLayerId The id of the source layer.
+ * @param params.sourceLayerType The type of the source layer.
+ * @param params.targetLayer The definition of the target layer.
  */
 export function redraw(params: RedrawParams): void {
   const { map, sourceLayerId, sourceLayerType, targetLayer } = params;
