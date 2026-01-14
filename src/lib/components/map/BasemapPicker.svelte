@@ -51,8 +51,8 @@
       return thumbnail;
     });
 
-    map.on('move', updateMapThumbnailCenter);
-    map.on('zoom', updateMapThumbnailZoom);
+    map.on('move', (event) => updateMapThumbnailCenter(event.target));
+    map.on('zoom', (event) => updateMapThumbnailZoom(event.target));
 
     const unregisterKeybinding = registerKeybinding('b', onClick);
 
@@ -62,8 +62,8 @@
       });
 
       unregisterKeybinding();
-      map.off('move', updateMapThumbnailCenter);
-      map.off('zoom', updateMapThumbnailZoom);
+      map.off('move', (event) => updateMapThumbnailCenter(event.target));
+      map.off('zoom', (event) => updateMapThumbnailZoom(event.target));
     };
   });
 
