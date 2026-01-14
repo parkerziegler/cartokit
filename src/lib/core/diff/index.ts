@@ -1,4 +1,5 @@
 import type { FeatureCollection } from 'geojson';
+import { get } from 'svelte/store';
 
 import { patch } from '$lib/core/patch';
 import { recon } from '$lib/core/recon';
@@ -20,7 +21,6 @@ import type {
   TransformationCall,
   VisualizationType
 } from '$lib/types';
-import { get } from 'svelte/store';
 
 interface LayerDiff {
   layerId: CartoKitLayer['id'];
