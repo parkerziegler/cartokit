@@ -35,12 +35,16 @@
   let map = $state<maplibregl.Map>();
   let error = $state({ message: '' });
   let processingDiff = $state(false);
+
+  // We intentionally capture the values of data.userId and data.enableChat
+  // from the load function in +page.server.ts.
+  //
+  // svelte-ignore state_referenced_locally
   user.userId = data.userId;
+  // svelte-ignore state_referenced_locally
   chat.enable = data.enableChat;
 
   onMount(() => {
-    // maplibre-gl is actually a CJS module, and not all module.exports may be
-    // supported as named exports.
     map = new maplibregl.Map({
       container: 'map',
       style: data.basemap.url,
@@ -65,8 +69,8 @@
     });
 
     map.on('move', (event) => {
-      const { lng, lat } = event.target.getCenter();
       ir.update((ir) => {
+        const { lng, lat } = event.target.getCenter();
         ir.center = [lng, lat];
 
         return ir;
@@ -81,8 +85,8 @@
       });
     });
 
-    map.on('style.load', () => {
-      map?.setProjection({ type: $ir.projection });
+    map.on('style.load', (event) => {
+      event.target.setProjection({ type: $ir.projection });
     });
 
     map.on('error', (err) => {
@@ -102,7 +106,7 @@
     );
 
     return () => {
-      map!.remove();
+      map?.remove();
       destroyHistory();
       unregisterKeybinding();
     };

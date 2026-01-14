@@ -109,7 +109,7 @@ test('workflow-3', async ({ page }) => {
   // Remove the layer's stroke.
   await page.getByTestId('remove-stroke-button').click();
 
-  // Switch the layer's Layer Type to Choropleth.
+  // Switch the layer's type to Choropleth.
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's Attribute to 'decadal_rate'.

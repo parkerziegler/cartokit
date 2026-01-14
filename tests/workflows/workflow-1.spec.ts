@@ -102,7 +102,7 @@ test('workflow-1', async ({ page }) => {
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
 
-  // Set the layer's Layer Type to Choropleth.
+  // Set the layer's type to Choropleth.
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's stroke to #1f2b2e.

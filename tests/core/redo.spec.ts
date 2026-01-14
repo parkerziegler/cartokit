@@ -76,17 +76,17 @@ test.describe('redo', () => {
     // Verify that the layer type is Polygon.
     expect(await layerTypeSelect.inputValue()).toBe('Polygon');
 
-    // Switch the layer's Layer Type to Choropleth.
+    // Switch the layer's type to Choropleth.
     await layerTypeSelect.selectOption('Choropleth');
     expect(await layerTypeSelect.inputValue()).toBe('Choropleth');
 
-    // Undo the layer-type diff.
+    // Undo the "layer-type" diff.
     await page.keyboard.press('ControlOrMeta+z');
 
     // Verify that the layer type is Polygon.
     expect(await layerTypeSelect.inputValue()).toBe('Polygon');
 
-    // Redo the layer-type diff.
+    // Redo the "layer-type" diff.
     await page.keyboard.press('ControlOrMeta+Shift+z');
     expect(await layerTypeSelect.inputValue()).toBe('Choropleth');
   });
@@ -98,7 +98,7 @@ test.describe('redo', () => {
     // Verify that the layer type is Polygon.
     expect(await layerTypeSelect.inputValue()).toBe('Polygon');
 
-    // Switch the layer's Layer Type to Choropleth.
+    // Switch the layer's type to Choropleth.
     await layerTypeSelect.selectOption('Choropleth');
 
     // Get the fill step count select.
@@ -109,19 +109,19 @@ test.describe('redo', () => {
     await fillStepCountSelect.selectOption('8');
     expect(await fillStepCountSelect.inputValue()).toBe('8');
 
-    // Undo the fill step count diff.
+    // Undo the "fill-step-count" diff.
     await page.keyboard.press('ControlOrMeta+z');
     expect(await fillStepCountSelect.inputValue()).toBe(`${DEFAULT_COUNT}`);
 
-    // Undo the layer-type diff.
+    // Undo the "layer-type" diff.
     await page.keyboard.press('ControlOrMeta+z');
     expect(await layerTypeSelect.inputValue()).toBe('Polygon');
 
-    // Redo the layer-type diff.
+    // Redo the "layer-type" diff.
     await page.keyboard.press('ControlOrMeta+Shift+z');
     expect(await layerTypeSelect.inputValue()).toBe('Choropleth');
 
-    // Redo the fill step count diff.
+    // Redo the "fill-step-count" diff.
     await page.keyboard.press('ControlOrMeta+Shift+z');
     expect(await fillStepCountSelect.inputValue()).toBe('8');
   });
@@ -135,19 +135,20 @@ test.describe('redo', () => {
     // Verify that the layer type is Polygon.
     expect(await layerTypeSelect.inputValue()).toBe('Polygon');
 
-    // Switch the layer's Layer Type to Choropleth.
+    // Switch the layer's type to Choropleth.
     await layerTypeSelect.selectOption('Choropleth');
     expect(await layerTypeSelect.inputValue()).toBe('Choropleth');
 
-    // Undo the layer-type diff.
+    // Undo the "layer-type" diff.
     await page.keyboard.press('ControlOrMeta+z');
     expect(await layerTypeSelect.inputValue()).toBe('Polygon');
 
-    // Instead of redoing, perform a new action: switch to Point.
+    // Instead of redoing, perform a new action.
     await layerTypeSelect.selectOption('Point');
     expect(await layerTypeSelect.inputValue()).toBe('Point');
 
-    // Attempt to redo - this should have no effect since redo stack was cleared.
+    // Attempt to redo.
+    // This should have no effect since the redo stack was cleared.
     await page.keyboard.press('ControlOrMeta+Shift+z');
 
     // Verify that the layer type is still Point.

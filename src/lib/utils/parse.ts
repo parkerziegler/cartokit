@@ -6,10 +6,8 @@ import type { Transformation, TransformationKind } from '$lib/types';
  * Parse a string of TypeScript code into a transformation.
  *
  * @param sourceCode The string of TypeScript code to parse.
+ * @param kind The {@link TransformationKind}, either 'geometric' or 'tabular'.
  * @param name The name of the {@link Transformation} to parse.
- * @param kind The type of the {@link Transformation}, either 'geometric' or
- * 'tabular'.
- *
  * @returns A {@link Transformation}.
  */
 export function parseStringToTransformation(

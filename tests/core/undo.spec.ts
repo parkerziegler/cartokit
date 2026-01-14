@@ -76,11 +76,11 @@ test.describe('undo', () => {
     // Verify that the layer type is Polygon.
     expect(await layerTypeSelect.inputValue()).toBe('Polygon');
 
-    // Switch the layer's Layer Type to Choropleth.
+    // Switch the layer's type to Choropleth.
     await layerTypeSelect.selectOption('Choropleth');
     expect(await layerTypeSelect.inputValue()).toBe('Choropleth');
 
-    // Undo the layer-type diff.
+    // Undo the "layer-type" diff.
     await page.keyboard.press('ControlOrMeta+z');
     expect(await layerTypeSelect.inputValue()).toBe('Polygon');
   });
@@ -92,7 +92,7 @@ test.describe('undo', () => {
     // Verify that the layer type is Polygon.
     expect(await layerTypeSelect.inputValue()).toBe('Polygon');
 
-    // Switch the layer's Layer Type to Choropleth.
+    // Switch the layer's type to Choropleth.
     await layerTypeSelect.selectOption('Choropleth');
 
     // Get the fill step count select.
@@ -103,11 +103,11 @@ test.describe('undo', () => {
     await fillStepCountSelect.selectOption('8');
     expect(await fillStepCountSelect.inputValue()).toBe('8');
 
-    // Undo the fill step count diff.
+    // Undo the "fill-step-count" diff.
     await page.keyboard.press('ControlOrMeta+z');
     expect(await fillStepCountSelect.inputValue()).toBe(`${DEFAULT_COUNT}`);
 
-    // Undo the layer-type diff.
+    // Undo the "layer-type" diff.
     await page.keyboard.press('ControlOrMeta+z');
     expect(await layerTypeSelect.inputValue()).toBe('Polygon');
   });
