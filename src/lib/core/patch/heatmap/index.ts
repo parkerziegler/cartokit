@@ -100,18 +100,21 @@ export async function patchHeatmapDiffs(
       };
 
       // Apply the patch.
-      if (diff.payload.weightType === 'Constant') {
-        layer.style.heatmap.weight = {
-          type: 'Constant',
-          value: 1
-        };
-      } else if (diff.payload.weightType === 'Quantitative') {
-        layer.style.heatmap.weight = {
-          type: 'Quantitative',
-          attribute: selectQuantitativeAttribute(layer.data.geojson.features),
-          min: 0,
-          max: 1
-        };
+      switch (diff.payload.weightType) {
+        case 'Constant':
+          layer.style.heatmap.weight = {
+            type: 'Constant',
+            value: 1
+          };
+          break;
+        case 'Quantitative':
+          layer.style.heatmap.weight = {
+            type: 'Quantitative',
+            attribute: selectQuantitativeAttribute(layer.data.geojson.features),
+            min: 0,
+            max: 1
+          };
+          break;
       }
 
       break;
