@@ -51,12 +51,8 @@
       return thumbnail;
     });
 
-    map.on('move', (event) =>
-      updateMapThumbnailCenter(event.target, thumbnails[0])
-    );
-    map.on('zoom', (event) =>
-      updateMapThumbnailZoom(event.target, thumbnails[0])
-    );
+    map.on('move', updateMapThumbnailCenter);
+    map.on('zoom', updateMapThumbnailZoom);
 
     const unregisterKeybinding = registerKeybinding('b', onClick);
 
@@ -66,27 +62,20 @@
       });
 
       unregisterKeybinding();
-      map.off('move', (event) =>
-        updateMapThumbnailCenter(event.target, thumbnails[0])
-      );
-      map.off('zoom', (event) =>
-        updateMapThumbnailZoom(event.target, thumbnails[0])
-      );
+      map.off('move', updateMapThumbnailCenter);
+      map.off('zoom', updateMapThumbnailZoom);
     };
   });
 
-  function updateMapThumbnailCenter(
-    map: maplibregl.Map,
-    thumbnail: maplibregl.Map
-  ) {
+  function updateMapThumbnailCenter(map: maplibregl.Map) {
     const { top, left } = picker.getBoundingClientRect();
+
+    const thumbnail = thumbnails[0];
     thumbnail.setCenter(map.unproject([left + 20, top + 20]));
   }
 
-  function updateMapThumbnailZoom(
-    map: maplibregl.Map,
-    thumbnail: maplibregl.Map
-  ) {
+  function updateMapThumbnailZoom(map: maplibregl.Map) {
+    const thumbnail = thumbnails[0];
     thumbnail.setZoom(map.getZoom());
   }
 
@@ -101,7 +90,7 @@
       }
 
       timeoutId = window.setTimeout(() => {
-        updateMapThumbnailCenter(map, thumbnails[0]);
+        updateMapThumbnailCenter(map);
       }, 400);
     }
   });
