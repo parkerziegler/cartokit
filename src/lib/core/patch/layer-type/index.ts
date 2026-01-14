@@ -7,7 +7,6 @@ import { patchLine } from '$lib/core/patch/layer-type/line';
 import { patchPoint } from '$lib/core/patch/layer-type/point';
 import { patchPolygon } from '$lib/core/patch/layer-type/polygon';
 import { patchProportionalSymbol } from '$lib/core/patch/layer-type/proportional-symbol';
-import type { CartoKitLayer } from '$lib/types';
 
 /**
  * Patch layer-type-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
@@ -23,7 +22,6 @@ export async function patchLayerTypeDiffs(
   const { diff, ir, inverseDiff } = await params;
 
   let inverse: CartoKitDiff = inverseDiff;
-  let targetLayer: CartoKitLayer;
 
   switch (diff.type) {
     case 'layer-type': {
@@ -42,29 +40,28 @@ export async function patchLayerTypeDiffs(
       // Apply the patch.
       switch (diff.payload.targetLayerType) {
         case 'Choropleth':
-          targetLayer = patchChoropleth(sourceLayer);
+          ir.layers[diff.layerId] = patchChoropleth(sourceLayer);
           break;
         case 'Dot Density':
-          targetLayer = patchDotDensity(sourceLayer);
+          ir.layers[diff.layerId] = patchDotDensity(sourceLayer);
           break;
         case 'Heatmap':
-          targetLayer = patchHeatmap(sourceLayer);
+          ir.layers[diff.layerId] = patchHeatmap(sourceLayer);
           break;
         case 'Line':
-          targetLayer = patchLine(sourceLayer);
+          ir.layers[diff.layerId] = patchLine(sourceLayer);
           break;
         case 'Point':
-          targetLayer = patchPoint(sourceLayer);
+          ir.layers[diff.layerId] = patchPoint(sourceLayer);
           break;
         case 'Polygon':
-          targetLayer = patchPolygon(sourceLayer);
+          ir.layers[diff.layerId] = patchPolygon(sourceLayer);
           break;
         case 'Proportional Symbol':
-          targetLayer = patchProportionalSymbol(sourceLayer);
+          ir.layers[diff.layerId] = patchProportionalSymbol(sourceLayer);
           break;
       }
 
-      ir.layers[diff.layerId] = targetLayer;
       break;
     }
   }
