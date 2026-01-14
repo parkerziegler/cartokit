@@ -1,12 +1,8 @@
-import * as Comlink from 'comlink';
-
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
 import { addLayer } from '$lib/interaction/layer';
-import { catalog } from '$lib/state/catalog.svelte';
 import { feature } from '$lib/state/feature.svelte';
 import { listeners, type LayerListeners } from '$lib/state/listeners.svelte';
 import { map } from '$lib/state/map.svelte';
-import type { CartoKitLayer, Catalog } from '$lib/types';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
 
 /**
@@ -36,15 +32,6 @@ export async function reconLayerDiffs(
         generateId: true
       });
 
-      // Build the catalog for the layer in a worker thread.
-      const catalogWorker = new Worker(
-        new URL('$lib/utils/catalog/worker.ts', import.meta.url),
-        { type: 'module' }
-      );
-      const buildCatalog =
-        Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
-      const catalogPatch = await buildCatalog(layer);
-      catalog.value = { ...catalog.value, ...catalogPatch };
       addLayer(map.value!, layer);
 
       // Focus the map canvas after adding the layer.
@@ -124,6 +111,11 @@ export async function reconLayerDiffs(
 
       // Remove the source.
       map.value!.removeSource(diff.layerId);
+
+      // Remove the outlines source for dot density layers.
+      if (map.value!.getSource(`${diff.layerId}-outlines`)) {
+        map.value!.removeSource(`${diff.layerId}-outlines`);
+      }
 
       // Remove the points source for heatmaps.
       if (map.value!.getSource(`${diff.layerId}-points`)) {

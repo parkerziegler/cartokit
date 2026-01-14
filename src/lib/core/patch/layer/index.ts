@@ -5,7 +5,8 @@ import { get } from 'svelte/store';
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { ir } from '$lib/stores/ir';
-import type { CartoKitLayer } from '$lib/types';
+import { catalog } from '$lib/state/catalog.svelte';
+import type { CartoKitLayer, Catalog } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_OPACITY,
@@ -167,7 +168,10 @@ export async function patchLayerDiffs(
 
   switch (diff.type) {
     case 'add-layer': {
+      let layer: CartoKitLayer;
+
       if (diff.payload.type === 'api') {
+        // Fetch the GeoJSON data in a worker thread.
         const sourceWorker = new Worker(
           new URL('$lib/utils/source/worker.ts', import.meta.url),
           { type: 'module' }
@@ -178,42 +182,52 @@ export async function patchLayerDiffs(
           );
 
         const featureCollection = await fetchGeoJSON(diff.payload.url);
-        const layer = generateCartoKitLayer(featureCollection, {
+        layer = generateCartoKitLayer(featureCollection, {
           displayName: diff.payload.displayName,
           layerId: diff.layerId,
           url: diff.payload.url
         });
-
-        // Derive the inverse diff after creating the layer.
-        inverse = {
-          type: 'remove-layer',
-          layerId: diff.layerId,
-          payload: {
-            sourceLayerType: layer.type
-          }
-        };
-
-        // Apply the patch.
-        ir.layers[diff.layerId] = layer;
-      } else if (diff.payload.type === 'file') {
-        const layer = generateCartoKitLayer(diff.payload.featureCollection, {
+      } else {
+        layer = generateCartoKitLayer(diff.payload.featureCollection, {
           displayName: diff.payload.displayName,
           layerId: diff.layerId,
           fileName: diff.payload.fileName
         });
-
-        // Derive the inverse diff after creating the layer.
-        inverse = {
-          type: 'remove-layer',
-          layerId: diff.layerId,
-          payload: {
-            sourceLayerType: layer.type
-          }
-        };
-
-        // Apply the patch.
-        ir.layers[diff.layerId] = layer;
       }
+
+      // Derive the inverse diff after creating the layer.
+      inverse = {
+        type: 'remove-layer',
+        layerId: diff.layerId,
+        payload: {
+          sourceLayerType: layer.type
+        }
+      };
+
+      // Build the catalog for the layer in a worker thread.
+      const catalogWorker = new Worker(
+        new URL('$lib/utils/catalog/worker.ts', import.meta.url),
+        { type: 'module' }
+      );
+      const buildCatalog =
+        Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
+      const catalogPatch = await buildCatalog(layer);
+      catalog.value = { ...catalog.value, ...catalogPatch };
+
+      // Apply the patch.
+      ir.layers[diff.layerId] = layer;
+
+      // Derive the inverse diff after creating the layer.
+      inverse = {
+        type: 'remove-layer',
+        layerId: diff.layerId,
+        payload: {
+          sourceLayerType: layer.type
+        }
+      };
+
+      // Apply the patch.
+      ir.layers[diff.layerId] = layer;
 
       break;
     }
@@ -271,6 +285,9 @@ export async function patchLayerDiffs(
               featureCollection: layer.data.sourceGeojson
             }
       };
+
+      // Remove the layer from the catalog.
+      delete catalog.value[diff.layerId];
 
       // Apply the patch.
       delete ir.layers[diff.layerId];
