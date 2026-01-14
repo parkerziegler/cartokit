@@ -3,8 +3,6 @@ import * as url from 'node:url';
 
 import { test, expect } from '@playwright/test';
 
-import { DEFAULT_COUNT } from '$lib/utils/constants';
-
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.describe('redo', () => {
@@ -103,7 +101,7 @@ test.describe('redo', () => {
 
     // Get the fill step count select.
     const fillStepCountSelect = page.locator('#fill-step-count-select');
-    expect(await fillStepCountSelect.inputValue()).toBe(`${DEFAULT_COUNT}`);
+    expect(await fillStepCountSelect.inputValue()).toBe('5');
 
     // Set the fill step count to 8.
     await fillStepCountSelect.selectOption('8');
@@ -111,7 +109,7 @@ test.describe('redo', () => {
 
     // Undo the "fill-step-count" diff.
     await page.keyboard.press('ControlOrMeta+z');
-    expect(await fillStepCountSelect.inputValue()).toBe(`${DEFAULT_COUNT}`);
+    expect(await fillStepCountSelect.inputValue()).toBe('5');
 
     // Undo the "layer-type" diff.
     await page.keyboard.press('ControlOrMeta+z');
