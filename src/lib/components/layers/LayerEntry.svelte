@@ -35,7 +35,6 @@
   // In this instance, we just want to capture the initial value of the display name.
   // svelte-ignore state_referenced_locally
   let lastCommittedDisplayName = $state(layer.displayName);
-  let entry: HTMLDivElement;
 
   async function toggleLayerVisibility() {
     const diff: CartoKitDiff = {
@@ -77,14 +76,7 @@
     event: KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement }
   ) {
     if (event.key === 'Enter') {
-      const event = new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true
-      }) as MouseEvent & {
-        currentTarget: EventTarget & HTMLDivElement;
-      };
-
-      entry.dispatchEvent(event);
+      onLayerClick(event);
     }
   }
 
@@ -146,7 +138,7 @@
   }
 
   function onLayerClick(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
+    event: Event & { currentTarget: EventTarget & HTMLDivElement }
   ) {
     // If the user clicked one of the buttons contained in the layer entry
     // (Layer Visibility, Layer Tooltip Visibility, or Remove Layer), or the
@@ -188,7 +180,6 @@
     role="button"
     tabindex="0"
     data-testid="layer-entry"
-    bind:this={entry}
   >
     <div class="flex items-center">
       <span class="shrink-0">
@@ -234,7 +225,7 @@
           content: layer.layout.visible ? 'Hide Layer' : 'Show Layer'
         })}
         onclick={toggleLayerVisibility}
-        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500"
+        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500 focus:bg-slate-500"
       >
         {#if layer.layout.visible}
           <LayerVisibleIcon />
@@ -249,7 +240,7 @@
             : 'Show Layer Tooltip'
         })}
         onclick={toggleLayerTooltip}
-        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500"
+        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500 focus:bg-slate-500"
       >
         {#if layer.layout.tooltip.visible}
           <TooltipIcon />
@@ -262,7 +253,7 @@
           content: 'Remove Layer'
         })}
         onclick={removeLayer}
-        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500"
+        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500 focus:bg-slate-500"
       >
         <MinusIcon />
       </button>
@@ -288,7 +279,8 @@
 <style lang="postcss">
   @reference 'tailwindcss';
 
-  .display-name--visible:hover::after {
+  .display-name--visible:hover::after,
+  .display-name--visible:focus-within::after {
     @apply absolute -left-4 -z-10 h-full bg-slate-700;
     width: calc(100% + 2rem);
     content: '';
