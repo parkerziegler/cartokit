@@ -113,7 +113,10 @@ export async function reconLayerDiffs(
       }
 
       // Remove all instrumented layers.
-      getInstrumentedLayerIds(diff.layerId, diff.payload.sourceLayerType).forEach((id) => {
+      getInstrumentedLayerIds(
+        diff.layerId,
+        diff.payload.sourceLayerType
+      ).forEach((id) => {
         if (map.value!.getLayer(id)) {
           map.value!.removeLayer(id);
         }

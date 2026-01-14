@@ -8,6 +8,7 @@
   import { applyDiff } from '$lib/core/diff';
   import { user } from '$lib/state/user.svelte';
   import { ir } from '$lib/stores/ir';
+  import type { LayerType } from '$lib/types';
 
   interface Props {
     form?: HTMLFormElement;
@@ -22,6 +23,15 @@
   let textarea: HTMLTextAreaElement | undefined = $state();
 
   let layerIds = $derived(Object.keys($ir.layers));
+  let layerIdsToTypes = $derived(
+    Object.entries($ir.layers).reduce<Record<string, LayerType>>(
+      (acc, [layerId, layer]) => {
+        acc[layerId] = layer.type;
+        return acc;
+      },
+      {}
+    )
+  );
   let layerIdsToAttributes = $derived(
     Object.entries($ir.layers).reduce<Record<string, string[]>>(
       (acc, [layerId, layer]) => {
@@ -69,6 +79,7 @@
         body: JSON.stringify({
           prompt,
           layerIds,
+          layerIdsToTypes,
           layerIdsToAttributes,
           userId: user.userId
         })

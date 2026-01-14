@@ -62,7 +62,7 @@ const openai = new OpenAI({
  * the prompt and diffs to MongoDB for later analysis.
  */
 export const POST = (async ({ request }) => {
-  const { prompt, layerIds, layerIdsToAttributes, userId } =
+  const { prompt, layerIds, layerIdsToTypes, layerIdsToAttributes, userId } =
     await request.json();
 
   const schema = makeSchema(layerIds, layerIdsToAttributes);
@@ -76,8 +76,20 @@ export const POST = (async ({ request }) => {
       messages: [
         {
           role: 'system',
-          content:
-            'Generate zero or more updates to the map visualization. Choose the "unknown" update if you cannot easily determine the type of update based on the prompt. When creating new layers with "add-layer", generate friendly layer IDs in kebab-case format with a unqiue hash suffix based on the displayName (e.g., "population-data__a1b2c3" for a layer named "Population Data"). Use the same layer ID when referencing the newly created layer in subsequent diffs within the same request, as appropriate.'
+          content: `Generate zero or more diffs to apply to the map visualization
+          based on the user's prompt. Choose the "unknown" diff if you cannot
+          easily determine the type of diff based on the prompt.
+            
+          When creating new layers with "add-layer", generate friendly layer IDs
+          in kebab-case format with a unqiue hash suffix based on the
+          displayName (e.g., "population-data__a1b2c3" for a layer named
+          "Population Data"). Use the same layer ID when referencing the newly
+          created layer in subsequent diffs within the same request, as
+          appropriate.
+          
+          When transitioning a layer's type with "layer-type", consult the
+          following dictionary to determine the current sourceLayerType for the
+          layer targeted by the diff: ${JSON.stringify(layerIdsToTypes)}.`
         },
         { role: 'user', content: prompt }
       ],
@@ -167,7 +179,8 @@ function LayerTypeDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
     type: z.literal('layer-type'),
     layerId: layerIdSchema,
     payload: z.object({
-      layerType: LayerType
+      sourceLayerType: LayerType,
+      targetLayerType: LayerType
     })
   });
 }
