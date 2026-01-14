@@ -88,8 +88,6 @@ export async function reconLayerTypeDiffs(
           );
           break;
         }
-        default:
-          break;
       }
     }
   }
