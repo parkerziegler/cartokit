@@ -8,8 +8,6 @@ import type {
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer,
-  CategoricalFill,
-  ConstantFill,
   QuantitativeFill
 } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
@@ -260,8 +258,6 @@ export async function patchFillDiffs(
         | CartoKitChoroplethLayer
         | CartoKitProportionalSymbolLayer;
 
-      let fill: QuantitativeFill | CategoricalFill | ConstantFill;
-
       // Derive the inverse diff prior to applying the patch.
       inverse = {
         type: 'fill-visualization-type',
@@ -278,7 +274,7 @@ export async function patchFillDiffs(
             layer.data.geojson.features
           );
 
-          fill = {
+          layer.style.fill = {
             type: diff.payload.visualizationType,
             attribute,
             categories: enumerateAttributeCategories(
@@ -302,7 +298,7 @@ export async function patchFillDiffs(
             layer.data.geojson.features
           );
 
-          fill = {
+          layer.style.fill = {
             type: diff.payload.visualizationType,
             attribute: attribute,
             method: 'Quantile',
@@ -321,7 +317,7 @@ export async function patchFillDiffs(
           break;
         }
         case 'Constant':
-          fill = {
+          layer.style.fill = {
             type: diff.payload.visualizationType,
             color: randomColor(),
             opacity: layer.style.fill.opacity,
@@ -329,7 +325,6 @@ export async function patchFillDiffs(
           };
           break;
       }
-      layer.style.fill = fill;
 
       break;
     }
