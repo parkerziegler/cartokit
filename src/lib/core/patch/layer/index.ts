@@ -6,7 +6,7 @@ import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { ir } from '$lib/stores/ir';
 import { catalog } from '$lib/state/catalog.svelte';
-import type { CartoKitLayer, Catalog } from '$lib/types';
+import type { CartoKitLayer } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_OPACITY,
@@ -203,16 +203,6 @@ export async function patchLayerDiffs(
           sourceLayerType: layer.type
         }
       };
-
-      // Build the catalog for the layer in a worker thread.
-      const catalogWorker = new Worker(
-        new URL('$lib/utils/catalog/worker.ts', import.meta.url),
-        { type: 'module' }
-      );
-      const buildCatalog =
-        Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
-      const catalogPatch = await buildCatalog(layer);
-      catalog.value = { ...catalog.value, ...catalogPatch };
 
       // Apply the patch.
       ir.layers[diff.layerId] = layer;

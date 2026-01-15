@@ -1,8 +1,12 @@
+import * as Comlink from 'comlink';
+
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
 import { addLayer } from '$lib/interaction/layer';
+import { catalog } from '$lib/state/catalog.svelte';
 import { feature } from '$lib/state/feature.svelte';
 import { listeners, type LayerListeners } from '$lib/state/listeners.svelte';
 import { map } from '$lib/state/map.svelte';
+import type { CartoKitLayer, Catalog } from '$lib/types';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
 
 /**
@@ -33,6 +37,16 @@ export async function reconLayerDiffs(
       });
 
       addLayer(map.value!, layer);
+
+      // Build the catalog for the layer in a worker thread.
+      const catalogWorker = new Worker(
+        new URL('$lib/utils/catalog/worker.ts', import.meta.url),
+        { type: 'module' }
+      );
+      const buildCatalog =
+        Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
+      const catalogPatch = await buildCatalog(layer);
+      catalog.value = { ...catalog.value, ...catalogPatch };
 
       // Focus the map canvas after adding the layer.
       // Use a more specific selector to avoid focusing maps in the BasemapPicker.
