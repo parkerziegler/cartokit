@@ -19,7 +19,7 @@
   );
 
   let attrs = $derived(
-    layer.style.fill?.type === 'Constant'
+    layer.style.fill.type === 'Constant'
       ? {
           fill: layer.style.fill.color,
           'fill-opacity': layer.style.fill.opacity ?? 0,
@@ -37,7 +37,12 @@
   );
 </script>
 
-<div class="ml-8 flex flex-col gap-2">
+<div
+  class={[
+    'ml-8 flex flex-col gap-2',
+    layer.layout.visible ? 'opacity-100' : 'opacity-75'
+  ]}
+>
   <div class="flex items-center gap-2">
     <svg
       viewBox="0 0 {dimension} {dimension}"
@@ -56,18 +61,20 @@
       {pluralize(geometryType, layer.data.geojson.features.length)}</span
     >
   </div>
-  {#if layer.style.fill?.type === 'Categorical'}
+  {#if layer.style.fill.visible && layer.style.fill.type === 'Categorical'}
     <CategoricalLegend
       layerType="Point"
       fill={layer.style.fill}
       stroke={layer.style.stroke}
+      visible={layer.layout.visible}
     />
-  {:else if layer.style.fill?.type === 'Quantitative'}
+  {:else if layer.style.fill.visible && layer.style.fill.type === 'Quantitative'}
     <QuantitativeLegend
       fill={layer.style.fill}
       stroke={layer.style.stroke}
       layerId={layer.id}
       layerType="Point"
+      visible={layer.layout.visible}
     />
   {/if}
 </div>

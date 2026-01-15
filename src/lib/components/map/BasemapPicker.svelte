@@ -9,15 +9,20 @@
   import Tabs from '$lib/components/shared/Tabs.svelte';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
-  import { map as mapStore } from '$lib/stores/map';
   import type { BasemapProvider } from '$lib/types';
   import { BASEMAPS } from '$lib/utils/basemap';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
+  interface Props {
+    map: maplibregl.Map;
+  }
+
+  let { map }: Props = $props();
+
   let picker: HTMLButtonElement;
-  let maps = $state<maplibregl.Map[]>([]);
-  let hovered = $state(false);
+  let thumbnails = $state<maplibregl.Map[]>([]);
   let showModal = $state(false);
+  let timeoutId = $state<number | null>(null);
 
   setContext('close-modal', () => {
     showModal = false;
@@ -31,73 +36,61 @@
   const mapStyles = ['outdoor-v2', 'winter-v2', 'satellite'];
 
   onMount(() => {
-    maps = mapStyles.map((style) => {
-      const map = new maplibregl.Map({
+    const { top, left } = picker.getBoundingClientRect();
+
+    thumbnails = mapStyles.map((style) => {
+      const thumbnail = new maplibregl.Map({
         container: `inset-${style}`,
         style: `https://api.maptiler.com/maps/${style}/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
-        center: $ir.center,
+        center: map.unproject([left + 20, top + 20]),
         zoom: $ir.zoom
       });
 
-      map.scrollZoom.disable();
+      thumbnail.scrollZoom.disable();
 
-      return map;
+      return thumbnail;
     });
+
+    map.on('move', (event) => updateMapThumbnailCenter(event.target));
+    map.on('zoom', (event) => updateMapThumbnailZoom(event.target));
 
     const unregisterKeybinding = registerKeybinding('b', onClick);
 
     return () => {
-      maps.forEach((map) => {
-        map.remove();
+      thumbnails.forEach((thumbnail) => {
+        thumbnail.remove();
       });
 
       unregisterKeybinding();
+      map.off('move', (event) => updateMapThumbnailCenter(event.target));
+      map.off('zoom', (event) => updateMapThumbnailZoom(event.target));
     };
   });
 
-  function updateMapThumbnail(map: maplibregl.Map) {
+  function updateMapThumbnailCenter(map: maplibregl.Map) {
     const { top, left } = picker.getBoundingClientRect();
-    map.setCenter($mapStore.unproject([left + 20, top + 20]));
-    map.setZoom($ir.zoom);
+
+    const thumbnail = thumbnails[0];
+    thumbnail.setCenter(map.unproject([left + 20, top + 20]));
   }
 
-  function onMouseEnter() {
-    hovered = true;
-  }
-
-  function onMouseLeave() {
-    hovered = false;
+  function updateMapThumbnailZoom(map: maplibregl.Map) {
+    const thumbnail = thumbnails[0];
+    thumbnail.setZoom(map.getZoom());
   }
 
   function onClick() {
     showModal = true;
   }
 
-  $effect(() => {
-    if (maps.length > 0 && $mapStore && $ir && picker) {
-      updateMapThumbnail(maps[0]);
-    }
-  });
-
-  // Only update hidden map thumbnails when the picker is hovered.
-  // This is a small perf optimization to avoid updating all three
-  // thumbnails while two are out of view.
-  $effect(() => {
-    if (hovered && $mapStore && $ir) {
-      maps.slice(1).forEach(updateMapThumbnail);
-    }
-  });
-
-  let timeoutId = $state<number | null>(null);
-
   layout.subscribe(() => {
-    if (maps.length > 0 && $mapStore && $ir) {
+    if (thumbnails.length > 0) {
       if (timeoutId) {
         window.clearTimeout(timeoutId);
       }
 
       timeoutId = window.setTimeout(() => {
-        updateMapThumbnail(maps[0]);
+        updateMapThumbnailCenter(map);
       }, 400);
     }
   });
@@ -106,8 +99,6 @@
 <button
   class="group relative"
   bind:this={picker}
-  onmouseenter={onMouseEnter}
-  onmouseleave={onMouseLeave}
   onclick={onClick}
   aria-label="Switch basemap"
   {@attach tooltip({

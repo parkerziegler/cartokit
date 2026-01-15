@@ -7,11 +7,12 @@
 
   interface Props {
     fill: CategoricalFill;
-    stroke?: ConstantStroke;
+    stroke: ConstantStroke;
     layerType: LayerType;
+    visible: boolean;
   }
 
-  let { fill, stroke, layerType }: Props = $props();
+  let { fill, stroke, layerType, visible }: Props = $props();
 
   let entries = $derived(
     d3[fill.scheme.id].length < fill.categories.length
@@ -27,7 +28,7 @@
   );
 </script>
 
-<div class="flex flex-col gap-2 text-white">
+<div class={['flex flex-col gap-2', visible ? 'opacity-100' : 'opacity-75']}>
   <p class="font-semibold">{fill.attribute} ↓</p>
   <ul class="flex flex-col gap-1">
     {#each entries as category, i (category)}

@@ -2,10 +2,10 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import ChoroplethIcon from '$lib/components/icons/ChoroplethIcon.svelte';
   import DotDensityIcon from '$lib/components/icons/DotDensityIcon.svelte';
+  import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
   import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
   import LayerVisibleIcon from '$lib/components/icons/LayerVisibleIcon.svelte';
   import LineIcon from '$lib/components/icons/LineIcon.svelte';
-  import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
   import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
@@ -20,10 +20,10 @@
   import PolygonLegend from '$lib/components/legends/PolygonLegend.svelte';
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import { feature } from '$lib/state/feature.svelte';
+  import { map } from '$lib/state/map.svelte';
   import type { CartoKitLayer } from '$lib/types';
-  import { map } from '$lib/stores/map';
-  import { selectedFeature } from '$lib/stores/selected-feature';
 
   interface Props {
     layer: CartoKitLayer;
@@ -32,41 +32,51 @@
   let { layer }: Props = $props();
 
   let editingDisplayName = $state(false);
+  // In this instance, we just want to capture the initial value of the display name.
+  // svelte-ignore state_referenced_locally
   let lastCommittedDisplayName = $state(layer.displayName);
 
-  function toggleLayerVisibility() {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+  async function toggleLayerVisibility() {
+    const diff: CartoKitDiff = {
       type: 'layer-visibility',
+      layerId: layer.id,
       payload: {
-        visibility: layer.layout.visibility === 'visible' ? 'hidden' : 'visible'
+        visible: !layer.layout.visible
       }
-    });
+    };
+
+    await applyDiff(diff);
   }
 
-  function toggleLayerTooltip() {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+  async function toggleLayerTooltip() {
+    const diff: CartoKitDiff = {
       type: 'layer-tooltip-visibility',
+      layerId: layer.id,
       payload: {
         visible: !layer.layout.tooltip.visible
       }
-    });
+    };
+
+    await applyDiff(diff);
   }
 
-  function removeLayer() {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+  async function removeLayer() {
+    const diff: CartoKitDiff = {
       type: 'remove-layer',
-      payload: {}
-    });
+      layerId: layer.id,
+      payload: {
+        sourceLayerType: layer.type
+      }
+    };
+
+    await applyDiff(diff);
   }
 
   function onLayerKeyDown(
     event: KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement }
   ) {
     if (event.key === 'Enter') {
-      onLayerClick();
+      onLayerClick(event);
     }
   }
 
@@ -82,19 +92,21 @@
     }
   }
 
-  function onDisplayNameInput(
+  async function onDisplayNameInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
-    dispatchLayerUpdate({
-      layerId: layer.id,
+    const diff: CartoKitDiff = {
       type: 'rename-layer',
+      layerId: layer.id,
       payload: {
         displayName: event.currentTarget.value
       }
-    });
+    };
+
+    await applyDiff(diff);
   }
 
-  function onDisplayNameInputKeyDown(
+  async function onDisplayNameInputKeyDown(
     event: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement }
   ) {
     if (event.key === 'Enter') {
@@ -103,13 +115,15 @@
     } else if (event.key === 'Escape') {
       editingDisplayName = false;
 
-      dispatchLayerUpdate({
-        layerId: layer.id,
+      const diff: CartoKitDiff = {
         type: 'rename-layer',
+        layerId: layer.id,
         payload: {
           displayName: lastCommittedDisplayName
         }
-      });
+      };
+
+      await applyDiff(diff);
     }
   }
 
@@ -123,22 +137,31 @@
     lastCommittedDisplayName = layer.displayName;
   }
 
-  function onLayerClick() {
-    const randomFeature = $map.queryRenderedFeatures({
+  function onLayerClick(
+    event: Event & { currentTarget: EventTarget & HTMLDivElement }
+  ) {
+    // If the user clicked one of the buttons contained in the layer entry
+    // (Layer Visibility, Layer Tooltip Visibility, or Remove Layer), or the
+    // layer is hidden, do nothing.
+    if (event.target instanceof HTMLButtonElement || !layer.layout.visible) {
+      return;
+    }
+
+    const randomFeature = map.value!.queryRenderedFeatures({
       layers: [layer.id]
     })[0];
 
     // If we have a currently selected feature, deselect it.
-    if ($selectedFeature) {
-      $map.setFeatureState(
-        { source: $selectedFeature.layer.id, id: $selectedFeature.id },
+    if (feature.value) {
+      map.value!.setFeatureState(
+        { source: feature.value.layer.id, id: feature.value.id },
         { selected: false }
       );
     }
 
-    selectedFeature.set(randomFeature);
+    feature.value = randomFeature;
 
-    $map.setFeatureState(
+    map.value!.setFeatureState(
       { source: layer.id, id: randomFeature.id },
       { selected: true }
     );
@@ -149,14 +172,14 @@
   <div
     class={[
       'relative flex items-center justify-between',
-      $selectedFeature?.layer.id === layer.id
-        ? 'display-name--selected'
-        : 'display-name'
+      layer.layout.visible ? 'display-name--visible' : 'display-name--hidden',
+      feature.value?.layer.id === layer.id && 'display-name--selected'
     ]}
     onclick={onLayerClick}
     onkeydown={onLayerKeyDown}
     role="button"
     tabindex="0"
+    data-testid="layer-entry"
   >
     <div class="flex items-center">
       <span class="shrink-0">
@@ -196,15 +219,15 @@
         >
       {/if}
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1">
       <button
-        onclick={toggleLayerVisibility}
         {@attach tooltip({
-          content:
-            layer.layout.visibility === 'visible' ? 'Hide Layer' : 'Show Layer'
+          content: layer.layout.visible ? 'Hide Layer' : 'Show Layer'
         })}
+        onclick={toggleLayerVisibility}
+        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500 focus:bg-slate-500"
       >
-        {#if layer.layout.visibility === 'visible'}
+        {#if layer.layout.visible}
           <LayerVisibleIcon />
         {:else}
           <LayerHiddenIcon />
@@ -217,6 +240,7 @@
             : 'Show Layer Tooltip'
         })}
         onclick={toggleLayerTooltip}
+        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500 focus:bg-slate-500"
       >
         {#if layer.layout.tooltip.visible}
           <TooltipIcon />
@@ -229,6 +253,7 @@
           content: 'Remove Layer'
         })}
         onclick={removeLayer}
+        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500 focus:bg-slate-500"
       >
         <MinusIcon />
       </button>
@@ -254,10 +279,15 @@
 <style lang="postcss">
   @reference 'tailwindcss';
 
-  .display-name:hover::after {
+  .display-name--visible:hover::after,
+  .display-name--visible:focus-within::after {
     @apply absolute -left-4 -z-10 h-full bg-slate-700;
     width: calc(100% + 2rem);
     content: '';
+  }
+
+  .display-name--hidden {
+    @apply opacity-75;
   }
 
   .display-name--selected::after {

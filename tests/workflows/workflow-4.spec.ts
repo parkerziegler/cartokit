@@ -17,12 +17,8 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * geographic space.
  */
 test('workflow-4', async ({ page }) => {
-  // Identify the playwright test for application code.
-  await page.addInitScript(() => {
-    (
-      window as unknown as Window & { playwrightWorkflowId: string }
-    ).playwrightWorkflowId = 'workflow-4';
-  });
+  // Mark workflow tests as slow.
+  test.slow();
 
   // Navigate to cartokit, running on a local development server.
   await page.goto('/');
@@ -115,14 +111,8 @@ test('workflow-4', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the Fishing Boat
-  // Transponder Gaps layer.
-  await page.locator('#map').click({
-    position: {
-      x: 180,
-      y: 300
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
@@ -130,18 +120,20 @@ test('workflow-4', async ({ page }) => {
   // Remove the layer's stroke.
   await page.getByTestId('remove-stroke-button').click();
 
-  // Switch the layer's Layer Type to Choropleth.
+  // Switch the layer's type to Choropleth.
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's Steps to 8.
-  await page.locator('#color-steps-select').selectOption('8');
+  await page.locator('#fill-step-count-select').selectOption('8');
 
   // Set the layer's Color Scheme to RdYlBu.
   await page.locator('#color-scheme').getByRole('button').click();
   await page.locator('li:nth-child(25)').getByRole('button').click();
 
   // Set the layer's Method to Manual.
-  await page.locator('#classification-method-select').selectOption('Manual');
+  await page
+    .locator('#fill-classification-method-select')
+    .selectOption('Manual');
 
   // Set the layer's Breaks to 614.791, 973.836, 1228.582, 1426.178, 1587.626,
   // 1724.178, 1842.373.

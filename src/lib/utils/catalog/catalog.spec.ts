@@ -35,7 +35,7 @@ describe('buildCatalog', () => {
     type: 'Polygon',
     displayName: 'US Counties Unemployment',
     layout: {
-      visibility: 'visible',
+      visible: true,
       z: 0,
       tooltip: {
         visible: true
@@ -50,7 +50,15 @@ describe('buildCatalog', () => {
       fill: {
         type: 'Constant',
         color: '#000000',
-        opacity: 0.5
+        opacity: 0.5,
+        visible: true
+      },
+      stroke: {
+        type: 'Constant',
+        color: '#000000',
+        width: 1,
+        opacity: 0.5,
+        visible: true
       }
     }
   };
@@ -60,7 +68,7 @@ describe('buildCatalog', () => {
     type: 'Polygon',
     displayName: 'American Crow Range',
     layout: {
-      visibility: 'visible',
+      visible: true,
       z: 0,
       tooltip: {
         visible: true
@@ -75,7 +83,15 @@ describe('buildCatalog', () => {
       fill: {
         type: 'Constant',
         color: '#000000',
-        opacity: 0.5
+        opacity: 0.5,
+        visible: true
+      },
+      stroke: {
+        type: 'Constant',
+        color: '#000000',
+        width: 1,
+        opacity: 0.5,
+        visible: true
       }
     }
   };

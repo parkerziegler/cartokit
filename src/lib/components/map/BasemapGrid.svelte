@@ -4,10 +4,10 @@
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import { ir } from '$lib/stores/ir';
   import type { BasemapProvider } from '$lib/types';
   import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
-  import { switchBasemapWithPreservedLayers } from '$lib/utils/maplibre';
 
   interface Props {
     provider: BasemapProvider;
@@ -27,8 +27,17 @@
   }
 
   function onSelectBasemap(tileUrl: string) {
-    return function updateBasemap() {
-      switchBasemapWithPreservedLayers(tileUrl, provider);
+    return async function updateBasemap() {
+      const diff: CartoKitDiff = {
+        type: 'basemap',
+        payload: {
+          url: tileUrl,
+          provider: provider
+        }
+      };
+
+      await applyDiff(diff);
+
       closeModal();
     };
   }

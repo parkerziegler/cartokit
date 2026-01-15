@@ -12,10 +12,10 @@
   import CodeEditor from '$lib/components/shared/CodeEditor.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
-  import { dispatchLayerUpdate } from '$lib/interaction/update';
-  import { selectedFeature } from '$lib/stores/selected-feature';
+  import { feature } from '$lib/state/feature.svelte';
   import { parseStringToTransformation } from '$lib/utils/parse';
   import { transformationWorker } from '$lib/utils/worker';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
 
   interface Props {
     oncloseeditor: () => void;
@@ -39,12 +39,12 @@
   // Preview editor state.
   let previewError = $state('');
   let previewDoc: string = $state(
-    $selectedFeature
+    feature.value
       ? JSON.stringify(
           {
-            type: $selectedFeature.type,
-            properties: $selectedFeature.properties,
-            geometry: $selectedFeature.geometry
+            type: feature.value.type,
+            properties: feature.value.properties,
+            geometry: feature.value.geometry
           },
           null,
           2
@@ -62,11 +62,11 @@
   function onClick() {
     const program = view?.state.doc.toString() ?? '';
 
-    transformationWorker(program, geojson, (message) => {
+    transformationWorker(program, geojson, async (message) => {
       switch (message.type) {
         case 'data': {
-          dispatchLayerUpdate({
-            type: 'transformation',
+          const diff: CartoKitDiff = {
+            type: 'add-transformation',
             layerId,
             payload: {
               geojson: message.data,
@@ -75,7 +75,9 @@
                 args: []
               }
             }
-          });
+          };
+
+          await applyDiff(diff);
 
           success = true;
           // Clear any errors on successful transformation.
@@ -98,10 +100,10 @@
   }
 
   function onEditorChange(program: string) {
-    if ($selectedFeature) {
+    if (feature.value) {
       transformationWorker(
         program,
-        turf.featureCollection([$selectedFeature]),
+        turf.featureCollection([feature.value]),
         (message) => {
           // TODO: Split out the additional edge cases here.
           // - message.data?.[0] is strictly a GeoJSON feature.

@@ -35,13 +35,18 @@
     }
   ]);
   let style = $derived(
-    layer.style.fill?.type === 'Constant'
+    layer.style.fill.type === 'Constant'
       ? `background-color: ${hexWithOpacity(layer.style.fill.color, layer.style.fill.opacity)}; border-color: ${layer.style.stroke ? hexWithOpacity(layer.style.stroke.color, layer.style.stroke.opacity) : 'transparent'}; border-width: ${layer.style.stroke?.width ?? 0}px;`
       : ''
   );
 </script>
 
-<div class="ml-8 flex flex-col gap-2">
+<div
+  class={[
+    'ml-8 flex flex-col gap-2',
+    layer.layout.visible ? 'opacity-100' : 'opacity-75'
+  ]}
+>
   <span class="text-xs font-semibold">{layer.style.size.attribute} →</span>
   <div class="flex gap-2">
     {#each circles as circle (circle.value)}
@@ -55,18 +60,20 @@
       </div>
     {/each}
   </div>
-  {#if layer.style.fill?.type === 'Categorical'}
+  {#if layer.style.fill.visible && layer.style.fill.type === 'Categorical'}
     <CategoricalLegend
       fill={layer.style.fill}
       stroke={layer.style.stroke}
       layerType="Proportional Symbol"
+      visible={layer.layout.visible}
     />
-  {:else if layer.style.fill?.type === 'Quantitative'}
+  {:else if layer.style.fill.visible && layer.style.fill.type === 'Quantitative'}
     <QuantitativeLegend
       fill={layer.style.fill}
       stroke={layer.style.stroke}
       layerId={layer.id}
       layerType="Proportional Symbol"
+      visible={layer.layout.visible}
     />
   {/if}
 </div>

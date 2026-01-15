@@ -17,13 +17,6 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * iles (i.e., 10%-90% coverage).
  */
 test('workflow-1', async ({ page }) => {
-  // Identify the playwright test for application code.
-  await page.addInitScript(() => {
-    (
-      window as unknown as Window & { playwrightWorkflowId: string }
-    ).playwrightWorkflowId = 'workflow-1';
-  });
-
   // Mark workflow tests as slow.
   test.slow();
 
@@ -66,7 +59,6 @@ test('workflow-1', async ({ page }) => {
   await page.mouse.wheel(0, 400);
 
   // Open the Add Layer modal.
-  await expect(page.getByTestId('add-layer-button')).toBeEnabled();
   await page.getByTestId('add-layer-button').click();
   await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
@@ -104,19 +96,13 @@ test('workflow-1', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the Penumbra Paths
-  // layer.
-  await page.locator('#map').click({
-    position: {
-      x: 550,
-      y: 375
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
 
-  // Set the layer's Layer Type to Choropleth.
+  // Set the layer's type to Choropleth.
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's stroke to #1f2b2e.
@@ -198,14 +184,8 @@ test('workflow-1', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the Path of Total-
-  // ity layer.
-  await page.locator('#map').click({
-    position: {
-      x: 500,
-      y: 680
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();

@@ -5,10 +5,10 @@ import type { CartoKitHeatmapLayer } from '$lib/types';
 
 /**
  * Derive an ExpressionSpecification or number for the weight of a
- * @see{CartoKitHeatmapLayer}.
+ * {@link CartoKitHeatmapLayer}.
  *
- * @param {CartoKitHeatmapLayer} layer – The layer to derive the weight for.
- * @returns – An ExpressionSpecification or number for the layer.
+ * @param layer The {@link CartoKitHeatmapLayer} to derive the weight for.
+ * @returns An {@link ExpressionSpecification} or number for the layer.
  */
 export function deriveHeatmapWeight(
   layer: CartoKitHeatmapLayer

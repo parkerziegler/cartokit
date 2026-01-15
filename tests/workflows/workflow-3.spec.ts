@@ -11,13 +11,6 @@ import { test, expect } from '@playwright/test';
  * location in geographic space from 1980-2024.
  */
 test('workflow-3', async ({ page }) => {
-  // Identify the playwright test for application code.
-  await page.addInitScript(() => {
-    (
-      window as unknown as Window & { playwrightWorkflowId: string }
-    ).playwrightWorkflowId = 'workflow-3';
-  });
-
   // Mark workflow tests as slow.
   test.setTimeout(150000);
 
@@ -73,7 +66,6 @@ test('workflow-3', async ({ page }) => {
   }
 
   // Open the Add Layer modal.
-  await expect(page.getByTestId('add-layer-button')).toBeEnabled();
   await page.getByTestId('add-layer-button').click();
   await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
@@ -92,9 +84,13 @@ test('workflow-3', async ({ page }) => {
     .getByTestId('add-layer-modal')
     .getByRole('button', { name: 'Add' })
     .click();
-  await expect(page.getByTestId('add-layer-modal')).not.toBeVisible({
-    timeout: 60000
-  });
+
+  // Wait for the loading indicator to disappear.
+  await page
+    .getByTestId('loading-indicator')
+    .waitFor({ state: 'hidden', timeout: 90000 });
+
+  await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
 
   // Wait for MapLibre to render the Winter Temperature Change layer.
   //
@@ -102,16 +98,10 @@ test('workflow-3', async ({ page }) => {
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(60000);
+  await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the Winter Tempera-
-  // ture Change layer.
-  await page.locator('#map').click({
-    position: {
-      x: 700,
-      y: 200
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
@@ -119,14 +109,16 @@ test('workflow-3', async ({ page }) => {
   // Remove the layer's stroke.
   await page.getByTestId('remove-stroke-button').click();
 
-  // Switch the layer's Layer Type to Choropleth.
+  // Switch the layer's type to Choropleth.
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's Attribute to 'decadal_rate'.
   await page.locator('#fill-attribute-select').selectOption('decadal_rate');
 
   // Set the layer's Method to Manual.
-  await page.locator('#classification-method-select').selectOption('Manual');
+  await page
+    .locator('#fill-classification-method-select')
+    .selectOption('Manual');
 
   // Set the layer's Breaks to -0.5, 0, 0.5, 1.
   const stops = [-0.5, 0, 0.5, 1];

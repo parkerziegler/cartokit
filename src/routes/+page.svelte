@@ -18,12 +18,12 @@
   import { onFeatureLeave } from '$lib/interaction/select';
   import { chat } from '$lib/state/chat.svelte';
   import { diffs } from '$lib/state/diffs.svelte';
+  import { initHistory } from '$lib/state/history.svelte';
   import { user } from '$lib/state/user.svelte';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
-  import { map as mapStore } from '$lib/stores/map';
-  import { selectedLayer } from '$lib/stores/selected-layer';
-  import { initHistory } from '$lib/utils/history';
+  import { map as mapState } from '$lib/state/map.svelte';
+  import { layer } from '$lib/state/layer.svelte';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
@@ -35,12 +35,16 @@
   let map = $state<maplibregl.Map>();
   let error = $state({ message: '' });
   let processingDiff = $state(false);
+
+  // We intentionally capture the values of data.userId and data.enableChat
+  // from the load function in +page.server.ts.
+  //
+  // svelte-ignore state_referenced_locally
   user.userId = data.userId;
+  // svelte-ignore state_referenced_locally
   chat.enable = data.enableChat;
 
   onMount(() => {
-    // maplibre-gl is actually a CJS module, and not all module.exports may be
-    // supported as named exports.
     map = new maplibregl.Map({
       container: 'map',
       style: data.basemap.url,
@@ -53,8 +57,8 @@
 
     // When the map first reaches an idle state, set it in the store.
     // This should ensure that the map's styles and data have fully loaded.
-    map.once('idle', () => {
-      mapStore.set(map!);
+    map.once('idle', (e) => {
+      mapState.value = e.target;
 
       ir.update((ir) => {
         ir.basemap.url = data.basemap.url;
@@ -81,8 +85,8 @@
       });
     });
 
-    map.on('style.load', () => {
-      map?.setProjection({ type: $ir.projection });
+    map.on('style.load', (event) => {
+      event.target.setProjection({ type: $ir.projection });
     });
 
     map.on('error', (err) => {
@@ -102,7 +106,7 @@
     );
 
     return () => {
-      map!.remove();
+      map?.remove();
       destroyHistory();
       unregisterKeybinding();
     };
@@ -180,10 +184,12 @@
       </MenuTitle>
       <LayerPanel />
     </Menu>
-    {#if $selectedLayer}
-      <PropertiesMenu map={map!} layer={$selectedLayer} />
+    {#if layer.value}
+      <PropertiesMenu map={map!} layer={layer.value} />
     {/if}
-    <Toolbar />
+    {#if map}
+      <Toolbar {map} />
+    {/if}
     <button
       class={[
         'ease-cubic-out absolute right-4 bottom-12 z-10 flex items-baseline gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 disabled:cursor-not-allowed',
@@ -194,16 +200,16 @@
         }
       ]}
       onclick={toggleEditorVisibility}
-      disabled={!$mapStore}
+      disabled={!mapState.value}
       data-testid="editor-toggle"
     >
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
       <span class="text-slate-400">E</span>
     </button>
-    {#if $layout.dataVisible && $selectedLayer}
+    {#if $layout.dataVisible && layer.value}
       <DataTable
-        data={$selectedLayer.data.geojson.features}
-        tableName={$selectedLayer.displayName}
+        data={layer.value.data.geojson.features}
+        tableName={layer.value.displayName}
         onClose={onViewDataClose}
         class={[
           'ease-cubic-out absolute bottom-0 h-72 transition-all duration-400',

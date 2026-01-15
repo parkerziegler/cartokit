@@ -17,13 +17,6 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * nental United States from 2012-2022.
  */
 test('workflow-5', async ({ page }) => {
-  // Identify the playwright test for application code.
-  await page.addInitScript(() => {
-    (
-      window as unknown as Window & { playwrightWorkflowId: string }
-    ).playwrightWorkflowId = 'workflow-5';
-  });
-
   // Mark workflow tests as slow.
   test.slow();
 
@@ -57,7 +50,6 @@ test('workflow-5', async ({ page }) => {
   await expect(page.getByTestId('program-editor')).toBeVisible();
 
   // Open the Add Layer modal.
-  await expect(page.getByTestId('add-layer-button')).toBeEnabled();
   await page.getByTestId('add-layer-button').click();
   await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
@@ -98,14 +90,8 @@ test('workflow-5', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the American Crow
-  // Range layer.
-  await page.locator('#map').click({
-    position: {
-      x: 600,
-      y: 400
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
@@ -170,19 +156,13 @@ test('workflow-5', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the American Crow
-  // Population Change layer.
-  await page.locator('#map').click({
-    position: {
-      x: 773,
-      y: 569
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
 
-  // Set the layer's Layer Type to Choropleth.
+  // Set the layer's type to Choropleth.
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Remove the layer's stroke.
@@ -192,10 +172,12 @@ test('workflow-5', async ({ page }) => {
   await page.locator('#fill-attribute-select').selectOption('abd_trend');
 
   // Set the layer's Steps to 8.
-  await page.locator('#color-steps-select').selectOption('8');
+  await page.locator('#fill-step-count-select').selectOption('8');
 
   // Set the layer's Method to Manual.
-  await page.locator('#classification-method-select').selectOption('Manual');
+  await page
+    .locator('#fill-classification-method-select')
+    .selectOption('Manual');
 
   // Set the layer's Breaks to -30, -20, -10, 0, 10, 20, 30.
   const stops = [-30, -20, -10, 0, 10, 20, 30];

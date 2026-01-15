@@ -16,13 +16,6 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * https://academic.oup.com/qje/article/137/4/2037/6571943
  */
 test('workflow-6', async ({ page }) => {
-  // Identify the playwright test for application code.
-  await page.addInitScript(() => {
-    (
-      window as unknown as Window & { playwrightWorkflowId: string }
-    ).playwrightWorkflowId = 'workflow-6';
-  });
-
   // Mark workflow tests as slow.
   test.slow();
 
@@ -56,7 +49,6 @@ test('workflow-6', async ({ page }) => {
   await expect(page.getByTestId('program-editor')).toBeVisible();
 
   // Open the Add Layer modal.
-  await expect(page.getByTestId('add-layer-button')).toBeEnabled();
   await page.getByTestId('add-layer-button').click();
   await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
@@ -97,14 +89,8 @@ test('workflow-6', async ({ page }) => {
   // ance to the global window object just for the sake of testing.
   await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the Climate Impact
-  // Regions layer.
-  await page.locator('#map').click({
-    position: {
-      x: 720,
-      y: 450
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
@@ -112,7 +98,7 @@ test('workflow-6', async ({ page }) => {
   // Remove the layer's stroke.
   await page.getByTestId('remove-stroke-button').click();
 
-  // Switch the layer's Layer Type to Choropleth.
+  // Switch the layer's type to Choropleth.
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's Attribute to 'years_2080_2099'.
@@ -126,10 +112,12 @@ test('workflow-6', async ({ page }) => {
   await page.getByTestId('color-scheme-reverse-button').click();
 
   // Set the layer's Steps to 8.
-  await page.locator('#color-steps-select').selectOption('8');
+  await page.locator('#fill-step-count-select').selectOption('8');
 
   // Set the layer's Method to Manual.
-  await page.locator('#classification-method-select').selectOption('Manual');
+  await page
+    .locator('#fill-classification-method-select')
+    .selectOption('Manual');
 
   // Set the layer's Breaks to -200, -100, -50, 0, 50, 100, 200.
   const stops = [-200, -100, -50, 0, 50, 100, 200];

@@ -3,8 +3,9 @@
 
   import { tooltip } from '$lib/attachments/tooltip';
   import GlobeIcon from '$lib/components/icons/GlobeIcon.svelte';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import { map } from '$lib/state/map.svelte';
   import { ir } from '$lib/stores/ir';
-  import { map } from '$lib/stores/map';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   onMount(() => {
@@ -13,18 +14,19 @@
     return unregisterKeybinding;
   });
 
-  function onToggleGlobe() {
-    const currentProjection = $map.getProjection();
+  async function onToggleGlobe() {
+    const currentProjection = map.value!.getProjection();
     const nextProjection =
       currentProjection?.type === 'globe' ? 'mercator' : 'globe';
 
-    $map.setProjection({
-      type: nextProjection
-    });
-    ir.update((ir) => {
-      ir.projection = nextProjection;
-      return ir;
-    });
+    const diff: CartoKitDiff = {
+      type: 'projection',
+      payload: {
+        projection: nextProjection
+      }
+    };
+
+    await applyDiff(diff);
   }
 </script>
 

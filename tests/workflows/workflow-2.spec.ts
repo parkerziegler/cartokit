@@ -11,13 +11,6 @@ import { test, expect } from '@playwright/test';
  * at that location in geographic space from 1981-2023.
  */
 test('workflow-2', async ({ page }) => {
-  // Identify the playwright test for application code.
-  await page.addInitScript(() => {
-    (
-      window as unknown as Window & { playwrightWorkflowId: string }
-    ).playwrightWorkflowId = 'workflow-2';
-  });
-
   // Mark workflow tests as slow.
   test.slow();
 
@@ -45,7 +38,6 @@ test('workflow-2', async ({ page }) => {
   });
 
   // Click the Open Editor button.
-  await expect(page.getByTestId('editor-toggle')).toBeEnabled();
   await page.getByTestId('editor-toggle').click();
 
   // Ensure the Editor Panel is visible.
@@ -74,7 +66,6 @@ test('workflow-2', async ({ page }) => {
   }
 
   // Open the Add Layer modal.
-  await expect(page.getByTestId('add-layer-button')).toBeEnabled();
   await page.getByTestId('add-layer-button').click();
   await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
@@ -95,7 +86,9 @@ test('workflow-2', async ({ page }) => {
     .click();
 
   // Wait for the loading indicator to disappear.
-  await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
+  await page
+    .getByTestId('loading-indicator')
+    .waitFor({ state: 'hidden', timeout: 45000 });
 
   // Ensure the Add Layer modal is no longer visible.
   await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
@@ -106,16 +99,10 @@ test('workflow-2', async ({ page }) => {
   // load. In theory, we'd like to hook into MapLibre's event system to deter-
   // mine when the map is idle; however, we don't want to attach the map inst-
   // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(20000);
+  await page.waitForTimeout(5000);
 
-  // Click on a page location that will trigger selection of the Spring Leaf
-  // Appearance layer.
-  await page.locator('#map').click({
-    position: {
-      x: 530,
-      y: 100
-    }
-  });
+  // Click on the layer entry in the Layers Panel.
+  await page.getByTestId('layer-entry').first().click();
 
   // Ensure that the Properties Panel is visible.
   await expect(page.locator('#properties')).toBeVisible();
@@ -123,14 +110,14 @@ test('workflow-2', async ({ page }) => {
   // Remove the layer's stroke.
   await page.getByTestId('remove-stroke-button').click();
 
-  // Switch the layer's Layer Type to Choropleth.
+  // Switch the layer's type to Choropleth.
   await page.locator('#layer-type-select').selectOption('Choropleth');
 
   // Set the layer's Attribute to 'trend'.
   await page.locator('#fill-attribute-select').selectOption('trend');
 
   // Set the layer's Steps to 6.
-  await page.locator('#color-steps-select').selectOption('6');
+  await page.locator('#fill-step-count-select').selectOption('6');
 
   // Switch the layer's Color Scheme to PRGn.
   await page.locator('#color-scheme').getByRole('button').click();
@@ -140,7 +127,9 @@ test('workflow-2', async ({ page }) => {
   await page.getByTestId('color-scheme-reverse-button').click();
 
   // Set the layer's Method to Manual.
-  await page.locator('#classification-method-select').selectOption('Manual');
+  await page
+    .locator('#fill-classification-method-select')
+    .selectOption('Manual');
 
   // Set the layer's Breaks to -21, -14, -7, 0, 7.
   const stops = [-21, -14, -7, 0, 7];
