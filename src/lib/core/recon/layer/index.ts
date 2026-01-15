@@ -36,8 +36,6 @@ export async function reconLayerDiffs(
         generateId: true
       });
 
-      addLayer(map.value!, layer);
-
       // Build the catalog for the layer in a worker thread.
       const catalogWorker = new Worker(
         new URL('$lib/utils/catalog/worker.ts', import.meta.url),
@@ -47,6 +45,8 @@ export async function reconLayerDiffs(
         Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
       const catalogPatch = await buildCatalog(layer);
       catalog.value = { ...catalog.value, ...catalogPatch };
+
+      addLayer(map.value!, layer);
 
       // Focus the map canvas after adding the layer.
       // Use a more specific selector to avoid focusing maps in the BasemapPicker.
