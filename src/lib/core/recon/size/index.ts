@@ -25,6 +25,7 @@ export async function reconSizeDiffs(
       );
       break;
     }
+    case 'size-attribute':
     case 'min-size':
     case 'max-size': {
       const layer = targetIR.layers[

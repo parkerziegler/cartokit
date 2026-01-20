@@ -41,6 +41,23 @@ export async function patchSizeDiffs(
 
       break;
     }
+    case 'size-attribute': {
+      const layer = ir.layers[diff.layerId] as CartoKitProportionalSymbolLayer;
+
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'size-attribute',
+        layerId: diff.layerId,
+        payload: {
+          attribute: layer.style.size.attribute
+        }
+      };
+
+      // Apply the patch.
+      layer.style.size.attribute = diff.payload.attribute;
+
+      break;
+    }
     case 'min-size': {
       const layer = ir.layers[diff.layerId] as CartoKitProportionalSymbolLayer;
 
