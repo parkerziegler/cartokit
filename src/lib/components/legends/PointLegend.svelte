@@ -15,7 +15,8 @@
     getFeatureCollectionGeometryType(layer.data.geojson)
   );
   let dimension = $derived(
-    layer.style.size * 2 + (layer.style.stroke?.width ?? 0) * 2
+    layer.style.size * 2 +
+      (layer.style.stroke.visible ? layer.style.stroke.width : 0) * 2
   );
 
   let attrs = $derived(
@@ -23,9 +24,15 @@
       ? {
           fill: layer.style.fill.color,
           'fill-opacity': layer.style.fill.opacity ?? 0,
-          stroke: layer.style.stroke?.color ?? '#ffffff',
-          'stroke-width': layer.style.stroke?.width ?? 0,
-          'stroke-opacity': layer.style.stroke?.opacity ?? 0
+          stroke: layer.style.stroke.visible
+            ? layer.style.stroke.color
+            : 'none',
+          'stroke-width': layer.style.stroke.visible
+            ? layer.style.stroke.width
+            : 0,
+          'stroke-opacity': layer.style.stroke.visible
+            ? layer.style.stroke.opacity
+            : 0
         }
       : {
           fill: 'none',

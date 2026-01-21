@@ -42,9 +42,9 @@
               height="16"
               fill={colors[i] ?? DEFAULT_FILL}
               fill-opacity={fill.opacity}
-              stroke={stroke?.color ?? 'none'}
-              stroke-width={stroke?.width ?? '0'}
-              stroke-opacity={stroke?.opacity ?? '0'}
+              stroke={stroke.visible ? stroke.color : 'none'}
+              stroke-width={stroke.visible ? stroke.width : 0}
+              stroke-opacity={stroke.visible ? stroke.opacity : 0}
             />
           </svg>
         {:else if layerType === 'Proportional Symbol' || layerType === 'Point'}
@@ -55,9 +55,9 @@
               cy="8"
               fill={colors[i] ?? DEFAULT_FILL}
               fill-opacity={fill.opacity}
-              stroke={stroke?.color ?? 'none'}
-              stroke-width={stroke?.width ?? '0'}
-              stroke-opacity={stroke?.opacity ?? '0'}
+              stroke={stroke.visible ? stroke.color : 'none'}
+              stroke-width={stroke.visible ? stroke.width : 0}
+              stroke-opacity={stroke.visible ? stroke.opacity : 0}
             />
           </svg>
         {/if}

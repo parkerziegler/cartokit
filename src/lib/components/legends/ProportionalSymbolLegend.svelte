@@ -36,7 +36,9 @@
   ]);
   let style = $derived(
     layer.style.fill.type === 'Constant'
-      ? `background-color: ${hexWithOpacity(layer.style.fill.color, layer.style.fill.opacity)}; border-color: ${layer.style.stroke ? hexWithOpacity(layer.style.stroke.color, layer.style.stroke.opacity) : 'transparent'}; border-width: ${layer.style.stroke?.width ?? 0}px;`
+      ? `background-color: ${hexWithOpacity(layer.style.fill.color, layer.style.fill.opacity)};
+      border-color: ${layer.style.stroke.visible ? hexWithOpacity(layer.style.stroke.color, layer.style.stroke.opacity) : 'transparent'};
+      border-width: ${layer.style.stroke.visible ? layer.style.stroke.width : 0}px;`
       : ''
   );
 </script>
