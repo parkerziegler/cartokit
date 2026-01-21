@@ -102,26 +102,37 @@ function deriveManualBreaks({
     return quantiles;
   }
 
-  return forceAscendingThresholds({ layerId, attribute, thresholds });
+  const min = catalog.value[layerId][attribute]['min'];
+  const max = catalog.value[layerId][attribute]['max'];
+
+  // If the thresholds do not fit within the range of the attribute,
+  // derive a fully new set of thresholds, defaulting to quantiles.
+  if (thresholds[0] < min || thresholds[thresholds.length - 1] > max) {
+    const quantiles = deriveQuantiles({ layerId, attribute, range });
+
+    return quantiles;
+  }
+
+  return forceAscendingThresholds({ min, max, thresholds });
 }
 
 /**
  * Force ascending thresholds.
  *
- * @param params – Input parameters to force ascending thresholds.
- * @param layerId – The ID of the visualized layer.
- * @param attribute – The data attribute to force ascending thresholds over.
- * @param thresholds – The current thresholds of the dataset.
- * @returns – The (potentially updated) ascending thresholds of the dataset.
+ * @param min The minimum value of the attribute.
+ * @param max The maximum value of the attribute.
+ * @param thresholds  The current thresholds of the dataset.
+ * @returns The (potentially updated) ascending thresholds of the dataset.
  */
 function forceAscendingThresholds({
-  layerId,
-  attribute,
+  min,
+  max,
   thresholds
-}: Omit<DeriveBreaksParams, 'range'> & { thresholds: number[] }): number[] {
-  const min = catalog.value[layerId][attribute]['min'];
-  const max = catalog.value[layerId][attribute]['max'];
-
+}: {
+  min: number;
+  max: number;
+  thresholds: number[];
+}): number[] {
   let prev = min;
   const output: number[] = [];
 
