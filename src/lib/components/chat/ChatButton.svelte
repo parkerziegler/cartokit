@@ -4,6 +4,7 @@
   import ChatIcon from '$lib/components/icons/ChatIcon.svelte';
 
   let chatVisible = $state(false);
+  let requestInFlight = $state(false);
   let form: HTMLFormElement | undefined = $state();
 
   function onClick() {
@@ -11,7 +12,11 @@
   }
 
   function onClickOutsideChat(event: MouseEvent) {
-    if (chatVisible && form && !form.contains(event.target as Node)) {
+    if (
+      chatVisible &&
+      !requestInFlight &&
+      !form?.contains(event.target as Node)
+    ) {
       chatVisible = false;
     }
   }
@@ -30,5 +35,5 @@
   <ChatIcon />
 </button>
 {#if chatVisible}
-  <Chat bind:form />
+  <Chat bind:form bind:requestInFlight />
 {/if}

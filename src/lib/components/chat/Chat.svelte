@@ -12,12 +12,15 @@
 
   interface Props {
     form?: HTMLFormElement;
+    requestInFlight: boolean;
   }
 
-  let { form = $bindable(undefined) }: Props = $props();
+  let {
+    form = $bindable(undefined),
+    requestInFlight = $bindable(false)
+  }: Props = $props();
 
   let prompt = $state('');
-  let fetching = $state(false);
   let diffUnknown = $state(false);
   let error = $state(false);
   let textarea: HTMLTextAreaElement | undefined = $state();
@@ -64,7 +67,7 @@
   ) {
     event.preventDefault();
 
-    fetching = true;
+    requestInFlight = true;
 
     if (textarea) {
       textarea.blur();
@@ -105,7 +108,7 @@
         error = false;
       }, 3000);
     } finally {
-      fetching = false;
+      requestInFlight = false;
     }
   }
 </script>
@@ -118,7 +121,7 @@
         placeholder="Prompt the model to update map layers..."
         bind:value={prompt}
         bind:this={textarea}
-        disabled={fetching}
+        disabled={requestInFlight}
         onkeydown={onKeyDown}
       >
       </textarea>
@@ -129,13 +132,13 @@
         >
         <button
           class="flex h-[22px] w-[22px] items-center justify-center rounded-xs border border-white bg-slate-400 text-white disabled:opacity-50"
-          disabled={fetching || error || diffUnknown || !prompt.length}
+          disabled={requestInFlight || error || diffUnknown || !prompt.length}
         >
           <ArrowUpIcon />
         </button>
       </div>
     </form>
-    {#if fetching}
+    {#if requestInFlight}
       <p class="loading px-2 text-slate-400" transition:slide>Thinking</p>
     {/if}
     {#if error}
