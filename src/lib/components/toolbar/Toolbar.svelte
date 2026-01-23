@@ -1,8 +1,9 @@
 <script lang="ts">
   import type maplibregl from 'maplibre-gl';
 
-  import BasemapPicker from '$lib/components/map/BasemapPicker.svelte';
-  import ProjectionPicker from '$lib/components/map/ProjectionPicker.svelte';
+  import ActionPicker from '$lib/components/toolbar/ActionPicker.svelte';
+  import BasemapPicker from '$lib/components/toolbar/BasemapPicker.svelte';
+  import ProjectionPicker from '$lib/components/toolbar/ProjectionPicker.svelte';
   import ChatButton from '$lib/components/chat/ChatButton.svelte';
   import { chat } from '$lib/state/chat.svelte';
   import { layout } from '$lib/stores/layout';
@@ -24,6 +25,8 @@
     }
   ]}
 >
+  <ActionPicker />
+  <div class="h-10 w-px bg-slate-600"></div>
   <BasemapPicker {map} />
   <ProjectionPicker />
   {#if chat.enable}

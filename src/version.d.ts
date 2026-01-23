@@ -1,0 +1,1 @@
+declare const __CARTOKIT_VERSION__: string;
