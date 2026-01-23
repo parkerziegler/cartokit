@@ -30,6 +30,10 @@
       await applyDiff(diff);
     };
   }
+
+  $effect(() => {
+    console.log(style.thresholds);
+  });
 </script>
 
 <div data-testid="breaks-editor" class="font-mono text-xs">

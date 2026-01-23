@@ -32,6 +32,6 @@
   @reference 'tailwindcss';
 
   :global(.menu > * + *) {
-    @apply border-t border-t-slate-400;
+    @apply border-t border-t-slate-600;
   }
 </style>

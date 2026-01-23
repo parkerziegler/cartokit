@@ -5,7 +5,6 @@ import { patch } from '$lib/core/patch';
 import { recon } from '$lib/core/recon';
 import { diffs } from '$lib/state/diffs.svelte';
 import { history } from '$lib/state/history.svelte';
-import { user } from '$lib/state/user.svelte';
 import { ir } from '$lib/stores/ir';
 import type {
   BasemapProvider,
@@ -415,8 +414,6 @@ export async function applyDiff(
 
   ir.set(draftIR);
 
-  // Track diffs for user study.
-  if (user.userId) {
-    diffs.push(execute);
-  }
+  // Track diffs as they are applied.
+  diffs.push(execute);
 }

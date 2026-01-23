@@ -158,7 +158,8 @@
       processingDiff = false;
     }
 
-    if (diffs.length) {
+    // Only process diffs for the study sessions.
+    if (diffs.length && user.userId) {
       processDiff();
     }
   });
