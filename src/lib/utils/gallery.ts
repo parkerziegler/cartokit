@@ -10,7 +10,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     attribution: 'US Census Bureau',
     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/urban-areas.json',
     src: UrbanAreas,
-    type: "Polygon"
+    type: 'Polygon'
   },
   {
     id: 'earthquakes',
@@ -18,23 +18,20 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     attribution: 'USGS',
     url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson',
     src: Earthquakes,
-    type: "Point"
-
+    type: 'Point'
   },
-//   {
-//     id: 'presidential-elections',
-//     name: '2024 Presidential Election Results',
-//     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/nyt-election-2024-national.json',
-//     src: Earthquakes
-//   },
-    {
+  //   {
+  //     id: 'presidential-elections',
+  //     name: '2024 Presidential Election Results',
+  //     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/nyt-election-2024-national.json',
+  //     src: Earthquakes
+  //   },
+  {
     id: 'climate-impacts',
     name: 'Climate Impact Regions',
     attribution: 'The Washington Post',
     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-climate-impact-regions.json',
     src: ClimateImpacts,
-    type: "Polygon"
-  },
-
-
+    type: 'Polygon'
+  }
 ];

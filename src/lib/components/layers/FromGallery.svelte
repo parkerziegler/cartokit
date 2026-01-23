@@ -14,7 +14,6 @@
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
   import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
 
-
   const closeModal = getContext<() => void>('close-modal');
 
   let loadingId: string | null = $state(null);
@@ -29,7 +28,11 @@
     };
   }
 
-  async function onSelectDataset(itemId: string, displayName: string, url: string) {
+  async function onSelectDataset(
+    itemId: string,
+    displayName: string,
+    url: string
+  ) {
     loadingId = itemId;
 
     const layerId = uniqueId(`${kebabCase(displayName)}__`);
@@ -54,16 +57,12 @@
       onclick={() => onSelectDataset(item.id, item.name, item.url)}
       disabled={loadingId !== null}
       class={[
-        'flex flex-col rounded-sm border p-2 transition-colors hover:border-slate-400 text-left',
+        'flex flex-col rounded-sm border p-2 text-left transition-colors hover:border-slate-400',
         loadingId === item.id ? 'border-slate-400' : 'border-transparent'
       ]}
     >
-      <enhanced:img
-        src={item.src}
-        alt={item.name}
-        class="rounded-xs"
-      />
-       <div class="mt-2 flex items-center justify-between">
+      <enhanced:img src={item.src} alt={item.name} class="rounded-xs" />
+      <div class="mt-2 flex items-center justify-between">
         <p class="text-sm font-semibold">{item.name}</p>
         <span class="shrink-0">
           {#if item.type === 'Choropleth'}
@@ -84,7 +83,6 @@
         </span>
       </div>
       <p class="mt-0 text-xs font-light text-gray-500">{item.attribution}</p>
-
     </button>
   {/each}
 </div>
