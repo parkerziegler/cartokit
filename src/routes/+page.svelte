@@ -100,7 +100,7 @@
 
     const destroyHistory = initHistory();
 
-    const unregisterKeybinding = registerKeybinding(
+    const deregisterKeybinding = registerKeybinding(
       'e',
       toggleEditorVisibility
     );
@@ -108,7 +108,7 @@
     return () => {
       map?.remove();
       destroyHistory();
-      unregisterKeybinding();
+      deregisterKeybinding();
     };
   });
 

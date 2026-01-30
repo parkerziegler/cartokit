@@ -25,9 +25,9 @@
   }
 
   onMount(() => {
-    const unregisterKeybinding = registerKeybinding('p', onCopyButtonClick);
+    const deregisterKeybinding = registerKeybinding('p', onCopyButtonClick);
 
-    return unregisterKeybinding;
+    return deregisterKeybinding;
   });
 </script>
 

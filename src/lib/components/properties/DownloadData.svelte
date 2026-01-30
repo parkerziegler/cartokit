@@ -26,9 +26,9 @@
   }
 
   onMount(() => {
-    const unregisterKeybinding = registerKeybinding('d', onClick);
+    const deregisterKeybinding = registerKeybinding('d', onClick);
 
-    return unregisterKeybinding;
+    return deregisterKeybinding;
   });
 </script>
 
