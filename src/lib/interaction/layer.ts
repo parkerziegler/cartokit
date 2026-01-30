@@ -33,16 +33,23 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         }
       });
 
-      // Add a separate layer for the stroke.
+      const strokePaint = layer.style.stroke.visible
+        ? {
+            'line-color': layer.style.stroke.color,
+            'line-width': layer.style.stroke.width,
+            'line-opacity': layer.style.stroke.opacity
+          }
+        : {
+            'line-color': 'transparent',
+            'line-width': 0,
+            'line-opacity': 0
+          };
+
       map.addLayer({
         id: `${layer.id}-stroke`,
         source: layer.id,
         type: 'line',
-        paint: {
-          'line-color': layer.style.stroke.color,
-          'line-width': layer.style.stroke.width,
-          'line-opacity': layer.style.stroke.opacity
-        }
+        paint: strokePaint
       });
 
       instrumentPolygonHover(map, layer.id);
@@ -72,18 +79,36 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         }
       });
 
+      const fillPaint = layer.style.fill.visible
+        ? {
+            'circle-color': layer.style.fill.color,
+            'circle-opacity': layer.style.fill.opacity
+          }
+        : {
+            'circle-color': 'transparent',
+            'circle-opacity': 0
+          };
+
+      const strokePaint = layer.style.stroke.visible
+        ? {
+            'circle-stroke-color': layer.style.stroke.color,
+            'circle-stroke-width': layer.style.stroke.width,
+            'circle-stroke-opacity': layer.style.stroke.opacity
+          }
+        : {
+            'circle-stroke-color': 'transparent',
+            'circle-stroke-width': 0,
+            'circle-stroke-opacity': 0
+          };
+
       // Add the dot density layer to the map.
       map.addLayer({
         id: layer.id,
         source: layer.id,
         type: 'circle',
         paint: {
-          'circle-color': layer.style.fill.color,
-          'circle-opacity': layer.style.fill.opacity,
-          'circle-stroke-color': layer.style.stroke.color,
-          'circle-stroke-width': layer.style.stroke.width,
-          'circle-stroke-opacity': layer.style.stroke.opacity,
-          'circle-radius': layer.style.size
+          ...fillPaint,
+          ...strokePaint
         }
       });
 
@@ -147,16 +172,35 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
       break;
     }
     case 'Point': {
+      const fillPaint = layer.style.fill.visible
+        ? {
+            'circle-color': deriveColorScale(layer.style.fill),
+            'circle-opacity': layer.style.fill.opacity
+          }
+        : {
+            'circle-color': 'transparent',
+            'circle-opacity': 0
+          };
+
+      const strokePaint = layer.style.stroke.visible
+        ? {
+            'circle-stroke-color': layer.style.stroke.color,
+            'circle-stroke-width': layer.style.stroke.width,
+            'circle-stroke-opacity': layer.style.stroke.opacity
+          }
+        : {
+            'circle-stroke-color': 'transparent',
+            'circle-stroke-width': 0,
+            'circle-stroke-opacity': 0
+          };
+
       map.addLayer({
         id: layer.id,
         source: layer.id,
         type: 'circle',
         paint: {
-          'circle-color': deriveColorScale(layer.style.fill),
-          'circle-opacity': layer.style.fill.opacity,
-          'circle-stroke-color': layer.style.stroke.color,
-          'circle-stroke-width': layer.style.stroke.width,
-          'circle-stroke-opacity': layer.style.stroke.opacity,
+          ...fillPaint,
+          ...strokePaint,
           'circle-radius': layer.style.size
         }
       });
@@ -166,26 +210,41 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
       break;
     }
     case 'Polygon': {
+      const fillPaint = layer.style.fill.visible
+        ? {
+            'fill-color': layer.style.fill.color,
+            'fill-opacity': layer.style.fill.opacity
+          }
+        : {
+            'fill-color': 'transparent',
+            'fill-opacity': 0
+          };
+
       map.addLayer({
         id: layer.id,
         source: layer.id,
         type: 'fill',
-        paint: {
-          'fill-color': layer.style.fill.color,
-          'fill-opacity': layer.style.fill.opacity
-        }
+        paint: fillPaint
       });
+
+      const strokePaint = layer.style.stroke.visible
+        ? {
+            'line-color': layer.style.stroke.color,
+            'line-width': layer.style.stroke.width,
+            'line-opacity': layer.style.stroke.opacity
+          }
+        : {
+            'line-color': 'transparent',
+            'line-width': 0,
+            'line-opacity': 0
+          };
 
       // Add a separate layer for the stroke.
       map.addLayer({
         id: `${layer.id}-stroke`,
         source: layer.id,
         type: 'line',
-        paint: {
-          'line-color': layer.style.stroke.color,
-          'line-width': layer.style.stroke.width,
-          'line-opacity': layer.style.stroke.opacity
-        }
+        paint: strokePaint
       });
 
       instrumentPolygonHover(map, layer.id);
@@ -193,16 +252,35 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
       break;
     }
     case 'Proportional Symbol': {
+      const fillPaint = layer.style.fill.visible
+        ? {
+            'circle-color': deriveColorScale(layer.style.fill),
+            'circle-opacity': layer.style.fill.opacity
+          }
+        : {
+            'circle-color': 'transparent',
+            'circle-opacity': 0
+          };
+
+      const strokePaint = layer.style.stroke.visible
+        ? {
+            'circle-stroke-color': layer.style.stroke.color,
+            'circle-stroke-width': layer.style.stroke.width,
+            'circle-stroke-opacity': layer.style.stroke.opacity
+          }
+        : {
+            'circle-stroke-color': 'transparent',
+            'circle-stroke-width': 0,
+            'circle-stroke-opacity': 0
+          };
+
       map.addLayer({
         id: layer.id,
         source: layer.id,
         type: 'circle',
         paint: {
-          'circle-color': deriveColorScale(layer.style.fill),
-          'circle-opacity': layer.style.fill.opacity,
-          'circle-stroke-color': layer.style.stroke.color,
-          'circle-stroke-width': layer.style.stroke.width,
-          'circle-stroke-opacity': layer.style.stroke.opacity,
+          ...fillPaint,
+          ...strokePaint,
           'circle-radius': deriveSize(layer)
         }
       });
