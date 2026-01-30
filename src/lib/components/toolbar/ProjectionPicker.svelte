@@ -9,9 +9,9 @@
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   onMount(() => {
-    const unregisterKeybinding = registerKeybinding('g', onToggleGlobe);
+    const deregisterKeybinding = registerKeybinding('g', onToggleGlobe);
 
-    return unregisterKeybinding;
+    return deregisterKeybinding;
   });
 
   async function onToggleGlobe() {

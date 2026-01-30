@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import Key from '$lib/components/shared/Key.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { diffs } from '$lib/state/diffs.svelte';
   import { ir } from '$lib/stores/ir';
+  import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
     actionMenu?: HTMLDivElement;
@@ -12,6 +15,16 @@
   let { actionMenu = $bindable() }: Props = $props();
 
   let files: FileList | null = $state(null);
+
+  onMount(() => {
+    const deregisterDownloadKeybinding = registerKeybinding(
+      'D',
+      onDownloadMap,
+      { requireShift: true }
+    );
+
+    return deregisterDownloadKeybinding;
+  });
 
   function onDownloadMap() {
     const meta = {
@@ -72,7 +85,6 @@
   }
 
   $effect(() => {
-    console.log('files', files);
     if (files && files.length === 1) {
       onUploadMap(files[0]);
     }
