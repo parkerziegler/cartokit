@@ -54,14 +54,14 @@
     map.on('move', (event) => updateMapThumbnailCenter(event.target));
     map.on('zoom', (event) => updateMapThumbnailZoom(event.target));
 
-    const unregisterKeybinding = registerKeybinding('b', onClick);
+    const deregisterKeybinding = registerKeybinding('b', onClick);
 
     return () => {
       thumbnails.forEach((thumbnail) => {
         thumbnail.remove();
       });
 
-      unregisterKeybinding();
+      deregisterKeybinding();
       map.off('move', (event) => updateMapThumbnailCenter(event.target));
       map.off('zoom', (event) => updateMapThumbnailZoom(event.target));
     };
