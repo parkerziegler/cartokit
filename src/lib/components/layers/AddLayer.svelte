@@ -5,6 +5,7 @@
   import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
   import FromAPI from '$lib/components/layers/FromAPI.svelte';
   import FromFile from '$lib/components/layers/FromFile.svelte';
+  import FromGallery from '$lib/components/layers/FromGallery.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
   import { map } from '$lib/state/map.svelte';
@@ -16,7 +17,8 @@
 
   const tabs = [
     { name: 'From API', content: FromAPI, props: {} },
-    { name: 'From File', content: FromFile, props: {} }
+    { name: 'From File', content: FromFile, props: {} },
+    { name: 'From Gallery', content: FromGallery, props: {} }
   ];
 
   let showModal = $state(false);
