@@ -3,9 +3,6 @@
   import { uniqueId, kebabCase } from 'lodash-es';
   import type { MapSourceDataEvent } from 'maplibre-gl';
 
-  import { GALLERY_ITEMS } from '$lib/utils/gallery';
-  import { applyDiff } from '$lib/core/diff';
-  import { map } from '$lib/state/map.svelte';
   import ChoroplethIcon from '$lib/components/icons/ChoroplethIcon.svelte';
   import DotDensityIcon from '$lib/components/icons/DotDensityIcon.svelte';
   import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
@@ -13,6 +10,10 @@
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
   import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
+  import { applyDiff } from '$lib/core/diff';
+  import { map } from '$lib/state/map.svelte';
+  import { GALLERY_ITEMS } from '$lib/utils/gallery';
+
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -57,28 +58,25 @@
       onclick={() => onSelectDataset(item.id, item.name, item.url)}
       disabled={loadingId !== null}
       class={[
-        'flex flex-col rounded-sm border p-2 text-left transition-colors hover:border-slate-400',
+        'relative flex flex-col rounded-sm border p-2 text-left transition-colors hover:border-slate-400',
         loadingId === item.id ? 'border-slate-400' : 'border-transparent'
       ]}
     >
+      {#if loadingId === item.id}
+        <div class="absolute inset-0 z-10 bg-white/10">
+          <span class="loader absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
+        </div>
+      {/if}
       <enhanced:img src={item.src} alt={item.name} class="rounded-xs" />
       <div class="mt-2 flex items-center justify-between">
         <p class="text-sm font-semibold">{item.name}</p>
         <span class="shrink-0">
-          {#if item.type === 'Choropleth'}
-            <ChoroplethIcon />
-          {:else if item.type === 'Dot Density'}
-            <DotDensityIcon />
-          {:else if item.type === 'Heatmap'}
-            <HeatmapIcon />
-          {:else if item.type === 'Line'}
+          {#if item.type === 'Line'}
             <LineIcon />
           {:else if item.type === 'Point'}
             <PointIcon />
           {:else if item.type === 'Polygon'}
             <PolygonIcon />
-          {:else if item.type === 'Proportional Symbol'}
-            <ProportionalSymbolIcon />
           {/if}
         </span>
       </div>
@@ -86,3 +84,29 @@
     </button>
   {/each}
 </div>
+
+<style lang="postcss">
+  @reference 'tailwindcss';
+
+  .loader {
+    @apply relative inline-block h-4 w-4;
+  }
+  .loader::after,
+  .loader::before {
+    @apply absolute top-0 left-0 h-4 w-4 rounded-full bg-slate-400;
+    content: '';
+    animation: animloader 0.5s ease-in-out infinite;
+  }
+
+  @keyframes animloader {
+    0% {
+      transform: scale(0);
+      opacity: 1;
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+</style>

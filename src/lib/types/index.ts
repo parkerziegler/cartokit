@@ -527,7 +527,7 @@ export interface GalleryItem {
   attribution: string;
   url: string;
   src: EnhancedImgAttributes['src'];
-  type: string;
+  type: CartoKitPointLayer['type'] | CartoKitLineLayer['type'] | CartoKitPolygonLayer['type'];
 }
 
 /**

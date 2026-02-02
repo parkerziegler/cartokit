@@ -58,5 +58,5 @@
   {#snippet header()}
     <h2 class="text-xl font-semibold">Add Layer</h2>
   {/snippet}
-  <Tabs {tabs} />
+  <Tabs {tabs} bodyClass="max-h-[24rem] overflow-y-auto"/>
 </Modal>

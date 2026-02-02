@@ -1,6 +1,7 @@
 import UrbanAreas from '$lib/assets/gallery/urban-areas.webp?enhanced';
 import Earthquakes from '$lib/assets/gallery/earthquakes.webp?enhanced';
 import ClimateImpacts from '$lib/assets/gallery/climate-impacts.webp?enhanced';
+import PowerPlants from '$lib/assets/gallery/power-plants.webp?enhanced';
 import type { GalleryItem } from '$lib/types';
 
 export const GALLERY_ITEMS: GalleryItem[] = [
@@ -20,12 +21,6 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     src: Earthquakes,
     type: 'Point'
   },
-  //   {
-  //     id: 'presidential-elections',
-  //     name: '2024 Presidential Election Results',
-  //     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/nyt-election-2024-national.json',
-  //     src: Earthquakes
-  //   },
   {
     id: 'climate-impacts',
     name: 'Climate Impact Regions',
@@ -33,5 +28,13 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-climate-impact-regions.json',
     src: ClimateImpacts,
     type: 'Polygon'
+  },
+  {
+    id: 'power-plants',
+    name: 'US Power Plants',
+    attribution: 'US Energy Information Administration',
+    url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-powerplants.json',
+    src: PowerPlants,
+    type: 'Point'
   }
 ];
