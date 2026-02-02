@@ -3,13 +3,9 @@
   import { uniqueId, kebabCase } from 'lodash-es';
   import type { MapSourceDataEvent } from 'maplibre-gl';
 
-  import ChoroplethIcon from '$lib/components/icons/ChoroplethIcon.svelte';
-  import DotDensityIcon from '$lib/components/icons/DotDensityIcon.svelte';
-  import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
   import LineIcon from '$lib/components/icons/LineIcon.svelte';
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
-  import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
   import { GALLERY_ITEMS } from '$lib/utils/gallery';
