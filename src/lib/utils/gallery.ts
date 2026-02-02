@@ -14,7 +14,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
   },
   {
     id: 'earthquakes',
-    name: 'Earthquakes',
+    name: 'Magnitude 2.5+ Earthquakes in the Past 30 Days',
     attribution: 'USGS',
     url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson',
     src: Earthquakes,
