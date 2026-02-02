@@ -29,7 +29,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
   {
     id: 'climate-impacts',
     name: 'Climate Impact Regions',
-    attribution: 'The Washington Post',
+    attribution: 'Climate Impact Lab, Carleton et al. 2022',
     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-climate-impact-regions.json',
     src: ClimateImpacts,
     type: 'Polygon'
