@@ -527,7 +527,10 @@ export interface GalleryItem {
   attribution: string;
   url: string;
   src: EnhancedImgAttributes['src'];
-  type: CartoKitPointLayer['type'] | CartoKitLineLayer['type'] | CartoKitPolygonLayer['type'];
+  type:
+    | CartoKitPointLayer['type']
+    | CartoKitLineLayer['type']
+    | CartoKitPolygonLayer['type'];
 }
 
 /**

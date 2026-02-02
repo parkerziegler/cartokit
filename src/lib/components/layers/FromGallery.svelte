@@ -14,7 +14,6 @@
   import { map } from '$lib/state/map.svelte';
   import { GALLERY_ITEMS } from '$lib/utils/gallery';
 
-
   const closeModal = getContext<() => void>('close-modal');
 
   let loadingId: string | null = $state(null);
@@ -64,7 +63,9 @@
     >
       {#if loadingId === item.id}
         <div class="absolute inset-0 z-10 bg-white/10">
-          <span class="loader absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
+          <span
+            class="loader absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          ></span>
         </div>
       {/if}
       <enhanced:img src={item.src} alt={item.name} class="rounded-xs" />
