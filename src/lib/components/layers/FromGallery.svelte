@@ -47,7 +47,7 @@
   }
 </script>
 
-<div class="grid grid-cols-2 gap-4">
+<div class="grid grid-cols-2 gap-x-2 gap-y-1">
   {#each GALLERY_ITEMS as item (item.id)}
     <button
       onclick={() => onSelectDataset(item.id, item.name, item.url)}
@@ -58,15 +58,15 @@
       ]}
     >
       {#if loadingId === item.id}
-        <div class="absolute inset-0 z-10 bg-white/10">
+        <div class="absolute inset-0 z-10 rounded-sm bg-white/20">
           <span
             class="loader absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
           ></span>
         </div>
       {/if}
       <enhanced:img src={item.src} alt={item.name} class="rounded-xs" />
-      <div class="mt-2 flex items-center justify-between">
-        <p class="text-sm font-semibold">{item.name}</p>
+      <div class="mt-2 flex items-center justify-between gap-1">
+        <p class="text-xs font-semibold">{item.name}</p>
         <span class="shrink-0">
           {#if item.type === 'Line'}
             <LineIcon />
@@ -77,7 +77,7 @@
           {/if}
         </span>
       </div>
-      <p class="mt-0 text-xs font-light text-gray-500">{item.attribution}</p>
+      <p class="text-2xs mt-0 font-light text-gray-500">{item.attribution}</p>
     </button>
   {/each}
 </div>
@@ -86,11 +86,11 @@
   @reference 'tailwindcss';
 
   .loader {
-    @apply relative inline-block h-4 w-4;
+    @apply relative inline-block h-8 w-8;
   }
   .loader::after,
   .loader::before {
-    @apply absolute top-0 left-0 h-4 w-4 rounded-full bg-slate-400;
+    @apply absolute top-0 left-0 h-8 w-8 rounded-full bg-slate-400;
     content: '';
     animation: animloader 0.5s ease-in-out infinite;
   }
