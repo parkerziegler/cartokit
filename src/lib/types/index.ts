@@ -519,6 +519,21 @@ export interface Basemap {
 }
 
 /**
+ * Represents a dataset gallery item in cartokit.
+ */
+export interface GalleryItem {
+  id: string;
+  name: string;
+  attribution: string;
+  url: string;
+  src: EnhancedImgAttributes['src'];
+  type:
+    | CartoKitPointLayer['type']
+    | CartoKitLineLayer['type']
+    | CartoKitPolygonLayer['type'];
+}
+
+/**
  * Represents the set of possible basemap providers in cartokit.
  */
 export type BasemapProvider =
