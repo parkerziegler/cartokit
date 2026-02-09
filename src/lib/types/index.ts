@@ -580,6 +580,7 @@ export type Catalog = Record<
       Jenks: Record<number, { breaks: number[] }>;
       min: number;
       max: number;
+      unique: number;
     }
   >
 >;
