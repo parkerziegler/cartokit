@@ -42,7 +42,9 @@
         if (isPropertyCategorical(propValue)) {
           return true;
         }
-        return isPropertyQuantitative(propValue) && (catalogEntry?.unique ?? 0) < 9;
+        return (
+          isPropertyQuantitative(propValue) && (catalogEntry?.unique ?? 0) < 9
+        );
       }
     })
   );
