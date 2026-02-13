@@ -90,19 +90,22 @@ export function selectCategoricalAttribute(features: Feature[]): string {
 /**
  * Enumerate the categories of a given attribute in a GeoJSON FeatureCollection.
  *
- * @param {Object[]} features – The GeoJSON dataset.
- * @param {string} attribute – The attribute to probe for categories.
- * @returns {string[]} – The categories of the attribute.
+ * @param features The GeoJSON dataset.
+ * @param attribute The attribute to probe for categories.
+ * @returns The categories of the attribute.
  */
 export function enumerateAttributeCategories(
   features: Feature[],
   attribute: string
-): string[] {
-  const categories = new Set<string>();
+): unknown[] {
+  const categories = new Set<unknown>();
 
   for (const feature of features) {
+    // Permit 0 and '0' as valid categories.
     if (
-      feature.properties?.[attribute] &&
+      feature.properties?.[attribute] !== undefined &&
+      feature.properties?.[attribute] !== null &&
+      feature.properties?.[attribute] !== '' &&
       !categories.has(feature.properties[attribute])
     ) {
       categories.add(feature.properties[attribute]);

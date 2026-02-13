@@ -367,13 +367,13 @@ export interface ConstantStroke extends ConstantStyle {
  * @property {string} attribute - The attribute of the GeoJSON data to classify.
  * @property {string[]} scheme - The color scheme to use,
  * @see CategoricalColorScheme.
- * @property {string[]} categories - The categorical values for the attribute.
+ * @property {unknown[]} categories - The categorical values for the attribute.
  * @property {number} opacity - The fill or stroke opacity.
  */
 export interface CategoricalStyle {
   type: 'Categorical';
   attribute: string;
-  categories: string[];
+  categories: unknown[];
   scheme: {
     id: CategoricalColorScheme;
     direction: SchemeDirection;

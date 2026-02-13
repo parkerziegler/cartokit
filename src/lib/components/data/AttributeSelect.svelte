@@ -34,20 +34,19 @@
   let properties = $derived(
     Object.keys(geojson.features[0]?.properties ?? {}).filter((prop) => {
       const propValue = geojson.features[0].properties?.[prop];
-      const catalogEntry = catalog.value[layerId]?.[prop];
+      const catalogEntry = catalog.value[layerId][prop];
 
       if (visualizationType === 'Quantitative') {
-        return isPropertyQuantitative(propValue) && catalogEntry?.unique >= 9;
-      } else {
-        if (isPropertyCategorical(propValue)) {
-          return true;
-        }
+        return isPropertyQuantitative(propValue) && catalogEntry.unique >= 9;
+      } else if (visualizationType === 'Categorical') {
         return (
-          isPropertyQuantitative(propValue) && (catalogEntry?.unique ?? 0) < 9
+          isPropertyCategorical(propValue) ||
+          (isPropertyQuantitative(propValue) && (catalogEntry.unique ?? 0) < 9)
         );
       }
     })
   );
+
   let options = $derived(
     properties.map((attribute) => ({
       value: attribute,

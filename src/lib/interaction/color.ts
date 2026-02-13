@@ -53,7 +53,7 @@ export function deriveColorScale(
 
       const stops = zip(categories, colors)
         .filter(
-          (pair): pair is [string, string] =>
+          (pair): pair is [string, string] | [number, string] =>
             pair[0] !== undefined && pair[1] !== undefined
         )
         .flat();
