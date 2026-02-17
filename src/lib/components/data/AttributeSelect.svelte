@@ -7,6 +7,7 @@
   import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import { catalog } from '$lib/state/catalog.svelte';
   import type { Channel, VisualizationType } from '$lib/types';
   import {
     isPropertyCategorical,
@@ -31,12 +32,21 @@
   let transformationEditorVisible = $state(false);
 
   let properties = $derived(
-    Object.keys(geojson.features[0]?.properties ?? {}).filter((prop) =>
-      visualizationType === 'Quantitative'
-        ? isPropertyQuantitative(geojson.features[0].properties?.[prop])
-        : isPropertyCategorical(geojson.features[0].properties?.[prop])
-    )
+    Object.keys(geojson.features[0]?.properties ?? {}).filter((prop) => {
+      const propValue = geojson.features[0].properties?.[prop];
+      const catalogEntry = catalog.value[layerId][prop];
+
+      if (visualizationType === 'Quantitative') {
+        return isPropertyQuantitative(propValue) && catalogEntry.unique >= 9;
+      } else if (visualizationType === 'Categorical') {
+        return (
+          isPropertyCategorical(propValue) ||
+          (isPropertyQuantitative(propValue) && (catalogEntry.unique ?? 0) < 9)
+        );
+      }
+    })
   );
+
   let options = $derived(
     properties.map((attribute) => ({
       value: attribute,

@@ -252,8 +252,7 @@ describe('deriveColorRamp', () => {
       },
       radius: 10,
       intensity: 1,
-      opacity: 1,
-      visible: true
+      opacity: 1
     });
 
     const start = d3.color(d3.interpolateSpectral(0));
@@ -300,8 +299,7 @@ describe('deriveColorRamp', () => {
       },
       radius: 10,
       intensity: 1,
-      opacity: 1,
-      visible: true
+      opacity: 1
     });
 
     const start = d3.color(d3.interpolateSpectral(1));

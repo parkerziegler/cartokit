@@ -26,6 +26,7 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
 
     set(catalog, `${layer.id}.${property}.min`, min);
     set(catalog, `${layer.id}.${property}.max`, max);
+    set(catalog, `${layer.id}.${property}.unique`, new Set(domain).size);
 
     CLASSIFICATION_METHODS.forEach((method) => {
       switch (method) {
