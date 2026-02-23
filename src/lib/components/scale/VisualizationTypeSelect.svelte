@@ -23,14 +23,16 @@
     switch (layerType) {
       case 'Choropleth':
         return [
-          { label: 'Range', value: 'Quantitative' },
+          { label: 'Discrete', value: 'DiscreteQuantitative' },
+          { label: 'Continuous', value: 'ContinuousQuantitative' },
           { label: 'Categories', value: 'Categorical' }
         ];
       case 'Proportional Symbol':
       case 'Point':
         return [
           { label: 'Single color', value: 'Constant' },
-          { label: 'Range', value: 'Quantitative' },
+          { label: 'Discrete', value: 'DiscreteQuantitative' },
+          { label: 'Continuous', value: 'ContinuousQuantitative' },
           { label: 'Categories', value: 'Categorical' }
         ];
       case 'Dot Density':
