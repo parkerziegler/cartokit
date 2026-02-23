@@ -10,7 +10,7 @@
   import type {
     CategoricalColorScheme,
     QuantitativeColorScheme,
-    QuantitativeStyle,
+    DiscreteQuantitativeStyle,
     CategoricalStyle,
     SchemeDirection
   } from '$lib/types';
@@ -21,7 +21,7 @@
 
   interface Props {
     layerId: string;
-    style: QuantitativeStyle | CategoricalStyle;
+    style: DiscreteQuantitativeStyle | CategoricalStyle;
   }
 
   let { layerId, style }: Props = $props();
@@ -33,7 +33,7 @@
   let y = $state(0);
 
   let schemes = $derived(
-    style.type === 'Quantitative'
+    style.type === 'DiscreteQuantitative'
       ? QUANTITATIVE_COLOR_SCHEMES
       : CATEGORICAL_COLOR_SCHEMES
   );
@@ -100,7 +100,7 @@
       <ColorPalette
         scheme={style.scheme.id}
         direction={style.scheme.direction}
-        count={style.type === 'Quantitative' ? style.count : undefined}
+        count={style.type === 'DiscreteQuantitative' ? style.count : undefined}
       />
     </button>
     {#if showOptions}
@@ -124,7 +124,7 @@
                 <ColorPalette
                   {scheme}
                   direction={style.scheme.direction}
-                  count={style.type === 'Quantitative'
+                  count={style.type === 'DiscreteQuantitative'
                     ? style.count
                     : undefined}
                 />

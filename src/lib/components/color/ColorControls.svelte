@@ -11,14 +11,15 @@
   import type {
     CategoricalFill,
     ConstantFill,
-    QuantitativeFill
+    DiscreteQuantitativeFill,
+    ContinuousQuantitativeFill
   } from '$lib/types';
 
   interface Props {
     layerId: string;
     layerType: 'Choropleth' | 'Proportional Symbol' | 'Point';
     geojson: FeatureCollection;
-    fill: QuantitativeFill | CategoricalFill | ConstantFill;
+    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill | CategoricalFill | ConstantFill;
   }
 
   let { layerId, layerType, geojson, fill }: Props = $props();
@@ -41,16 +42,25 @@
       channel="fill"
     />
     <ColorSchemeSelect {layerId} style={fill} />
-  {:else if fill.type === 'Quantitative'}
+  {:else if fill.type === 'DiscreteQuantitative'}
     <AttributeSelect
       {layerId}
       {geojson}
-      visualizationType={fill.type}
+      visualizationType="Quantitative"
       selected={fill.attribute}
       channel="fill"
     />
     <ClassificationMethodSelect {layerId} style={fill} />
     <StepsSelect {layerId} style={fill} />
+    <ColorSchemeSelect {layerId} style={fill} />
+  {:else if fill.type === 'ContinuousQuantitative'}
+    <AttributeSelect
+      {layerId}
+      {geojson}
+      visualizationType="Quantitative"
+      selected={fill.attribute}
+      channel="fill"
+    />
     <ColorSchemeSelect {layerId} style={fill} />
   {/if}
   <OpacityInput {layerId} channel="fill" style={fill} />
