@@ -36,7 +36,7 @@
       const propValue = geojson.features[0].properties?.[prop];
       const catalogEntry = catalog.value[layerId][prop];
 
-      if (visualizationType === 'Quantitative') {
+      if (visualizationType === 'DiscreteQuantitative' || visualizationType === 'ContinuousQuantitative') {
         return isPropertyQuantitative(propValue) && catalogEntry.unique >= 9;
       } else if (visualizationType === 'Categorical') {
         return (

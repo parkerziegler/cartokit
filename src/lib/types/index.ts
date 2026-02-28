@@ -9,7 +9,6 @@ export type ClassificationMethod =
   | 'Equal Interval'
   | 'Jenks'
   | 'Manual';
-
 /**
  * Represents a quantitative D3 color scheme.
  */
@@ -42,6 +41,36 @@ export type QuantitativeColorScheme =
   | 'schemeRdYlGn'
   | 'schemeSpectral';
 
+
+export type QuantitativeColorInterpolator =
+  | 'interpolatorBlues'
+  | 'interpolatorGreens'
+  | 'interpolatorGreys'
+  | 'interpolatorOranges'
+  | 'interpolatorPurples'
+  | 'interpolatorReds'
+  | 'interpolatorBuGn'
+  | 'interpolatorBuPu'
+  | 'interpolatorGnBu'
+  | 'interpolatorOrRd'
+  | 'interpolatorPuBuGn'
+  | 'interpolatorPuBu'
+  | 'interpolatorPuRd'
+  | 'interpolatorYlGnBu'
+  | 'interpolatorYlGn'
+  | 'interpolatorYlOrBr'
+  | 'interpolatorYlOrRd'
+  | 'interpolatorBrBG'
+  | 'interpolatorPRGn'
+  | 'interpolatorPiYG'
+  | 'interpolatorPuOr'
+  | 'interpolatorRdBu'
+  | 'interpolatorRdGy'
+  | 'interpolatorRdPu'
+  | 'interpolatorRdYlBu'
+  | 'interpolatorRdYlGn'
+  | 'interpolatorSpectral';
+
 /**
  * Represents a categorical D3 color scheme.
  */
@@ -62,6 +91,11 @@ export type CategoricalColorScheme =
  * Represents the direction of a color scheme.
  */
 export type SchemeDirection = 'Forward' | 'Reverse';
+
+/**
+ * Represents the direction of a color interpolator.
+ */
+export type InterpolatorDirection = 'Forward' | 'Reverse';
 
 /**
  * Represents a color ramp.
@@ -109,7 +143,7 @@ export type Channel = 'fill' | 'stroke' | 'size' | 'dot';
 /**
  * Represents the visualization type for a given channel.
  */
-export type VisualizationType = 'Quantitative' | 'Categorical' | 'Constant';
+export type VisualizationType = 'DiscreteQuantitative' | 'ContinuousQuantitative' | 'Categorical' | 'Constant';
 
 /**
  * Represents the kind of transformation.
@@ -214,7 +248,7 @@ export interface CartoKitPointLayer extends Layer {
   type: 'Point';
   style: {
     size: number;
-    fill: ConstantFill | QuantitativeFill | CategoricalFill;
+    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill | CategoricalFill;
     stroke: ConstantStroke;
   };
 }
@@ -261,7 +295,7 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
   type: 'Proportional Symbol';
   style: {
     size: ProportionalSymbolStyle;
-    fill: QuantitativeFill | CategoricalFill | ConstantFill;
+    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill | CategoricalFill | ConstantFill;
     stroke: ConstantStroke;
   };
 }
@@ -277,7 +311,7 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
 export interface CartoKitChoroplethLayer extends Layer {
   type: 'Choropleth';
   style: {
-    fill: QuantitativeFill | CategoricalFill;
+    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill | CategoricalFill;
     stroke: ConstantStroke;
   };
 }
@@ -405,8 +439,8 @@ export type CategoricalFill = CategoricalStyle;
  * @property {number} opacity - The fill or stroke opacity.
  * @property {boolean} visible - Whether the style is visible.
  */
-export interface QuantitativeStyle {
-  type: 'Quantitative';
+export interface DiscreteQuantitativeStyle {
+  type: 'DiscreteQuantitative';
   attribute: string;
   method: ClassificationMethod;
   scheme: {
@@ -419,10 +453,23 @@ export interface QuantitativeStyle {
   visible: boolean;
 }
 
+export interface ContinuousQuantitativeStyle {
+  type: 'ContinuousQuantitative';
+  attribute: string;
+  method: "Continuous";
+  interpolator: {
+    id: QuantitativeColorInterpolator;
+    direction: InterpolatorDirection;
+  };
+  opacity: number;
+  visible: boolean;
+}
+
 /**
- * An alias for QuantitativeStyle. Should be used when typing a fill style.
+ * Aliases for QuantitativeStyle. Should be used when typing a fill style.
  */
-export type QuantitativeFill = QuantitativeStyle;
+export type DiscreteQuantitativeFill = DiscreteQuantitativeStyle;
+export type ContinuousQuantitativeFill = ContinuousQuantitativeStyle;
 
 /**
  * Represents a proportional symbol size style object. A proportional symbol

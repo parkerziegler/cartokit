@@ -20,7 +20,7 @@
 <MenuItem title="Dots">
   <AttributeSelect
     layerId={layer.id}
-    visualizationType="Quantitative"
+    visualizationType="DiscreteQuantitative"
     geojson={layer.data.geojson}
     selected={layer.style.dot.attribute}
     channel="dot"
