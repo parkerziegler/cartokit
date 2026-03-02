@@ -51,13 +51,27 @@ export function deriveColorScale(
       const { interpolator, attribute } = style;
       const NUM_STEPS = 10;
 
-      const { min, max } = catalog.value[layerId][attribute];
+      if (!layerId) {
+        throw new Error(
+          'deriveColorScale requires layerId for ContinuousQuantitative styles'
+        );
+      }
+
+      const attributeRange = catalog.value[layerId]?.[attribute];
+
+      if (!attributeRange) {
+        throw new Error(
+          `Missing catalog range for layer '${layerId}' attribute '${attribute}'`
+        );
+      }
+
+      const { min, max } = attributeRange;
       const colorInterpolator = materializeColorInterpolator(
         interpolator.id,
         interpolator.direction
       );
 
-      // ample the interpolator at regular intervals
+      // Sample the interpolator at regular intervals.
       const prelude: ExpressionSpecification = [
         'interpolate',
         ['linear'],

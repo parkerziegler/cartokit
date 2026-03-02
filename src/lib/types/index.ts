@@ -248,7 +248,7 @@ export interface CartoKitPointLayer extends Layer {
   type: 'Point';
   style: {
     size: number;
-    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill | CategoricalFill;
+    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill | CategoricalFill | ConstantFill;
     stroke: ConstantStroke;
   };
 }

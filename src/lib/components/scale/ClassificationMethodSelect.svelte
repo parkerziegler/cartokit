@@ -5,22 +5,28 @@
   import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import type { ClassificationMethod, QuantitativeStyle } from '$lib/types';
+  import type {
+    ClassificationMethod,
+    ContinuousQuantitativeStyle,
+    DiscreteQuantitativeStyle
+  } from '$lib/types';
   import { CLASSIFICATION_METHODS } from '$lib/utils/classification';
   import { layout } from '$lib/stores/layout';
 
+  type QuantitativeMethod = ClassificationMethod | 'Continuous';
+
   interface Props {
     layerId: string;
-    style: QuantitativeStyle;
+    style: DiscreteQuantitativeStyle | ContinuousQuantitativeStyle;
   }
 
   let { layerId, style }: Props = $props();
 
   let displayBreaksEditor = $state(false);
 
-  const options = CLASSIFICATION_METHODS.map((scale) => ({
-    value: scale,
-    label: scale
+  const options = ['Continuous', ...CLASSIFICATION_METHODS].map((method) => ({
+    value: method,
+    label: method
   }));
 
   function showBreaksEditor() {
@@ -34,17 +40,44 @@
   async function onClassificationMethodChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    if (event.currentTarget.value === 'Manual') {
+    const method = event.currentTarget.value as QuantitativeMethod;
+
+    if (method === 'Manual') {
       showBreaksEditor();
     } else {
       hideBreaksEditor();
+    }
+
+    if (method === 'Continuous') {
+      if (style.type === 'ContinuousQuantitative') {
+        return;
+      }
+
+      await applyDiff({
+        type: 'fill-visualization-type',
+        layerId,
+        payload: {
+          visualizationType: 'ContinuousQuantitative'
+        }
+      });
+      return;
+    }
+
+    if (style.type === 'ContinuousQuantitative') {
+      await applyDiff({
+        type: 'fill-visualization-type',
+        layerId,
+        payload: {
+          visualizationType: 'DiscreteQuantitative'
+        }
+      });
     }
 
     const diff: CartoKitDiff = {
       type: 'fill-classification-method',
       layerId,
       payload: {
-        method: event.currentTarget.value as ClassificationMethod
+        method
       }
     };
 
@@ -60,7 +93,7 @@
     id="fill-classification-method-select"
     onchange={onClassificationMethodChange}
   />
-  {#if style.method === 'Manual'}
+  {#if style.type === 'DiscreteQuantitative' && style.method === 'Manual'}
     <button onclick={showBreaksEditor}>
       <MoreIcon />
     </button>
@@ -79,6 +112,8 @@
     {#snippet header()}
       <p class="font-sans text-sm font-medium tracking-wider">Set steps</p>
     {/snippet}
-    <StepsEditor {layerId} {style} />
+    {#if style.type === 'DiscreteQuantitative'}
+      <StepsEditor {layerId} {style} />
+    {/if}
   </Dialog>
 </Portal>
