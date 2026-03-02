@@ -47,10 +47,20 @@ export function materializeColorInterpolator(
   interpolator: QuantitativeColorInterpolator,
   direction: InterpolatorDirection
 ): (t: number) => string {
-  const interpolateFn = d3[interpolator];
+  const d3Interpolator = interpolator.replace(
+    /^interpolator/,
+    'interpolate'
+  ) as keyof typeof d3;
+  const interpolateFn = d3[d3Interpolator] as unknown;
+
+  if (typeof interpolateFn !== 'function') {
+    throw new Error(`Unknown D3 interpolator '${interpolator}'`);
+  }
+
+  const interpolate = interpolateFn as (t: number) => string;
 
   return (t: number) => {
     const normalizedT = direction === 'Reverse' ? 1 - t : t;
-    return d3.rgb(interpolateFn(normalizedT)).formatHex();
+    return d3.rgb(interpolate(normalizedT)).formatHex();
   };
 }

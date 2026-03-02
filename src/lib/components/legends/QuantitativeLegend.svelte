@@ -1,10 +1,14 @@
 <script lang="ts">
-  import type { ConstantStroke, LayerType, QuantitativeFill } from '$lib/types';
+  import type {
+    ConstantStroke,
+    DiscreteQuantitativeFill,
+    LayerType
+  } from '$lib/types';
   import { catalog } from '$lib/state/catalog.svelte';
   import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
-    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill;
+    fill: DiscreteQuantitativeFill;
     stroke: ConstantStroke;
     layerId: string;
     layerType: LayerType;

@@ -2,6 +2,7 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import { onClickOutside } from '$lib/attachments/on-click-outside';
   import { focus } from '$lib/actions/focus.svelte';
+  import ColorInterpolator from '$lib/components/channel/shared/ColorInterpolator.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
@@ -11,10 +12,7 @@
     QuantitativeColorInterpolator,
     InterpolatorDirection
   } from '$lib/types';
-  import {
-    QUANTITATIVE_COLOR_INTERPOLATORS,
-    materializeColorInterpolator
-  } from '$lib/utils/color/interpolator';
+  import { QUANTITATIVE_COLOR_INTERPOLATORS } from '$lib/utils/color/interpolator';
 
   interface Props {
     layerId: string;
@@ -88,17 +86,10 @@
       class="flex-1"
       {@attach onClickOutside({ callback: onClickOutsideCurrentInterpolator })}
     >
-      <div class="flex h-4 w-full">
-        {#each Array.from({ length: 10 }) as _, i (i)}
-          {@const t = i / 9}
-          {@const interpolator = materializeColorInterpolator(
-            style.interpolator.id,
-            style.interpolator.direction
-          )}
-          {@const color = interpolator(t)}
-          <span style="background-color: {color};" class="flex-1"></span>
-        {/each}
-      </div>
+      <ColorInterpolator
+        interpolator={style.interpolator.id}
+        direction={style.interpolator.direction}
+      />
     </button>
     {#if showOptions}
       <Portal
@@ -118,17 +109,10 @@
                 use:focus={() => interpolator === style.interpolator.id}
                 class="flex-1 p-2 hover:bg-slate-600"
               >
-                <div class="flex h-4 w-full">
-                  {#each Array.from({ length: 10 }) as _, i (i)}
-                    {@const t = i / 9}
-                    {@const interpolatorFn = materializeColorInterpolator(
-                      interpolator,
-                      style.interpolator.direction
-                    )}
-                    {@const color = interpolatorFn(t)}
-                    <span style="background-color: {color};" class="flex-1"></span>
-                  {/each}
-                </div>
+                <ColorInterpolator
+                  interpolator={interpolator}
+                  direction={style.interpolator.direction}
+                />
               </button>
             </li>
           {/each}

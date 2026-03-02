@@ -43,26 +43,23 @@
       channel="fill"
     />
     <ColorSchemeSelect {layerId} style={fill} />
-  {:else if fill.type === 'DiscreteQuantitative'}
+  {:else if
+    fill.type === 'DiscreteQuantitative' ||
+      fill.type === 'ContinuousQuantitative'}
     <AttributeSelect
       {layerId}
       {geojson}
-      visualizationType="Quantitative"
+      visualizationType={fill.type}
       selected={fill.attribute}
       channel="fill"
     />
     <ClassificationMethodSelect {layerId} style={fill} />
-    <StepsSelect {layerId} style={fill} />
-    <ColorSchemeSelect {layerId} style={fill} />
-  {:else if fill.type === 'ContinuousQuantitative'}
-    <AttributeSelect
-      {layerId}
-      {geojson}
-      visualizationType="Quantitative"
-      selected={fill.attribute}
-      channel="fill"
-    />
-    <ColorInterpolatorSelect {layerId} style={fill} />
+    {#if fill.type === 'DiscreteQuantitative'}
+      <StepsSelect {layerId} style={fill} />
+      <ColorSchemeSelect {layerId} style={fill} />
+    {:else}
+      <ColorInterpolatorSelect {layerId} style={fill} />
+    {/if}
   {/if}
   <OpacityInput {layerId} channel="fill" style={fill} />
 </div>
