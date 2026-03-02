@@ -4,7 +4,7 @@
   import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
-    fill: QuantitativeFill;
+    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill;
     stroke: ConstantStroke;
     layerId: string;
     layerType: LayerType;
