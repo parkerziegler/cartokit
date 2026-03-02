@@ -174,6 +174,50 @@ export async function patchFillDiffs(
 
       break;
     }
+    case 'fill-color-interpolator': {
+      const layer = ir.layers[diff.layerId] as
+        | CartoKitChoroplethLayer
+        | CartoKitPointLayer
+        | CartoKitProportionalSymbolLayer;
+
+      if (layer.style.fill.type === 'ContinuousQuantitative') {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-color-interpolator',
+          layerId: diff.layerId,
+          payload: {
+            interpolator: layer.style.fill.interpolator.id
+          }
+        };
+
+        // Apply the patch.
+        layer.style.fill.interpolator.id = diff.payload.interpolator;
+      }
+
+      break;
+    }
+    case 'fill-color-interpolator-direction': {
+      const layer = ir.layers[diff.layerId] as
+        | CartoKitChoroplethLayer
+        | CartoKitPointLayer
+        | CartoKitProportionalSymbolLayer;
+
+      if (layer.style.fill.type === 'ContinuousQuantitative') {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-color-interpolator-direction',
+          layerId: diff.layerId,
+          payload: {
+            direction: layer.style.fill.interpolator.direction
+          }
+        };
+
+        // Apply the patch.
+        layer.style.fill.interpolator.direction = diff.payload.direction;
+      }
+
+      break;
+    }
     case 'fill-classification-method': {
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer

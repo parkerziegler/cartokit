@@ -57,7 +57,7 @@ export function deriveColorScale(
         interpolator.direction
       );
 
-      // Sample the interpolator at regular intervals
+      // ample the interpolator at regular intervals
       const prelude: ExpressionSpecification = [
         'interpolate',
         ['linear'],
