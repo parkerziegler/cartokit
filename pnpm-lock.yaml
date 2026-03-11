@@ -58,7 +58,7 @@ importers:
         version: 3.8.1
       simple-statistics:
         specifier: ^7.8.7
-        version: 7.8.8
+        version: 7.8.9
       ts-morph:
         specifier: ^27.0.0
         version: 27.0.2
@@ -2828,8 +2828,8 @@ packages:
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
 
-  simple-statistics@7.8.8:
-    resolution: {integrity: sha512-CUtP0+uZbcbsFpqEyvNDYjJCl+612fNgjT8GaVuvMG7tBuJg8gXGpsP5M7X658zy0IcepWOZ6nPBu1Qb9ezA1w==}
+  simple-statistics@7.8.9:
+    resolution: {integrity: sha512-YT6MLqYsz7y1rQZOLFlOCCgSRpCi6bqY417yhoOLI7aVoBi29dD39EPrOE03W9DY25H0J0jizVsHZnkLzyGJFg==}
 
   sirv@3.0.2:
     resolution: {integrity: sha512-2wcC/oGxHis/BoHkkPwldgiPSYcpZK3JU28WoMVv55yHJgcZ8rlXvuG9iZggz+sU1d4bRgIGASwyWqjxu3FM0g==}
@@ -6343,7 +6343,7 @@ snapshots:
 
   siginfo@2.0.0: {}
 
-  simple-statistics@7.8.8: {}
+  simple-statistics@7.8.9: {}
 
   sirv@3.0.2:
     dependencies:
