@@ -20,7 +20,7 @@
     "@floating-ui/dom": "^1.7.3",
     "@lezer/highlight": "^1.2.1",
     "@turf/turf": "^7.2.0",
-    "@vercel/analytics": "^1.5.0",
+    "@vercel/analytics": "^2.0.0",
     "codemirror": "^6.0.1",
     "comlink": "^4.4.2",
     "d3": "^7.9.0",
