@@ -20,7 +20,11 @@
     layerId: string;
     layerType: 'Choropleth' | 'Proportional Symbol' | 'Point';
     geojson: FeatureCollection;
-    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill | CategoricalFill | ConstantFill;
+    fill:
+      | DiscreteQuantitativeFill
+      | ContinuousQuantitativeFill
+      | CategoricalFill
+      | ConstantFill;
   }
 
   let { layerId, layerType, geojson, fill }: Props = $props();
@@ -43,9 +47,7 @@
       channel="fill"
     />
     <ColorSchemeSelect {layerId} style={fill} />
-  {:else if
-    fill.type === 'DiscreteQuantitative' ||
-      fill.type === 'ContinuousQuantitative'}
+  {:else if fill.type === 'DiscreteQuantitative' || fill.type === 'ContinuousQuantitative'}
     <AttributeSelect
       {layerId}
       {geojson}

@@ -25,7 +25,11 @@ import { catalog } from '$lib/state/catalog.svelte';
  * a color scale.
  */
 export function deriveColorScale(
-  style: ConstantStyle | CategoricalStyle | DiscreteQuantitativeStyle | ContinuousQuantitativeStyle,
+  style:
+    | ConstantStyle
+    | CategoricalStyle
+    | DiscreteQuantitativeStyle
+    | ContinuousQuantitativeStyle,
   layerId?: string
 ): ExpressionSpecification | string {
   switch (style.type) {

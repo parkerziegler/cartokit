@@ -222,7 +222,8 @@ export async function patchFillDiffs(
 
       break;
     }
-    case 'fill-classification-method': { // add conditional logic for the continuous case here & some work needs to be done here. fillEncodingType to determine whether contin or discrete
+    case 'fill-classification-method': {
+      // add conditional logic for the continuous case here & some work needs to be done here. fillEncodingType to determine whether contin or discrete
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer
         | CartoKitPointLayer
@@ -231,7 +232,8 @@ export async function patchFillDiffs(
       if (
         layer.style.fill.type === 'DiscreteQuantitative' &&
         diff.payload.method !== 'Continuous'
-      ) { // perhaps change this to Quantitative (rest of logic elsewhere)
+      ) {
+        // perhaps change this to Quantitative (rest of logic elsewhere)
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'fill-classification-method',
@@ -304,7 +306,8 @@ export async function patchFillDiffs(
 
       break;
     }
-    case 'fill-visualization-type': { // the work should be done
+    case 'fill-visualization-type': {
+      // the work should be done
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer
         | CartoKitPointLayer
