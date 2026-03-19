@@ -113,9 +113,7 @@ export async function reconFillDiffs(
       break;
     }
     case 'add-fill': {
-      const layer = targetIR.layers[
-        diff.layerId
-      ] as // | CartoKitChoroplethLayer
+      const layer = targetIR.layers[diff.layerId] as  // | CartoKitChoroplethLayer
         | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
