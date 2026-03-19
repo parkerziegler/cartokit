@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ColorInterpolator from '$lib/components/channel/shared/ColorInterpolator.svelte';
   import type {
     ConstantStroke,
     DiscreteQuantitativeFill,
@@ -7,8 +8,6 @@
   } from '$lib/types';
   import { catalog } from '$lib/state/catalog.svelte';
   import { materializeColorScheme } from '$lib/utils/color/scheme';
-  import { materializeColorInterpolator } from '$lib/utils/color/interpolator';
-  import { hexWithOpacity } from '$lib/utils/color';
 
   interface Props {
     fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill;
@@ -24,35 +23,21 @@
   let isDiscrete = $derived(fill.type === 'DiscreteQuantitative');
   let colors = $derived.by(() => {
     if (isDiscrete) {
-      return materializeColorScheme((fill as DiscreteQuantitativeFill).scheme.id, (fill as DiscreteQuantitativeFill).scheme.direction, (fill as DiscreteQuantitativeFill).count);
+      return materializeColorScheme(
+        (fill as DiscreteQuantitativeFill).scheme.id,
+        (fill as DiscreteQuantitativeFill).scheme.direction,
+        (fill as DiscreteQuantitativeFill).count
+      );
     }
     return [];
   });
-
-  let gradient = $derived.by(() => {
-    if (!isDiscrete) {
-      const contFill = fill as ContinuousQuantitativeFill;
-      const colorInterpolator = materializeColorInterpolator(
-        contFill.interpolator.id,
-        contFill.interpolator.direction
-      );
-      return Array.from({ length: 11 }, (_, i) => {
-        const t = i / 10;
-        return `${colorInterpolator(t)} ${t * 100}%`;
-      }).join(', ');
-    }
-    return '';
-  });
-
-  let border = $derived(
-    stroke.visible
-      ? `${stroke.width}px solid ${hexWithOpacity(stroke.color, stroke.opacity)}`
-      : '0 solid transparent'
-  );
 </script>
 
 <div class={['flex flex-col gap-2', visible ? 'opacity-100' : 'opacity-75']}>
-  <p class="font-semibold">{fill.attribute} ↓</p>
+  <p class={isDiscrete ? 'font-semibold' : 'text-xs font-semibold'}>
+    {fill.attribute}
+    {isDiscrete ? '↓' : '→'}
+  </p>
   {#if isDiscrete}
     <div class="flex gap-2 rounded-md bg-slate-900">
       <ul class="mt-3 flex flex-col gap-2">
@@ -99,12 +84,15 @@
       </ul>
     </div>
   {:else}
-    <div class="flex w-32 flex-col gap-1">
-      <div
-        class="h-4 rounded-sm"
-        style="background: linear-gradient(to right, {gradient}); border: {border}; opacity: {fill.opacity};"
-      ></div>
-      <div class="text-3xs flex justify-between font-mono">
+    <div class="flex max-w-48 flex-col gap-2">
+      <div style="opacity: {fill.opacity};">
+        <ColorInterpolator
+          interpolator={(fill as ContinuousQuantitativeFill).interpolator.id}
+          direction={(fill as ContinuousQuantitativeFill).interpolator
+            .direction}
+        />
+      </div>
+      <div class="text-2xs flex justify-between font-mono">
         <span>{min.toFixed(2)}</span>
         <span>{max.toFixed(2)}</span>
       </div>

@@ -110,7 +110,7 @@
                 class="flex-1 p-2 hover:bg-slate-600"
               >
                 <ColorInterpolator
-                  interpolator={interpolator}
+                  {interpolator}
                   direction={style.interpolator.direction}
                 />
               </button>

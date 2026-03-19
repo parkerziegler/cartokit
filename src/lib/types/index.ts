@@ -41,7 +41,6 @@ export type QuantitativeColorScheme =
   | 'schemeRdYlGn'
   | 'schemeSpectral';
 
-
 export type QuantitativeColorInterpolator =
   | 'interpolatorBlues'
   | 'interpolatorGreens'
@@ -143,7 +142,11 @@ export type Channel = 'fill' | 'stroke' | 'size' | 'dot';
 /**
  * Represents the visualization type for a given channel.
  */
-export type VisualizationType = 'DiscreteQuantitative' | 'ContinuousQuantitative' | 'Categorical' | 'Constant';
+export type VisualizationType =
+  | 'DiscreteQuantitative'
+  | 'ContinuousQuantitative'
+  | 'Categorical'
+  | 'Constant';
 
 /**
  * Represents the kind of transformation.
@@ -248,7 +251,11 @@ export interface CartoKitPointLayer extends Layer {
   type: 'Point';
   style: {
     size: number;
-    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill | CategoricalFill | ConstantFill;
+    fill:
+      | DiscreteQuantitativeFill
+      | ContinuousQuantitativeFill
+      | CategoricalFill
+      | ConstantFill;
     stroke: ConstantStroke;
   };
 }
@@ -295,7 +302,11 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
   type: 'Proportional Symbol';
   style: {
     size: ProportionalSymbolStyle;
-    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill | CategoricalFill | ConstantFill;
+    fill:
+      | DiscreteQuantitativeFill
+      | ContinuousQuantitativeFill
+      | CategoricalFill
+      | ConstantFill;
     stroke: ConstantStroke;
   };
 }
@@ -311,7 +322,10 @@ export interface CartoKitProportionalSymbolLayer extends Layer {
 export interface CartoKitChoroplethLayer extends Layer {
   type: 'Choropleth';
   style: {
-    fill: DiscreteQuantitativeFill | ContinuousQuantitativeFill | CategoricalFill;
+    fill:
+      | DiscreteQuantitativeFill
+      | ContinuousQuantitativeFill
+      | CategoricalFill;
     stroke: ConstantStroke;
   };
 }
@@ -456,7 +470,7 @@ export interface DiscreteQuantitativeStyle {
 export interface ContinuousQuantitativeStyle {
   type: 'ContinuousQuantitative';
   attribute: string;
-  method: "Continuous";
+  method: 'Continuous';
   interpolator: {
     id: QuantitativeColorInterpolator;
     direction: InterpolatorDirection;

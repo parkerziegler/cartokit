@@ -5,36 +5,37 @@ import type {
   InterpolatorDirection
 } from '$lib/types';
 
-export const QUANTITATIVE_COLOR_INTERPOLATORS: QuantitativeColorInterpolator[] = [
-  // Sequential interpolators.
-  'interpolatorBlues',
-  'interpolatorGreens',
-  'interpolatorGreys',
-  'interpolatorOranges',
-  'interpolatorPurples',
-  'interpolatorReds',
-  'interpolatorBuGn',
-  'interpolatorBuPu',
-  'interpolatorGnBu',
-  'interpolatorOrRd',
-  'interpolatorPuBuGn',
-  'interpolatorPuBu',
-  'interpolatorPuRd',
-  'interpolatorYlGnBu',
-  'interpolatorYlGn',
-  'interpolatorYlOrBr',
-  'interpolatorYlOrRd',
-  // Diverging interpolators.
-  'interpolatorBrBG',
-  'interpolatorPRGn',
-  'interpolatorPiYG',
-  'interpolatorPuOr',
-  'interpolatorRdBu',
-  'interpolatorRdGy',
-  'interpolatorRdYlBu',
-  'interpolatorRdYlGn',
-  'interpolatorSpectral'
-];
+export const QUANTITATIVE_COLOR_INTERPOLATORS: QuantitativeColorInterpolator[] =
+  [
+    // Sequential interpolators.
+    'interpolatorBlues',
+    'interpolatorGreens',
+    'interpolatorGreys',
+    'interpolatorOranges',
+    'interpolatorPurples',
+    'interpolatorReds',
+    'interpolatorBuGn',
+    'interpolatorBuPu',
+    'interpolatorGnBu',
+    'interpolatorOrRd',
+    'interpolatorPuBuGn',
+    'interpolatorPuBu',
+    'interpolatorPuRd',
+    'interpolatorYlGnBu',
+    'interpolatorYlGn',
+    'interpolatorYlOrBr',
+    'interpolatorYlOrRd',
+    // Diverging interpolators.
+    'interpolatorBrBG',
+    'interpolatorPRGn',
+    'interpolatorPiYG',
+    'interpolatorPuOr',
+    'interpolatorRdBu',
+    'interpolatorRdGy',
+    'interpolatorRdYlBu',
+    'interpolatorRdYlGn',
+    'interpolatorSpectral'
+  ];
 
 /**
  * Materialize a color interpolator into a continuous interpolation function.
