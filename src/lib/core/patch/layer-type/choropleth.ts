@@ -37,7 +37,7 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
         },
         style: {
           fill: {
-            type: 'Quantitative',
+            type: 'DiscreteQuantitative',
             attribute: layer.style.dot.attribute,
             method: DEFAULT_METHOD,
             scheme: {
@@ -86,10 +86,10 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
         },
         style: {
           fill:
-            layer.style.fill.type === 'Quantitative'
+            layer.style.fill.type !== 'Constant'
               ? layer.style.fill
               : {
-                  type: 'Quantitative',
+                  type: 'DiscreteQuantitative',
                   attribute,
                   method: DEFAULT_METHOD,
                   scheme: {
@@ -120,7 +120,7 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
         data: layer.data,
         style: {
           fill: {
-            type: 'Quantitative',
+            type: 'DiscreteQuantitative',
             attribute,
             method: DEFAULT_METHOD,
             scheme: {
