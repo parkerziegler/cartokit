@@ -71,12 +71,15 @@ export function deriveColorScale(
         interpolator.direction
       );
 
+      if (min === max) {
+        return colorInterpolator(0.5);
+      }
+
       // Sample the interpolator at regular intervals.
       const prelude: ExpressionSpecification = [
         'interpolate',
         ['linear'],
-        ['get', attribute],
-        min
+        ['get', attribute]
       ];
 
       // Add color stops at regular intervals across the data range

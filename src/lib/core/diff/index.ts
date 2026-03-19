@@ -80,7 +80,7 @@ interface FillColorInterpolatorDirectionDiff extends LayerDiff {
 interface FillClassificationMethodDiff extends LayerDiff {
   type: 'fill-classification-method';
   payload: {
-    method: ClassificationMethod;
+    method: ClassificationMethod | 'Continuous'; // reuse this diff
   };
 }
 

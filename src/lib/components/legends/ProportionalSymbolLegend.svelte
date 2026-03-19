@@ -69,7 +69,7 @@
       layerType="Proportional Symbol"
       visible={layer.layout.visible}
     />
-  {:else if layer.style.fill.visible && layer.style.fill.type === 'DiscreteQuantitative'}
+  {:else if layer.style.fill.visible && (layer.style.fill.type === 'DiscreteQuantitative' || layer.style.fill.type === 'ContinuousQuantitative')}
     <QuantitativeLegend
       fill={layer.style.fill}
       stroke={layer.style.stroke}

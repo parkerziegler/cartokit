@@ -37,7 +37,7 @@
     displayBreaksEditor = false;
   }
 
-  async function onClassificationMethodChange(
+  async function onClassificationMethodChange( // clean this to chnage the visualization type
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
     const method = event.currentTarget.value as QuantitativeMethod;
