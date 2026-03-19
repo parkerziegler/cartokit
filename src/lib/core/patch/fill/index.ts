@@ -86,6 +86,18 @@ export async function patchFillDiffs(
           layer.id,
           layer.style.fill
         );
+      } else if (layer.style.fill.type === 'ContinuousQuantitative') {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-attribute',
+          layerId: diff.layerId,
+          payload: {
+            attribute: layer.style.fill.attribute
+          }
+        };
+
+        // Apply the patch.
+        layer.style.fill.attribute = diff.payload.attribute;
       } else if (layer.style.fill.type === 'Categorical') {
         // Derive the inverse diff prior to applying the patch.
         inverse = {

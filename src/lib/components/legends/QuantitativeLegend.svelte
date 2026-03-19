@@ -85,13 +85,10 @@
     </div>
   {:else}
     <div class="flex max-w-48 flex-col gap-2">
-      <div style="opacity: {fill.opacity};">
-        <ColorInterpolator
-          interpolator={(fill as ContinuousQuantitativeFill).interpolator.id}
-          direction={(fill as ContinuousQuantitativeFill).interpolator
-            .direction}
-        />
-      </div>
+      <ColorInterpolator
+        interpolator={(fill as ContinuousQuantitativeFill).interpolator.id}
+        direction={(fill as ContinuousQuantitativeFill).interpolator.direction}
+      />
       <div class="text-2xs flex justify-between font-mono">
         <span>{min.toFixed(2)}</span>
         <span>{max.toFixed(2)}</span>
