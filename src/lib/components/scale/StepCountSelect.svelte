@@ -3,11 +3,11 @@
 
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import type { QuantitativeStyle } from '$lib/types';
+  import type { DiscreteQuantitativeStyle } from '$lib/types';
 
   interface Props {
     layerId: string;
-    style: QuantitativeStyle;
+    style: DiscreteQuantitativeStyle;
   }
 
   let { layerId, style }: Props = $props();

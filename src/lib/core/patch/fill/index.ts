@@ -8,7 +8,8 @@ import type {
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer,
-  QuantitativeFill
+  DiscreteQuantitativeFill,
+  QuantitativeColorInterpolator
 } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
@@ -28,10 +29,10 @@ import type { CartoKitDiff } from '$lib/core/diff';
  * Recompute the quantitative breaks for a given layer and fill style.
  *
  * @param layerId The ID of the {@link CartoKitLayer}.
- * @param fill The current {@link QuantitativeFill} style.
+ * @param fill The current {@link DiscreteQuantitativeFill} style.
  * @returns The new breaks for the given layer and fill style.
  */
-function recomputeBreaks(layerId: string, fill: QuantitativeFill) {
+function recomputeBreaks(layerId: string, fill: DiscreteQuantitativeFill) {
   const colors = d3[fill.scheme.id][fill.count];
 
   return deriveThresholds({
@@ -43,6 +44,9 @@ function recomputeBreaks(layerId: string, fill: QuantitativeFill) {
     thresholds: fill.thresholds
   });
 }
+
+const DEFAULT_QUANTITATIVE_INTERPOLATOR: QuantitativeColorInterpolator =
+  'interpolatorSpectral';
 
 /**
  * Patch fill-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
@@ -66,7 +70,7 @@ export async function patchFillDiffs(
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
 
-      if (layer.style.fill.type === 'Quantitative') {
+      if (layer.style.fill.type === 'DiscreteQuantitative') {
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'fill-attribute',
@@ -82,6 +86,18 @@ export async function patchFillDiffs(
           layer.id,
           layer.style.fill
         );
+      } else if (layer.style.fill.type === 'ContinuousQuantitative') {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-attribute',
+          layerId: diff.layerId,
+          payload: {
+            attribute: layer.style.fill.attribute
+          }
+        };
+
+        // Apply the patch.
+        layer.style.fill.attribute = diff.payload.attribute;
       } else if (layer.style.fill.type === 'Categorical') {
         // Derive the inverse diff prior to applying the patch.
         inverse = {
@@ -131,7 +147,7 @@ export async function patchFillDiffs(
         | CartoKitProportionalSymbolLayer;
 
       if (
-        layer.style.fill.type === 'Quantitative' ||
+        layer.style.fill.type === 'DiscreteQuantitative' ||
         layer.style.fill.type === 'Categorical'
       ) {
         // Derive the inverse diff prior to applying the patch.
@@ -156,7 +172,7 @@ export async function patchFillDiffs(
         | CartoKitProportionalSymbolLayer;
 
       if (
-        layer.style.fill.type === 'Quantitative' ||
+        layer.style.fill.type === 'DiscreteQuantitative' ||
         layer.style.fill.type === 'Categorical'
       ) {
         // Derive the inverse diff prior to applying the patch.
@@ -174,13 +190,62 @@ export async function patchFillDiffs(
 
       break;
     }
-    case 'fill-classification-method': {
+    case 'fill-color-interpolator': {
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer;
 
-      if (layer.style.fill.type === 'Quantitative') {
+      if (layer.style.fill.type === 'ContinuousQuantitative') {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-color-interpolator',
+          layerId: diff.layerId,
+          payload: {
+            interpolator: layer.style.fill.interpolator.id
+          }
+        };
+
+        // Apply the patch.
+        layer.style.fill.interpolator.id = diff.payload.interpolator;
+      }
+
+      break;
+    }
+    case 'fill-color-interpolator-direction': {
+      const layer = ir.layers[diff.layerId] as
+        | CartoKitChoroplethLayer
+        | CartoKitPointLayer
+        | CartoKitProportionalSymbolLayer;
+
+      if (layer.style.fill.type === 'ContinuousQuantitative') {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-color-interpolator-direction',
+          layerId: diff.layerId,
+          payload: {
+            direction: layer.style.fill.interpolator.direction
+          }
+        };
+
+        // Apply the patch.
+        layer.style.fill.interpolator.direction = diff.payload.direction;
+      }
+
+      break;
+    }
+    case 'fill-classification-method': {
+      // add conditional logic for the continuous case here & some work needs to be done here. fillEncodingType to determine whether contin or discrete
+      const layer = ir.layers[diff.layerId] as
+        | CartoKitChoroplethLayer
+        | CartoKitPointLayer
+        | CartoKitProportionalSymbolLayer;
+
+      if (
+        layer.style.fill.type === 'DiscreteQuantitative' &&
+        diff.payload.method !== 'Continuous'
+      ) {
+        // perhaps change this to Quantitative (rest of logic elsewhere)
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'fill-classification-method',
@@ -206,7 +271,7 @@ export async function patchFillDiffs(
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer;
 
-      if (layer.style.fill.type === 'Quantitative') {
+      if (layer.style.fill.type === 'DiscreteQuantitative') {
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'fill-step-count',
@@ -232,7 +297,7 @@ export async function patchFillDiffs(
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer;
 
-      if (layer.style.fill.type === 'Quantitative') {
+      if (layer.style.fill.type === 'DiscreteQuantitative') {
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'fill-step-value',
@@ -254,8 +319,10 @@ export async function patchFillDiffs(
       break;
     }
     case 'fill-visualization-type': {
+      // the work should be done
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer
+        | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer;
 
       // Derive the inverse diff prior to applying the patch.
@@ -293,7 +360,7 @@ export async function patchFillDiffs(
           };
           break;
         }
-        case 'Quantitative': {
+        case 'DiscreteQuantitative': {
           const attribute = selectQuantitativeAttribute(
             layer.data.geojson.features
           );
@@ -311,6 +378,27 @@ export async function patchFillDiffs(
             },
             count: DEFAULT_COUNT,
             thresholds: DEFAULT_THRESHOLDS(layer.id, attribute),
+            opacity: layer.style.fill.opacity,
+            visible: layer.style.fill.visible
+          };
+          break;
+        }
+        case 'ContinuousQuantitative': {
+          const attribute = selectQuantitativeAttribute(
+            layer.data.geojson.features
+          );
+
+          layer.style.fill = {
+            type: diff.payload.visualizationType,
+            attribute,
+            method: 'Continuous',
+            interpolator: {
+              id: DEFAULT_QUANTITATIVE_INTERPOLATOR,
+              direction:
+                'interpolator' in layer.style.fill
+                  ? layer.style.fill.interpolator.direction
+                  : 'Forward'
+            },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
           };
@@ -352,6 +440,7 @@ export async function patchFillDiffs(
     }
     case 'add-fill': {
       const layer = ir.layers[diff.layerId] as
+        | CartoKitChoroplethLayer
         | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
@@ -371,6 +460,7 @@ export async function patchFillDiffs(
     }
     case 'remove-fill': {
       const layer = ir.layers[diff.layerId] as
+        | CartoKitChoroplethLayer
         | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer

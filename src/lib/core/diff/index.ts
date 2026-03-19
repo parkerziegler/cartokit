@@ -13,9 +13,11 @@ import type {
   CategoricalColorScheme,
   ClassificationMethod,
   ColorRamp,
+  InterpolatorDirection,
   LayerType,
   Projection,
   QuantitativeColorScheme,
+  QuantitativeColorInterpolator,
   RampDirection,
   SchemeDirection,
   TransformationCall,
@@ -62,10 +64,24 @@ interface FillColorSchemeDirectionDiff extends LayerDiff {
   };
 }
 
+interface FillColorInterpolatorDiff extends LayerDiff {
+  type: 'fill-color-interpolator';
+  payload: {
+    interpolator: QuantitativeColorInterpolator;
+  };
+}
+
+interface FillColorInterpolatorDirectionDiff extends LayerDiff {
+  type: 'fill-color-interpolator-direction';
+  payload: {
+    direction: InterpolatorDirection;
+  };
+}
+
 interface FillClassificationMethodDiff extends LayerDiff {
   type: 'fill-classification-method';
   payload: {
-    method: ClassificationMethod;
+    method: ClassificationMethod | 'Continuous'; // reuse this diff
   };
 }
 
@@ -338,6 +354,8 @@ export type CartoKitDiff =
   | FillColorDiff
   | FillColorSchemeDiff
   | FillColorSchemeDirectionDiff
+  | FillColorInterpolatorDiff
+  | FillColorInterpolatorDirectionDiff
   | FillClassificationMethodDiff
   | FillStepCountDiff
   | FillStepValueDiff

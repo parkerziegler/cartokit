@@ -40,7 +40,7 @@
   <AttributeSelect
     layerId={layer.id}
     geojson={layer.data.geojson}
-    visualizationType="Quantitative"
+    visualizationType="DiscreteQuantitative"
     selected={layer.style.size.attribute}
     channel="size"
   />

@@ -26,6 +26,8 @@ export async function reconFillDiffs(
     case 'fill-attribute':
     case 'fill-color-scheme':
     case 'fill-color-scheme-direction':
+    case 'fill-color-interpolator':
+    case 'fill-color-interpolator-direction':
     case 'fill-classification-method':
     case 'fill-step-count':
     case 'fill-step-value':
@@ -40,7 +42,7 @@ export async function reconFillDiffs(
           map.value!.setPaintProperty(
             diff.layerId,
             'fill-color',
-            deriveColorScale(layer.style.fill)
+            deriveColorScale(layer.style.fill, layer.id)
           );
           break;
         case 'Point':
@@ -48,7 +50,7 @@ export async function reconFillDiffs(
           map.value!.setPaintProperty(
             diff.layerId,
             'circle-color',
-            deriveColorScale(layer.style.fill)
+            deriveColorScale(layer.style.fill, layer.id) // check if layer.id should be passed here
           );
           break;
       }
@@ -111,20 +113,32 @@ export async function reconFillDiffs(
       break;
     }
     case 'add-fill': {
-      const layer = targetIR.layers[diff.layerId] as
+      const layer = targetIR.layers[diff.layerId] as  // | CartoKitChoroplethLayer
         | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
 
       switch (layer.type) {
+        case 'Choropleth':
+          map.value!.setPaintProperty(
+            diff.layerId,
+            'fill-color',
+            deriveColorScale(layer.style.fill, layer.id)
+          );
+          map.value!.setPaintProperty(
+            diff.layerId,
+            'fill-opacity',
+            layer.style.fill.opacity
+          );
+          break;
         case 'Dot Density':
         case 'Point':
         case 'Proportional Symbol':
           map.value!.setPaintProperty(
             diff.layerId,
             'circle-color',
-            deriveColorScale(layer.style.fill)
+            deriveColorScale(layer.style.fill, layer.id)
           );
           map.value!.setPaintProperty(
             diff.layerId,
@@ -136,7 +150,7 @@ export async function reconFillDiffs(
           map.value!.setPaintProperty(
             diff.layerId,
             'fill-color',
-            deriveColorScale(layer.style.fill)
+            deriveColorScale(layer.style.fill, layer.id)
           );
           map.value!.setPaintProperty(
             diff.layerId,
@@ -149,12 +163,21 @@ export async function reconFillDiffs(
     }
     case 'remove-fill': {
       const layer = targetIR.layers[diff.layerId] as
+        | CartoKitChoroplethLayer
         | CartoKitDotDensityLayer
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer
         | CartoKitPolygonLayer;
 
       switch (layer.type) {
+        case 'Choropleth':
+          map.value!.setPaintProperty(
+            diff.layerId,
+            'fill-color',
+            'transparent'
+          );
+          map.value!.setPaintProperty(diff.layerId, 'fill-opacity', 0);
+          break;
         case 'Dot Density':
         case 'Point':
         case 'Proportional Symbol':
