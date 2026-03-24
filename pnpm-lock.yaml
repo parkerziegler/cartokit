@@ -49,7 +49,7 @@ importers:
         version: 5.21.0
       mongodb:
         specifier: ^7.0.0
-        version: 7.1.0
+        version: 7.1.1
       openai:
         specifier: ^6.0.0
         version: 6.32.0(zod@4.1.12)
@@ -2307,8 +2307,8 @@ packages:
     resolution: {integrity: sha512-h0AZ9A7IDVwwHyMxmdMXKy+9oNlF0zFoahHiX3vQ8e3KFcSP3VmsmfvtRSuLPxmyv2vjIDxqty8smTgie/SNRQ==}
     engines: {node: '>=20.19.0'}
 
-  mongodb@7.1.0:
-    resolution: {integrity: sha512-kMfnKunbolQYwCIyrkxNJFB4Ypy91pYqua5NargS/f8ODNSJxT03ZU3n1JqL4mCzbSih8tvmMEMLpKTT7x5gCg==}
+  mongodb@7.1.1:
+    resolution: {integrity: sha512-067DXiMjcpYQl6bGjWQoTUEE9UoRViTtKFcoqX7z08I+iDZv/emH1g8XEFiO3qiDfXAheT5ozl1VffDTKhIW/w==}
     engines: {node: '>=20.19.0'}
     peerDependencies:
       '@aws-sdk/credential-providers': ^3.806.0
@@ -5793,7 +5793,7 @@ snapshots:
       '@types/whatwg-url': 13.0.0
       whatwg-url: 14.2.0
 
-  mongodb@7.1.0:
+  mongodb@7.1.1:
     dependencies:
       '@mongodb-js/saslprep': 1.4.6
       bson: 7.2.0
