@@ -37,7 +37,7 @@ test.describe('upload-map', () => {
 
     // Upload the map.ck.json file.
     await page
-      .locator('#upload-map')
+      .getByLabel('Upload Map')
       .setInputFiles(path.join(__dirname, '../data/maps/map.ck.json'));
 
     // Look for the info indicator.
