@@ -1,15 +1,21 @@
 <script lang="ts">
-  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
-  import CheckIcon from '$lib/components/icons/CheckIcon.svelte';
+  import type { Snippet } from 'svelte';
 
   interface Props {
     kind: 'error' | 'success' | 'warn' | 'info';
     message: string;
     class?: string;
     testId?: string;
+    icon?: Snippet;
   }
 
-  let { kind, message, class: className = '', testId = '' }: Props = $props();
+  let {
+    kind,
+    message,
+    class: className = '',
+    testId = '',
+    icon
+  }: Props = $props();
 </script>
 
 <div
@@ -21,7 +27,7 @@
       'bg-red-500/10 text-red-100 outline outline-red-500/15': kind === 'error',
       'bg-yellow-500/10 text-yellow-100 outline outline-yellow-500/15':
         kind === 'warn',
-      'bg-blue-500/10 text-blue-300 outline outline-blue-500/20':
+      'bg-ck-light/10 text-ck-light outline-ck-light/20 outline':
         kind === 'info'
     },
     className
@@ -29,11 +35,7 @@
   data-testid={testId}
 >
   <span class="shrink-0">
-    {#if kind === 'success'}
-      <CheckIcon />
-    {:else if kind === 'error'}
-      <AlertIcon />
-    {/if}
+    {@render icon?.()}
   </span>
   <p class="font-sans">{message}</p>
 </div>

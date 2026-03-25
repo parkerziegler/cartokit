@@ -4,6 +4,7 @@
   import { onClickOutside } from '$lib/attachments/on-click-outside';
   import CartokitIcon from '$lib/components/icons/CartokitIcon.svelte';
   import ChevronIcon from '$lib/components/icons/ChevronIcon.svelte';
+  import MapUploadIcon from '$lib/components/icons/MapUploadIcon.svelte';
   import Alert from '$lib/components/shared/Alert.svelte';
   import Key from '$lib/components/shared/Key.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
@@ -172,25 +173,21 @@
           <Key>D</Key>
         </div>
       </button>
-      <div
-        class="-mx-2 flex items-center justify-between px-2 py-1 hover:bg-slate-700"
-      >
-        <label class="flex-1 text-sm text-white" for="upload-map"
-          >Upload Map</label
-        >
+      <label
+        class="-mx-2 flex items-center justify-between px-2 py-1 text-sm text-white hover:bg-slate-700"
+        >Upload Map
         <input
           type="file"
-          id="upload-map"
           class="sr-only"
           bind:files
           bind:this={fileInput}
           accept=".json"
         />
-        <div class="flex items-baseline gap-1">
+        <div class="flex items-baseline gap-1 text-xs">
           <Key>⇧</Key>
           <Key>U</Key>
-        </div>
-      </div>
+        </div></label
+      >
     </div>
   </Menu>
 {/if}
@@ -200,11 +197,11 @@
       <div
         class="absolute bottom-12 left-4 rounded-md bg-slate-900 p-2 text-xs tracking-wider text-white shadow-lg"
       >
-        <Alert
-          kind="info"
-          message="Uploading map..."
-          testId="upload-map-alert"
-        />
+        <Alert kind="info" message="Uploading map..." testId="upload-map-alert">
+          {#snippet icon()}
+            <MapUploadIcon />
+          {/snippet}
+        </Alert>
       </div>
     </div></Portal
   >
