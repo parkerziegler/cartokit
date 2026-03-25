@@ -47,7 +47,7 @@
 {:else}
   <button
     onclick={onAddStroke}
-    data-testid="add-stroke"
+    data-testid="add-stroke-button"
     aria-label="Add stroke"
     {@attach tooltip({
       content: 'Add Stroke'

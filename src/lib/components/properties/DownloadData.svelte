@@ -21,8 +21,13 @@
     const a = document.createElement('a');
     a.href = url;
     a.download = `${kebabCase(layer.displayName)}.json`;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      a.remove();
+    }, 1000);
   }
 
   onMount(() => {

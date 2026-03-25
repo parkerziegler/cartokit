@@ -4,8 +4,10 @@
   import { onClickOutside } from '$lib/attachments/on-click-outside';
   import CartokitIcon from '$lib/components/icons/CartokitIcon.svelte';
   import ChevronIcon from '$lib/components/icons/ChevronIcon.svelte';
+  import Alert from '$lib/components/shared/Alert.svelte';
   import Key from '$lib/components/shared/Key.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
+  import Portal from '$lib/components/shared/Portal.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { diffs } from '$lib/state/diffs.svelte';
   import { ir } from '$lib/stores/ir';
@@ -15,6 +17,7 @@
   let actionMenu = $state<HTMLDivElement>();
   let fileInput = $state<HTMLInputElement>();
   let files = $state<FileList | null>(null);
+  let uploading = $state(false);
 
   onMount(() => {
     const deregisterDownloadKeybinding = registerKeybinding(
@@ -46,57 +49,73 @@
   }
 
   function onDownloadMap() {
-    const meta = {
+    const camera = {
       center: $ir.center,
       zoom: $ir.zoom
     };
 
-    const blob = new Blob([JSON.stringify({ meta, diffs }, null, 2)], {
-      type: 'application/json'
-    });
+    const blob = new Blob(
+      [
+        JSON.stringify(
+          { cartokitVersion: __CARTOKIT_VERSION__, camera, diffs },
+          null,
+          2
+        )
+      ],
+      {
+        type: 'application/json'
+      }
+    );
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = 'map.ck.json';
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      a.remove();
+    }, 1000);
   }
 
   function onUploadMap(file: File) {
     const reader = new FileReader();
     reader.onload = async function (event) {
+      uploading = true;
+
       try {
         const content =
           typeof event.target?.result === 'string'
             ? JSON.parse(event.target.result)
             : null;
 
-        // Apply diff to update center.
+        // Apply all diffs in sequence.
+        for (const diff of content.diffs) {
+          await applyDiff(diff);
+        }
+
+        // Update the camera.
         await applyDiff({
           type: 'center',
           payload: {
             center: {
-              lng: content.meta.center[0],
-              lat: content.meta.center[1]
+              lng: content.camera.center[0],
+              lat: content.camera.center[1]
             }
           }
         });
 
-        // Apply diff to update zoom.
         await applyDiff({
           type: 'zoom',
           payload: {
-            zoom: content.meta.zoom
+            zoom: content.camera.zoom
           }
         });
-
-        // Now apply all other diffs.
-        for (const diff of content.diffs) {
-          await applyDiff(diff);
-        }
       } catch (err) {
-        // Optionally, add error handling here
         console.error('Failed to load map:', err);
+      } finally {
+        uploading = false;
       }
     };
 
@@ -130,6 +149,7 @@
     }
   ]}
   {@attach onClickOutside({ callback: onClickOutsideActionPicker })}
+  data-testid="action-picker-button"
 >
   <CartokitIcon />
   <ChevronIcon />
@@ -143,7 +163,7 @@
     </div>
     <div class="flex flex-col gap-1 pt-3">
       <button
-        class="-mx-2 flex items-center justify-between px-2 py-1 hover:bg-slate-600"
+        class="-mx-2 flex items-center justify-between px-2 py-1 hover:bg-slate-700"
         onclick={onDownloadMap}
       >
         <span class="text-sm text-white">Download Map</span>
@@ -153,7 +173,7 @@
         </div>
       </button>
       <div
-        class="-mx-2 flex items-center justify-between px-2 py-1 hover:bg-slate-600"
+        class="-mx-2 flex items-center justify-between px-2 py-1 hover:bg-slate-700"
       >
         <label class="flex-1 text-sm text-white" for="upload-map"
           >Upload Map</label
@@ -174,12 +194,32 @@
     </div>
   </Menu>
 {/if}
+{#if uploading}
+  <Portal>
+    <div class="fixed inset-0 z-20 bg-[rgba(0,0,0,0.3)]">
+      <div
+        class="absolute bottom-12 left-4 rounded-md bg-slate-900 p-2 text-xs tracking-wider text-white shadow-lg"
+      >
+        <Alert
+          kind="info"
+          message="Uploading map..."
+          testId="upload-map-alert"
+        />
+      </div>
+    </div></Portal
+  >
+{/if}
 
 <style lang="postcss">
   @reference 'tailwindcss';
 
+  .action-picker::before,
+  .action-picker--active::before {
+    @apply absolute top-0 -left-[2%] -z-10 h-10 w-[104%] -translate-y-1.5 rounded-sm bg-transparent transition-colors content-[''];
+  }
+
   .action-picker:hover::before,
   .action-picker--active::before {
-    @apply absolute top-0 -left-[2%] -z-10 h-10 w-[104%] -translate-y-1.5 rounded-sm bg-slate-600 content-[''];
+    @apply bg-slate-700;
   }
 </style>

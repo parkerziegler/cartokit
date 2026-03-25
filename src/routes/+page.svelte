@@ -17,7 +17,6 @@
   import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
   import { chat } from '$lib/state/chat.svelte';
-  import { diffs } from '$lib/state/diffs.svelte';
   import { initHistory } from '$lib/state/history.svelte';
   import { user } from '$lib/state/user.svelte';
   import { ir } from '$lib/stores/ir';
@@ -34,7 +33,6 @@
 
   let map = $state<maplibregl.Map>();
   let error = $state({ message: '' });
-  let processingDiff = $state(false);
 
   // We intentionally capture the values of data.userId and data.enableChat
   // from the load function in +page.server.ts.
@@ -127,42 +125,6 @@
       return layout;
     });
   }
-
-  $effect(() => {
-    async function processDiff() {
-      if (processingDiff) {
-        return;
-      }
-
-      processingDiff = true;
-
-      while (diffs.length) {
-        const loggedDiff = diffs.shift();
-
-        if (loggedDiff) {
-          try {
-            fetch('/diff', {
-              method: 'POST',
-              body: JSON.stringify({
-                userId: user.userId,
-                diff: loggedDiff,
-                llmAvailable: chat.enable
-              })
-            });
-          } catch (err) {
-            console.error(err);
-          }
-        }
-      }
-
-      processingDiff = false;
-    }
-
-    // Only process diffs for the study sessions.
-    if (diffs.length && user.userId) {
-      processDiff();
-    }
-  });
 </script>
 
 <main class="absolute inset-0 overflow-hidden">

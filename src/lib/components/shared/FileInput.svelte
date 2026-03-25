@@ -61,7 +61,7 @@
   }
 
   .file-prompt:hover::before {
-    @apply bg-slate-600;
+    @apply bg-slate-700;
   }
 
   .file-prompt::after {

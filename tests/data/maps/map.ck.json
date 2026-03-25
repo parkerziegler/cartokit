@@ -1,0 +1,48 @@
+{
+  "cartokitVersion": "0.16.0",
+  "camera": {
+    "center": [
+      -98.35,
+      39.5
+    ],
+    "zoom": 4
+  },
+  "diffs": [
+    {
+      "type": "add-layer",
+      "layerId": "climate-impact-regions__1",
+      "payload": {
+        "type": "api",
+        "displayName": "Climate Impact Regions",
+        "url": "https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-climate-impact-regions.json"
+      }
+    },
+    {
+      "type": "remove-stroke",
+      "layerId": "climate-impact-regions__1",
+      "payload": {}
+    },
+    {
+      "type": "layer-type",
+      "layerId": "climate-impact-regions__1",
+      "payload": {
+        "sourceLayerType": "Polygon",
+        "targetLayerType": "Choropleth"
+      }
+    },
+    {
+      "type": "fill-attribute",
+      "layerId": "climate-impact-regions__1",
+      "payload": {
+        "attribute": "years_2080_2099"
+      }
+    },
+    {
+      "type": "fill-color-scheme",
+      "layerId": "climate-impact-regions__1",
+      "payload": {
+        "scheme": "schemePRGn"
+      }
+    }
+  ]
+}

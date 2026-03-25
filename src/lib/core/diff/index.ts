@@ -414,6 +414,8 @@ export async function applyDiff(
 
   ir.set(draftIR);
 
-  // Track diffs as they are applied.
-  diffs.push(execute);
+  // Track diffs as they are applied, excluding center and zoom diffs.
+  if (execute.type !== 'center' && execute.type !== 'zoom') {
+    diffs.push(execute);
+  }
 }
