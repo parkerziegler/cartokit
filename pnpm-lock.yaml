@@ -46,7 +46,7 @@ importers:
         version: 4.17.23
       maplibre-gl:
         specifier: ^5.1.1
-        version: 5.21.0
+        version: 5.21.1
       mongodb:
         specifier: ^7.0.0
         version: 7.1.1
@@ -2278,8 +2278,8 @@ packages:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
     engines: {node: '>=10'}
 
-  maplibre-gl@5.21.0:
-    resolution: {integrity: sha512-n0v4J/Ge0EG8ix/z3TY3ragtJYMqzbtSnj1riOC0OwQbzwp0lUF2maS1ve1z8HhitQCKtZZiZJhb8to36aMMfQ==}
+  maplibre-gl@5.21.1:
+    resolution: {integrity: sha512-zto1RTnFkOpOO1bm93ElCXF1huey2N4LvXaGLMFcYAu9txh0OhGIdX1q3LZLkrMKgMxMeYduaQo+DVNzg098fg==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
   memory-pager@1.5.0:
@@ -5748,7 +5748,7 @@ snapshots:
     dependencies:
       semver: 7.7.4
 
-  maplibre-gl@5.21.0:
+  maplibre-gl@5.21.1:
     dependencies:
       '@mapbox/jsonlint-lines-primitives': 2.0.2
       '@mapbox/point-geometry': 1.1.0
