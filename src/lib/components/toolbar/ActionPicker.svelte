@@ -4,7 +4,7 @@
   import { onClickOutside } from '$lib/attachments/on-click-outside';
   import CartokitIcon from '$lib/components/icons/CartokitIcon.svelte';
   import ChevronIcon from '$lib/components/icons/ChevronIcon.svelte';
-  import MapUploadIcon from '$lib/components/icons/MapUploadIcon.svelte';
+  import UploadIcon from '$lib/components/icons/UploadIcon.svelte';
   import Alert from '$lib/components/shared/Alert.svelte';
   import Key from '$lib/components/shared/Key.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
@@ -12,6 +12,7 @@
   import { applyDiff } from '$lib/core/diff';
   import { diffs } from '$lib/state/diffs.svelte';
   import { ir } from '$lib/stores/ir';
+  import { downloadContentToFile } from '$lib/utils/files/download';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   let actionPickerActive = $state(false);
@@ -55,29 +56,10 @@
       zoom: $ir.zoom
     };
 
-    const blob = new Blob(
-      [
-        JSON.stringify(
-          { cartokitVersion: __CARTOKIT_VERSION__, camera, diffs },
-          null,
-          2
-        )
-      ],
-      {
-        type: 'application/json'
-      }
+    downloadContentToFile(
+      { cartokitVersion: __CARTOKIT_VERSION__, camera, diffs },
+      'map.ck.json'
     );
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'map.ck.json';
-    document.body.appendChild(a);
-    a.click();
-
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-      a.remove();
-    }, 1000);
   }
 
   function onUploadMap(file: File) {
@@ -199,7 +181,7 @@
       >
         <Alert kind="info" message="Uploading map..." testId="upload-map-alert">
           {#snippet icon()}
-            <MapUploadIcon />
+            <UploadIcon />
           {/snippet}
         </Alert>
       </div>

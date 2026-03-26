@@ -5,6 +5,7 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import DownloadIcon from '$lib/components/icons/DownloadIcon.svelte';
   import type { CartoKitLayer } from '$lib/types';
+  import { downloadContentToFile } from '$lib/utils/files/download';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
@@ -14,20 +15,10 @@
   let { layer }: Props = $props();
 
   function onClick() {
-    const blob = new Blob([JSON.stringify(layer.data.geojson, null, 2)], {
-      type: 'application/json'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${kebabCase(layer.displayName)}.json`;
-    document.body.appendChild(a);
-    a.click();
-
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-      a.remove();
-    }, 1000);
+    downloadContentToFile(
+      layer.data.geojson,
+      `${kebabCase(layer.displayName)}.json`
+    );
   }
 
   onMount(() => {

@@ -35,3 +35,6 @@ vite.config.ts.timestamp-*
 
 # Vitest
 /coverage/
+
+# Cursor
+.cursor

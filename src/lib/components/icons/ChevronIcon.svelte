@@ -1,10 +1,9 @@
 <script lang="ts">
   interface Props {
     rotate?: number;
-    class?: string;
   }
 
-  let { rotate = 0, class: className = '' }: Props = $props();
+  let { rotate = 0 }: Props = $props();
 </script>
 
 <svg
@@ -14,7 +13,7 @@
   width="16"
   style="color: currentcolor;"
   transform="rotate({rotate})"
-  class={[className, 'transition-transform']}
+  class="transition-transform"
   ><path
     fill-rule="evenodd"
     clip-rule="evenodd"

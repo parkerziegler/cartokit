@@ -34,8 +34,10 @@
   ]}
   data-testid={testId}
 >
-  <span class="shrink-0">
-    {@render icon?.()}
-  </span>
+  {#if icon}
+    <span class="shrink-0">
+      {@render icon()}
+    </span>
+  {/if}
   <p class="font-sans">{message}</p>
 </div>

@@ -162,7 +162,7 @@
             class={[
               'cursor-pointer border-t border-dotted border-slate-400 first:border-t-0',
               selectedRow === i
-                ? 'bg-slate-600 hover:bg-slate-700'
+                ? 'bg-slate-700 hover:bg-slate-800'
                 : 'hover:bg-slate-800'
             ]}
             onclick={() => handleRowClick(row, i)}

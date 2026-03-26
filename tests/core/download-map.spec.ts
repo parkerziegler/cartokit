@@ -72,33 +72,70 @@ test.describe('download-map', () => {
 
     // Ensure that the Properties Panel is visible.
     await expect(page.locator('#properties')).toBeVisible();
-  });
 
-  test.afterEach(async () => {
-    // Delete the map.ck.json file.
-    // await fs.unlink(path.join(__dirname, 'map.ck.json'));
-  });
-
-  test('should download the map to a .ck.json file', async ({ page }) => {
-    // Apply four diffs.
+    // Apply a sequence of diffs.
     await page.getByTestId('remove-stroke-button').click();
 
-    // Switch the layer's type to Choropleth.
     await page.locator('#layer-type-select').selectOption('Choropleth');
 
-    // Set the layer's Attribute to 'years_2080_2099'.
     await page
       .locator('#fill-attribute-select')
       .selectOption('years_2080_2099');
 
-    // Switch the layer's Color Scheme to PRGn.
     await page.locator('#color-scheme').getByRole('button').click();
-    await page.locator('li:nth-child(20)').getByRole('button').click();
+    await page.locator('li:nth-child(20)').getByRole('button').click(); //
+  });
 
-    // Register the event listener for the download.
+  test.afterEach(async () => {
+    // Delete the map.ck.json file.
+    await fs.unlink(path.join(__dirname, 'map.ck.json'));
+  });
+
+  // Expected content of the map.ck.json file.
+  const expectedContent = {
+    cartokitVersion: packageJson.version,
+    camera: {
+      center: [-98.35, 39.5],
+      zoom: 4
+    },
+    diffs: [
+      {
+        type: 'add-layer',
+        layerId: 'climate-impact-regions__1',
+        payload: {
+          type: 'api',
+          displayName: 'Climate Impact Regions',
+          url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-climate-impact-regions.json'
+        }
+      },
+      {
+        type: 'remove-stroke',
+        layerId: 'climate-impact-regions__1',
+        payload: {}
+      },
+      {
+        type: 'layer-type',
+        layerId: 'climate-impact-regions__1',
+        payload: { sourceLayerType: 'Polygon', targetLayerType: 'Choropleth' }
+      },
+      {
+        type: 'fill-attribute',
+        layerId: 'climate-impact-regions__1',
+        payload: { attribute: 'years_2080_2099' }
+      },
+      {
+        type: 'fill-color-scheme',
+        layerId: 'climate-impact-regions__1',
+        payload: { scheme: 'schemePRGn' }
+      }
+    ]
+  };
+
+  test('should download the map to a .ck.json file', async ({ page }) => {
+    // Register the Promise for the download.
     const downloadPromise = page.waitForEvent('download');
 
-    // Initiate download via clicks.
+    // Initiate the download via click.
     await page.getByTestId('action-picker-button').click();
     await page.getByRole('button', { name: 'Download Map' }).click();
 
@@ -114,44 +151,29 @@ test.describe('download-map', () => {
       'utf-8'
     );
 
-    const expectedContent = {
-      cartokitVersion: packageJson.version,
-      camera: {
-        center: [-98.35, 39.5],
-        zoom: 4
-      },
-      diffs: [
-        {
-          type: 'add-layer',
-          layerId: 'climate-impact-regions__1',
-          payload: {
-            type: 'api',
-            displayName: 'Climate Impact Regions',
-            url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-climate-impact-regions.json'
-          }
-        },
-        {
-          type: 'remove-stroke',
-          layerId: 'climate-impact-regions__1',
-          payload: {}
-        },
-        {
-          type: 'layer-type',
-          layerId: 'climate-impact-regions__1',
-          payload: { sourceLayerType: 'Polygon', targetLayerType: 'Choropleth' }
-        },
-        {
-          type: 'fill-attribute',
-          layerId: 'climate-impact-regions__1',
-          payload: { attribute: 'years_2080_2099' }
-        },
-        {
-          type: 'fill-color-scheme',
-          layerId: 'climate-impact-regions__1',
-          payload: { scheme: 'schemePRGn' }
-        }
-      ]
-    };
+    expect(JSON.stringify(JSON.parse(content), null, 2)).toEqual(
+      JSON.stringify(expectedContent, null, 2)
+    );
+  });
+
+  test('should download the map on Shift+D', async ({ page }) => {
+    // Register the Promise for the download.
+    const downloadPromise = page.waitForEvent('download');
+
+    // Press Shift+D.
+    await page.keyboard.press('Shift+D');
+
+    // Wait for the download Promise to resolve.
+    const download = await downloadPromise;
+
+    // Save the download to a file.
+    await download.saveAs(path.join(__dirname, 'map.ck.json'));
+
+    // Verify that the download matches the expected content.
+    const content = await fs.readFile(
+      path.join(__dirname, 'map.ck.json'),
+      'utf-8'
+    );
 
     expect(JSON.stringify(JSON.parse(content), null, 2)).toEqual(
       JSON.stringify(expectedContent, null, 2)

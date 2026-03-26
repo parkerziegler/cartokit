@@ -5,7 +5,6 @@ import { on } from 'svelte/events';
  *
  * @param key The key to bind the callback to.
  * @param callback The callback to invoke when the key is pressed.
- * @param options The options for the keybinding.
  * @param options.requireShift Whether the keybinding requires the shift key to be pressed.
  * @returns A function to deregister the keybinding.
  */
