@@ -99,7 +99,7 @@
               <button
                 onclick={() => onClickRamp(ramp)}
                 use:focus={() => ramp === layer.style.heatmap.ramp.id}
-                class="flex-1 p-2 hover:bg-slate-600"
+                class="flex-1 p-2 hover:bg-slate-700"
               >
                 <ColorRamp
                   {ramp}

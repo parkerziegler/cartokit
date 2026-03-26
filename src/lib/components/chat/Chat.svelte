@@ -128,7 +128,7 @@
       <div class="flex items-center justify-between px-2 pb-2">
         <code
           class="self-start rounded-xs bg-slate-400 px-1 py-0.5 text-xs text-white"
-          >GPT-5</code
+          >GPT-5.4 Mini</code
         >
         <button
           class="flex h-[22px] w-[22px] items-center justify-center rounded-xs border border-white bg-slate-400 text-white disabled:opacity-50"

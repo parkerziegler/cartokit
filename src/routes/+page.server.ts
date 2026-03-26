@@ -14,7 +14,7 @@ export async function load({ url }) {
 
   return {
     basemap:
-      VERCEL_ENV === 'preview' || !!user
+      VERCEL_ENV === 'preview'
         ? {
             url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
             provider: 'CARTO' as const

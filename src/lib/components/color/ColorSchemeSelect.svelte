@@ -119,7 +119,7 @@
               <button
                 onclick={() => onClickScheme(scheme)}
                 use:focus={() => scheme === style.scheme.id}
-                class="flex-1 p-2 hover:bg-slate-600"
+                class="flex-1 p-2 hover:bg-slate-700"
               >
                 <ColorPalette
                   {scheme}

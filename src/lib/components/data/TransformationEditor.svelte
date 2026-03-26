@@ -5,6 +5,8 @@
   import { onDestroy } from 'svelte';
 
   import Alert from '$lib/components/shared/Alert.svelte';
+  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
+  import CheckIcon from '$lib/components/icons/CheckIcon.svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import PlayCircle from '$lib/components/icons/PlayCircle.svelte';
   import TerminalIcon from '$lib/components/icons/TerminalIcon.svelte';
@@ -180,9 +182,17 @@
         <Alert
           kind="error"
           message={`Failed to transform data. Error: ${error}`}
-        />
+        >
+          {#snippet icon()}
+            <AlertIcon />
+          {/snippet}
+        </Alert>
       {:else if success}
-        <Alert kind="success" message="Successfully transformed data." />
+        <Alert kind="success" message="Successfully transformed data.">
+          {#snippet icon()}
+            <CheckIcon />
+          {/snippet}
+        </Alert>
       {/if}
       <Button
         class="flex items-center gap-2 self-end"
@@ -201,7 +211,11 @@
       <p class="text-slate-400">OUTPUT</p>
     {/snippet}
     {#if previewError}
-      <Alert kind="error" message={previewError} />
+      <Alert kind="error" message={previewError}>
+        {#snippet icon()}
+          <AlertIcon />
+        {/snippet}
+      </Alert>
     {/if}
   </MenuItem>
   <MenuItem title="Console">

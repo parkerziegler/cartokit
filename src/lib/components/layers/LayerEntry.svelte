@@ -281,7 +281,7 @@
 
   .display-name--visible:hover::after,
   .display-name--visible:focus-within::after {
-    @apply absolute -left-4 -z-10 h-full bg-slate-700;
+    @apply absolute -left-4 -z-10 h-full bg-slate-800;
     width: calc(100% + 2rem);
     content: '';
   }
@@ -290,8 +290,9 @@
     @apply opacity-75;
   }
 
-  .display-name--selected::after {
-    @apply absolute -left-4 -z-10 h-full bg-slate-600;
+  .display-name--selected::after,
+  .display-name--selected:focus-within::after {
+    @apply absolute -left-4 -z-10 h-full bg-slate-700;
     width: calc(100% + 2rem);
     content: '';
   }
