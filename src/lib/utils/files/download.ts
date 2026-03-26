@@ -1,7 +1,8 @@
 /**
  * Downloads structured content to a file.
- * @param content - The con to download.
- * @param fileName - The name of the file to download.
+ *
+ * @param content The content to download.
+ * @param fileName The name of the file to download.
  */
 export function downloadContentToFile<T>(content: T, fileName: string) {
   const blob = new Blob([JSON.stringify(content, null, 2)], {
