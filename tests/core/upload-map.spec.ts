@@ -46,6 +46,14 @@ test.describe('upload-map', () => {
     // Wait for the info indicator to disappear.
     await expect(page.getByTestId('upload-map-alert')).toBeHidden();
 
+    // Wait for MapLibre to render the Climate Impact Regions layer.
+    //
+    // Tiles are generated on the fly by MapLibre, so we need to wait for them to
+    // load. In theory, we'd like to hook into MapLibre's event system to deter-
+    // mine when the map is idle; however, we don't want to attach the map inst-
+    // ance to the global window object just for the sake of testing.
+    await page.waitForTimeout(5000);
+
     // Click on the layer entry in the Layers Panel.
     await page.getByTestId('layer-entry').first().click();
 

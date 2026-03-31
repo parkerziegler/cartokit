@@ -1,4 +1,4 @@
-import type { EnhancedImgAttributes } from '@sveltejs/enhanced-img';
+import type { SvelteHTMLElements } from 'svelte/elements';
 import type { FeatureCollection } from 'geojson';
 
 /**
@@ -515,7 +515,7 @@ export interface HeatmapStyle {
 export interface Basemap {
   title: string;
   tileId: string;
-  src: EnhancedImgAttributes['src'];
+  src: SvelteHTMLElements['enhanced:img']['src'];
 }
 
 /**
@@ -526,7 +526,7 @@ export interface GalleryItem {
   name: string;
   attribution: string;
   url: string;
-  src: EnhancedImgAttributes['src'];
+  src: SvelteHTMLElements['enhanced:img']['src'];
   type:
     | CartoKitPointLayer['type']
     | CartoKitLineLayer['type']
