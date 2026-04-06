@@ -56,7 +56,9 @@
     try {
       await applyDiff(diff);
     } catch (e) {
-      error.set(e instanceof Error ? e.message : 'Failed to change visualization type.');
+      error.set(
+        e instanceof Error ? e.message : 'Failed to change visualization type.'
+      );
     }
   }
 </script>

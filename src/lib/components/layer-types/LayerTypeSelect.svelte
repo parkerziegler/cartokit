@@ -37,7 +37,9 @@
     try {
       await applyDiff(diff);
     } catch (e) {
-      error.set(e instanceof Error ? e.message : 'Failed to change layer type.');
+      error.set(
+        e instanceof Error ? e.message : 'Failed to change layer type.'
+      );
     }
   }
 </script>
