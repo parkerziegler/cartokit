@@ -2,18 +2,22 @@
   import { getContext } from 'svelte';
   import { uniqueId, kebabCase } from 'lodash-es';
 
+  import Alert from '$lib/components/shared/Alert.svelte';
+  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
+  import { geometryToLayerTypes } from '$lib/utils/layer';
 
   const closeModal = getContext<() => void>('close-modal');
 
   let file: File | null = $state(null);
   let displayName = $state('');
   let dataLoading = $state(false);
+  let error = $state('');
 
   function onFileUpload(f: File) {
     file = f;
@@ -39,9 +43,24 @@
 
     reader.onload = async function readGeoJSON(theFile) {
       if (typeof theFile.target?.result === 'string' && file) {
-        const featureCollection = normalizeGeoJSONToFeatureCollection(
-          JSON.parse(theFile.target.result)
-        );
+        const VALID_GEOJSON_TYPES = new Set([
+          ...geometryToLayerTypes.keys(),
+          'Feature',
+          'FeatureCollection'
+        ]);
+
+        let featureCollection;
+        try {
+          const parsed = JSON.parse(theFile.target.result);
+          if (!parsed || !VALID_GEOJSON_TYPES.has(parsed.type)) {
+            throw new Error('Not a valid GeoJSON type.');
+          }
+          featureCollection = normalizeGeoJSONToFeatureCollection(parsed);
+        } catch {
+          error = 'Invalid file. Please check the file and try again.';
+          dataLoading = false;
+          return;
+        }
 
         const layerId = uniqueId(`${kebabCase(displayName)}__`);
 
@@ -57,6 +76,7 @@
         });
 
         dataLoading = false;
+        error = '';
         file = null;
         displayName = '';
 
@@ -82,6 +102,13 @@
       placeholder="(e.g., Earthquakes)"
     />
   </div>
+  {#if error}
+    <Alert kind="error" message={error}>
+      {#snippet icon()}
+        <AlertIcon />
+      {/snippet}
+    </Alert>
+  {/if}
   <Button
     class="self-end"
     loading={dataLoading}

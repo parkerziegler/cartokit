@@ -3,17 +3,21 @@
   import { uniqueId, kebabCase } from 'lodash-es';
   import type { MapSourceDataEvent } from 'maplibre-gl';
 
+  import Alert from '$lib/components/shared/Alert.svelte';
+  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
+  import { fetchGeoJSON } from '$lib/utils/source';
 
   const closeModal = getContext<() => void>('close-modal');
 
   let endpoint = $state('');
   let displayName = $state('');
   let dataLoading = $state(false);
+  let error = $state('');
 
   function onEndpointInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
@@ -31,6 +35,7 @@
     return (event: MapSourceDataEvent) => {
       if (event.sourceId === layerId) {
         dataLoading = false;
+        error = '';
         endpoint = '';
         displayName = '';
 
@@ -50,6 +55,15 @@
     }
 
     dataLoading = true;
+    error = '';
+
+    try {
+      await fetchGeoJSON(endpoint);
+    } catch {
+      error = 'Invalid endpoint. Please check the URL and try again.';
+      dataLoading = false;
+      return;
+    }
 
     const layerId = uniqueId(`${kebabCase(displayName)}__`);
 
@@ -88,6 +102,13 @@
       placeholder="(e.g., Earthquakes)"
     />
   </div>
+  {#if error}
+    <Alert kind="error" message={error}>
+      {#snippet icon()}
+        <AlertIcon />
+      {/snippet}
+    </Alert>
+  {/if}
   <Button
     class="self-end"
     loading={dataLoading}
