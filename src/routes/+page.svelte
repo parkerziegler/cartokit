@@ -21,6 +21,7 @@
   import { user } from '$lib/state/user.svelte';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
+  import { error } from '$lib/state/error.svelte';
   import { map as mapState } from '$lib/state/map.svelte';
   import { layer } from '$lib/state/layer.svelte';
   import { registerKeybinding } from '$lib/utils/keybinding';
@@ -32,7 +33,6 @@
   let { data }: Props = $props();
 
   let map = $state<maplibregl.Map>();
-  let error = $state({ message: '' });
 
   // We intentionally capture the values of data.userId and data.enableChat
   // from the load function in +page.server.ts.
@@ -89,11 +89,7 @@
 
     map.on('error', (err) => {
       console.error(err);
-      error.message = 'A map rendering error occurred.';
-
-      window.setTimeout(() => {
-        error.message = '';
-      }, 5000);
+      error.set('A map rendering error occurred.');
     });
 
     const destroyHistory = initHistory();
@@ -188,7 +184,7 @@
     <div
       class="absolute bottom-12 left-4 rounded-md bg-slate-900 p-2 text-xs tracking-wider text-white shadow-lg"
     >
-      <Alert kind="error" message="A map rendering error occurred." />
+      <Alert kind="error" message={error.message} />
     </div>
   {/if}
   <Cursor />

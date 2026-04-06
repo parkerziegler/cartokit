@@ -63,8 +63,6 @@ export function selectQuantitativeAttribute(features: Feature[]): string {
     }
   }
 
-  // TODO: Catch this error and display a message prompting the user
-  // to select a layer type that does not require a quantitative attribute.
   throw new Error('No quantitative attributes found in dataset.');
 }
 
@@ -82,9 +80,7 @@ export function selectCategoricalAttribute(features: Feature[]): string {
     }
   }
 
-  // TODO: Catch this error and display a message prompting the user
-  // to select a layer type that does not require a categorical attribute.
-  throw new Error('No cateogrical attributes found in dataset.');
+  throw new Error('No categorical attributes found in dataset.');
 }
 
 /**
