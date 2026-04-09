@@ -10,7 +10,7 @@
   let { layer }: Props = $props();
 </script>
 
-<div class="ml-8 flex flex-col gap-2">
+<div class="ml-8 flex flex-col gap-2" data-testid="choropleth-legend">
   {#if layer.style.fill.visible && layer.style.fill.type === 'Categorical'}
     <CategoricalLegend
       fill={layer.style.fill}

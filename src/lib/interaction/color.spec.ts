@@ -12,13 +12,15 @@ describe('deriveColorScale', () => {
       const result = deriveColorScale({
         type: 'Quantitative',
         attribute: 'total_capacity',
-        scheme: {
-          id: 'schemeBlues',
-          direction: 'Forward'
+        scale: {
+          type: 'Quantile',
+          scheme: {
+            id: 'schemeBlues',
+            direction: 'Forward'
+          },
+          steps: STOPS,
+          thresholds: [1.6, 2.8, 5, 10.8, 42, 151.63]
         },
-        method: 'Quantile',
-        count: STOPS,
-        thresholds: [1.6, 2.8, 5, 10.8, 42, 151.63],
         opacity: 1,
         visible: true
       });
@@ -46,13 +48,15 @@ describe('deriveColorScale', () => {
       const result = deriveColorScale({
         type: 'Quantitative',
         attribute: 'total_capacity',
-        scheme: {
-          id: 'schemeBlues',
-          direction: 'Reverse'
+        scale: {
+          type: 'Quantile',
+          scheme: {
+            id: 'schemeBlues',
+            direction: 'Reverse'
+          },
+          steps: STOPS,
+          thresholds: [1.6, 2.8, 5, 10.8, 42, 151.63]
         },
-        method: 'Quantile',
-        count: STOPS,
-        thresholds: [1.6, 2.8, 5, 10.8, 42, 151.63],
         opacity: 1,
         visible: true
       });
@@ -82,19 +86,22 @@ describe('deriveColorScale', () => {
       const result = deriveColorScale({
         type: 'Categorical',
         attribute: 'primary_source',
-        categories: [
-          'oil',
-          'hydroelectric',
-          'natural gas',
-          'nuclear',
-          'coal',
-          'other',
-          'wind',
-          'solar'
-        ],
-        scheme: {
-          id: 'schemeCategory10',
-          direction: 'Forward'
+        scale: {
+          type: 'Categorical',
+          scheme: {
+            id: 'schemeCategory10',
+            direction: 'Forward'
+          },
+          categories: [
+            'oil',
+            'hydroelectric',
+            'natural gas',
+            'nuclear',
+            'coal',
+            'other',
+            'wind',
+            'solar'
+          ]
         },
         opacity: 1,
         visible: true
@@ -127,26 +134,29 @@ describe('deriveColorScale', () => {
       const result = deriveColorScale({
         type: 'Categorical',
         attribute: 'county',
-        categories: [
-          'Aleutians East',
-          'Tuscaloosa',
-          'Mobile',
-          'Elmore',
-          'Etowah',
-          'El Paso',
-          'Greene',
-          'Calhoun',
-          'Talladega',
-          'Chilton',
-          'Coosa',
-          'Walker',
-          'Cherokee',
-          'Shelby',
-          'Watonwan'
-        ],
-        scheme: {
-          id: 'schemeCategory10',
-          direction: 'Forward'
+        scale: {
+          type: 'Categorical',
+          scheme: {
+            id: 'schemeCategory10',
+            direction: 'Forward'
+          },
+          categories: [
+            'Aleutians East',
+            'Tuscaloosa',
+            'Mobile',
+            'Elmore',
+            'Etowah',
+            'El Paso',
+            'Greene',
+            'Calhoun',
+            'Talladega',
+            'Chilton',
+            'Coosa',
+            'Walker',
+            'Cherokee',
+            'Shelby',
+            'Watonwan'
+          ]
         },
         opacity: 1,
         visible: true
@@ -183,19 +193,22 @@ describe('deriveColorScale', () => {
       const result = deriveColorScale({
         type: 'Categorical',
         attribute: 'primary_source',
-        categories: [
-          'oil',
-          'hydroelectric',
-          'natural gas',
-          'nuclear',
-          'coal',
-          'other',
-          'wind',
-          'solar'
-        ],
-        scheme: {
-          id: 'schemeCategory10',
-          direction: 'Reverse'
+        scale: {
+          type: 'Categorical',
+          scheme: {
+            id: 'schemeCategory10',
+            direction: 'Reverse'
+          },
+          categories: [
+            'oil',
+            'hydroelectric',
+            'natural gas',
+            'nuclear',
+            'coal',
+            'other',
+            'wind',
+            'solar'
+          ]
         },
         opacity: 1,
         visible: true
@@ -247,7 +260,7 @@ describe('deriveColorRamp', () => {
         value: 1
       },
       ramp: {
-        id: 'Spectral',
+        id: 'interpolateSpectral',
         direction: 'Forward'
       },
       radius: 10,
@@ -294,7 +307,7 @@ describe('deriveColorRamp', () => {
         value: 1
       },
       ramp: {
-        id: 'Spectral',
+        id: 'interpolateSpectral',
         direction: 'Reverse'
       },
       radius: 10,

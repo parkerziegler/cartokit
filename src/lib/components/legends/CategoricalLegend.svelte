@@ -15,14 +15,16 @@
   let { fill, stroke, layerType, visible }: Props = $props();
 
   let entries = $derived(
-    d3[fill.scheme.id].length < fill.categories.length
-      ? fill.categories.slice(0, d3[fill.scheme.id].length).concat('Other')
-      : fill.categories
+    d3[fill.scale.scheme.id].length < fill.scale.categories.length
+      ? fill.scale.categories
+          .slice(0, d3[fill.scale.scheme.id].length)
+          .concat('Other')
+      : fill.scale.categories
   );
   let colors = $derived(
     materializeColorScheme(
-      fill.scheme.id,
-      fill.scheme.direction,
+      fill.scale.scheme.id,
+      fill.scale.scheme.direction,
       entries.length
     )
   );

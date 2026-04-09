@@ -8,10 +8,11 @@
   import Portal from '$lib/components/shared/Portal.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type {
+    CategoricalColorScale,
     CategoricalColorScheme,
+    ContinuousColorScale,
+    QuantitativeColorScale,
     QuantitativeColorScheme,
-    QuantitativeStyle,
-    CategoricalStyle,
     SchemeDirection
   } from '$lib/types';
   import {
@@ -21,10 +22,12 @@
 
   interface Props {
     layerId: string;
-    style: QuantitativeStyle | CategoricalStyle;
+    scale:
+      | Exclude<QuantitativeColorScale, ContinuousColorScale>
+      | CategoricalColorScale;
   }
 
-  let { layerId, style }: Props = $props();
+  let { layerId, scale }: Props = $props();
 
   let showOptions = $state(false);
   let offsetHeight = $state(0);
@@ -33,9 +36,9 @@
   let y = $state(0);
 
   let schemes = $derived(
-    style.type === 'Quantitative'
-      ? QUANTITATIVE_COLOR_SCHEMES
-      : CATEGORICAL_COLOR_SCHEMES
+    scale.type === 'Categorical'
+      ? CATEGORICAL_COLOR_SCHEMES
+      : QUANTITATIVE_COLOR_SCHEMES
   );
 
   let trigger: HTMLDivElement;
@@ -67,7 +70,7 @@
   }
 
   async function onSchemeReverse() {
-    const currentDirection = style.scheme.direction;
+    const currentDirection = scale.scheme.direction;
     const nextDirection: SchemeDirection =
       currentDirection === 'Forward' ? 'Reverse' : 'Forward';
 
@@ -98,9 +101,9 @@
       {@attach onClickOutside({ callback: onClickOutsideCurrentScheme })}
     >
       <ColorPalette
-        scheme={style.scheme.id}
-        direction={style.scheme.direction}
-        count={style.type === 'Quantitative' ? style.count : undefined}
+        scheme={scale.scheme.id}
+        direction={scale.scheme.direction}
+        count={scale.type === 'Categorical' ? undefined : scale.steps}
       />
     </button>
     {#if showOptions}
@@ -118,15 +121,13 @@
             <li class="flex">
               <button
                 onclick={() => onClickScheme(scheme)}
-                use:focus={() => scheme === style.scheme.id}
+                use:focus={() => scheme === scale.scheme.id}
                 class="flex-1 p-2 hover:bg-slate-700"
               >
                 <ColorPalette
                   {scheme}
-                  direction={style.scheme.direction}
-                  count={style.type === 'Quantitative'
-                    ? style.count
-                    : undefined}
+                  direction={scale.scheme.direction}
+                  count={scale.type === 'Categorical' ? undefined : scale.steps}
                 />
               </button>
             </li>

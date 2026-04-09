@@ -9,11 +9,11 @@
   import Portal from '$lib/components/shared/Portal.svelte';
   import type {
     CartoKitHeatmapLayer,
-    ColorRamp as ColorRampType,
+    QuantitativeColorRamp,
     RampDirection
   } from '$lib/types';
 
-  import { COLOR_RAMPS } from '$lib/utils/color/ramp';
+  import { QUANTITATIVE_COLOR_RAMPS } from '$lib/utils/color/ramp';
 
   interface Props {
     layer: CartoKitHeatmapLayer;
@@ -39,7 +39,7 @@
     showOptions = false;
   }
 
-  async function onClickRamp(ramp: ColorRampType) {
+  async function onClickRamp(ramp: QuantitativeColorRamp) {
     const diff: CartoKitDiff = {
       type: 'heatmap-ramp',
       layerId: layer.id,
@@ -94,7 +94,7 @@
         <ul
           class="flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 shadow-lg"
         >
-          {#each COLOR_RAMPS as ramp (ramp)}
+          {#each QUANTITATIVE_COLOR_RAMPS as ramp (ramp)}
             <li>
               <button
                 onclick={() => onClickRamp(ramp)}

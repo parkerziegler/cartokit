@@ -8,7 +8,9 @@ import type {
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer,
-  QuantitativeFill
+  QuantitativeColorScale,
+  ContinuousColorScale,
+  CategoricalColorScale
 } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
@@ -19,10 +21,17 @@ import {
 import {
   DEFAULT_CATEGORICAL_SCHEME,
   DEFAULT_COUNT,
+  DEFAULT_METHOD,
   DEFAULT_QUANTITATIVE_SCHEME,
+  DEFAULT_SCHEME_DIRECTION,
   DEFAULT_THRESHOLDS
 } from '$lib/utils/constants';
 import type { CartoKitDiff } from '$lib/core/diff';
+import {
+  convertRampToScheme,
+  convertSchemeToRamp
+} from '$lib/utils/color/converter';
+import { materializeColorScheme } from '$lib/utils/color/scheme';
 
 /**
  * Recompute the quantitative breaks for a given layer and fill style.
@@ -31,16 +40,22 @@ import type { CartoKitDiff } from '$lib/core/diff';
  * @param fill The current {@link QuantitativeFill} style.
  * @returns The new breaks for the given layer and fill style.
  */
-function recomputeBreaks(layerId: string, fill: QuantitativeFill) {
-  const colors = d3[fill.scheme.id][fill.count];
+function recomputeBreaks(
+  layerId: string,
+  attribute: string,
+  scale: Exclude<QuantitativeColorScale, ContinuousColorScale>
+) {
+  const colors = d3[scale.scheme.id][scale.steps];
 
   return deriveThresholds({
-    method: fill.method,
+    method: scale.type,
     layerId,
-    attribute: fill.attribute,
+    attribute,
     range:
-      fill.scheme.direction === 'Reverse' ? [...colors].reverse() : [...colors],
-    thresholds: fill.thresholds
+      scale.scheme.direction === 'Reverse'
+        ? [...colors].reverse()
+        : [...colors],
+    thresholds: scale.thresholds
   });
 }
 
@@ -78,10 +93,19 @@ export async function patchFillDiffs(
 
         // Apply the patch.
         layer.style.fill.attribute = diff.payload.attribute;
-        layer.style.fill.thresholds = recomputeBreaks(
-          layer.id,
-          layer.style.fill
-        );
+
+        if (layer.style.fill.scale.type === 'Continuous') {
+          // TODO: Consider what we'll need to do for continuous color scales.
+          // My hunch is that we may not need to do anything; the catalog should
+          // already contain min and max values that we can use to derive the
+          // color scale in deriveColorScale.
+        } else {
+          layer.style.fill.scale.thresholds = recomputeBreaks(
+            layer.id,
+            layer.style.fill.attribute,
+            layer.style.fill.scale
+          );
+        }
       } else if (layer.style.fill.type === 'Categorical') {
         // Derive the inverse diff prior to applying the patch.
         inverse = {
@@ -94,7 +118,7 @@ export async function patchFillDiffs(
 
         // Apply the patch.
         layer.style.fill.attribute = diff.payload.attribute;
-        layer.style.fill.categories = enumerateAttributeCategories(
+        layer.style.fill.scale.categories = enumerateAttributeCategories(
           layer.data.geojson.features,
           layer.style.fill.attribute
         );
@@ -131,20 +155,25 @@ export async function patchFillDiffs(
         | CartoKitProportionalSymbolLayer;
 
       if (
-        layer.style.fill.type === 'Quantitative' ||
+        (layer.style.fill.type === 'Quantitative' &&
+          layer.style.fill.scale.type !== 'Continuous') ||
         layer.style.fill.type === 'Categorical'
       ) {
+        const currentScale = layer.style.fill.scale as
+          | Exclude<QuantitativeColorScale, ContinuousColorScale>
+          | CategoricalColorScale;
+
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'fill-color-scheme',
           layerId: diff.layerId,
           payload: {
-            scheme: layer.style.fill.scheme.id
+            scheme: currentScale.scheme.id
           }
         };
 
         // Apply the patch.
-        layer.style.fill.scheme.id = diff.payload.scheme;
+        currentScale.scheme.id = diff.payload.scheme;
       }
 
       break;
@@ -164,12 +193,20 @@ export async function patchFillDiffs(
           type: 'fill-color-scheme-direction',
           layerId: diff.layerId,
           payload: {
-            direction: layer.style.fill.scheme.direction
+            direction: (
+              layer.style.fill.scale as
+                | Exclude<QuantitativeColorScale, ContinuousColorScale>
+                | CategoricalColorScale
+            ).scheme.direction
           }
         };
 
         // Apply the patch.
-        layer.style.fill.scheme.direction = diff.payload.direction;
+        (
+          layer.style.fill.scale as
+            | Exclude<QuantitativeColorScale, ContinuousColorScale>
+            | CategoricalColorScale
+        ).scheme.direction = diff.payload.direction;
       }
 
       break;
@@ -186,16 +223,65 @@ export async function patchFillDiffs(
           type: 'fill-classification-method',
           layerId: diff.layerId,
           payload: {
-            method: layer.style.fill.method
+            method: layer.style.fill.scale.type
           }
         };
 
-        // Apply the patch.
-        layer.style.fill.method = diff.payload.method;
-        layer.style.fill.thresholds = recomputeBreaks(
-          layer.id,
-          layer.style.fill
-        );
+        // If transitioning from a discrete to a continuous color scale or vice
+        // versa, build the color scale wholesale.
+        if (
+          diff.payload.method === 'Continuous' &&
+          layer.style.fill.scale.type !== 'Continuous'
+        ) {
+          layer.style.fill.scale = {
+            type: diff.payload.method,
+            interpolator: {
+              id: convertSchemeToRamp(layer.style.fill.scale.scheme.id),
+              direction: layer.style.fill.scale.scheme.direction
+            }
+          };
+        } else if (
+          diff.payload.method !== 'Continuous' &&
+          layer.style.fill.scale.type === 'Continuous'
+        ) {
+          const scheme = {
+            id: convertRampToScheme(layer.style.fill.scale.interpolator.id),
+            direction: layer.style.fill.scale.interpolator.direction
+          };
+
+          const range = materializeColorScheme(
+            scheme.id,
+            scheme.direction,
+            DEFAULT_COUNT
+          );
+
+          layer.style.fill.scale = {
+            type: diff.payload.method,
+            scheme,
+            steps: DEFAULT_COUNT,
+            thresholds: deriveThresholds({
+              method: diff.payload.method,
+              layerId: layer.id,
+              attribute: layer.style.fill.attribute,
+              range,
+              thresholds: DEFAULT_THRESHOLDS(
+                layer.id,
+                layer.style.fill.attribute
+              )
+            })
+          };
+        } else if (
+          diff.payload.method !== 'Continuous' &&
+          layer.style.fill.scale.type !== 'Continuous'
+        ) {
+          // Just recompute the thresholds.
+          layer.style.fill.scale.type = diff.payload.method;
+          layer.style.fill.scale.thresholds = recomputeBreaks(
+            layer.id,
+            layer.style.fill.attribute,
+            layer.style.fill.scale
+          );
+        }
       }
 
       break;
@@ -206,21 +292,25 @@ export async function patchFillDiffs(
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer;
 
-      if (layer.style.fill.type === 'Quantitative') {
+      if (
+        layer.style.fill.type === 'Quantitative' &&
+        layer.style.fill.scale.type !== 'Continuous'
+      ) {
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'fill-step-count',
           layerId: diff.layerId,
           payload: {
-            count: layer.style.fill.count
+            count: layer.style.fill.scale.steps
           }
         };
 
         // Apply the patch.
-        layer.style.fill.count = diff.payload.count;
-        layer.style.fill.thresholds = recomputeBreaks(
+        layer.style.fill.scale.steps = diff.payload.count;
+        layer.style.fill.scale.thresholds = recomputeBreaks(
           layer.id,
-          layer.style.fill
+          layer.style.fill.attribute,
+          layer.style.fill.scale
         );
       }
 
@@ -232,22 +322,27 @@ export async function patchFillDiffs(
         | CartoKitPointLayer
         | CartoKitProportionalSymbolLayer;
 
-      if (layer.style.fill.type === 'Quantitative') {
+      if (
+        layer.style.fill.type === 'Quantitative' &&
+        layer.style.fill.scale.type === 'Manual'
+      ) {
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'fill-step-value',
           layerId: diff.layerId,
           payload: {
             step: diff.payload.step,
-            value: layer.style.fill.thresholds[diff.payload.step]
+            value: layer.style.fill.scale.thresholds[diff.payload.step]
           }
         };
 
         // Apply the patch.
-        layer.style.fill.thresholds[diff.payload.step] = diff.payload.value;
-        layer.style.fill.thresholds = recomputeBreaks(
+        layer.style.fill.scale.thresholds[diff.payload.step] =
+          diff.payload.value;
+        layer.style.fill.scale.thresholds = recomputeBreaks(
           layer.id,
-          layer.style.fill
+          layer.style.fill.attribute,
+          layer.style.fill.scale
         );
       }
 
@@ -277,16 +372,16 @@ export async function patchFillDiffs(
           layer.style.fill = {
             type: diff.payload.visualizationType,
             attribute,
-            categories: enumerateAttributeCategories(
-              layer.data.geojson.features,
-              attribute
-            ),
-            scheme: {
-              id: DEFAULT_CATEGORICAL_SCHEME,
-              direction:
-                'scheme' in layer.style.fill
-                  ? layer.style.fill.scheme.direction
-                  : 'Forward'
+            scale: {
+              type: 'Categorical',
+              scheme: {
+                id: DEFAULT_CATEGORICAL_SCHEME,
+                direction: 'Forward'
+              },
+              categories: enumerateAttributeCategories(
+                layer.data.geojson.features,
+                attribute
+              )
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
@@ -301,16 +396,15 @@ export async function patchFillDiffs(
           layer.style.fill = {
             type: diff.payload.visualizationType,
             attribute: attribute,
-            method: 'Quantile',
-            scheme: {
-              id: DEFAULT_QUANTITATIVE_SCHEME,
-              direction:
-                layer.style.fill && 'scheme' in layer.style.fill
-                  ? layer.style.fill.scheme.direction
-                  : 'Forward'
+            scale: {
+              type: DEFAULT_METHOD,
+              scheme: {
+                id: DEFAULT_QUANTITATIVE_SCHEME,
+                direction: DEFAULT_SCHEME_DIRECTION
+              },
+              steps: DEFAULT_COUNT,
+              thresholds: DEFAULT_THRESHOLDS(layer.id, attribute)
             },
-            count: DEFAULT_COUNT,
-            thresholds: DEFAULT_THRESHOLDS(layer.id, attribute),
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
           };

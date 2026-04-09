@@ -10,15 +10,15 @@ import type {
   BasemapProvider,
   CartoKitLayer,
   CategoricalColorScheme,
-  ClassificationMethod,
-  ColorRamp,
+  QuantitativeColorRamp,
   LayerType,
   Projection,
   QuantitativeColorScheme,
   RampDirection,
   SchemeDirection,
   TransformationCall,
-  VisualizationType
+  VisualizationType,
+  QuantitativeColorScale
 } from '$lib/types';
 
 interface LayerDiff {
@@ -64,7 +64,7 @@ interface FillColorSchemeDirectionDiff extends LayerDiff {
 interface FillClassificationMethodDiff extends LayerDiff {
   type: 'fill-classification-method';
   payload: {
-    method: ClassificationMethod;
+    method: QuantitativeColorScale['type'];
   };
 }
 
@@ -197,7 +197,7 @@ interface HeatmapRadiusDiff extends LayerDiff {
 interface HeatmapRampDiff extends LayerDiff {
   type: 'heatmap-ramp';
   payload: {
-    ramp: ColorRamp;
+    ramp: QuantitativeColorRamp;
   };
 }
 

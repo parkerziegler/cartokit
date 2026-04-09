@@ -10,7 +10,7 @@ export const DEFAULT_STROKE_OPACITY = 1;
 export const DEFAULT_METHOD = 'Quantile';
 export const DEFAULT_QUANTITATIVE_SCHEME = 'schemeOranges';
 export const DEFAULT_CATEGORICAL_SCHEME = 'schemeCategory10';
-export const DEFAULT_RAMP = 'Spectral';
+export const DEFAULT_RAMP = 'interpolateSpectral';
 export const DEFAULT_SCHEME_DIRECTION = 'Forward';
 export const DEFAULT_COUNT = 5;
 export const DEFAULT_THRESHOLDS = (layerId: string, attribute: string) =>

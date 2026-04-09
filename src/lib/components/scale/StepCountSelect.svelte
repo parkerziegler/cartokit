@@ -3,14 +3,17 @@
 
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import type { QuantitativeStyle } from '$lib/types';
+  import type {
+    QuantitativeColorScale,
+    ContinuousColorScale
+  } from '$lib/types';
 
   interface Props {
     layerId: string;
-    style: QuantitativeStyle;
+    scale: Exclude<QuantitativeColorScale, ContinuousColorScale>;
   }
 
-  let { layerId, style }: Props = $props();
+  let { layerId, scale }: Props = $props();
 
   const options = d3.range(3, 10).map((_, i) => ({
     value: i + 3,
@@ -34,7 +37,7 @@
 
 <Select
   {options}
-  selected={style.count}
+  selected={scale.steps}
   title="Steps"
   id="fill-step-count-select"
   onchange={onStepCountChange}
