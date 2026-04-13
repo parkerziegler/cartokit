@@ -222,6 +222,21 @@ interface HeatmapWeightAttributeDiff extends LayerDiff {
   };
 }
 
+
+interface FillColorRampDiff extends LayerDiff {
+  type: 'fill-color-ramp';
+  payload: {
+    ramp: QuantitativeColorRamp;
+  };
+}
+
+interface FillColorRampDirectionDiff extends LayerDiff {
+  type: 'fill-color-ramp-direction';
+  payload: {
+    direction: RampDirection;
+  };
+}
+
 interface HeatmapWeightMinDiff extends LayerDiff {
   type: 'heatmap-weight-min';
   payload: {
@@ -337,6 +352,8 @@ export type CartoKitDiff =
   | FillColorDiff
   | FillColorSchemeDiff
   | FillColorSchemeDirectionDiff
+  | FillColorRampDiff
+  | FillColorRampDirectionDiff
   | FillClassificationMethodDiff
   | FillStepCountDiff
   | FillStepValueDiff

@@ -11,6 +11,7 @@ import type {
 import { DEFAULT_FILL } from '$lib/utils/constants';
 import { materializeColorRamp } from '$lib/utils/color/ramp';
 import { materializeColorScheme } from '$lib/utils/color/scheme';
+import { catalog } from '$lib/state/catalog.svelte';
 
 /**
  * Derive a MapLibre GL JS expression for a choropleth color scale.
@@ -20,15 +21,31 @@ import { materializeColorScheme } from '$lib/utils/color/scheme';
  * @returns An {@link ExpressionSpecification} or string for a color scale.
  */
 export function deriveColorScale(
-  style: ConstantStyle | CategoricalStyle | QuantitativeStyle
+  style: ConstantStyle | CategoricalStyle | QuantitativeStyle,
+  layerId?: string
 ): ExpressionSpecification | string {
   switch (style.type) {
     case 'Quantitative': {
       const { scale, attribute } = style;
 
       if (scale.type === 'Continuous') {
-        // TODO: Implement continuous color scale.
-        return 'TODO';
+        const { min, max } = catalog.value[layerId!][attribute];
+        const colors = materializeColorRamp(
+          scale.interpolator.id,
+          scale.interpolator.direction,
+          10
+        );
+        const step = (max - min) / 10;
+
+        return [
+          'interpolate',
+          ['linear'],
+          ['get', attribute],
+          ...colors.flatMap((color, i) => [
+            parseFloat((min + i * step).toFixed(10)),
+            color
+          ])
+        ];
       } else {
         const colors = materializeColorScheme(
           scale.scheme.id,

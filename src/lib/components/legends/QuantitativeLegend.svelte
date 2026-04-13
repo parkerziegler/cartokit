@@ -2,6 +2,7 @@
   import type { ConstantStroke, LayerType, QuantitativeFill } from '$lib/types';
   import { catalog } from '$lib/state/catalog.svelte';
   import { materializeColorScheme } from '$lib/utils/color/scheme';
+  import ColorRamp from '$lib/components/channel/shared/ColorRamp.svelte';
 
   interface Props {
     fill: QuantitativeFill;
@@ -26,7 +27,19 @@
 </script>
 
 {#if fill.scale.type === 'Continuous'}
-  <div>TODO</div>
+  <div class={['flex flex-col gap-2', visible ? 'opacity-100' : 'opacity-75']}>
+    <p class="font-semibold">{fill.attribute} ↓</p>
+    <div class="flex flex-col gap-1">
+      <ColorRamp
+        ramp={fill.scale.interpolator.id}
+        direction={fill.scale.interpolator.direction}
+      />
+      <div class="flex justify-between font-mono text-xs">
+        <span>{min.toFixed(2)}</span>
+        <span>{max.toFixed(2)}</span>
+      </div>
+    </div>
+  </div>
 {:else}
   <div class={['flex flex-col gap-2', visible ? 'opacity-100' : 'opacity-75']}>
     <p class="font-semibold">{fill.attribute} ↓</p>

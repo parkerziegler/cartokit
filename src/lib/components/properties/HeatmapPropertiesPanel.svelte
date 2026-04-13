@@ -1,5 +1,5 @@
 <script lang="ts">
-  import HeatmapColor from '$lib/components/channel/heatmap/HeatmapColor.svelte';
+  import ColorRampSelect from '$lib/components/color/ColorRampSelect.svelte';
   import HeatmapOpacity from '$lib/components/channel/heatmap/HeatmapOpacity.svelte';
   import HeatmapRadius from '$lib/components/channel/heatmap/HeatmapRadius.svelte';
   import HeatmapWeight from '$lib/components/channel/heatmap/HeatmapWeight.svelte';
@@ -17,7 +17,11 @@
   <HeatmapWeight {layer} />
 </MenuItem>
 <MenuItem title="Display">
-  <HeatmapColor {layer} />
+  <ColorRampSelect
+    layerId={layer.id}
+    channel="heatmap-color"
+    ramp={layer.style.heatmap.ramp}
+  />
   <HeatmapRadius {layer} />
   <HeatmapOpacity {layer} />
 </MenuItem>

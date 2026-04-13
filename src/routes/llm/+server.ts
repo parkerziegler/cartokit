@@ -222,6 +222,67 @@ function FillColorSchemeDirectionDiff(
   });
 }
 
+const QuantitativeColorRamp = z.union([
+  z.literal('interpolateBlues'),
+  z.literal('interpolateGreens'),
+  z.literal('interpolateGreys'),
+  z.literal('interpolateOranges'),
+  z.literal('interpolatePurples'),
+  z.literal('interpolateReds'),
+  z.literal('interpolateBuGn'),
+  z.literal('interpolateBuPu'),
+  z.literal('interpolateGnBu'),
+  z.literal('interpolateOrRd'),
+  z.literal('interpolatePuBuGn'),
+  z.literal('interpolatePuBu'),
+  z.literal('interpolatePuRd'),
+  z.literal('interpolateRdPu'),
+  z.literal('interpolateYlGnBu'),
+  z.literal('interpolateYlGn'),
+  z.literal('interpolateYlOrBr'),
+  z.literal('interpolateYlOrRd'),
+  z.literal('interpolateCividis'),
+  z.literal('interpolateViridis'),
+  z.literal('interpolateInferno'),
+  z.literal('interpolateMagma'),
+  z.literal('interpolatePlasma'),
+  z.literal('interpolateWarm'),
+  z.literal('interpolateCool'),
+  z.literal('interpolateCubehelixDefault'),
+  z.literal('interpolateTurbo'),
+  z.literal('interpolateBrBG'),
+  z.literal('interpolatePRGn'),
+  z.literal('interpolatePiYG'),
+  z.literal('interpolatePuOr'),
+  z.literal('interpolateRdBu'),
+  z.literal('interpolateRdGy'),
+  z.literal('interpolateRdYlBu'),
+  z.literal('interpolateRdYlGn'),
+  z.literal('interpolateSpectral'),
+  z.literal('interpolateRainbow'),
+  z.literal('interpolateSinebow')
+]);
+
+function FillColorRampDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
+  return z.object({
+    type: z.literal('fill-color-ramp'),
+    layerId: layerIdSchema,
+    payload: z.object({ ramp: QuantitativeColorRamp })
+  });
+}
+
+function FillColorRampDirectionDiff(
+  layerIdSchema: z.infer<typeof makeLayerIdSchema>
+) {
+  return z.object({
+    type: z.literal('fill-color-ramp-direction'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      direction: z.union([z.literal('Forward'), z.literal('Reverse')])
+    })
+  });
+}
+
 const ClassificationMethod = z.union([
   z.literal('Quantile'),
   z.literal('Equal Interval'),
@@ -630,6 +691,8 @@ function makeSchema(
         FillColorDiff(layerIdSchema),
         FillColorSchemeDiff(layerIdSchema),
         FillColorSchemeDirectionDiff(layerIdSchema),
+        FillColorRampDiff(layerIdSchema),
+        FillColorRampDirectionDiff(layerIdSchema),
         FillClassificationMethodDiff(layerIdSchema),
         FillStepCountDiff(layerIdSchema),
         FillStepValueDiff(layerIdSchema),

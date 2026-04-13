@@ -28,7 +28,7 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         source: layer.id,
         type: 'fill',
         paint: {
-          'fill-color': deriveColorScale(layer.style.fill),
+          'fill-color': deriveColorScale(layer.style.fill, layer.id),
           'fill-opacity': layer.style.fill.opacity
         }
       });
@@ -174,7 +174,7 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
     case 'Point': {
       const fillPaint = layer.style.fill.visible
         ? {
-            'circle-color': deriveColorScale(layer.style.fill),
+            'circle-color': deriveColorScale(layer.style.fill, layer.id),
             'circle-opacity': layer.style.fill.opacity
           }
         : {
@@ -254,7 +254,7 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
     case 'Proportional Symbol': {
       const fillPaint = layer.style.fill.visible
         ? {
-            'circle-color': deriveColorScale(layer.style.fill),
+            'circle-color': deriveColorScale(layer.style.fill, layer.id),
             'circle-opacity': layer.style.fill.opacity
           }
         : {

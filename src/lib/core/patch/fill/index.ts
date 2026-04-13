@@ -148,6 +148,56 @@ export async function patchFillDiffs(
 
       break;
     }
+    case 'fill-color-ramp': {
+      const layer = ir.layers[diff.layerId] as
+        | CartoKitChoroplethLayer
+        | CartoKitPointLayer
+        | CartoKitProportionalSymbolLayer;
+
+      if (
+        layer.style.fill.type === 'Quantitative' &&
+        layer.style.fill.scale.type === 'Continuous'
+      ) {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-color-ramp',
+          layerId: diff.layerId,
+          payload: {
+            ramp: layer.style.fill.scale.interpolator.id
+          }
+        };
+
+        // Apply the patch.
+        layer.style.fill.scale.interpolator.id = diff.payload.ramp;
+      }
+
+      break;
+    }
+    case 'fill-color-ramp-direction': {
+      const layer = ir.layers[diff.layerId] as
+        | CartoKitChoroplethLayer
+        | CartoKitPointLayer
+        | CartoKitProportionalSymbolLayer;
+
+      if (
+        layer.style.fill.type === 'Quantitative' &&
+        layer.style.fill.scale.type === 'Continuous'
+      ) {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'fill-color-ramp-direction',
+          layerId: diff.layerId,
+          payload: {
+            direction: layer.style.fill.scale.interpolator.direction
+          }
+        };
+
+        // Apply the patch.
+        layer.style.fill.scale.interpolator.direction = diff.payload.direction;
+      }
+
+      break;
+    }
     case 'fill-color-scheme': {
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer

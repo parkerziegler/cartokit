@@ -26,6 +26,8 @@ export async function reconFillDiffs(
     case 'fill-attribute':
     case 'fill-color-scheme':
     case 'fill-color-scheme-direction':
+    case 'fill-color-ramp':
+    case 'fill-color-ramp-direction':
     case 'fill-classification-method':
     case 'fill-step-count':
     case 'fill-step-value':
@@ -40,7 +42,7 @@ export async function reconFillDiffs(
           map.value!.setPaintProperty(
             diff.layerId,
             'fill-color',
-            deriveColorScale(layer.style.fill)
+            deriveColorScale(layer.style.fill, layer.id)
           );
           break;
         case 'Point':
@@ -48,7 +50,7 @@ export async function reconFillDiffs(
           map.value!.setPaintProperty(
             diff.layerId,
             'circle-color',
-            deriveColorScale(layer.style.fill)
+            deriveColorScale(layer.style.fill, layer.id)
           );
           break;
       }
@@ -124,7 +126,7 @@ export async function reconFillDiffs(
           map.value!.setPaintProperty(
             diff.layerId,
             'circle-color',
-            deriveColorScale(layer.style.fill)
+            deriveColorScale(layer.style.fill, layer.id)
           );
           map.value!.setPaintProperty(
             diff.layerId,
@@ -136,7 +138,7 @@ export async function reconFillDiffs(
           map.value!.setPaintProperty(
             diff.layerId,
             'fill-color',
-            deriveColorScale(layer.style.fill)
+            deriveColorScale(layer.style.fill, layer.id)
           );
           map.value!.setPaintProperty(
             diff.layerId,
