@@ -10,7 +10,7 @@
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
-  import { geometryToLayerTypes } from '$lib/utils/layer';
+  import { VALID_GEOJSON_TYPES } from '$lib/utils/layer';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -43,44 +43,38 @@
 
     reader.onload = async function readGeoJSON(theFile) {
       if (typeof theFile.target?.result === 'string' && file) {
-        const VALID_GEOJSON_TYPES = new Set([
-          ...geometryToLayerTypes.keys(),
-          'Feature',
-          'FeatureCollection'
-        ]);
-
-        let featureCollection;
         try {
           const parsed = JSON.parse(theFile.target.result);
-          if (!parsed || !VALID_GEOJSON_TYPES.has(parsed.type)) {
+          // VALID_GEOJSON_TYPES should be imported.
+          if (!VALID_GEOJSON_TYPES.has(parsed.type)) {
             throw new Error('Not a valid GeoJSON type.');
           }
-          featureCollection = normalizeGeoJSONToFeatureCollection(parsed);
-        } catch {
-          error = 'Invalid file. Please check the file and try again.';
+
+          const featureCollection = normalizeGeoJSONToFeatureCollection(parsed);
+          const layerId = uniqueId(`${kebabCase(displayName)}__`);
+
+          await applyDiff({
+            type: 'add-layer',
+            layerId,
+            payload: {
+              type: 'file',
+              displayName,
+              fileName: file.name,
+              featureCollection
+            }
+          });
+
+          displayName = '';
+        } catch (e) {
+          error =
+            e instanceof Error
+              ? e.message
+              : 'Invalid GeoJSON file. Please check the file and try again.';
+        } finally {
           dataLoading = false;
-          return;
+          file = null;
+          closeModal();
         }
-
-        const layerId = uniqueId(`${kebabCase(displayName)}__`);
-
-        await applyDiff({
-          type: 'add-layer',
-          layerId,
-          payload: {
-            type: 'file',
-            displayName,
-            fileName: file.name,
-            featureCollection
-          }
-        });
-
-        dataLoading = false;
-        error = '';
-        file = null;
-        displayName = '';
-
-        closeModal();
       }
     };
 

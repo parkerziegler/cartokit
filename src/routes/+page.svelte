@@ -10,6 +10,7 @@
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import PropertiesMenu from '$lib/components/properties/PropertiesMenu.svelte';
   import Alert from '$lib/components/shared/Alert.svelte';
+  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
   import DataTable from '$lib/components/shared/DataTable.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
@@ -184,7 +185,11 @@
     <div
       class="absolute bottom-12 left-4 rounded-md bg-slate-900 p-2 text-xs tracking-wider text-white shadow-lg"
     >
-      <Alert kind="error" message={error.message} />
+      <Alert kind="error" message={error.message}>
+        {#snippet icon()}
+          <AlertIcon />
+        {/snippet}
+      </Alert>
     </div>
   {/if}
   <Cursor />
