@@ -5,26 +5,35 @@ import type { ExpressionSpecification } from 'maplibre-gl';
 import type {
   ConstantStyle,
   CategoricalStyle,
-  QuantitativeStyle,
+  DiscreteQuantitativeStyle,
+  ContinuousQuantitativeStyle,
   HeatmapStyle
 } from '$lib/types';
 import { DEFAULT_FILL } from '$lib/utils/constants';
 import { materializeColorRamp } from '$lib/utils/color/ramp';
 import { materializeColorScheme } from '$lib/utils/color/scheme';
+import { materializeColorInterpolator } from '$lib/utils/color/interpolator';
+import { catalog } from '$lib/state/catalog.svelte';
 
 /**
  * Derive a MapLibre GL JS expression for a choropleth color scale.
  *
- * @param {ConstantStyle | CategoricalStyle | QuantitativeStyle} style – The
+ * @param {ConstantStyle | CategoricalStyle | DiscreteQuantitativeStyle | ContinuousQuantitativeStyle} style – The
  * style from which to derive the color scale.
+ * @param {string} [layerId] – The layer ID (required for continuous quantitative styles).
  * @returns {ExpressionSpecification | string} — A MapLibre GL JS expression for
  * a color scale.
  */
 export function deriveColorScale(
-  style: ConstantStyle | CategoricalStyle | QuantitativeStyle
+  style:
+    | ConstantStyle
+    | CategoricalStyle
+    | DiscreteQuantitativeStyle
+    | ContinuousQuantitativeStyle,
+  layerId?: string
 ): ExpressionSpecification | string {
   switch (style.type) {
-    case 'Quantitative': {
+    case 'DiscreteQuantitative': {
       const { scheme, count, attribute, thresholds } = style;
 
       const colors = materializeColorScheme(scheme.id, scheme.direction, count);
@@ -41,6 +50,52 @@ export function deriveColorScale(
       );
 
       return [...prelude, ...stops];
+    }
+    case 'ContinuousQuantitative': {
+      const { interpolator, attribute } = style;
+      const NUM_STEPS = 10;
+
+      if (!layerId) {
+        throw new Error(
+          'deriveColorScale requires layerId for ContinuousQuantitative styles'
+        );
+      }
+
+      const attributeRange = catalog.value[layerId]?.[attribute];
+
+      if (!attributeRange) {
+        throw new Error(
+          `Missing catalog range for layer '${layerId}' attribute '${attribute}'`
+        );
+      }
+
+      const { min, max } = attributeRange;
+      const colorInterpolator = materializeColorInterpolator(
+        interpolator.id,
+        interpolator.direction
+      );
+
+      if (min === max) {
+        return colorInterpolator(0.5);
+      }
+
+      // Sample the interpolator at regular intervals.
+      const prelude: ExpressionSpecification = [
+        'interpolate',
+        ['linear'],
+        ['get', attribute]
+      ];
+
+      // Add color stops at regular intervals across the data range
+      for (let i = 0; i <= NUM_STEPS; i++) {
+        const t = i / NUM_STEPS;
+        const value = min + (max - min) * t;
+        const color = colorInterpolator(t);
+        prelude.push(value);
+        prelude.push(color);
+      }
+
+      return prelude;
     }
     case 'Categorical': {
       const { categories, scheme, attribute } = style;

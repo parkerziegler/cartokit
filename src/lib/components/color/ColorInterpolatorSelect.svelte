@@ -2,26 +2,21 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import { onClickOutside } from '$lib/attachments/on-click-outside';
   import { focus } from '$lib/actions/focus.svelte';
-  import ColorPalette from '$lib/components/channel/shared/ColorPalette.svelte';
+  import ColorInterpolator from '$lib/components/channel/shared/ColorInterpolator.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type {
-    CategoricalColorScheme,
-    QuantitativeColorScheme,
-    DiscreteQuantitativeStyle,
-    CategoricalStyle,
-    SchemeDirection
+    ContinuousQuantitativeStyle,
+    QuantitativeColorInterpolator,
+    InterpolatorDirection
   } from '$lib/types';
-  import {
-    QUANTITATIVE_COLOR_SCHEMES,
-    CATEGORICAL_COLOR_SCHEMES
-  } from '$lib/utils/color/scheme';
+  import { QUANTITATIVE_COLOR_INTERPOLATORS } from '$lib/utils/color/interpolator';
 
   interface Props {
     layerId: string;
-    style: DiscreteQuantitativeStyle | CategoricalStyle;
+    style: ContinuousQuantitativeStyle;
   }
 
   let { layerId, style }: Props = $props();
@@ -32,47 +27,41 @@
   let x = $state(0);
   let y = $state(0);
 
-  let schemes = $derived(
-    style.type === 'DiscreteQuantitative'
-      ? QUANTITATIVE_COLOR_SCHEMES
-      : CATEGORICAL_COLOR_SCHEMES
-  );
-
   let trigger: HTMLDivElement;
   const target = document.getElementById('map') ?? document.body;
 
-  function onClickCurrentScheme() {
+  function onClickCurrentInterpolator() {
     showOptions = !showOptions;
     ({ x, y } = trigger.getBoundingClientRect());
   }
 
-  function onClickOutsideCurrentScheme() {
+  function onClickOutsideCurrentInterpolator() {
     showOptions = false;
   }
 
-  async function onClickScheme(
-    scheme: CategoricalColorScheme | QuantitativeColorScheme
+  async function onClickInterpolator(
+    interpolator: QuantitativeColorInterpolator
   ) {
     showOptions = false;
 
     const diff: CartoKitDiff = {
-      type: 'fill-color-scheme',
+      type: 'fill-color-interpolator',
       layerId,
       payload: {
-        scheme
+        interpolator
       }
     };
 
     await applyDiff(diff);
   }
 
-  async function onSchemeReverse() {
-    const currentDirection = style.scheme.direction;
-    const nextDirection: SchemeDirection =
+  async function onInterpolatorReverse() {
+    const currentDirection = style.interpolator.direction;
+    const nextDirection: InterpolatorDirection =
       currentDirection === 'Forward' ? 'Reverse' : 'Forward';
 
     const diff: CartoKitDiff = {
-      type: 'fill-color-scheme-direction',
+      type: 'fill-color-interpolator-direction',
       layerId,
       payload: {
         direction: nextDirection
@@ -84,23 +73,22 @@
 </script>
 
 <div class="flex items-center gap-2">
-  <FieldLabel fieldId="color-scheme">Scheme</FieldLabel>
+  <FieldLabel fieldId="color-interpolator">Interpolator</FieldLabel>
   <div
-    id="color-scheme"
+    id="color-interpolator"
     class="flex grow items-center border border-transparent p-2 focus-within:border-slate-600 hover:border-slate-600"
     bind:this={trigger}
     bind:offsetHeight
     bind:offsetWidth
   >
     <button
-      onclick={onClickCurrentScheme}
+      onclick={onClickCurrentInterpolator}
       class="flex-1"
-      {@attach onClickOutside({ callback: onClickOutsideCurrentScheme })}
+      {@attach onClickOutside({ callback: onClickOutsideCurrentInterpolator })}
     >
-      <ColorPalette
-        scheme={style.scheme.id}
-        direction={style.scheme.direction}
-        count={style.type === 'DiscreteQuantitative' ? style.count : undefined}
+      <ColorInterpolator
+        interpolator={style.interpolator.id}
+        direction={style.interpolator.direction}
       />
     </button>
     {#if showOptions}
@@ -114,19 +102,16 @@
         <ul
           class="flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 shadow-lg"
         >
-          {#each schemes as scheme (scheme)}
+          {#each QUANTITATIVE_COLOR_INTERPOLATORS as interpolator (interpolator)}
             <li class="flex">
               <button
-                onclick={() => onClickScheme(scheme)}
-                use:focus={() => scheme === style.scheme.id}
-                class="flex-1 p-2 hover:bg-slate-700"
+                onclick={() => onClickInterpolator(interpolator)}
+                use:focus={() => interpolator === style.interpolator.id}
+                class="flex-1 p-2 hover:bg-slate-600"
               >
-                <ColorPalette
-                  {scheme}
-                  direction={style.scheme.direction}
-                  count={style.type === 'DiscreteQuantitative'
-                    ? style.count
-                    : undefined}
+                <ColorInterpolator
+                  {interpolator}
+                  direction={style.interpolator.direction}
                 />
               </button>
             </li>
@@ -136,10 +121,10 @@
     {/if}
   </div>
   <button
-    onclick={onSchemeReverse}
-    data-testid="color-scheme-reverse-button"
+    onclick={onInterpolatorReverse}
+    data-testid="color-interpolator-reverse-button"
     {@attach tooltip({
-      content: 'Reverse Scheme'
+      content: 'Reverse Interpolator'
     })}><ReverseIcon /></button
   >
 </div>
