@@ -10,7 +10,6 @@
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
-  import { fetchGeoJSON } from '$lib/utils/source';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -58,26 +57,26 @@
     error = '';
 
     try {
-      await fetchGeoJSON(endpoint);
-    } catch {
-      error = 'Invalid endpoint. Please check the URL and try again.';
+      const layerId = uniqueId(`${kebabCase(displayName)}__`);
+      await applyDiff({
+        type: 'add-layer',
+        layerId,
+        payload: {
+          type: 'api',
+          displayName,
+          url: endpoint
+        }
+      });
+
+      map.value!.on('sourcedata', handleSourceLoaded(layerId));
+    } catch (e) {
+      error =
+        e instanceof Error
+          ? e.message
+          : 'Failed to add layer. Check the endpoint and try again.';
+    } finally {
       dataLoading = false;
-      return;
     }
-
-    const layerId = uniqueId(`${kebabCase(displayName)}__`);
-
-    await applyDiff({
-      type: 'add-layer',
-      layerId,
-      payload: {
-        type: 'api',
-        displayName,
-        url: endpoint
-      }
-    });
-
-    map.value!.on('sourcedata', handleSourceLoaded(layerId));
   }
 </script>
 

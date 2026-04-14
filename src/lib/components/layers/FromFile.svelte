@@ -45,9 +45,15 @@
       if (typeof theFile.target?.result === 'string' && file) {
         try {
           const parsed = JSON.parse(theFile.target.result);
-          // VALID_GEOJSON_TYPES should be imported.
-          if (!VALID_GEOJSON_TYPES.has(parsed.type)) {
-            throw new Error('Not a valid GeoJSON type.');
+
+          if (!parsed.type) {
+            throw new Error(
+              'Missing required member "type" in GeoJSON file. Fix the file and try again.'
+            );
+          } else if (!VALID_GEOJSON_TYPES.has(parsed.type)) {
+            throw new Error(
+              `Invalid value for "type" in GeoJSON file: ${parsed.type}. Valid values are: ${Array.from(VALID_GEOJSON_TYPES).join(', ')}. Fix the file and try again.`
+            );
           }
 
           const featureCollection = normalizeGeoJSONToFeatureCollection(parsed);
@@ -64,7 +70,7 @@
             }
           });
 
-          displayName = '';
+          closeModal();
         } catch (e) {
           error =
             e instanceof Error
@@ -72,8 +78,6 @@
               : 'Invalid GeoJSON file. Please check the file and try again.';
         } finally {
           dataLoading = false;
-          file = null;
-          closeModal();
         }
       }
     };
