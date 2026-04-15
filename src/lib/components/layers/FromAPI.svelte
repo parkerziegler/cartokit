@@ -3,6 +3,8 @@
   import { uniqueId, kebabCase } from 'lodash-es';
   import type { MapSourceDataEvent } from 'maplibre-gl';
 
+  import Alert from '$lib/components/shared/Alert.svelte';
+  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
@@ -14,6 +16,7 @@
   let endpoint = $state('');
   let displayName = $state('');
   let dataLoading = $state(false);
+  let error = $state('');
 
   function onEndpointInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
@@ -31,6 +34,7 @@
     return (event: MapSourceDataEvent) => {
       if (event.sourceId === layerId) {
         dataLoading = false;
+        error = '';
         endpoint = '';
         displayName = '';
 
@@ -50,20 +54,29 @@
     }
 
     dataLoading = true;
+    error = '';
 
-    const layerId = uniqueId(`${kebabCase(displayName)}__`);
+    try {
+      const layerId = uniqueId(`${kebabCase(displayName)}__`);
+      await applyDiff({
+        type: 'add-layer',
+        layerId,
+        payload: {
+          type: 'api',
+          displayName,
+          url: endpoint
+        }
+      });
 
-    await applyDiff({
-      type: 'add-layer',
-      layerId,
-      payload: {
-        type: 'api',
-        displayName,
-        url: endpoint
-      }
-    });
-
-    map.value!.on('sourcedata', handleSourceLoaded(layerId));
+      map.value!.on('sourcedata', handleSourceLoaded(layerId));
+    } catch (e) {
+      error =
+        e instanceof Error
+          ? e.message
+          : 'Failed to add layer. Check the endpoint and try again.';
+    } finally {
+      dataLoading = false;
+    }
   }
 </script>
 
@@ -88,6 +101,13 @@
       placeholder="(e.g., Earthquakes)"
     />
   </div>
+  {#if error}
+    <Alert kind="error" message={error}>
+      {#snippet icon()}
+        <AlertIcon />
+      {/snippet}
+    </Alert>
+  {/if}
   <Button
     class="self-end"
     loading={dataLoading}

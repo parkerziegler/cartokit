@@ -2,18 +2,22 @@
   import { getContext } from 'svelte';
   import { uniqueId, kebabCase } from 'lodash-es';
 
+  import Alert from '$lib/components/shared/Alert.svelte';
+  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
+  import { VALID_GEOJSON_TYPES } from '$lib/utils/layer';
 
   const closeModal = getContext<() => void>('close-modal');
 
   let file: File | null = $state(null);
   let displayName = $state('');
   let dataLoading = $state(false);
+  let error = $state('');
 
   function onFileUpload(f: File) {
     file = f;
@@ -39,28 +43,42 @@
 
     reader.onload = async function readGeoJSON(theFile) {
       if (typeof theFile.target?.result === 'string' && file) {
-        const featureCollection = normalizeGeoJSONToFeatureCollection(
-          JSON.parse(theFile.target.result)
-        );
+        try {
+          const parsed = JSON.parse(theFile.target.result);
 
-        const layerId = uniqueId(`${kebabCase(displayName)}__`);
-
-        await applyDiff({
-          type: 'add-layer',
-          layerId,
-          payload: {
-            type: 'file',
-            displayName,
-            fileName: file.name,
-            featureCollection
+          if (!parsed.type) {
+            throw new Error(
+              'Missing required member "type" in GeoJSON file. Fix the file and try again.'
+            );
+          } else if (!VALID_GEOJSON_TYPES.has(parsed.type)) {
+            throw new Error(
+              `Invalid value for "type" in GeoJSON file: ${parsed.type}. Valid values are: ${Array.from(VALID_GEOJSON_TYPES).join(', ')}. Fix the file and try again.`
+            );
           }
-        });
 
-        dataLoading = false;
-        file = null;
-        displayName = '';
+          const featureCollection = normalizeGeoJSONToFeatureCollection(parsed);
+          const layerId = uniqueId(`${kebabCase(displayName)}__`);
 
-        closeModal();
+          await applyDiff({
+            type: 'add-layer',
+            layerId,
+            payload: {
+              type: 'file',
+              displayName,
+              fileName: file.name,
+              featureCollection
+            }
+          });
+
+          closeModal();
+        } catch (e) {
+          error =
+            e instanceof Error
+              ? e.message
+              : 'Invalid GeoJSON file. Please check the file and try again.';
+        } finally {
+          dataLoading = false;
+        }
       }
     };
 
@@ -82,6 +100,13 @@
       placeholder="(e.g., Earthquakes)"
     />
   </div>
+  {#if error}
+    <Alert kind="error" message={error}>
+      {#snippet icon()}
+        <AlertIcon />
+      {/snippet}
+    </Alert>
+  {/if}
   <Button
     class="self-end"
     loading={dataLoading}

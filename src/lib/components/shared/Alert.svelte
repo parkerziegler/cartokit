@@ -24,7 +24,7 @@
     {
       'bg-green-500/10 text-green-200 outline outline-green-500/20':
         kind === 'success',
-      'bg-red-500/10 text-red-100 outline outline-red-500/15': kind === 'error',
+      'bg-red-500/15 text-red-100 outline outline-red-500/40': kind === 'error',
       'bg-yellow-500/10 text-yellow-100 outline outline-yellow-500/15':
         kind === 'warn',
       'bg-ck-light/10 text-ck-light outline-ck-light/20 outline':

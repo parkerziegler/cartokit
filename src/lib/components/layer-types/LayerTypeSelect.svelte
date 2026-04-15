@@ -1,6 +1,7 @@
 <script lang="ts">
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import { error } from '$lib/state/error.svelte';
   import type { CartoKitLayer, LayerType } from '$lib/types';
   import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
   import { geometryToLayerTypes } from '$lib/utils/layer';
@@ -33,7 +34,13 @@
       }
     };
 
-    await applyDiff(diff);
+    try {
+      await applyDiff(diff);
+    } catch (e) {
+      error.set(
+        e instanceof Error ? e.message : 'Failed to change layer type.'
+      );
+    }
   }
 </script>
 

@@ -53,3 +53,10 @@ export const geometryToLayerTypes = new Map<Geometry['type'], LayerType[]>([
   ],
   ['GeometryCollection', []]
 ]);
+
+// A set of valid GeoJSON Geometry types for cartokit layers.
+export const VALID_GEOJSON_TYPES = new Set([
+  ...geometryToLayerTypes.keys(),
+  'Feature',
+  'FeatureCollection'
+]);
