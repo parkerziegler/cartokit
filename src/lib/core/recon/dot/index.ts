@@ -21,11 +21,13 @@ export async function reconDotDensityDiffs(
     case 'dot-attribute': {
       const layer = targetIR.layers[diff.layerId] as CartoKitDotDensityLayer;
 
-      // The patch operation will have already updated the layer's GeoJSON data.
-      // Reconciliation only needs to update the source data on the map.
-      (map.value!.getSource(diff.layerId) as GeoJSONSource)?.setData(
-        layer.data.geojson
-      );
+      if (layer.source.type === 'geojson') {
+        // The patch operation will have already updated the layer's GeoJSON data.
+        // Reconciliation only needs to update the source data on the map.
+        (map.value!.getSource(diff.layerId) as GeoJSONSource)?.setData(
+          layer.source.data
+        );
+      }
       break;
     }
   }

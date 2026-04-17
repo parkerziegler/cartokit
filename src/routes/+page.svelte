@@ -166,9 +166,9 @@
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
       <span class="text-slate-400">E</span>
     </button>
-    {#if $layout.dataVisible && layer.value}
+    {#if $layout.dataVisible && layer.value?.source.type === 'geojson'}
       <DataTable
-        data={layer.value.data.geojson.features}
+        data={layer.value.source.data.features}
         tableName={layer.value.displayName}
         onClose={onViewDataClose}
         class={[

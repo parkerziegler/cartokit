@@ -16,20 +16,25 @@
     { value: 'Constant', label: 'Constant' },
     { value: 'Quantitative', label: 'Range' }
   ];
-  let weightAttributeOptions = $derived(
-    layer.style.heatmap.weight.type === 'Quantitative'
-      ? Object.keys(layer.data.geojson.features[0].properties ?? {})
-          .filter((attribute) =>
-            isPropertyQuantitative(
-              layer.data.geojson.features[0].properties?.[attribute]
-            )
-          )
-          .map((attribute) => ({
-            value: attribute,
-            label: attribute
-          }))
-      : []
-  );
+  let weightAttributeOptions = $derived.by(() => {
+    if (
+      layer.style.heatmap.weight.type === 'Quantitative' &&
+      layer.source.type === 'geojson'
+    ) {
+      const geojson = layer.source.data;
+
+      return Object.keys(geojson.features[0].properties ?? {})
+        .filter((attribute) =>
+          isPropertyQuantitative(geojson.features[0].properties?.[attribute])
+        )
+        .map((attribute) => ({
+          value: attribute,
+          label: attribute
+        }));
+    }
+
+    return [];
+  });
 
   async function onWeightTypeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }

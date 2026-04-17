@@ -63,7 +63,9 @@ export function codegenFns(
   // Obtain the set of transformations identified uniquely by their name
   // property and generate a function for each.
   uniqBy(
-    Object.values(ir.layers).flatMap((layer) => layer.data.transformations),
+    Object.values(ir.layers).flatMap((layer) =>
+      layer.source.type === 'geojson' ? layer.source.transformations : []
+    ),
     'name'
   ).forEach((transformation) => {
     fns.push(codegenTransformationFn(transformation, analysis));

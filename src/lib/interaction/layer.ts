@@ -21,6 +21,7 @@ import type { CartoKitLayer } from '$lib/types';
  * @param layer The {@link CartoKitLayer} to add to the map.
  */
 export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
+  // TODO: Discern if and how to add layers for vector tile layers.
   switch (layer.type) {
     case 'Choropleth': {
       map.addLayer({
@@ -59,10 +60,13 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
     case 'Dot Density': {
       // Add a separate source for the polygon outlines of the dot density layer.
       // Ensure it does not already exist from a previous transition before adding it.
-      if (!map.getSource(`${layer.id}-outlines`)) {
+      if (
+        !map.getSource(`${layer.id}-outlines`) &&
+        layer.source.type === 'geojson'
+      ) {
         map.addSource(`${layer.id}-outlines`, {
           type: 'geojson',
-          data: layer.data.sourceGeojson,
+          data: layer.source.data,
           generateId: true
         });
       }
@@ -119,10 +123,13 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
     case 'Heatmap': {
       // Add a separate source for the point outlines of the heatmap layer.
       // Ensure it does not already exist from a previous transition before adding it.
-      if (!map.getSource(`${layer.id}-points`)) {
+      if (
+        !map.getSource(`${layer.id}-points`) &&
+        layer.source.type === 'geojson'
+      ) {
         map.addSource(`${layer.id}-points`, {
           type: 'geojson',
-          data: layer.data.sourceGeojson,
+          data: layer.source.data,
           generateId: true
         });
       }

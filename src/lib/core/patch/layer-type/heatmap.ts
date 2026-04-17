@@ -23,10 +23,8 @@ export function patchHeatmap(layer: CartoKitLayer): CartoKitHeatmapLayer {
       );
     case 'Point': {
       const targetLayer: CartoKitHeatmapLayer = {
-        id: layer.id,
+        ...layer,
         type: 'Heatmap',
-        displayName: layer.displayName,
-        data: layer.data,
         style: {
           heatmap: {
             weight: {
@@ -41,18 +39,15 @@ export function patchHeatmap(layer: CartoKitLayer): CartoKitHeatmapLayer {
             intensity: DEFAULT_HEATMAP_INTENSITY,
             opacity: layer.style.fill.opacity
           }
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;
     }
     case 'Proportional Symbol': {
       const targetLayer: CartoKitHeatmapLayer = {
-        id: layer.id,
+        ...layer,
         type: 'Heatmap',
-        displayName: layer.displayName,
-        data: layer.data,
         style: {
           heatmap: {
             weight: {
@@ -69,8 +64,7 @@ export function patchHeatmap(layer: CartoKitLayer): CartoKitHeatmapLayer {
             intensity: DEFAULT_HEATMAP_INTENSITY,
             opacity: layer.style.fill.opacity
           }
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;

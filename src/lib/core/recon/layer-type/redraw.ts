@@ -43,10 +43,12 @@ export function redraw(params: RedrawParams): void {
     }
   });
 
-  // Update the source with the new data.
-  (map.getSource(sourceLayerId) as maplibregl.GeoJSONSource).setData(
-    targetLayer.data.geojson
-  );
+  if (targetLayer.source.type === 'geojson') {
+    // Update the source with the new data.
+    (map.getSource(sourceLayerId) as maplibregl.GeoJSONSource).setData(
+      targetLayer.source.data
+    );
+  }
 
   // Add the new layer. This function call includes instrumentation.
   addLayer(map, targetLayer);

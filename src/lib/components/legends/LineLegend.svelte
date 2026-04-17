@@ -8,10 +8,6 @@
   }
 
   let { layer }: Props = $props();
-
-  let geometryType = $derived(
-    getFeatureCollectionGeometryType(layer.data.geojson)
-  );
 </script>
 
 <div
@@ -35,8 +31,13 @@
       stroke-opacity={layer.style.stroke.opacity}
     />
   </svg>
-  <span
-    >{layer.data.geojson.features.length}
-    {pluralize(geometryType, layer.data.geojson.features.length)}</span
-  >
+  {#if layer.source.type === 'geojson'}
+    <span
+      >{layer.source.data.features.length}
+      {pluralize(
+        getFeatureCollectionGeometryType(layer.source.data),
+        layer.source.data.features.length
+      )}</span
+    >
+  {/if}
 </div>
