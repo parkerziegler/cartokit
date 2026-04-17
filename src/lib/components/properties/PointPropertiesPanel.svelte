@@ -24,11 +24,11 @@
   />
 </MenuItem>
 <MenuItem title="Fill">
-  {#if layer.style.fill.visible}
+  {#if layer.style.fill.visible && layer.source.type === 'geojson'}
     <ColorControls
       layerId={layer.id}
       layerType="Point"
-      geojson={layer.data.geojson}
+      geojson={layer.source.data}
       fill={layer.style.fill}
     />
   {/if}

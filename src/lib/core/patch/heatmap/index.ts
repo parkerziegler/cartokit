@@ -110,7 +110,10 @@ export async function patchHeatmapDiffs(
         case 'Quantitative':
           layer.style.heatmap.weight = {
             type: 'Quantitative',
-            attribute: selectQuantitativeAttribute(layer.data.geojson.features),
+            attribute:
+              layer.source.type === 'geojson'
+                ? selectQuantitativeAttribute(layer.source.sourceData.features)
+                : '', // TODO: Determine how to select a quantitative attribute for vector tile layers.
             min: 0,
             max: 1
           };

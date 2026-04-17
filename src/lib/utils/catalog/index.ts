@@ -7,7 +7,9 @@ import { CLASSIFICATION_METHODS } from '$lib/utils/classification';
 import { isPropertyQuantitative } from '$lib/utils/property';
 
 export function buildCatalog(layer: CartoKitLayer): Catalog {
-  const features = layer.data.geojson.features;
+  // TODO: Discern if and how to build a catalog for vector tile layers.
+  const features =
+    layer.source.type === 'geojson' ? layer.source.data.features : [];
   const properties = Object.entries(features[0].properties || {})
     .filter(([, value]) => isPropertyQuantitative(value))
     .map(([key]) => key);

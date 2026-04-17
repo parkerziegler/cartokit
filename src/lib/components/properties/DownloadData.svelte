@@ -15,10 +15,12 @@
   let { layer }: Props = $props();
 
   function onClick() {
-    downloadContentToFile(
-      layer.data.geojson,
-      `${kebabCase(layer.displayName)}.json`
-    );
+    if (layer.source.type === 'geojson') {
+      downloadContentToFile(
+        layer.source.data,
+        `${kebabCase(layer.displayName)}.json`
+      );
+    }
   }
 
   onMount(() => {
