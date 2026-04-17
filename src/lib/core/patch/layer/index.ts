@@ -5,7 +5,7 @@ import { get } from 'svelte/store';
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { ir } from '$lib/stores/ir';
-import type { CartoKitLayer } from '$lib/types';
+import type { CartoKitLayer, CartoKitSource } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_OPACITY,
@@ -15,29 +15,48 @@ import {
 } from '$lib/utils/constants';
 import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
 
+interface GenerateCartoKitLayerOptions {
+  layerId: string;
+  displayName: string;
+}
+
 /**
- * Generate a {@link CartoKitLayer} for a given GeoJSON dataset, using the
- * dataset's geometry type to select the appropriate member from the
- * {@link CartoKitLayer} union.
+ * Generate a {@link CartoKitLayer} for a given {@link CartoKitSource}, dis-
+ * patching on the source's type to the appropriate source-specific generator.
  *
- * @param featureCollection The GeoJSON FeatureCollection associated with the layer.
+ * @param source The {@link CartoKitSource} associated with the layer.
  * @param options The options for the {@link CartoKitLayer}.
- * @param options.displayName The display name of the {@link CartoKitLayer}.
  * @param options.layerId The ID of the {@link CartoKitLayer}.
- * @param options.url The URL of the GeoJSON dataset.
- * @param options.fileName The file name of the GeoJSON dataset.
- * @returns A default {@link CartoKitLayer} appropriate for the input geometry type.
+ * @param options.displayName The display name of the {@link CartoKitLayer}.
+ * @returns A default {@link CartoKitLayer} appropriate for the input source.
  */
 function generateCartoKitLayer(
-  featureCollection: FeatureCollection,
-  options: {
-    displayName: string;
-    layerId: string;
-    url?: string;
-    fileName?: string;
-  }
+  source: CartoKitSource,
+  options: GenerateCartoKitLayerOptions
 ): CartoKitLayer {
-  const geometryType = getFeatureCollectionGeometryType(featureCollection);
+  switch (source.type) {
+    case 'geojson':
+      return generateCartoKitLayerFromGeoJSON(source, options);
+    case 'vector':
+      return generateCartoKitLayerFromVectorTiles(source, options);
+  }
+}
+
+/**
+ * Generate a {@link CartoKitLayer} for a GeoJSON-backed source, using the
+ * source's geometry type to select the appropriate member of the
+ * {@link CartoKitLayer} union.
+ *
+ * @param source The GeoJSON {@link CartoKitSource} associated with the layer.
+ * @param options The options for the {@link CartoKitLayer}.
+ * @returns A default {@link CartoKitLayer} appropriate for the input geometry
+ * type.
+ */
+function generateCartoKitLayerFromGeoJSON(
+  source: Extract<CartoKitSource, { type: 'geojson' }>,
+  options: GenerateCartoKitLayerOptions
+): CartoKitLayer {
+  const geometryType = getFeatureCollectionGeometryType(source.data);
   const color = randomColor();
   const z = Object.values(get(ir).layers).length;
 
@@ -48,13 +67,7 @@ function generateCartoKitLayer(
         id: options.layerId,
         displayName: options.displayName,
         type: 'Point',
-        data: {
-          geojson: featureCollection,
-          sourceGeojson: featureCollection,
-          fileName: options.fileName,
-          url: options.url,
-          transformations: []
-        },
+        source,
         style: {
           size: DEFAULT_SIZE,
           fill: {
@@ -85,13 +98,7 @@ function generateCartoKitLayer(
         id: options.layerId,
         displayName: options.displayName,
         type: 'Line',
-        data: {
-          geojson: featureCollection,
-          sourceGeojson: featureCollection,
-          fileName: options.fileName,
-          url: options.url,
-          transformations: []
-        },
+        source,
         style: {
           stroke: {
             type: 'Constant',
@@ -115,13 +122,7 @@ function generateCartoKitLayer(
         id: options.layerId,
         displayName: options.displayName,
         type: 'Polygon',
-        data: {
-          geojson: featureCollection,
-          sourceGeojson: featureCollection,
-          fileName: options.fileName,
-          url: options.url,
-          transformations: []
-        },
+        source,
         style: {
           fill: {
             type: 'Constant',
@@ -151,6 +152,56 @@ function generateCartoKitLayer(
 }
 
 /**
+ * Generate a {@link CartoKitLayer} for a vector tile source.
+ *
+ * TODO: This is a stub. A complete implementation will need to inspect the
+ * source layers advertised by the vector tile endpoint (via its TileJSON or
+ * equivalent metadata) to discern the appropriate geometry type, source layer
+ * name, and default styling. For now, we default to a Polygon layer.
+ *
+ * @param source The vector tile {@link CartoKitSource} associated with the
+ * layer.
+ * @param options The options for the {@link CartoKitLayer}.
+ * @returns A default {@link CartoKitLayer} for the vector tile source.
+ */
+function generateCartoKitLayerFromVectorTiles(
+  source: Extract<CartoKitSource, { type: 'vector' }>,
+  options: GenerateCartoKitLayerOptions
+): CartoKitLayer {
+  const color = randomColor();
+  const z = Object.values(get(ir).layers).length;
+
+  return {
+    id: options.layerId,
+    displayName: options.displayName,
+    type: 'Polygon',
+    source,
+    style: {
+      fill: {
+        type: 'Constant',
+        color,
+        opacity: DEFAULT_OPACITY,
+        visible: true
+      },
+      stroke: {
+        type: 'Constant',
+        color,
+        width: DEFAULT_STROKE_WIDTH,
+        opacity: DEFAULT_STROKE_OPACITY,
+        visible: true
+      }
+    },
+    layout: {
+      visible: true,
+      z,
+      tooltip: {
+        visible: true
+      }
+    }
+  };
+}
+
+/**
  * Patch layer-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
  *
  * @param params A promise that resolves to the {@link PatchFnParams}, including
@@ -169,7 +220,33 @@ export async function patchLayerDiffs(
     case 'add-layer': {
       let layer: CartoKitLayer;
 
-      if (diff.payload.type === 'api') {
+      if (diff.payload.type === 'vector') {
+        layer = generateCartoKitLayer(
+          {
+            type: 'vector',
+            location: diff.payload.location
+          },
+          {
+            layerId: diff.layerId,
+            displayName: diff.payload.displayName
+          }
+        );
+
+        // Derive the inverse diff after creating the layer.
+        inverse = {
+          type: 'remove-layer',
+          layerId: diff.layerId,
+          payload: {
+            sourceLayerType: layer.type
+          }
+        };
+
+        // Apply the patch.
+        ir.layers[diff.layerId] = layer;
+      } else if (
+        diff.payload.type === 'geojson' &&
+        diff.payload.location.type === 'api'
+      ) {
         // Fetch the GeoJSON data in a worker thread.
         const sourceWorker = new Worker(
           new URL('$lib/utils/source/worker.ts', import.meta.url),
@@ -180,43 +257,62 @@ export async function patchLayerDiffs(
             sourceWorker
           );
 
-        const featureCollection = await fetchGeoJSON(diff.payload.url);
-        layer = generateCartoKitLayer(featureCollection, {
-          displayName: diff.payload.displayName,
+        const featureCollection = await fetchGeoJSON(diff.payload.location.url);
+        layer = generateCartoKitLayer(
+          {
+            type: 'geojson',
+            location: diff.payload.location,
+            data: featureCollection,
+            sourceData: featureCollection,
+            transformations: []
+          },
+          {
+            layerId: diff.layerId,
+            displayName: diff.payload.displayName
+          }
+        );
+
+        // Derive the inverse diff after creating the layer.
+        inverse = {
+          type: 'remove-layer',
           layerId: diff.layerId,
-          url: diff.payload.url
-        });
-      } else {
-        layer = generateCartoKitLayer(diff.payload.featureCollection, {
-          displayName: diff.payload.displayName,
+          payload: {
+            sourceLayerType: layer.type
+          }
+        };
+
+        // Apply the patch.
+        ir.layers[diff.layerId] = layer;
+      } else if (
+        diff.payload.type === 'geojson' &&
+        diff.payload.location.type === 'file'
+      ) {
+        layer = generateCartoKitLayer(
+          {
+            type: 'geojson',
+            location: diff.payload.location,
+            data: diff.payload.location.featureCollection,
+            sourceData: diff.payload.location.featureCollection,
+            transformations: []
+          },
+          {
+            layerId: diff.layerId,
+            displayName: diff.payload.displayName
+          }
+        );
+
+        // Derive the inverse diff after creating the layer.
+        inverse = {
+          type: 'remove-layer',
           layerId: diff.layerId,
-          fileName: diff.payload.fileName
-        });
+          payload: {
+            sourceLayerType: layer.type
+          }
+        };
+
+        // Apply the patch.
+        ir.layers[diff.layerId] = layer;
       }
-
-      // Derive the inverse diff after creating the layer.
-      inverse = {
-        type: 'remove-layer',
-        layerId: diff.layerId,
-        payload: {
-          sourceLayerType: layer.type
-        }
-      };
-
-      // Apply the patch.
-      ir.layers[diff.layerId] = layer;
-
-      // Derive the inverse diff after creating the layer.
-      inverse = {
-        type: 'remove-layer',
-        layerId: diff.layerId,
-        payload: {
-          sourceLayerType: layer.type
-        }
-      };
-
-      // Apply the patch.
-      ir.layers[diff.layerId] = layer;
 
       break;
     }
@@ -258,22 +354,50 @@ export async function patchLayerDiffs(
       const layer = ir.layers[diff.layerId];
 
       // Derive the inverse diff prior to applying the patch.
-      inverse = {
-        type: 'add-layer',
-        layerId: diff.layerId,
-        payload: layer.data.url
-          ? {
+      if (layer.source.type === 'vector') {
+        inverse = {
+          type: 'add-layer',
+          layerId: diff.layerId,
+          payload: {
+            type: 'vector',
+            displayName: layer.displayName,
+            location: layer.source.location
+          }
+        };
+      } else if (
+        layer.source.type === 'geojson' &&
+        layer.source.location.type === 'api'
+      ) {
+        inverse = {
+          type: 'add-layer',
+          layerId: diff.layerId,
+          payload: {
+            type: 'geojson',
+            displayName: layer.displayName,
+            location: {
               type: 'api',
-              displayName: layer.displayName,
-              url: layer.data.url
+              url: layer.source.location.url
             }
-          : {
+          }
+        };
+      } else if (
+        layer.source.type === 'geojson' &&
+        layer.source.location.type === 'file'
+      ) {
+        inverse = {
+          type: 'add-layer',
+          layerId: diff.layerId,
+          payload: {
+            type: 'geojson',
+            displayName: layer.displayName,
+            location: {
               type: 'file',
-              displayName: layer.displayName,
-              fileName: layer.data.fileName!,
-              featureCollection: layer.data.sourceGeojson
+              fileName: layer.source.location.fileName,
+              featureCollection: layer.source.sourceData
             }
-      };
+          }
+        };
+      }
 
       // Apply the patch.
       delete ir.layers[diff.layerId];

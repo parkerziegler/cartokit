@@ -32,11 +32,16 @@ export function codegenImports(
     .join('\n');
 
   const fileImports = Object.values(ir.layers).reduce((acc, layer) => {
-    if (layer.data.fileName) {
+    if (
+      layer.source.type === 'geojson' &&
+      layer.source.location.type === 'file'
+    ) {
       const dataIdent = camelCase(layer.displayName);
       uploadTable.set(layer.id, dataIdent);
 
-      return acc.concat(`import ${dataIdent} from './${layer.data.fileName}';`);
+      return acc.concat(
+        `import ${dataIdent} from './${layer.source.location.fileName}';`
+      );
     }
 
     return acc;

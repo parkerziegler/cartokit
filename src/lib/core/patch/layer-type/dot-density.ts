@@ -18,40 +18,44 @@ import { parseStringToTransformation } from '$lib/utils/parse';
 export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
   switch (layer.type) {
     case 'Choropleth': {
+      let source = layer.source;
       const attribute = layer.style.fill.attribute;
-      const dotValue = deriveDotDensityStartingValue(
-        layer.data.sourceGeojson.features,
-        attribute
-      );
+      let dotValue = -1;
 
-      const targetLayer: CartoKitDotDensityLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
-        type: 'Dot Density',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          sourceGeojson: layer.data.sourceGeojson,
-          geojson: generateDotDensityPoints(
-            layer.data.sourceGeojson as FeatureCollection<
+      if (layer.source.type === 'geojson') {
+        dotValue = deriveDotDensityStartingValue(layer.id, attribute);
+
+        const transformations = [
+          ...layer.source.transformations,
+          {
+            ...parseStringToTransformation(
+              generateDotDensityPointsSrc,
+              'geometric',
+              'generateDotDensityPoints'
+            ),
+            args: [attribute, dotValue]
+          }
+        ];
+
+        source = {
+          ...layer.source,
+          data: generateDotDensityPoints(
+            layer.source.sourceData as FeatureCollection<
               Polygon | MultiPolygon
             >,
             attribute,
             dotValue
           ),
-          transformations: [
-            ...layer.data.transformations,
-            {
-              ...parseStringToTransformation(
-                generateDotDensityPointsSrc,
-                'geometric',
-                'generateDotDensityPoints'
-              ),
-              args: [attribute, dotValue]
-            }
-          ]
-        },
+          transformations
+        };
+      }
+
+      const targetLayer: CartoKitDotDensityLayer = {
+        ...layer,
+        type: 'Dot Density',
+        source,
         style: {
+          ...layer.style,
           dot: {
             attribute,
             value: dotValue
@@ -62,10 +66,8 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
           },
-          stroke: layer.style.stroke,
           size: DEFAULT_SIZE
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;
@@ -78,97 +80,93 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
         `Unsupported geometry transition. Transition initiated from ${layer.type} to Dot Density.`
       );
     case 'Point': {
-      const attribute = selectQuantitativeAttribute(
-        layer.data.geojson.features
-      );
-      const dotValue = deriveDotDensityStartingValue(
-        layer.data.geojson.features,
-        attribute
-      );
+      let source = layer.source;
+      let attribute = '';
+      let dotValue = -1;
 
-      // Replace the centroid transformation with a dot density transformation.
-      const generateDotDensityPointsTransformation = {
-        ...parseStringToTransformation(
-          generateDotDensityPointsSrc,
-          'geometric',
-          'generateDotDensityPoints'
-        ),
-        args: [attribute, dotValue]
-      };
+      if (layer.source.type === 'geojson') {
+        attribute = selectQuantitativeAttribute(
+          layer.source.sourceData.features
+        );
+        dotValue = deriveDotDensityStartingValue(layer.id, attribute);
 
-      const deriveCentroidsTransformationIndex =
-        layer.data.transformations.findIndex(
-          (transformation) => transformation.name === 'deriveCentroids'
+        // Replace the centroid transformation with a dot density transformation.
+        const generateDotDensityPointsTransformation = {
+          ...parseStringToTransformation(
+            generateDotDensityPointsSrc,
+            'geometric',
+            'generateDotDensityPoints'
+          ),
+          args: [attribute, dotValue]
+        };
+
+        const transformations = [...layer.source.transformations].splice(
+          layer.source.transformations.findIndex(
+            (transformation) => transformation.name === 'deriveCentroids'
+          ),
+          1,
+          generateDotDensityPointsTransformation
         );
 
-      const transformations = [...layer.data.transformations].splice(
-        deriveCentroidsTransformationIndex,
-        1,
-        generateDotDensityPointsTransformation
-      );
-
-      const targetLayer: CartoKitDotDensityLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
-        type: 'Dot Density',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          sourceGeojson: layer.data.sourceGeojson,
-          geojson: generateDotDensityPoints(
-            layer.data.sourceGeojson as FeatureCollection<
+        source = {
+          ...layer.source,
+          data: generateDotDensityPoints(
+            layer.source.sourceData as FeatureCollection<
               Polygon | MultiPolygon
             >,
             attribute,
             dotValue
           ),
           transformations
-        },
+        };
+      }
+
+      const targetLayer: CartoKitDotDensityLayer = {
+        ...layer,
+        type: 'Dot Density',
+        source,
         style: {
+          ...layer.style,
           dot: {
             attribute,
             value: dotValue
           },
-          fill: {
-            type: 'Constant',
-            color: randomColor(),
-            opacity: layer.style.fill.opacity,
-            visible: layer.style.fill.visible
-          },
-          stroke: layer.style.stroke,
-          size: DEFAULT_SIZE
-        },
-        layout: layer.layout
+          fill:
+            layer.style.fill.type === 'Constant'
+              ? layer.style.fill
+              : {
+                  type: 'Constant',
+                  color: randomColor(),
+                  opacity: layer.style.fill.opacity,
+                  visible: layer.style.fill.visible
+                }
+        }
       };
 
       return targetLayer;
     }
     case 'Polygon': {
-      const attribute = selectQuantitativeAttribute(
-        layer.data.sourceGeojson.features
-      );
-      const dotValue = deriveDotDensityStartingValue(
-        layer.data.sourceGeojson.features,
-        attribute
-      );
+      let source = layer.source;
+      let attribute = '';
+      let dotValue = -1;
 
-      const targetLayer: CartoKitDotDensityLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
-        type: 'Dot Density',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          sourceGeojson: layer.data.sourceGeojson,
-          geojson: generateDotDensityPoints(
-            layer.data.sourceGeojson as FeatureCollection<
+      if (layer.source.type === 'geojson') {
+        attribute = selectQuantitativeAttribute(
+          layer.source.sourceData.features
+        );
+        dotValue = deriveDotDensityStartingValue(layer.id, attribute);
+
+        source = {
+          ...layer.source,
+          data: generateDotDensityPoints(
+            layer.source.sourceData as FeatureCollection<
               Polygon | MultiPolygon
             >,
             attribute,
             dotValue
           ),
           transformations: [
-            ...layer.data.transformations,
+            ...layer.source.transformations,
             {
               ...parseStringToTransformation(
                 generateDotDensityPointsSrc,
@@ -178,81 +176,83 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
               args: [attribute, dotValue]
             }
           ]
-        },
+        };
+      }
+
+      const targetLayer: CartoKitDotDensityLayer = {
+        ...layer,
+        type: 'Dot Density',
+        source,
         style: {
+          ...layer.style,
           dot: {
             attribute,
             value: dotValue
           },
-          fill: layer.style.fill,
-          stroke: layer.style.stroke,
           size: DEFAULT_SIZE
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;
     }
     case 'Proportional Symbol': {
+      let source = layer.source;
       const attribute = layer.style.size.attribute;
-      const dotValue = deriveDotDensityStartingValue(
-        layer.data.sourceGeojson.features,
-        layer.style.size.attribute
-      );
+      let dotValue = -1;
 
-      // Replace the centroid transformation with a dot density transformation.
-      const generateDotDensityPointsTransformation = {
-        ...parseStringToTransformation(
-          generateDotDensityPointsSrc,
-          'geometric',
-          'generateDotDensityPoints'
-        ),
-        args: [attribute, dotValue]
-      };
+      if (layer.source.type === 'geojson') {
+        dotValue = deriveDotDensityStartingValue(layer.id, attribute);
 
-      const deriveCentroidsTransformationIndex =
-        layer.data.transformations.findIndex(
-          (transformation) => transformation.name === 'deriveCentroids'
+        const transformations = [...layer.source.transformations].splice(
+          // Replace the deriveCentroids transformation with the generateDotDensityPoints transformation.
+          layer.source.transformations.findIndex(
+            (transformation) => transformation.name === 'deriveCentroids'
+          ),
+          1,
+          {
+            ...parseStringToTransformation(
+              generateDotDensityPointsSrc,
+              'geometric',
+              'generateDotDensityPoints'
+            ),
+            args: [attribute, dotValue]
+          }
         );
 
-      const transformations = [...layer.data.transformations].splice(
-        deriveCentroidsTransformationIndex,
-        1,
-        generateDotDensityPointsTransformation
-      );
-
-      const targetLayer: CartoKitDotDensityLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
-        type: 'Dot Density',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          sourceGeojson: layer.data.sourceGeojson,
-          geojson: generateDotDensityPoints(
-            layer.data.sourceGeojson as FeatureCollection<
+        source = {
+          ...layer.source,
+          data: generateDotDensityPoints(
+            layer.source.sourceData as FeatureCollection<
               Polygon | MultiPolygon
             >,
             attribute,
             dotValue
           ),
           transformations
-        },
+        };
+      }
+
+      const targetLayer: CartoKitDotDensityLayer = {
+        ...layer,
+        type: 'Dot Density',
+        source,
         style: {
+          ...layer.style,
           dot: {
             attribute,
             value: dotValue
           },
-          fill: {
-            type: 'Constant',
-            color: randomColor(),
-            opacity: layer.style.fill.opacity,
-            visible: layer.style.fill.visible
-          },
-          stroke: layer.style.stroke,
+          fill:
+            layer.style.fill.type === 'Constant'
+              ? layer.style.fill
+              : {
+                  type: 'Constant',
+                  color: randomColor(),
+                  opacity: layer.style.fill.opacity,
+                  visible: layer.style.fill.visible
+                },
           size: DEFAULT_SIZE
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;

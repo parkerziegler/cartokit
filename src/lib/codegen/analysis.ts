@@ -13,7 +13,8 @@ import type {
 function isTurfRequired(ir: CartoKitIR): boolean {
   return Object.values(ir.layers).some(
     (layer) =>
-      layer.data.transformations.filter(
+      layer.source.type === 'geojson' &&
+      layer.source.transformations.filter(
         (transformation) => transformation.kind === 'geometric'
       ).length > 0
   );
@@ -29,7 +30,10 @@ function isTurfRequired(ir: CartoKitIR): boolean {
  */
 function isFetchGeoJSONRequired(ir: CartoKitIR): boolean {
   return Object.values(ir.layers).some(
-    (layer) => layer.data.url && layer.data.transformations.length > 0
+    (layer) =>
+      layer.source.type === 'geojson' &&
+      layer.source.location.type === 'api' &&
+      layer.source.transformations.length > 0
   );
 }
 
@@ -47,7 +51,9 @@ export function isGeoJSONNamespaceRequired(
   return (
     languageBackend === 'typescript' &&
     Object.values(ir.layers).some(
-      (layer) => layer.data.transformations.length > 0
+      (layer) =>
+        layer.source.type === 'geojson' &&
+        layer.source.transformations.length > 0
     )
   );
 }

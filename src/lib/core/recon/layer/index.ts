@@ -26,25 +26,32 @@ export async function reconLayerDiffs(
     case 'add-layer': {
       const layer = targetIR.layers[diff.layerId];
 
-      map.value!.addSource(layer.id, {
-        type: 'geojson',
-        // Still use the API endpoint when available to speed up vector tile generation.
-        data:
-          diff.payload.type === 'api'
-            ? diff.payload.url
-            : diff.payload.featureCollection,
-        generateId: true
-      });
+      if (diff.payload.type === 'geojson') {
+        map.value!.addSource(layer.id, {
+          type: 'geojson',
+          // Still use the API endpoint when available to speed up vector tile generation.
+          data:
+            diff.payload.location.type === 'api'
+              ? diff.payload.location.url
+              : diff.payload.location.featureCollection,
+          generateId: true
+        });
 
-      // Build the catalog for the layer in a worker thread.
-      const catalogWorker = new Worker(
-        new URL('$lib/utils/catalog/worker.ts', import.meta.url),
-        { type: 'module' }
-      );
-      const buildCatalog =
-        Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
-      const catalogPatch = await buildCatalog(layer);
-      catalog.value = { ...catalog.value, ...catalogPatch };
+        // Build the catalog for the layer in a worker thread.
+        const catalogWorker = new Worker(
+          new URL('$lib/utils/catalog/worker.ts', import.meta.url),
+          { type: 'module' }
+        );
+        const buildCatalog =
+          Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
+        const catalogPatch = await buildCatalog(layer);
+        catalog.value = { ...catalog.value, ...catalogPatch };
+      } else if (diff.payload.type === 'vector') {
+        map.value!.addSource(layer.id, {
+          type: 'vector',
+          url: diff.payload.location.url
+        });
+      }
 
       addLayer(map.value!, layer);
 

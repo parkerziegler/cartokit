@@ -28,100 +28,112 @@ export function patchProportionalSymbol(
   switch (layer.type) {
     case 'Choropleth':
     case 'Polygon': {
-      const targetLayer: CartoKitProportionalSymbolLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
-        type: 'Proportional Symbol',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          sourceGeojson: layer.data.sourceGeojson,
-          geojson: deriveCentroids(layer.data.geojson),
-          transformations: [
-            ...layer.data.transformations,
-            {
-              ...parseStringToTransformation(
-                deriveCentroidsSrc,
-                'geometric',
-                'deriveCentroids'
-              ),
-              args: []
+      const { source, attribute } =
+        layer.source.type === 'geojson'
+          ? {
+              source: {
+                ...layer.source,
+                data: deriveCentroids(layer.source.data),
+                transformations: [
+                  ...layer.source.transformations,
+                  {
+                    ...parseStringToTransformation(
+                      deriveCentroidsSrc,
+                      'geometric',
+                      'deriveCentroids'
+                    ),
+                    args: []
+                  }
+                ]
+              },
+              attribute: selectQuantitativeAttribute(layer.source.data.features)
             }
-          ]
-        },
+          : {
+              source: layer.source,
+              attribute: '' // TODO: Discern if and how to select a quantitative attribute for vector tile layers.
+            };
+
+      const targetLayer: CartoKitProportionalSymbolLayer = {
+        ...layer,
+        type: 'Proportional Symbol',
+        source,
         style: {
+          ...layer.style,
           size: {
-            attribute: selectQuantitativeAttribute(layer.data.geojson.features),
+            attribute,
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
-          },
-          fill: layer.style.fill,
-          stroke: layer.style.stroke
-        },
-        layout: layer.layout
+          }
+        }
       };
 
       return targetLayer;
     }
     case 'Dot Density': {
-      // Replace the dot density transformation with a centroid transformation.
-      const deriveCentroidsTransformation = {
-        ...parseStringToTransformation(
-          deriveCentroidsSrc,
-          'geometric',
-          'deriveCentroids'
-        ),
-        args: []
-      };
+      let source = layer.source;
 
-      const generateDotDensityPointsTransformationIndex =
-        layer.data.transformations.findIndex(
-          (transformation) => transformation.name === 'generateDotDensityPoints'
+      if (layer.source.type === 'geojson') {
+        // Replace the dot density transformation with a centroid transformation.
+        const deriveCentroidsTransformation = {
+          ...parseStringToTransformation(
+            deriveCentroidsSrc,
+            'geometric',
+            'deriveCentroids'
+          ),
+          args: []
+        };
+
+        const generateDotDensityPointsTransformationIndex =
+          layer.source.transformations.findIndex(
+            (transformation) =>
+              transformation.name === 'generateDotDensityPoints'
+          );
+
+        const transformations = [...layer.source.transformations].splice(
+          generateDotDensityPointsTransformationIndex,
+          1,
+          deriveCentroidsTransformation
         );
 
-      const transformations = [...layer.data.transformations].splice(
-        generateDotDensityPointsTransformationIndex,
-        1,
-        deriveCentroidsTransformation
-      );
+        source = {
+          ...layer.source,
+          data: deriveCentroids(layer.source.data),
+          transformations
+        };
+      }
 
       const targetLayer: CartoKitProportionalSymbolLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Proportional Symbol',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          sourceGeojson: layer.data.sourceGeojson,
-          geojson: deriveCentroids(layer.data.sourceGeojson),
-          transformations
-        },
+        source,
         style: {
+          fill: layer.style.fill,
+          stroke: layer.style.stroke,
           size: {
             attribute: layer.style.dot.attribute,
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
-          },
-          fill: layer.style.fill,
-          stroke: layer.style.stroke
-        },
-        layout: layer.layout
+          }
+        }
       };
 
       return targetLayer;
     }
     case 'Heatmap': {
+      let attribute = '';
+
+      if (layer.style.heatmap.weight.type === 'Quantitative') {
+        attribute = layer.style.heatmap.weight.attribute;
+      } else if (layer.source.type === 'geojson') {
+        attribute = selectQuantitativeAttribute(layer.source.data.features);
+      }
+
       const targetLayer: CartoKitProportionalSymbolLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Proportional Symbol',
-        data: layer.data,
         style: {
           size: {
-            attribute:
-              layer.style.heatmap.weight.type === 'Quantitative'
-                ? layer.style.heatmap.weight.attribute
-                : selectQuantitativeAttribute(layer.data.geojson.features),
+            attribute,
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
@@ -138,37 +150,45 @@ export function patchProportionalSymbol(
             width: DEFAULT_STROKE_WIDTH,
             visible: true
           }
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;
     }
     case 'Line': {
-      const targetLayer: CartoKitProportionalSymbolLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
-        type: 'Proportional Symbol',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          sourceGeojson: layer.data.sourceGeojson,
-          geojson: deriveCentroids(layer.data.geojson),
-          transformations: [
-            ...layer.data.transformations,
-            {
-              ...parseStringToTransformation(
-                deriveCentroidsSrc,
-                'geometric',
-                'deriveCentroids'
-              ),
-              args: []
+      const { source, attribute } =
+        layer.source.type === 'geojson'
+          ? {
+              source: {
+                ...layer.source,
+                data: deriveCentroids(layer.source.data),
+                transformations: [
+                  ...layer.source.transformations,
+                  {
+                    ...parseStringToTransformation(
+                      deriveCentroidsSrc,
+                      'geometric',
+                      'deriveCentroids'
+                    ),
+                    args: []
+                  }
+                ]
+              },
+              attribute: selectQuantitativeAttribute(layer.source.data.features)
             }
-          ]
-        },
+          : {
+              source: layer.source,
+              attribute: '' // TODO: Discern if and how to select a quantitative attribute for vector tile layers.
+            };
+
+      const targetLayer: CartoKitProportionalSymbolLayer = {
+        ...layer,
+        type: 'Proportional Symbol',
+        source,
         style: {
+          ...layer.style,
           size: {
-            attribute: selectQuantitativeAttribute(layer.data.geojson.features),
+            attribute,
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
@@ -177,30 +197,29 @@ export function patchProportionalSymbol(
             color: randomColor(),
             opacity: DEFAULT_OPACITY,
             visible: true
-          },
-          stroke: layer.style.stroke
-        },
-        layout: layer.layout
+          }
+        }
       };
 
       return targetLayer;
     }
     case 'Point': {
+      const attribute =
+        layer.source.type === 'geojson'
+          ? selectQuantitativeAttribute(layer.source.data.features)
+          : ''; // TODO: Discern if and how to select a quantitative attribute for vector tile layers.
+
       const targetLayer: CartoKitProportionalSymbolLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Proportional Symbol',
-        data: layer.data,
         style: {
+          ...layer.style,
           size: {
-            attribute: selectQuantitativeAttribute(layer.data.geojson.features),
+            attribute,
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
-          },
-          fill: layer.style.fill,
-          stroke: layer.style.stroke
-        },
-        layout: layer.layout
+          }
+        }
       };
 
       return targetLayer;
