@@ -13,7 +13,9 @@
   let { layer }: Props = $props();
 
   let geometryType = $derived(
-    getFeatureCollectionGeometryType(layer.data.sourceGeojson)
+    layer.source.type === 'geojson'
+      ? getFeatureCollectionGeometryType(layer.source.data)
+      : 'Polygon' // TODO: Figure out how to obtain the geometry type of a vector tile layer.
   );
   let options = $derived(
     geometryToLayerTypes.get(geometryType)?.map((layerType) => ({

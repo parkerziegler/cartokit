@@ -20,85 +20,84 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
   switch (layer.type) {
     case 'Choropleth':
     case 'Polygon': {
-      const targetLayer: CartoKitPointLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
-        type: 'Point',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          sourceGeojson: layer.data.sourceGeojson,
-          geojson: deriveCentroids(layer.data.geojson),
-          transformations: [
-            ...layer.data.transformations,
-            {
-              ...parseStringToTransformation(
-                deriveCentroidsSrc,
-                'geometric',
-                'deriveCentroids'
-              ),
-              args: []
+      const source =
+        layer.source.type === 'geojson'
+          ? {
+              ...layer.source,
+              data: deriveCentroids(layer.source.data),
+              transformations: [
+                ...layer.source.transformations,
+                {
+                  ...parseStringToTransformation(
+                    deriveCentroidsSrc,
+                    'geometric',
+                    'deriveCentroids'
+                  ),
+                  args: []
+                }
+              ]
             }
-          ]
-        },
+          : layer.source;
+
+      const targetLayer: CartoKitPointLayer = {
+        ...layer,
+        type: 'Point',
+        source,
         style: {
-          size: DEFAULT_SIZE,
-          fill: layer.style.fill,
-          stroke: layer.style.stroke
-        },
-        layout: layer.layout
+          ...layer.style,
+          size: DEFAULT_SIZE
+        }
       };
 
       return targetLayer;
     }
     case 'Dot Density': {
-      // Replace the dot density transformation with a centroid transformation.
-      const deriveCentroidsTransformation = {
-        ...parseStringToTransformation(
-          deriveCentroidsSrc,
-          'geometric',
-          'deriveCentroids'
-        ),
-        args: []
-      };
+      let source = layer.source;
 
-      const generateDotDensityPointsTransformationIndex =
-        layer.data.transformations.findIndex(
-          (transformation) => transformation.name === 'generateDotDensityPoints'
+      if (layer.source.type === 'geojson') {
+        // Replace the dot density transformation with a centroid transformation.
+        const deriveCentroidsTransformation = {
+          ...parseStringToTransformation(
+            deriveCentroidsSrc,
+            'geometric',
+            'deriveCentroids'
+          ),
+          args: []
+        };
+
+        const transformations = [...layer.source.transformations].splice(
+          layer.source.transformations.findIndex(
+            (transformation) =>
+              transformation.name === 'generateDotDensityPoints'
+          ),
+          1,
+          deriveCentroidsTransformation
         );
-      const transformations = [...layer.data.transformations].splice(
-        generateDotDensityPointsTransformationIndex,
-        1,
-        deriveCentroidsTransformation
-      );
+
+        source = {
+          ...layer.source,
+          data: deriveCentroids(layer.source.sourceData),
+          transformations
+        };
+      }
 
       const targetLayer: CartoKitPointLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Point',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          sourceGeojson: layer.data.sourceGeojson,
-          geojson: deriveCentroids(layer.data.sourceGeojson),
-          transformations
-        },
+        source,
         style: {
-          size: layer.style.size,
           fill: layer.style.fill,
-          stroke: layer.style.stroke
-        },
-        layout: layer.layout
+          stroke: layer.style.stroke,
+          size: layer.style.size
+        }
       };
 
       return targetLayer;
     }
     case 'Heatmap': {
       const targetLayer: CartoKitPointLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Point',
-        data: layer.data,
         style: {
           size: DEFAULT_SIZE,
           fill: {
@@ -114,45 +113,45 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
             width: DEFAULT_STROKE_WIDTH,
             visible: true
           }
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;
     }
     case 'Line': {
-      const targetLayer: CartoKitPointLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
-        type: 'Point',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          sourceGeojson: layer.data.sourceGeojson,
-          geojson: deriveCentroids(layer.data.geojson),
-          transformations: [
-            ...layer.data.transformations,
-            {
-              ...parseStringToTransformation(
-                deriveCentroidsSrc,
-                'geometric',
-                'deriveCentroids'
-              ),
-              args: []
+      const source =
+        layer.source.type === 'geojson'
+          ? {
+              ...layer.source,
+              data: deriveCentroids(layer.source.data),
+              transformations: [
+                ...layer.source.transformations,
+                {
+                  ...parseStringToTransformation(
+                    deriveCentroidsSrc,
+                    'geometric',
+                    'deriveCentroids'
+                  ),
+                  args: []
+                }
+              ]
             }
-          ]
-        },
+          : layer.source;
+
+      const targetLayer: CartoKitPointLayer = {
+        ...layer,
+        type: 'Point',
+        source,
         style: {
+          ...layer.style,
           size: DEFAULT_SIZE,
           fill: {
             type: 'Constant',
             color: randomColor(),
             opacity: DEFAULT_OPACITY,
             visible: true
-          },
-          stroke: layer.style.stroke
-        },
-        layout: layer.layout
+          }
+        }
       };
 
       return targetLayer;
@@ -161,16 +160,12 @@ export function patchPoint(layer: CartoKitLayer): CartoKitPointLayer {
       return layer;
     case 'Proportional Symbol': {
       const targetLayer: CartoKitPointLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Point',
-        data: layer.data,
         style: {
-          fill: layer.style.fill,
-          stroke: layer.style.stroke,
+          ...layer.style,
           size: DEFAULT_SIZE
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;

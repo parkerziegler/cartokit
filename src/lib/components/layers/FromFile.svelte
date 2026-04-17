@@ -63,10 +63,13 @@
             type: 'add-layer',
             layerId,
             payload: {
-              type: 'file',
-              displayName,
-              fileName: file.name,
-              featureCollection
+              type: 'geojson',
+              location: {
+                type: 'file',
+                fileName: file.name,
+                featureCollection
+              },
+              displayName
             }
           });
 

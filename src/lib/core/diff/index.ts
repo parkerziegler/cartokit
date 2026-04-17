@@ -276,12 +276,24 @@ interface LayerTooltipVisibilityDiff extends LayerDiff {
 interface AddLayerDiff extends LayerDiff {
   type: 'add-layer';
   payload:
-    | { type: 'api'; displayName: string; url: string }
     | {
-        type: 'file';
+        type: 'geojson';
         displayName: string;
-        fileName: string;
-        featureCollection: FeatureCollection;
+        location: { type: 'api'; url: string };
+      }
+    | {
+        type: 'geojson';
+        displayName: string;
+        location: {
+          type: 'file';
+          fileName: string;
+          featureCollection: FeatureCollection;
+        };
+      }
+    | {
+        type: 'vector';
+        displayName: string;
+        location: { type: 'api'; url: string };
       };
 }
 

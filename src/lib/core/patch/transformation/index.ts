@@ -20,57 +20,60 @@ export async function patchTransformationDiffs(
     case 'add-transformation': {
       const layer = ir.layers[diff.layerId];
 
-      // Derive the inverse diff prior to applying the patch.
-      inverse = {
-        type: 'remove-transformation',
-        layerId: diff.layerId,
-        payload: {
-          geojson: layer.data.geojson,
-          transformationName: diff.payload.transformation.name
-        }
-      };
+      if (layer.source.type === 'geojson') {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'remove-transformation',
+          layerId: diff.layerId,
+          payload: {
+            geojson: layer.source.data,
+            transformationName: diff.payload.transformation.name
+          }
+        };
 
-      // Apply the patch.
-      layer.data.geojson = diff.payload.geojson;
+        // Apply the patch.
+        layer.source.data = diff.payload.geojson;
 
-      const tIdx = layer.data.transformations.findIndex(
-        (t) => t.name === diff.payload.transformation.name
-      );
-      layer.data.transformations =
-        tIdx > -1
-          ? [
-              ...layer.data.transformations.slice(tIdx),
-              diff.payload.transformation,
-              ...layer.data.transformations.slice(tIdx + 1)
-            ]
-          : [...layer.data.transformations, diff.payload.transformation];
-
+        const tIdx = layer.source.transformations.findIndex(
+          (t) => t.name === diff.payload.transformation.name
+        );
+        layer.source.transformations =
+          tIdx > -1
+            ? [
+                ...layer.source.transformations.slice(tIdx),
+                diff.payload.transformation,
+                ...layer.source.transformations.slice(tIdx + 1)
+              ]
+            : [...layer.source.transformations, diff.payload.transformation];
+      }
       break;
     }
     case 'remove-transformation': {
       const layer = ir.layers[diff.layerId];
 
-      // Find the transformation before removing it so we can create the inverse.
-      const tIdx = layer.data.transformations.findIndex(
-        (t) => t.name === diff.payload.transformationName
-      );
+      if (layer.source.type === 'geojson') {
+        // Find the transformation before removing it so we can create the inverse.
+        const tIdx = layer.source.transformations.findIndex(
+          (t) => t.name === diff.payload.transformationName
+        );
 
-      if (tIdx > -1) {
-        const transformation = layer.data.transformations[tIdx];
+        if (tIdx > -1) {
+          const transformation = layer.source.transformations[tIdx];
 
-        // Derive the inverse diff prior to applying the patch.
-        inverse = {
-          type: 'add-transformation',
-          layerId: diff.layerId,
-          payload: {
-            geojson: layer.data.geojson,
-            transformation
-          }
-        };
+          // Derive the inverse diff prior to applying the patch.
+          inverse = {
+            type: 'add-transformation',
+            layerId: diff.layerId,
+            payload: {
+              geojson: layer.source.data,
+              transformation
+            }
+          };
 
-        // Apply the patch.
-        layer.data.geojson = diff.payload.geojson;
-        layer.data.transformations.splice(tIdx, 1);
+          // Apply the patch.
+          layer.source.data = diff.payload.geojson;
+          layer.source.transformations.splice(tIdx, 1);
+        }
       }
 
       break;

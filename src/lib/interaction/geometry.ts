@@ -1,7 +1,6 @@
-import * as d3 from 'd3';
-import type * as GeoJSON from 'geojson';
 import type { ExpressionSpecification } from 'maplibre-gl';
 
+import { catalog } from '$lib/state/catalog.svelte';
 import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 
 /**
@@ -14,23 +13,13 @@ import type { CartoKitProportionalSymbolLayer } from '$lib/types';
 export function deriveSize(
   layer: CartoKitProportionalSymbolLayer
 ): ExpressionSpecification {
-  const {
-    data: {
-      geojson: { features }
-    },
-    style: {
-      size: { attribute, min: rMin, max: rMax }
-    }
-  } = layer;
-  const extent = d3.extent(features, (d) =>
-    Math.sqrt(d.properties?.[attribute] ?? 0)
-  );
-  const [min, max] = [extent[0] ?? 0, extent[1] ?? 1];
+  const { min, max } = catalog.value[layer.id][layer.style.size.attribute];
+  const [rMin, rMax] = [layer.style.size.min, layer.style.size.max];
 
   return [
     'interpolate',
     ['linear'],
-    ['sqrt', ['get', attribute]],
+    ['sqrt', ['get', layer.style.size.attribute]],
     min,
     rMin,
     max,
@@ -42,16 +31,16 @@ export function deriveSize(
  * Obtain a starting dot value for a {@link CartoKitDotDensityLayer} based on
  * the maximum value of the data attribute.
  *
- * @param features The features of the {@link CartoKitDotDensityLayer}.
+ * @param layerId The ID of the {@link CartoKitDotDensityLayer}.
  * @param attribute The attribute of the {@link CartoKitDotDensityLayer} to use
  * for the starting dot value.
  * @returns The starting dot value.
  */
 export function deriveDotDensityStartingValue(
-  features: GeoJSON.Feature[],
+  layerId: string,
   attribute: string
 ): number {
-  const [min, max] = d3.extent(features, (d) => d.properties?.[attribute] ?? 0);
+  const { min, max } = catalog.value[layerId][attribute];
 
   // Aim for a ratio where the number of dots is 10% of the range.
   return (max - min) * 0.1 || 1;

@@ -146,28 +146,55 @@ export interface TransformationCall extends Transformation {
 }
 
 /**
- * Represents the underlying data and metadata of a layer. This object maintains
- * two copies of a layer's GeoJSON data in memory:
+ * Represents the underlying data and metadata of a GeoJSON layer. This object
+ * maintains two copies of a layer's GeoJSON data in memory:
  *
  *   1. The source GeoJSON at the time of layer creation. All accumulated trans-
  *      formations are executed against this copy to produce the current
  *      GeoJSON.
  *   2. The current GeoJSON of the layer, used for display.
  *
- * @property {string} url - The URL of the data source, if fetched from a remote
- * server.
- * @property {string} fileName - The name of the data source's file on disk, if
- * loaded locally.
- * @property {Object} geojson - The current GeoJSON of the layer.
- * @property {Object} sourceGeojson - The source GeoJSON of the layer.
+ * @property type The type of the source, 'geojson'.
+ * @property location The location of the source, either a remote API endpoint
+ * or a local file on disk.
+ * @property data The current GeoJSON data of the layer.
+ * @property sourceData The source GeoJSON data of the layer.
+ * @property transformations The transformations applied to the layer.
  */
-interface LayerData {
-  url?: string;
-  fileName?: string;
-  geojson: FeatureCollection;
-  sourceGeojson: FeatureCollection;
+interface CartoKitGeoJSONSource {
+  type: 'geojson';
+  location:
+    | {
+        type: 'api';
+        url: string;
+      }
+    | {
+        type: 'file';
+        fileName: string;
+      };
+  data: FeatureCollection;
+  sourceData: FeatureCollection;
   transformations: TransformationCall[];
 }
+
+/**
+ * Represents the underlying data and metadata of a vector tile layer.
+ *
+ * @property type The type of the source, 'vector'.
+ * @property location The location of the source, a remote API endpoint.
+ */
+interface CartoKitVectorTileSource {
+  type: 'vector';
+  location: {
+    type: 'api';
+    url: string;
+  };
+}
+
+/**
+ * Represents the possible data sources for a layer.
+ */
+export type CartoKitSource = CartoKitGeoJSONSource | CartoKitVectorTileSource;
 
 /**
  * Represents the layout of a layer.
@@ -188,18 +215,17 @@ interface LayerLayout {
  * Represents the base structure of a layer in cartokit. All layers extend from
  * this interface.
  *
- * @property {string} id - A globally unique identifier for the layer.
- * @property {string} displayName - A user-supplied display name for the layer.
- * @property {LayerType} type - The type of the layer, @see LayerType.
- * @property {LayerData} data - The data and metadata of the layer, @see
- * LayerData.
- * @property {LayerLayout} layout - The layout of the layer, @see LayerLayout.
+ * @property id A globally unique identifier for the layer.
+ * @property displayName A user-supplied display name for the layer.
+ * @property type The {@link LayerType} of the layer.
+ * @property source The {@link CartoKitSource} of the layer.
+ * @property layout The {@link LayerLayout} of the layer.
  */
 interface Layer {
   id: string;
   displayName: string;
   type: LayerType;
-  data: LayerData;
+  source: CartoKitSource;
   layout: LayerLayout;
 }
 

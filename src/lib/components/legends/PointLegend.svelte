@@ -11,9 +11,6 @@
 
   let { layer }: Props = $props();
 
-  let geometryType = $derived(
-    getFeatureCollectionGeometryType(layer.data.geojson)
-  );
   let dimension = $derived(
     layer.style.size * 2 +
       (layer.style.stroke.visible ? layer.style.stroke.width : 0) * 2
@@ -63,10 +60,15 @@
         {...attrs}
       />
     </svg>
-    <span
-      >{layer.data.geojson.features.length}
-      {pluralize(geometryType, layer.data.geojson.features.length)}</span
-    >
+    {#if layer.source.type === 'geojson'}
+      <span
+        >{layer.source.data.features.length}
+        {pluralize(
+          getFeatureCollectionGeometryType(layer.source.data),
+          layer.source.data.features.length
+        )}</span
+      >
+    {/if}
   </div>
   {#if layer.style.fill.visible && layer.style.fill.type === 'Categorical'}
     <CategoricalLegend

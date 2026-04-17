@@ -38,9 +38,13 @@
   let layerIdsToAttributes = $derived(
     Object.entries($ir.layers).reduce<Record<string, string[]>>(
       (acc, [layerId, layer]) => {
-        acc[layerId] = Object.keys(
-          layer.data.geojson.features[0].properties ?? {}
-        );
+        if (layer.source.type === 'geojson') {
+          acc[layerId] = Object.keys(
+            layer.source.data.features[0].properties ?? {}
+          );
+        } else {
+          acc[layerId] = [];
+        }
 
         return acc;
       },

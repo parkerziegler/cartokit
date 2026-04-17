@@ -19,22 +19,23 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
     case 'Choropleth':
       return layer;
     case 'Dot Density': {
-      // Remove the dot density transformation.
-      const transformations = layer.data.transformations.filter(
-        (transformation) => transformation.name !== 'generateDotDensityPoints'
-      );
+      const source =
+        layer.source.type === 'geojson'
+          ? {
+              ...layer.source,
+              data: layer.source.sourceData,
+              // Remove the dot density transformation.
+              transformations: layer.source.transformations.filter(
+                (transformation) =>
+                  transformation.name !== 'generateDotDensityPoints'
+              )
+            }
+          : layer.source;
 
       const targetLayer: CartoKitChoroplethLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Choropleth',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          geojson: layer.data.sourceGeojson,
-          sourceGeojson: layer.data.sourceGeojson,
-          transformations
-        },
+        source,
         style: {
           fill: {
             type: 'Quantitative',
@@ -50,8 +51,7 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
             visible: layer.style.fill.visible
           },
           stroke: layer.style.stroke
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;
@@ -63,27 +63,34 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
       );
     case 'Point':
     case 'Proportional Symbol': {
-      // Remove the centroid transformation.
-      const transformations = layer.data.transformations.filter(
-        (transformation) => transformation.name !== 'deriveCentroids'
-      );
-
-      // Select a quantitative attribute for the visualization.
-      const attribute = selectQuantitativeAttribute(
-        layer.data.geojson.features
-      );
+      const { source, attribute } =
+        layer.source.type === 'geojson'
+          ? {
+              source: {
+                ...layer.source,
+                data: layer.source.sourceData,
+                // Remove the centroid transformation.
+                transformations: layer.source.transformations.filter(
+                  (transformation) => transformation.name !== 'deriveCentroids'
+                )
+              },
+              attribute:
+                layer.type === 'Proportional Symbol'
+                  ? layer.style.size.attribute
+                  : selectQuantitativeAttribute(layer.source.data.features)
+            }
+          : {
+              source: layer.source,
+              attribute:
+                layer.type === 'Proportional Symbol'
+                  ? layer.style.size.attribute
+                  : '' // TODO: Discern if and how to select a quantitative attribute for vector tile layers.
+            };
 
       const targetLayer: CartoKitChoroplethLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Choropleth',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          geojson: layer.data.sourceGeojson,
-          sourceGeojson: layer.data.sourceGeojson,
-          transformations
-        },
+        source,
         style: {
           fill:
             layer.style.fill.type === 'Quantitative'
@@ -102,23 +109,22 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
                   visible: layer.style.fill.visible
                 },
           stroke: layer.style.stroke
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;
     }
     case 'Polygon': {
-      const attribute = selectQuantitativeAttribute(
-        layer.data.geojson.features
-      );
+      const attribute =
+        layer.source.type === 'geojson'
+          ? selectQuantitativeAttribute(layer.source.data.features)
+          : ''; // TODO: Discern if and how to select a quantitative attribute for vector tile layers.
 
       const targetLayer: CartoKitChoroplethLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Choropleth',
-        data: layer.data,
         style: {
+          ...layer.style,
           fill: {
             type: 'Quantitative',
             attribute,
@@ -131,10 +137,8 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
             thresholds: DEFAULT_THRESHOLDS(layer.id, attribute),
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
-          },
-          stroke: layer.style.stroke
-        },
-        layout: layer.layout
+          }
+        }
       };
 
       return targetLayer;
