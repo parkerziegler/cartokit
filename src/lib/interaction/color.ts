@@ -22,14 +22,14 @@ import { catalog } from '$lib/state/catalog.svelte';
  */
 export function deriveColorScale(
   style: ConstantStyle | CategoricalStyle | QuantitativeStyle,
-  layerId?: string
+  layerId: string
 ): ExpressionSpecification | string {
   switch (style.type) {
     case 'Quantitative': {
       const { scale, attribute } = style;
 
       if (scale.type === 'Continuous') {
-        const { min, max } = catalog.value[layerId!][attribute];
+        const { min, max } = catalog.value[layerId][attribute];
         const colors = materializeColorRamp(
           scale.interpolator.id,
           scale.interpolator.direction,

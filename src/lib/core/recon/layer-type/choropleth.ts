@@ -35,7 +35,7 @@ export function reconChoropleth(
       map.value?.setPaintProperty(
         targetLayer.id,
         'fill-color',
-        deriveColorScale(targetLayer.style.fill)
+        deriveColorScale(targetLayer.style.fill, targetLayer.id)
       );
   }
 }

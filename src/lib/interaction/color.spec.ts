@@ -23,7 +23,7 @@ describe('deriveColorScale', () => {
         },
         opacity: 1,
         visible: true
-      });
+      }, 'test-layer');
 
       expect(result).toEqual([
         'step',
@@ -59,7 +59,7 @@ describe('deriveColorScale', () => {
         },
         opacity: 1,
         visible: true
-      });
+      }, 'test-layer');
 
       expect(result).toEqual([
         'step',
@@ -105,7 +105,7 @@ describe('deriveColorScale', () => {
         },
         opacity: 1,
         visible: true
-      });
+      }, 'test-layer');
 
       expect(result).toEqual([
         'match',
@@ -160,7 +160,7 @@ describe('deriveColorScale', () => {
         },
         opacity: 1,
         visible: true
-      });
+      }, 'test-layer');
 
       expect(result).toEqual([
         'match',
@@ -212,7 +212,7 @@ describe('deriveColorScale', () => {
         },
         opacity: 1,
         visible: true
-      });
+      }, 'test-layer');
 
       expect(result).toEqual([
         'match',
@@ -245,7 +245,7 @@ describe('deriveColorScale', () => {
         color: '#c6abdd',
         opacity: 1,
         visible: true
-      });
+      }, 'test-layer');
 
       expect(result).toEqual('#c6abdd');
     });
