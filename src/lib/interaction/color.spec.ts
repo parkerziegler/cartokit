@@ -9,21 +9,24 @@ describe('deriveColorScale', () => {
     const STOPS = 7;
 
     test('should derive a quantitative color scale', () => {
-      const result = deriveColorScale({
-        type: 'Quantitative',
-        attribute: 'total_capacity',
-        scale: {
-          type: 'Quantile',
-          scheme: {
-            id: 'schemeBlues',
-            direction: 'Forward'
+      const result = deriveColorScale(
+        {
+          type: 'Quantitative',
+          attribute: 'total_capacity',
+          scale: {
+            type: 'Quantile',
+            scheme: {
+              id: 'schemeBlues',
+              direction: 'Forward'
+            },
+            steps: STOPS,
+            thresholds: [1.6, 2.8, 5, 10.8, 42, 151.63]
           },
-          steps: STOPS,
-          thresholds: [1.6, 2.8, 5, 10.8, 42, 151.63]
+          opacity: 1,
+          visible: true
         },
-        opacity: 1,
-        visible: true
-      }, 'test-layer');
+        'test-layer'
+      );
 
       expect(result).toEqual([
         'step',
@@ -45,21 +48,24 @@ describe('deriveColorScale', () => {
     });
 
     test('should derive a quantitative color scale with a reverse direction', () => {
-      const result = deriveColorScale({
-        type: 'Quantitative',
-        attribute: 'total_capacity',
-        scale: {
-          type: 'Quantile',
-          scheme: {
-            id: 'schemeBlues',
-            direction: 'Reverse'
+      const result = deriveColorScale(
+        {
+          type: 'Quantitative',
+          attribute: 'total_capacity',
+          scale: {
+            type: 'Quantile',
+            scheme: {
+              id: 'schemeBlues',
+              direction: 'Reverse'
+            },
+            steps: STOPS,
+            thresholds: [1.6, 2.8, 5, 10.8, 42, 151.63]
           },
-          steps: STOPS,
-          thresholds: [1.6, 2.8, 5, 10.8, 42, 151.63]
+          opacity: 1,
+          visible: true
         },
-        opacity: 1,
-        visible: true
-      }, 'test-layer');
+        'test-layer'
+      );
 
       expect(result).toEqual([
         'step',
@@ -83,29 +89,32 @@ describe('deriveColorScale', () => {
 
   describe('Categorical', () => {
     test('should derive a categorical color scale with fewer categories than colors in the scheme', () => {
-      const result = deriveColorScale({
-        type: 'Categorical',
-        attribute: 'primary_source',
-        scale: {
+      const result = deriveColorScale(
+        {
           type: 'Categorical',
-          scheme: {
-            id: 'schemeCategory10',
-            direction: 'Forward'
+          attribute: 'primary_source',
+          scale: {
+            type: 'Categorical',
+            scheme: {
+              id: 'schemeCategory10',
+              direction: 'Forward'
+            },
+            categories: [
+              'oil',
+              'hydroelectric',
+              'natural gas',
+              'nuclear',
+              'coal',
+              'other',
+              'wind',
+              'solar'
+            ]
           },
-          categories: [
-            'oil',
-            'hydroelectric',
-            'natural gas',
-            'nuclear',
-            'coal',
-            'other',
-            'wind',
-            'solar'
-          ]
+          opacity: 1,
+          visible: true
         },
-        opacity: 1,
-        visible: true
-      }, 'test-layer');
+        'test-layer'
+      );
 
       expect(result).toEqual([
         'match',
@@ -131,36 +140,39 @@ describe('deriveColorScale', () => {
     });
 
     test('should derive a categorical color scale with more categories than colors in the scheme, applying the DEFAULT_FILL to unmatched categories', () => {
-      const result = deriveColorScale({
-        type: 'Categorical',
-        attribute: 'county',
-        scale: {
+      const result = deriveColorScale(
+        {
           type: 'Categorical',
-          scheme: {
-            id: 'schemeCategory10',
-            direction: 'Forward'
+          attribute: 'county',
+          scale: {
+            type: 'Categorical',
+            scheme: {
+              id: 'schemeCategory10',
+              direction: 'Forward'
+            },
+            categories: [
+              'Aleutians East',
+              'Tuscaloosa',
+              'Mobile',
+              'Elmore',
+              'Etowah',
+              'El Paso',
+              'Greene',
+              'Calhoun',
+              'Talladega',
+              'Chilton',
+              'Coosa',
+              'Walker',
+              'Cherokee',
+              'Shelby',
+              'Watonwan'
+            ]
           },
-          categories: [
-            'Aleutians East',
-            'Tuscaloosa',
-            'Mobile',
-            'Elmore',
-            'Etowah',
-            'El Paso',
-            'Greene',
-            'Calhoun',
-            'Talladega',
-            'Chilton',
-            'Coosa',
-            'Walker',
-            'Cherokee',
-            'Shelby',
-            'Watonwan'
-          ]
+          opacity: 1,
+          visible: true
         },
-        opacity: 1,
-        visible: true
-      }, 'test-layer');
+        'test-layer'
+      );
 
       expect(result).toEqual([
         'match',
@@ -190,29 +202,32 @@ describe('deriveColorScale', () => {
     });
 
     test('should derive a categorical color scale with a reverse direction', () => {
-      const result = deriveColorScale({
-        type: 'Categorical',
-        attribute: 'primary_source',
-        scale: {
+      const result = deriveColorScale(
+        {
           type: 'Categorical',
-          scheme: {
-            id: 'schemeCategory10',
-            direction: 'Reverse'
+          attribute: 'primary_source',
+          scale: {
+            type: 'Categorical',
+            scheme: {
+              id: 'schemeCategory10',
+              direction: 'Reverse'
+            },
+            categories: [
+              'oil',
+              'hydroelectric',
+              'natural gas',
+              'nuclear',
+              'coal',
+              'other',
+              'wind',
+              'solar'
+            ]
           },
-          categories: [
-            'oil',
-            'hydroelectric',
-            'natural gas',
-            'nuclear',
-            'coal',
-            'other',
-            'wind',
-            'solar'
-          ]
+          opacity: 1,
+          visible: true
         },
-        opacity: 1,
-        visible: true
-      }, 'test-layer');
+        'test-layer'
+      );
 
       expect(result).toEqual([
         'match',
@@ -240,12 +255,15 @@ describe('deriveColorScale', () => {
 
   describe('Constant', () => {
     test('should derive a constant color scale', () => {
-      const result = deriveColorScale({
-        type: 'Constant',
-        color: '#c6abdd',
-        opacity: 1,
-        visible: true
-      }, 'test-layer');
+      const result = deriveColorScale(
+        {
+          type: 'Constant',
+          color: '#c6abdd',
+          opacity: 1,
+          visible: true
+        },
+        'test-layer'
+      );
 
       expect(result).toEqual('#c6abdd');
     });

@@ -232,12 +232,20 @@ test.describe('color scales', () => {
 
   test('supports changing from Continuous to Quantile', async ({ page }) => {
     // Switch to Continuous first.
-    await page.locator('#fill-classification-method-select').selectOption('Continuous');
-    await expect(page.locator('#fill-classification-method-select')).toHaveValue('Continuous');
+    await page
+      .locator('#fill-classification-method-select')
+      .selectOption('Continuous');
+    await expect(
+      page.locator('#fill-classification-method-select')
+    ).toHaveValue('Continuous');
 
     // Switch back to Quantile.
-    await page.locator('#fill-classification-method-select').selectOption('Quantile');
-    await expect(page.locator('#fill-classification-method-select')).toHaveValue('Quantile');
+    await page
+      .locator('#fill-classification-method-select')
+      .selectOption('Quantile');
+    await expect(
+      page.locator('#fill-classification-method-select')
+    ).toHaveValue('Quantile');
 
     const quantiles = [-1528.88, -77.05, 4, 25.89, 71.08, 608.88];
 
@@ -249,21 +257,32 @@ test.describe('color scales', () => {
     }
   });
 
-test('supports changing from Quantile to Continuous', async ({ page }) => {
-  // Switch to Quantile first.
-    await page.locator('#fill-classification-method-select').selectOption('Quantile');
-    await expect(page.locator('#fill-classification-method-select')).toHaveValue('Quantile');
+  test('supports changing from Quantile to Continuous', async ({ page }) => {
+    // Switch to Quantile first.
+    await page
+      .locator('#fill-classification-method-select')
+      .selectOption('Quantile');
+    await expect(
+      page.locator('#fill-classification-method-select')
+    ).toHaveValue('Quantile');
 
     // Switch back to Continuous.
-    await page.locator('#fill-classification-method-select').selectOption('Continuous');
-    await expect(page.locator('#fill-classification-method-select')).toHaveValue('Continuous');
+    await page
+      .locator('#fill-classification-method-select')
+      .selectOption('Continuous');
+    await expect(
+      page.locator('#fill-classification-method-select')
+    ).toHaveValue('Continuous');
 
     // Assert values in the legend.
-    await expect(page.getByTestId('choropleth-legend')).toContainText('-1528.88');
+    await expect(page.getByTestId('choropleth-legend')).toContainText(
+      '-1528.88'
+    );
     await expect(page.getByTestId('choropleth-legend')).toContainText('608.88');
 
     // No intermediate values.
-    await expect(page.getByTestId('choropleth-legend')).not.toContainText('25.89');
+    await expect(page.getByTestId('choropleth-legend')).not.toContainText(
+      '25.89'
+    );
   });
-
 });
