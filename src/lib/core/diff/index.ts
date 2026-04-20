@@ -222,7 +222,6 @@ interface HeatmapWeightAttributeDiff extends LayerDiff {
   };
 }
 
-
 interface FillColorRampDiff extends LayerDiff {
   type: 'fill-color-ramp';
   payload: {

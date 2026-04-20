@@ -88,7 +88,9 @@
       <Portal
         {target}
         class="absolute z-10"
-        style="top: {offsetHeight + y + 4}px; left: {x}px; width: {offsetWidth}px;"
+        style="top: {offsetHeight +
+          y +
+          4}px; left: {x}px; width: {offsetWidth}px;"
       >
         <ul
           class="flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 shadow-lg"
@@ -111,6 +113,6 @@
   <button
     onclick={onRampReverse}
     data-testid="{channel}-ramp-reverse-button"
-    {@attach tooltip({ content: 'Reverse Ramp' })}
-  ><ReverseIcon /></button>
+    {@attach tooltip({ content: 'Reverse Ramp' })}><ReverseIcon /></button
+  >
 </div>
