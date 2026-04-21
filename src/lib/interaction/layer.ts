@@ -230,6 +230,7 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
       map.addLayer({
         id: layer.id,
         source: layer.id,
+        'source-layer': 'TODO',
         type: 'fill',
         paint: fillPaint
       });
@@ -250,6 +251,7 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
       map.addLayer({
         id: `${layer.id}-stroke`,
         source: layer.id,
+        'source-layer': 'TODO',
         type: 'line',
         paint: strokePaint
       });
