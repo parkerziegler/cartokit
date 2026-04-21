@@ -84,6 +84,7 @@ export function instrumentPolygonSelect(
     id: `${layerId}-select`,
     type: 'line',
     source: layerId,
+    'source-layer': 'TODO',
     paint: {
       'line-color': '#A534FF',
       'line-width': [

@@ -49,7 +49,7 @@ export async function reconLayerDiffs(
       } else if (diff.payload.type === 'vector') {
         map.value!.addSource(layer.id, {
           type: 'vector',
-          url: diff.payload.location.url
+          url: `pmtiles://${diff.payload.location.url}`
         });
       }
 
