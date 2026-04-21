@@ -58,18 +58,29 @@
 
     try {
       const layerId = uniqueId(`${kebabCase(displayName)}__`);
-      // TODO: Add support for vector tile layers.
+
+      const payload = endpoint.endsWith('.pmtiles')
+        ? {
+            type: 'vector' as const,
+            displayName,
+            location: {
+              type: 'api' as const,
+              url: endpoint
+            }
+          }
+        : {
+            type: 'geojson' as const,
+            displayName,
+            location: {
+              type: 'api' as const,
+              url: endpoint
+            }
+          };
+
       await applyDiff({
         type: 'add-layer',
         layerId,
-        payload: {
-          type: 'geojson',
-          location: {
-            type: 'api',
-            url: endpoint
-          },
-          displayName
-        }
+        payload
       });
 
       map.value!.on('sourcedata', handleSourceLoaded(layerId));
