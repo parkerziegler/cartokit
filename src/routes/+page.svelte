@@ -1,5 +1,6 @@
 <script lang="ts">
   import maplibregl from 'maplibre-gl';
+  import * as pmtiles from 'pmtiles';
   import { onMount } from 'svelte';
 
   import type { PageData } from './$types';
@@ -44,6 +45,9 @@
   chat.enable = data.enableChat;
 
   onMount(() => {
+    const protocol = new pmtiles.Protocol();
+    maplibregl.addProtocol('pmtiles', protocol.tile);
+
     map = new maplibregl.Map({
       container: 'map',
       style: data.basemap.url,

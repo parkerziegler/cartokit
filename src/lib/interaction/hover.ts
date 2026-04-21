@@ -83,6 +83,7 @@ export function instrumentPolygonHover(
     id: `${layerId}-hover`,
     type: 'line',
     source: layerId,
+    'source-layer': 'TODO',
     paint: {
       'line-color': '#FFFFFF',
       'line-width': [
