@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { FeatureCollection } from 'geojson';
 
+  import ColorRampSelect from '$lib/components/color/ColorRampSelect.svelte';
   import ColorSchemeSelect from '$lib/components/color/ColorSchemeSelect.svelte';
   import FillPicker from '$lib/components/color/FillPicker.svelte';
   import OpacityInput from '$lib/components/color/OpacityInput.svelte';
@@ -40,7 +41,7 @@
       selected={fill.attribute}
       channel="fill"
     />
-    <ColorSchemeSelect {layerId} style={fill} />
+    <ColorSchemeSelect {layerId} scale={fill.scale} />
   {:else if fill.type === 'Quantitative'}
     <AttributeSelect
       {layerId}
@@ -49,9 +50,21 @@
       selected={fill.attribute}
       channel="fill"
     />
-    <ClassificationMethodSelect {layerId} style={fill} />
-    <StepsSelect {layerId} style={fill} />
-    <ColorSchemeSelect {layerId} style={fill} />
+    <ClassificationMethodSelect
+      {layerId}
+      attribute={fill.attribute}
+      scale={fill.scale}
+    />
+    {#if fill.scale.type === 'Continuous'}
+      <ColorRampSelect
+        {layerId}
+        channel="fill-color"
+        ramp={fill.scale.interpolator}
+      />
+    {:else}
+      <StepsSelect {layerId} scale={fill.scale} />
+      <ColorSchemeSelect {layerId} scale={fill.scale} />
+    {/if}
   {/if}
   <OpacityInput {layerId} channel="fill" style={fill} />
 </div>

@@ -39,13 +39,18 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
           fill: {
             type: 'Quantitative',
             attribute: layer.style.dot.attribute,
-            method: DEFAULT_METHOD,
-            scheme: {
-              id: DEFAULT_QUANTITATIVE_SCHEME,
-              direction: DEFAULT_SCHEME_DIRECTION
+            scale: {
+              type: DEFAULT_METHOD,
+              scheme: {
+                id: DEFAULT_QUANTITATIVE_SCHEME,
+                direction: DEFAULT_SCHEME_DIRECTION
+              },
+              steps: DEFAULT_COUNT,
+              thresholds: DEFAULT_THRESHOLDS(
+                layer.id,
+                layer.style.dot.attribute
+              )
             },
-            count: DEFAULT_COUNT,
-            thresholds: DEFAULT_THRESHOLDS(layer.id, layer.style.dot.attribute),
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
           },
@@ -91,13 +96,15 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
               : {
                   type: 'Quantitative',
                   attribute,
-                  method: DEFAULT_METHOD,
-                  scheme: {
-                    id: DEFAULT_QUANTITATIVE_SCHEME,
-                    direction: DEFAULT_SCHEME_DIRECTION
+                  scale: {
+                    type: DEFAULT_METHOD,
+                    scheme: {
+                      id: DEFAULT_QUANTITATIVE_SCHEME,
+                      direction: DEFAULT_SCHEME_DIRECTION
+                    },
+                    steps: DEFAULT_COUNT,
+                    thresholds: DEFAULT_THRESHOLDS(layer.id, attribute)
                   },
-                  count: DEFAULT_COUNT,
-                  thresholds: DEFAULT_THRESHOLDS(layer.id, attribute),
                   opacity: layer.style.fill.opacity,
                   visible: layer.style.fill.visible
                 },
@@ -122,13 +129,15 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
           fill: {
             type: 'Quantitative',
             attribute,
-            method: DEFAULT_METHOD,
-            scheme: {
-              id: DEFAULT_QUANTITATIVE_SCHEME,
-              direction: 'Forward'
+            scale: {
+              type: DEFAULT_METHOD,
+              scheme: {
+                id: DEFAULT_QUANTITATIVE_SCHEME,
+                direction: DEFAULT_SCHEME_DIRECTION
+              },
+              steps: DEFAULT_COUNT,
+              thresholds: DEFAULT_THRESHOLDS(layer.id, attribute)
             },
-            count: DEFAULT_COUNT,
-            thresholds: DEFAULT_THRESHOLDS(layer.id, attribute),
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
           },

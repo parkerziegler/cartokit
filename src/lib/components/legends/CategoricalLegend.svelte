@@ -2,7 +2,6 @@
   import * as d3 from 'd3';
 
   import type { CategoricalFill, ConstantStroke, LayerType } from '$lib/types';
-  import { DEFAULT_FILL } from '$lib/utils/constants';
   import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
@@ -15,14 +14,16 @@
   let { fill, stroke, layerType, visible }: Props = $props();
 
   let entries = $derived(
-    d3[fill.scheme.id].length < fill.categories.length
-      ? fill.categories.slice(0, d3[fill.scheme.id].length).concat('Other')
-      : fill.categories
+    d3[fill.scale.scheme.id].length < fill.scale.categories.length
+      ? fill.scale.categories
+          .slice(0, d3[fill.scale.scheme.id].length)
+          .concat('Other')
+      : fill.scale.categories
   );
   let colors = $derived(
     materializeColorScheme(
-      fill.scheme.id,
-      fill.scheme.direction,
+      fill.scale.scheme.id,
+      fill.scale.scheme.direction,
       entries.length
     )
   );
@@ -40,7 +41,7 @@
               y="0"
               width="32"
               height="16"
-              fill={colors[i] ?? DEFAULT_FILL}
+              fill={colors[i]}
               fill-opacity={fill.opacity}
               stroke={stroke.visible ? stroke.color : 'none'}
               stroke-width={stroke.visible ? stroke.width : 0}
@@ -53,7 +54,7 @@
               r="7"
               cx="8"
               cy="8"
-              fill={colors[i] ?? DEFAULT_FILL}
+              fill={colors[i]}
               fill-opacity={fill.opacity}
               stroke={stroke.visible ? stroke.color : 'none'}
               stroke-width={stroke.visible ? stroke.width : 0}

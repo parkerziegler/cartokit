@@ -10,10 +10,10 @@ import type {
   BasemapProvider,
   CartoKitLayer,
   CategoricalColorScheme,
-  ClassificationMethod,
-  ColorRamp,
   LayerType,
   Projection,
+  QuantitativeColorRamp,
+  QuantitativeColorScale,
   QuantitativeColorScheme,
   RampDirection,
   SchemeDirection,
@@ -64,7 +64,7 @@ interface FillColorSchemeDirectionDiff extends LayerDiff {
 interface FillClassificationMethodDiff extends LayerDiff {
   type: 'fill-classification-method';
   payload: {
-    method: ClassificationMethod;
+    method: QuantitativeColorScale['type'];
   };
 }
 
@@ -90,7 +90,7 @@ interface FillOpacityDiff extends LayerDiff {
   };
 }
 
-interface FillVisualizationDiff extends LayerDiff {
+interface FillVisualizationTypeDiff extends LayerDiff {
   type: 'fill-visualization-type';
   payload: {
     visualizationType: VisualizationType;
@@ -197,7 +197,7 @@ interface HeatmapRadiusDiff extends LayerDiff {
 interface HeatmapRampDiff extends LayerDiff {
   type: 'heatmap-ramp';
   payload: {
-    ramp: ColorRamp;
+    ramp: QuantitativeColorRamp;
   };
 }
 
@@ -219,6 +219,20 @@ interface HeatmapWeightAttributeDiff extends LayerDiff {
   type: 'heatmap-weight-attribute';
   payload: {
     weightAttribute: string;
+  };
+}
+
+interface FillColorRampDiff extends LayerDiff {
+  type: 'fill-color-ramp';
+  payload: {
+    ramp: QuantitativeColorRamp;
+  };
+}
+
+interface FillColorRampDirectionDiff extends LayerDiff {
+  type: 'fill-color-ramp-direction';
+  payload: {
+    direction: RampDirection;
   };
 }
 
@@ -337,10 +351,12 @@ export type CartoKitDiff =
   | FillColorDiff
   | FillColorSchemeDiff
   | FillColorSchemeDirectionDiff
+  | FillColorRampDiff
+  | FillColorRampDirectionDiff
   | FillClassificationMethodDiff
   | FillStepCountDiff
   | FillStepValueDiff
-  | FillVisualizationDiff
+  | FillVisualizationTypeDiff
   | FillOpacityDiff
   | AddFillDiff
   | RemoveFillDiff

@@ -5,21 +5,18 @@
   import ColorRamp from '$lib/components/channel/shared/ColorRamp.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import Portal from '$lib/components/shared/Portal.svelte';
-  import type {
-    CartoKitHeatmapLayer,
-    ColorRamp as ColorRampType,
-    RampDirection
-  } from '$lib/types';
-
-  import { COLOR_RAMPS } from '$lib/utils/color/ramp';
+  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import type { QuantitativeColorRamp, RampDirection } from '$lib/types';
+  import { QUANTITATIVE_COLOR_RAMPS } from '$lib/utils/color/ramp';
 
   interface Props {
-    layer: CartoKitHeatmapLayer;
+    layerId: string;
+    channel: 'heatmap-color' | 'fill-color';
+    ramp: { id: QuantitativeColorRamp; direction: RampDirection };
   }
 
-  let { layer }: Props = $props();
+  let { layerId, channel, ramp }: Props = $props();
 
   const target = document.getElementById('map') ?? document.body;
   let trigger: HTMLDivElement;
@@ -39,35 +36,42 @@
     showOptions = false;
   }
 
-  async function onClickRamp(ramp: ColorRampType) {
-    const diff: CartoKitDiff = {
-      type: 'heatmap-ramp',
-      layerId: layer.id,
-      payload: { ramp }
-    };
+  async function onClickRamp(id: QuantitativeColorRamp) {
+    showOptions = false;
+
+    const diff: CartoKitDiff =
+      channel === 'heatmap-color'
+        ? { type: 'heatmap-ramp', layerId, payload: { ramp: id } }
+        : { type: 'fill-color-ramp', layerId, payload: { ramp: id } };
 
     await applyDiff(diff);
   }
 
   async function onRampReverse() {
-    const currentDirection = layer.style.heatmap.ramp.direction;
     const nextDirection: RampDirection =
-      currentDirection === 'Forward' ? 'Reverse' : 'Forward';
+      ramp.direction === 'Forward' ? 'Reverse' : 'Forward';
 
-    const diff: CartoKitDiff = {
-      type: 'heatmap-ramp-direction',
-      layerId: layer.id,
-      payload: { direction: nextDirection }
-    };
+    const diff: CartoKitDiff =
+      channel === 'heatmap-color'
+        ? {
+            type: 'heatmap-ramp-direction',
+            layerId,
+            payload: { direction: nextDirection }
+          }
+        : {
+            type: 'fill-color-ramp-direction',
+            layerId,
+            payload: { direction: nextDirection }
+          };
 
     await applyDiff(diff);
   }
 </script>
 
 <div class="flex items-center gap-2">
-  <FieldLabel fieldId="heatmap-color-ramp">Ramp</FieldLabel>
+  <FieldLabel fieldId="{channel}-ramp">Ramp</FieldLabel>
   <div
-    id="heatmap-color-ramp"
+    id="{channel}-ramp"
     class="flex grow items-center"
     bind:this={trigger}
     bind:offsetHeight
@@ -78,10 +82,7 @@
       class="flex-1 border border-transparent p-2 focus-within:border-slate-600 hover:border-slate-600"
       {@attach onClickOutside({ callback: onClickOutsideCurrentRamp })}
     >
-      <ColorRamp
-        ramp={layer.style.heatmap.ramp.id}
-        direction={layer.style.heatmap.ramp.direction}
-      />
+      <ColorRamp ramp={ramp.id} direction={ramp.direction} />
     </button>
     {#if showOptions}
       <Portal
@@ -94,17 +95,14 @@
         <ul
           class="flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 shadow-lg"
         >
-          {#each COLOR_RAMPS as ramp (ramp)}
+          {#each QUANTITATIVE_COLOR_RAMPS as colramp (colramp)}
             <li>
               <button
-                onclick={() => onClickRamp(ramp)}
-                use:focus={() => ramp === layer.style.heatmap.ramp.id}
-                class="flex-1 p-2 hover:bg-slate-700"
+                onclick={() => onClickRamp(colramp)}
+                use:focus={() => colramp === ramp.id}
+                class="w-full p-2 hover:bg-slate-700"
               >
-                <ColorRamp
-                  {ramp}
-                  direction={layer.style.heatmap.ramp.direction}
-                />
+                <ColorRamp ramp={colramp} direction={ramp.direction} />
               </button>
             </li>
           {/each}
@@ -114,9 +112,7 @@
   </div>
   <button
     onclick={onRampReverse}
-    data-testid="color-ramp-reverse-button"
-    {@attach tooltip({
-      content: 'Reverse Ramp'
-    })}><ReverseIcon /></button
+    data-testid="{channel}-ramp-reverse-button"
+    {@attach tooltip({ content: 'Reverse Ramp' })}><ReverseIcon /></button
   >
 </div>

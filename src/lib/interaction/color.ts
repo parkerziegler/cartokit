@@ -11,47 +11,73 @@ import type {
 import { DEFAULT_FILL } from '$lib/utils/constants';
 import { materializeColorRamp } from '$lib/utils/color/ramp';
 import { materializeColorScheme } from '$lib/utils/color/scheme';
+import { catalog } from '$lib/state/catalog.svelte';
 
 /**
  * Derive a MapLibre GL JS expression for a choropleth color scale.
  *
- * @param {ConstantStyle | CategoricalStyle | QuantitativeStyle} style – The
- * style from which to derive the color scale.
- * @returns {ExpressionSpecification | string} — A MapLibre GL JS expression for
- * a color scale.
+ * @param style The {@link ConstantStyle}, {@link CategoricalStyle}, or
+ * {@link QuantitativeStyle} from which to derive the color scale.
+ * @param layerId The ID of the {@link CartoKitLayer}.
+ * @returns An {@link ExpressionSpecification} or string for a color scale.
  */
 export function deriveColorScale(
-  style: ConstantStyle | CategoricalStyle | QuantitativeStyle
+  style: ConstantStyle | CategoricalStyle | QuantitativeStyle,
+  layerId: string
 ): ExpressionSpecification | string {
   switch (style.type) {
     case 'Quantitative': {
-      const { scheme, count, attribute, thresholds } = style;
+      const { scale, attribute } = style;
 
-      const colors = materializeColorScheme(scheme.id, scheme.direction, count);
+      if (scale.type === 'Continuous') {
+        const { min, max } = catalog.value[layerId][attribute];
+        const colors = materializeColorRamp(
+          scale.interpolator.id,
+          scale.interpolator.direction,
+          10
+        );
+        const interpolate = d3.interpolateNumber(min, max);
 
-      const prelude: ExpressionSpecification = [
-        'step',
-        ['get', attribute],
-        colors[0]
-      ];
-      const stops = colors.reduce<(string | number)[]>(
-        (acc, color, i) =>
-          i === 0 ? acc : acc.concat([thresholds[i - 1], color]),
-        []
-      );
+        return [
+          'interpolate',
+          ['linear'],
+          ['get', attribute],
+          ...colors.flatMap((color, i) => [
+            parseFloat(interpolate(i / 10).toFixed(1)),
+            color
+          ])
+        ];
+      } else {
+        const colors = materializeColorScheme(
+          scale.scheme.id,
+          scale.scheme.direction,
+          scale.steps
+        );
 
-      return [...prelude, ...stops];
+        const prelude: ExpressionSpecification = [
+          'step',
+          ['get', attribute],
+          colors[0]
+        ];
+        const stops = colors.reduce<(string | number)[]>(
+          (acc, color, i) =>
+            i === 0 ? acc : acc.concat([scale.thresholds[i - 1], color]),
+          []
+        );
+
+        return [...prelude, ...stops];
+      }
     }
     case 'Categorical': {
-      const { categories, scheme, attribute } = style;
+      const { scale, attribute } = style;
 
       const colors = materializeColorScheme(
-        scheme.id,
-        scheme.direction,
-        categories.length
+        scale.scheme.id,
+        scale.scheme.direction,
+        scale.categories.length
       );
 
-      const stops = zip(categories, colors)
+      const stops = zip(scale.categories, colors)
         .filter(
           (pair): pair is [string, string] | [number, string] =>
             pair[0] !== undefined && pair[1] !== undefined
@@ -75,9 +101,8 @@ export function deriveColorScale(
 /**
  * Derive a MapLibre GL JS expression for a color ramp.
  *
- * @param {HeatmapStyle} style – The style from which to derive the color ramp.
- * @returns {ExpressionSpecification} — A MapLibre GL JS expression for a color
- * ramp.
+ * @param style The style from which to derive the color ramp.
+ * @returns An {@link ExpressionSpecification} for a color ramp.
  */
 export function deriveColorRamp(style: HeatmapStyle): ExpressionSpecification {
   const { ramp } = style;

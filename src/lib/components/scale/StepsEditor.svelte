@@ -1,19 +1,23 @@
 <script lang="ts">
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import type { QuantitativeStyle } from '$lib/types';
   import { catalog } from '$lib/state/catalog.svelte';
+  import type {
+    ContinuousColorScale,
+    QuantitativeColorScale
+  } from '$lib/types';
   import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
     layerId: string;
-    style: QuantitativeStyle;
+    attribute: string;
+    scale: Exclude<QuantitativeColorScale, ContinuousColorScale>;
   }
 
-  let { layerId, style }: Props = $props();
-  let { min, max } = $derived(catalog.value[layerId][style.attribute]);
+  let { layerId, attribute, scale }: Props = $props();
+  let { min, max } = $derived(catalog.value[layerId][attribute]);
   let colors = $derived(
-    materializeColorScheme(style.scheme.id, style.scheme.direction, style.count)
+    materializeColorScheme(scale.scheme.id, scale.scheme.direction, scale.steps)
   );
 
   function onThresholdChange(i: number) {
@@ -33,7 +37,7 @@
 </script>
 
 <div data-testid="breaks-editor" class="font-mono text-xs">
-  {#each [min, ...style.thresholds] as threshold, i (threshold)}
+  {#each [min, ...scale.thresholds] as threshold, i (threshold)}
     <div
       class="grid grid-cols-[3rem_minmax(0,1fr)_minmax(0,1fr)] gap-x-1 gap-y-2 border-b border-slate-600 last:border-b-0"
     >
@@ -46,7 +50,7 @@
       <NumberInput
         {min}
         {max}
-        value={style.thresholds[i - 1] ?? min}
+        value={scale.thresholds[i - 1] ?? min}
         step={0.01}
         class="self-center hover:border-transparent"
         disabled={i === 0}
@@ -55,10 +59,10 @@
       <NumberInput
         {min}
         {max}
-        value={style.thresholds[i] ?? max}
+        value={scale.thresholds[i] ?? max}
         step={0.01}
         class="self-center hover:border-transparent"
-        disabled={i === style.thresholds.length}
+        disabled={i === scale.thresholds.length}
         onchange={onThresholdChange(i)}
       />
     </div>

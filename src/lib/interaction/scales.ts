@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
 import { catalog } from '$lib/state/catalog.svelte';
-import type { ClassificationMethod } from '$lib/types';
+import type { QuantitativeColorScale } from '$lib/types';
 
 interface DeriveBreaksParams {
   layerId: string;
@@ -12,11 +12,11 @@ interface DeriveBreaksParams {
 /**
  * Derive quantiles for a given attribute of a GeoJSON FeatureCollection.
  *
- * @param params — Input parameters to compute quantiles over a GeoJSON FeatureCollection.
- * @param layerId – The ID of the visualized layer.
- * @param attribute – The data attribute to compute quantiles over.
- * @param range – The output range of the quantile scale.
- * @returns – The quantiles of the dataset.
+ * @param params Input parameters to compute quantiles over a GeoJSON FeatureCollection.
+ * @param layerId The ID of the visualized layer.
+ * @param attribute The data attribute to compute quantiles over.
+ * @param range The output range of the quantile scale.
+ * @returns The quantiles of the dataset.
  */
 function deriveQuantiles({
   layerId,
@@ -38,11 +38,11 @@ function deriveQuantiles({
 /**
  * Derive equal interval thresholds for a given attribute of a GeoJSON FeatureCollection.
  *
- * @param params — Input parameters to compute equal interval thresholds over a GeoJSON FeatureCollection.
- * @param layerId – The ID of the visualized layer.
- * @param attribute – The data attribute to compute equal interval thresholds over.
- * @param range – The output range of the equal interval (quantize) scale.
- * @returns – The equal interval thresholds of the dataset.
+ * @param params Input parameters to compute equal interval thresholds over a GeoJSON FeatureCollection.
+ * @param layerId The ID of the visualized layer.
+ * @param attribute The data attribute to compute equal interval thresholds over.
+ * @param range The output range of the equal interval (quantize) scale.
+ * @returns The equal interval thresholds of the dataset.
  */
 function deriveEqualIntervals({
   layerId,
@@ -64,11 +64,11 @@ function deriveEqualIntervals({
 /**
  * Derive Jenks natural breaks for a given attribute of a GeoJSON FeatureCollection.
  *
- * @param params — Input parameters to compute Jenks natural breaks over a GeoJSON FeatureCollection.
- * @param layerId – The ID of the visualized layer.
- * @param attribute – The data attribute to compute Jenks natural breaks over.
- * @param range – The output range of the Jenks scale.
- * @returns – The Jenks natural breaks of the dataset.
+ * @param params Input parameters to compute Jenks natural breaks over a GeoJSON FeatureCollection.
+ * @param layerId The ID of the visualized layer.
+ * @param attribute The data attribute to compute Jenks natural breaks over.
+ * @param range The output range of the Jenks scale.
+ * @returns The Jenks natural breaks of the dataset.
  */
 function deriveJenksBreaks({
   layerId,
@@ -81,12 +81,12 @@ function deriveJenksBreaks({
 /**
  * Derive manual thresholds for a given attribute of a GeoJSON FeatureCollection.
  *
- * @param params – Input parameters to compute manual thresholds over a GeoJSON FeatureCollection.
- * @param layerId – The ID of the visualized layer.
- * @param attribute – The data attribute to compute manual thresholds over.
- * @param range – The output range of the scale.
- * @param thresholds – The current thresholds of the dataset.
- * @returns – The (potentially updated) manual thresholds of the dataset.
+ * @param params Input parameters to compute manual thresholds over a GeoJSON FeatureCollection.
+ * @param layerId The ID of the visualized layer.
+ * @param attribute The data attribute to compute manual thresholds over.
+ * @param range The output range of the scale.
+ * @param thresholds The current thresholds of the dataset.
+ * @returns The (potentially updated) manual thresholds of the dataset.
  */
 function deriveManualBreaks({
   layerId,
@@ -152,21 +152,21 @@ function forceAscendingThresholds({
 }
 
 interface DeriveThresholdsParams extends DeriveBreaksParams {
-  method: ClassificationMethod;
+  method: Exclude<QuantitativeColorScale['type'], 'Continuous'>;
   thresholds: number[];
 }
 
 /**
  * Obtain the thresholds for a given attribute of a GeoJSON FeatureCollection.
  *
- * @param params – Input parameters to compute thresholds over a GeoJSON FeatureCollection.
- * @param method – The @see{ClassificationMethod} to use.
- * @param layerId – The ID of the visualized layer.
- * @param attribute – The data attribute to compute thresholds over.layerId,
- * @param range – The output range of the scale.
- * @param thresholds – The thresholds of the dataset, if supplied manually.
+ * @param params Input parameters to compute thresholds over a GeoJSON FeatureCollection.
+ * @param method The {@link QuantitativeColorScale['type']} to use.
+ * @param layerId The ID of the visualized layer.
+ * @param attribute The data attribute to compute thresholds over.layerId,
+ * @param range The output range of the scale.
+ * @param thresholds The thresholds of the dataset, if supplied manually.
  *
- * @returns – The thresholds of the dataset based on the method, attribute, features, and range supplied.
+ * @returns The thresholds of the range.
  */
 export function deriveThresholds({
   method,

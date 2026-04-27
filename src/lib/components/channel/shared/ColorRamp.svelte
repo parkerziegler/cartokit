@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import type { ColorRamp, RampDirection } from '$lib/types';
+  import type { QuantitativeColorRamp, RampDirection } from '$lib/types';
   import { materializeColorRamp } from '$lib/utils/color/ramp';
 
   interface Props {
-    ramp: ColorRamp;
+    ramp: QuantitativeColorRamp;
     direction: RampDirection;
   }
 

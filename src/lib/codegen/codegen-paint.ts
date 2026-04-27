@@ -32,7 +32,7 @@ export function codegenFill(layer: CartoKitLayer): string {
       return [
         layer.style.fill.type === 'Constant'
           ? withDefault('circle-color', layer.style.fill.color)
-          : `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
+          : `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill, layer.id))}`,
         withDefault('circle-radius', layer.style.size),
         withDefault(
           'circle-opacity',
@@ -50,7 +50,7 @@ export function codegenFill(layer: CartoKitLayer): string {
       return [
         layer.style.fill.type === 'Constant'
           ? withDefault('circle-color', layer.style.fill.color)
-          : `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
+          : `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill, layer.id))}`,
         `'circle-radius': ${JSON.stringify(deriveSize(layer))}`,
         withDefault(
           'circle-opacity',
@@ -92,7 +92,7 @@ export function codegenFill(layer: CartoKitLayer): string {
     }
     case 'Choropleth': {
       return [
-        `'fill-color': ${JSON.stringify(deriveColorScale(layer.style.fill))}`,
+        `'fill-color': ${JSON.stringify(deriveColorScale(layer.style.fill, layer.id))}`,
         withDefault('fill-opacity', layer.style.fill.opacity)
       ]
         .filter(Boolean)
