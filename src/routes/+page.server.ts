@@ -1,16 +1,29 @@
-import { VERCEL_ENV } from '$env/static/private';
-import { connectToMongoDB } from '$lib/db';
+import {
+  VERCEL_ENV,
+  CLOUDFLARE_API_TOKEN,
+  CLOUDFLARE_ACCOUNT_ID,
+  KV_NAMESPACE_ID
+} from '$env/static/private';
+import Cloudflare from 'cloudflare';
+
+const client = new Cloudflare({ apiToken: CLOUDFLARE_API_TOKEN });
 
 export async function load({ url }) {
-  const db = connectToMongoDB();
-  const collection = db.collection('users');
-
-  // Check if the userId exists in the database.
   const userId = url.searchParams.get('userId');
-  const user = await collection.findOne({ id: userId });
-
-  // Check for the LLM enabled flag.
   const llmEnabled = url.searchParams.get('llm') === '1';
+
+  let userExists = false;
+
+  if (userId) {
+    try {
+      await client.kv.namespaces.values.get(KV_NAMESPACE_ID, userId, {
+        account_id: CLOUDFLARE_ACCOUNT_ID
+      });
+      userExists = true;
+    } catch {
+      userExists = false;
+    }
+  }
 
   return {
     basemap:
@@ -24,6 +37,6 @@ export async function load({ url }) {
             provider: 'Stamen' as const
           },
     userId,
-    enableChat: !!user && !!llmEnabled
+    enableChat: userExists && llmEnabled
   };
 }
