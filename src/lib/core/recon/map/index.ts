@@ -48,6 +48,11 @@ export async function reconMapDiffs(
           return { ...nextStyle, layers, sources };
         }
       });
+
+      // Append or remove the .dark class to the <main> element.
+      document
+        .querySelector<HTMLElement>('main')
+        ?.classList.toggle('dark', diff.payload.mode === 'dark');
       break;
     }
     case 'zoom': {

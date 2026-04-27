@@ -17,6 +17,7 @@ import type {
   QuantitativeColorScheme,
   RampDirection,
   SchemeDirection,
+  ThemeMode,
   TransformationCall,
   VisualizationType
 } from '$lib/types';
@@ -304,6 +305,7 @@ interface BasemapDiff {
   payload: {
     url: string;
     provider: BasemapProvider;
+    mode: ThemeMode;
   };
 }
 

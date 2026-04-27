@@ -506,16 +506,16 @@ export interface HeatmapStyle {
 /**
  * Represents a basemap in cartokit.
  *
- * @property {string} title - The name of the basemap, set by the tile provider.
- * @property {string} tileId - The tile ID of the basemap, set by the tile pro-
- * vider.
- * @property {EnhancedImgAttributes['src']} src - The source for the basemap
- * thumbnail.
+ * @property title The name of the basemap, set by the tile provider.
+ * @property tileId The tile ID of the basemap, set by the tile provider.
+ * @property src The source for the basemap thumbnail.
+ * @property mode The default mode of the basemap, either 'light' or 'dark'.
  */
 export interface Basemap {
   title: string;
   tileId: string;
   src: SvelteHTMLElements['enhanced:img']['src'];
+  mode: ThemeMode;
 }
 
 /**
@@ -618,3 +618,8 @@ export interface CartoKitBackendAnalysis extends CartoKitBackend {
   isFetchGeoJSONRequired: boolean;
   isGeoJSONNamespaceRequired: boolean;
 }
+
+/**
+ * Represents the color theme mode.
+ */
+export type ThemeMode = 'light' | 'dark';

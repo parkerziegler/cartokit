@@ -6,7 +6,7 @@
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import { ir } from '$lib/stores/ir';
-  import type { BasemapProvider } from '$lib/types';
+  import type { BasemapProvider, ThemeMode } from '$lib/types';
   import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
 
   interface Props {
@@ -26,13 +26,14 @@
     tileUrl = event.currentTarget.value;
   }
 
-  function onSelectBasemap(tileUrl: string) {
+  function onSelectBasemap(tileUrl: string, mode: ThemeMode) {
     return async function updateBasemap() {
       const diff: CartoKitDiff = {
         type: 'basemap',
         payload: {
           url: tileUrl,
-          provider: provider
+          provider,
+          mode
         }
       };
 
@@ -56,7 +57,7 @@
       />
     </div>
     <Button
-      onclick={onSelectBasemap(tileUrl)}
+      onclick={onSelectBasemap(tileUrl, 'light')}
       class="mt-2 self-end"
       disabled={!tileUrl || tileUrl === $ir.basemap.url}>Apply</Button
     >
@@ -71,7 +72,10 @@
             ? 'border-slate-400'
             : 'border-transparent'
         ]}
-        onclick={onSelectBasemap(TILE_URLS[provider](basemap.tileId))}
+        onclick={onSelectBasemap(
+          TILE_URLS[provider](basemap.tileId),
+          basemap.mode
+        )}
       >
         <enhanced:img
           src={basemap.src}

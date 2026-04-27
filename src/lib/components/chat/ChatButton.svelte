@@ -1,11 +1,21 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { onClickOutside } from '$lib/attachments/on-click-outside';
+  import { tooltip } from '$lib/attachments/tooltip';
   import Chat from '$lib/components/chat/Chat.svelte';
   import ChatIcon from '$lib/components/icons/ChatIcon.svelte';
+  import { registerKeybinding } from '$lib/utils/keybinding';
 
   let chatVisible = $state(false);
   let requestInFlight = $state(false);
   let form: HTMLFormElement | undefined = $state();
+
+  onMount(() => {
+    const deregisterKeybinding = registerKeybinding('c', onClick);
+
+    return deregisterKeybinding;
+  });
 
   function onClick() {
     chatVisible = true;
@@ -31,6 +41,7 @@
     }
   ]}
   {@attach onClickOutside({ callback: onClickOutsideChat })}
+  {@attach tooltip({ content: 'Chat', keybinding: 'C' })}
 >
   <ChatIcon />
 </button>

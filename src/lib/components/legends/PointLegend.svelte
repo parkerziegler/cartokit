@@ -23,7 +23,9 @@
     layer.style.fill.type === 'Constant'
       ? {
           fill: layer.style.fill.color,
-          'fill-opacity': layer.style.fill.opacity ?? 0,
+          'fill-opacity': layer.style.fill.visible
+            ? layer.style.fill.opacity
+            : 0,
           stroke: layer.style.stroke.visible
             ? layer.style.stroke.color
             : 'none',
