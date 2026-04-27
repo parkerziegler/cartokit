@@ -24,6 +24,7 @@ export function registerKeybinding(
     }
 
     if (event.key === key && (!requireShift || event.shiftKey)) {
+      event.preventDefault();
       callback();
     }
   });

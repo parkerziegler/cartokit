@@ -14,6 +14,12 @@
       onfilechange(files[0]);
     }
   });
+
+  $effect(() => {
+    if (!file) {
+      files = null;
+    }
+  });
 </script>
 
 <label class="file relative inline-block cursor-pointer">
@@ -22,6 +28,7 @@
     type="file"
     tabindex="0"
     bind:files
+    onclick={(e) => (e.currentTarget.value = '')}
     class="m-0 min-w-0 opacity-0"
     accept=".geojson,.json"
   />
