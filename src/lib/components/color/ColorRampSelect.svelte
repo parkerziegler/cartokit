@@ -72,14 +72,14 @@
   <FieldLabel fieldId="{channel}-ramp">Ramp</FieldLabel>
   <div
     id="{channel}-ramp"
-    class="flex grow items-center border border-transparent p-2 focus-within:border-slate-600 hover:border-slate-600"
+    class="flex grow items-center"
     bind:this={trigger}
     bind:offsetHeight
     bind:offsetWidth
   >
     <button
       onclick={onClickCurrentRamp}
-      class="flex-1"
+      class="flex-1 border border-transparent p-2 focus-within:border-slate-600 hover:border-slate-600"
       {@attach onClickOutside({ callback: onClickOutsideCurrentRamp })}
     >
       <ColorRamp ramp={ramp.id} direction={ramp.direction} />
@@ -95,14 +95,14 @@
         <ul
           class="flex max-h-44 flex-col overflow-auto rounded-md border border-slate-600 bg-slate-900 shadow-lg"
         >
-          {#each QUANTITATIVE_COLOR_RAMPS as rampOption (rampOption)}
+          {#each QUANTITATIVE_COLOR_RAMPS as colramp (colramp)}
             <li>
               <button
-                onclick={() => onClickRamp(rampOption)}
-                use:focus={() => rampOption === ramp.id}
+                onclick={() => onClickRamp(colramp)}
+                use:focus={() => colramp === ramp.id}
                 class="w-full p-2 hover:bg-slate-700"
               >
-                <ColorRamp ramp={rampOption} direction={ramp.direction} />
+                <ColorRamp ramp={colramp} direction={ramp.direction} />
               </button>
             </li>
           {/each}

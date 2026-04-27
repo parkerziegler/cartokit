@@ -1,8 +1,8 @@
 <script lang="ts">
-  import ColorRampSelect from '$lib/components/color/ColorRampSelect.svelte';
   import HeatmapOpacity from '$lib/components/channel/heatmap/HeatmapOpacity.svelte';
   import HeatmapRadius from '$lib/components/channel/heatmap/HeatmapRadius.svelte';
   import HeatmapWeight from '$lib/components/channel/heatmap/HeatmapWeight.svelte';
+  import ColorRampSelect from '$lib/components/color/ColorRampSelect.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import type { CartoKitHeatmapLayer } from '$lib/types';
 

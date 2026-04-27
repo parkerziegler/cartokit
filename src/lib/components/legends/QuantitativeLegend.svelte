@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { ConstantStroke, LayerType, QuantitativeFill } from '$lib/types';
-  import { catalog } from '$lib/state/catalog.svelte';
-  import { materializeColorScheme } from '$lib/utils/color/scheme';
   import ColorRamp from '$lib/components/channel/shared/ColorRamp.svelte';
+  import { catalog } from '$lib/state/catalog.svelte';
+  import type { ConstantStroke, LayerType, QuantitativeFill } from '$lib/types';
+  import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
     fill: QuantitativeFill;
@@ -28,13 +28,13 @@
 
 {#if fill.scale.type === 'Continuous'}
   <div class={['flex flex-col gap-2', visible ? 'opacity-100' : 'opacity-75']}>
-    <p class="font-semibold">{fill.attribute} ↓</p>
-    <div class="flex flex-col gap-1">
+    <p class="font-semibold">{fill.attribute} →</p>
+    <div class="flex flex-col gap-2">
       <ColorRamp
         ramp={fill.scale.interpolator.id}
         direction={fill.scale.interpolator.direction}
       />
-      <div class="flex justify-between font-mono text-xs">
+      <div class="text-3xs flex justify-between font-mono">
         <span>{min.toFixed(2)}</span>
         <span>{max.toFixed(2)}</span>
       </div>

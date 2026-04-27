@@ -2,7 +2,6 @@
   import * as d3 from 'd3';
 
   import type { CategoricalFill, ConstantStroke, LayerType } from '$lib/types';
-  import { DEFAULT_FILL } from '$lib/utils/constants';
   import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
@@ -42,7 +41,7 @@
               y="0"
               width="32"
               height="16"
-              fill={colors[i] ?? DEFAULT_FILL}
+              fill={colors[i]}
               fill-opacity={fill.opacity}
               stroke={stroke.visible ? stroke.color : 'none'}
               stroke-width={stroke.visible ? stroke.width : 0}
@@ -55,7 +54,7 @@
               r="7"
               cx="8"
               cy="8"
-              fill={colors[i] ?? DEFAULT_FILL}
+              fill={colors[i]}
               fill-opacity={fill.opacity}
               stroke={stroke.visible ? stroke.color : 'none'}
               stroke-width={stroke.visible ? stroke.width : 0}

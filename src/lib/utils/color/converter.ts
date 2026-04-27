@@ -14,7 +14,6 @@ import { DEFAULT_QUANTITATIVE_SCHEME } from '$lib/utils/constants';
 export function convertSchemeToRamp(
   scheme: QuantitativeColorScheme
 ): QuantitativeColorRamp {
-  // All D3 schemes have valid interpolator equivalents.
   return scheme.replace('scheme', 'interpolate') as QuantitativeColorRamp;
 }
 

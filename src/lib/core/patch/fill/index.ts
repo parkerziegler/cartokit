@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 
+import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { deriveThresholds } from '$lib/interaction/scales';
 import type {
@@ -8,16 +9,16 @@ import type {
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer,
-  QuantitativeColorScale,
+  CategoricalColorScale,
   ContinuousColorScale,
-  CategoricalColorScale
+  QuantitativeColorScale
 } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
 import {
-  enumerateAttributeCategories,
-  selectCategoricalAttribute,
-  selectQuantitativeAttribute
-} from '$lib/utils/geojson';
+  convertRampToScheme,
+  convertSchemeToRamp
+} from '$lib/utils/color/converter';
+import { materializeColorScheme } from '$lib/utils/color/scheme';
 import {
   DEFAULT_CATEGORICAL_SCHEME,
   DEFAULT_COUNT,
@@ -26,19 +27,19 @@ import {
   DEFAULT_SCHEME_DIRECTION,
   DEFAULT_THRESHOLDS
 } from '$lib/utils/constants';
-import type { CartoKitDiff } from '$lib/core/diff';
 import {
-  convertRampToScheme,
-  convertSchemeToRamp
-} from '$lib/utils/color/converter';
-import { materializeColorScheme } from '$lib/utils/color/scheme';
+  enumerateAttributeCategories,
+  selectCategoricalAttribute,
+  selectQuantitativeAttribute
+} from '$lib/utils/geojson';
 
 /**
  * Recompute the quantitative breaks for a given layer and fill style.
  *
  * @param layerId The ID of the {@link CartoKitLayer}.
- * @param fill The current {@link QuantitativeFill} style.
- * @returns The new breaks for the given layer and fill style.
+ * @param attribute The attribute to use for computing breaks.
+ * @param scale The current {@link QuantitativeColorScale} style.
+ * @returns The new breaks for the given layer, attribute, and color scale.
  */
 function recomputeBreaks(
   layerId: string,
@@ -94,12 +95,7 @@ export async function patchFillDiffs(
         // Apply the patch.
         layer.style.fill.attribute = diff.payload.attribute;
 
-        if (layer.style.fill.scale.type === 'Continuous') {
-          // TODO: Consider what we'll need to do for continuous color scales.
-          // My hunch is that we may not need to do anything; the catalog should
-          // already contain min and max values that we can use to derive the
-          // color scale in deriveColorScale.
-        } else {
+        if (layer.style.fill.scale.type !== 'Continuous') {
           layer.style.fill.scale.thresholds = recomputeBreaks(
             layer.id,
             layer.style.fill.attribute,
@@ -118,6 +114,7 @@ export async function patchFillDiffs(
 
         // Apply the patch.
         layer.style.fill.attribute = diff.payload.attribute;
+
         layer.style.fill.scale.categories = enumerateAttributeCategories(
           layer.data.geojson.features,
           layer.style.fill.attribute

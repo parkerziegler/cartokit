@@ -18,6 +18,7 @@ import { catalog } from '$lib/state/catalog.svelte';
  *
  * @param style The {@link ConstantStyle}, {@link CategoricalStyle}, or
  * {@link QuantitativeStyle} from which to derive the color scale.
+ * @param layerId The ID of the {@link CartoKitLayer}.
  * @returns An {@link ExpressionSpecification} or string for a color scale.
  */
 export function deriveColorScale(
@@ -35,14 +36,14 @@ export function deriveColorScale(
           scale.interpolator.direction,
           10
         );
-        const step = (max - min) / 10;
+        const interpolate = d3.interpolateNumber(min, max);
 
         return [
           'interpolate',
           ['linear'],
           ['get', attribute],
           ...colors.flatMap((color, i) => [
-            parseFloat((min + i * step).toFixed(10)),
+            parseFloat(interpolate(i / 10).toFixed(1)),
             color
           ])
         ];

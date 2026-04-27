@@ -10,15 +10,15 @@ import type {
   BasemapProvider,
   CartoKitLayer,
   CategoricalColorScheme,
-  QuantitativeColorRamp,
   LayerType,
   Projection,
+  QuantitativeColorRamp,
+  QuantitativeColorScale,
   QuantitativeColorScheme,
   RampDirection,
   SchemeDirection,
   TransformationCall,
-  VisualizationType,
-  QuantitativeColorScale
+  VisualizationType
 } from '$lib/types';
 
 interface LayerDiff {
@@ -90,7 +90,7 @@ interface FillOpacityDiff extends LayerDiff {
   };
 }
 
-interface FillVisualizationDiff extends LayerDiff {
+interface FillVisualizationTypeDiff extends LayerDiff {
   type: 'fill-visualization-type';
   payload: {
     visualizationType: VisualizationType;
@@ -356,7 +356,7 @@ export type CartoKitDiff =
   | FillClassificationMethodDiff
   | FillStepCountDiff
   | FillStepValueDiff
-  | FillVisualizationDiff
+  | FillVisualizationTypeDiff
   | FillOpacityDiff
   | AddFillDiff
   | RemoveFillDiff

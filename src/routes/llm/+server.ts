@@ -619,7 +619,9 @@ function RemoveLayerDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
   return z.object({
     type: z.literal('remove-layer'),
     layerId: layerIdSchema,
-    payload: z.object({})
+    payload: z.object({
+      sourceLayerType: LayerType
+    })
   });
 }
 
