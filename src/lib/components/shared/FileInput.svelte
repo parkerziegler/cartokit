@@ -20,6 +20,12 @@
       files = null;
     }
   });
+
+  function onClick(
+    event: MouseEvent & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    event.currentTarget.value = '';
+  }
 </script>
 
 <label class="file relative inline-block cursor-pointer">
@@ -28,7 +34,7 @@
     type="file"
     tabindex="0"
     bind:files
-    onclick={(e) => (e.currentTarget.value = '')}
+    onclick={onClick}
     class="m-0 min-w-0 opacity-0"
     accept=".geojson,.json"
   />

@@ -141,7 +141,7 @@ const MAPTILER_BASEMAPS: Basemap[] = [
     mode: 'light'
   },
   { title: 'Dataviz', tileId: 'dataviz', src: Dataviz, mode: 'light' },
-  { title: 'Hybrid', tileId: 'hybrid', src: Hybrid, mode: 'light' },
+  { title: 'Hybrid', tileId: 'hybrid', src: Hybrid, mode: 'dark' },
   {
     title: 'Landscape Dark',
     tileId: 'landscape-dark',
@@ -169,7 +169,7 @@ const MAPTILER_BASEMAPS: Basemap[] = [
     mode: 'dark'
   },
   { title: 'Outdoor', tileId: 'outdoor-v2', src: OutdoorV2, mode: 'light' },
-  { title: 'Satellite', tileId: 'satellite', src: Satellite, mode: 'light' },
+  { title: 'Satellite', tileId: 'satellite', src: Satellite, mode: 'dark' },
   {
     title: 'Streets Dark',
     tileId: 'streets-v2-dark',
@@ -195,7 +195,7 @@ const MAPTILER_BASEMAPS: Basemap[] = [
     src: TonerV2Lite,
     mode: 'light'
   },
-  { title: 'Toner', tileId: 'toner-v2', src: TonerV2, mode: 'light' },
+  { title: 'Toner', tileId: 'toner-v2', src: TonerV2, mode: 'dark' },
   { title: 'Topo Dark', tileId: 'topo-v2-dark', src: TopoV2Dark, mode: 'dark' },
   {
     title: 'Topo Pastel',
