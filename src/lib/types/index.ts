@@ -694,6 +694,7 @@ export interface CartoKitIR {
   basemap: {
     url: string;
     provider: BasemapProvider;
+    mode: ThemeMode;
   };
   projection: Projection;
   layers: Record<string, CartoKitLayer>;

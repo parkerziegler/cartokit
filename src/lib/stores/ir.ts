@@ -7,7 +7,8 @@ export const ir = writable<CartoKitIR>({
   zoom: 4,
   basemap: {
     url: 'https://tiles.stadiamaps.com/styles/stamen_toner_lite.json',
-    provider: 'Stamen'
+    provider: 'Stamen',
+    mode: 'light'
   },
   projection: 'mercator',
   layers: {}

@@ -24,7 +24,8 @@
       type: 'basemap',
       payload: {
         url: tileUrl,
-        provider: 'Custom'
+        provider: 'Custom',
+        mode: 'light'
       }
     };
 
