@@ -22,7 +22,7 @@
   let attrs = $derived(
     layer.style.fill.type === 'Constant'
       ? {
-          fill: layer.style.fill.color,
+          fill: layer.style.fill.visible ? layer.style.fill.color : 'none',
           'fill-opacity': layer.style.fill.visible
             ? layer.style.fill.opacity
             : 0,
