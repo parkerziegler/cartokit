@@ -8,6 +8,7 @@
   let { id = '', file = null, onfilechange }: Props = $props();
 
   let files: FileList | null = $state(null);
+  let fileInput: HTMLInputElement;
 
   $effect(() => {
     if (files) {
@@ -16,16 +17,11 @@
   });
 
   $effect(() => {
-    if (!file) {
+    if (!file && fileInput) {
+      fileInput.value = '';
       files = null;
     }
   });
-
-  function onClick(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLInputElement }
-  ) {
-    event.currentTarget.value = '';
-  }
 </script>
 
 <label class="file relative inline-block cursor-pointer">
@@ -33,9 +29,9 @@
     {id}
     type="file"
     tabindex="0"
+    bind:this={fileInput}
     bind:files
-    onclick={onClick}
-    class="m-0 min-w-0 opacity-0"
+    class="sr-only"
     accept=".geojson,.json"
   />
   <span
