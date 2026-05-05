@@ -23,13 +23,15 @@ export async function patchMapDiffs(
         type: 'basemap',
         payload: {
           url: ir.basemap.url,
-          provider: ir.basemap.provider
+          provider: ir.basemap.provider,
+          mode: ir.basemap.mode
         }
       };
 
       // Apply the patch.
       ir.basemap.url = diff.payload.url;
       ir.basemap.provider = diff.payload.provider;
+      ir.basemap.mode = diff.payload.mode;
       break;
     }
     case 'zoom': {

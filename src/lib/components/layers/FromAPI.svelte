@@ -69,6 +69,9 @@
       });
 
       map.value!.on('sourcedata', handleSourceLoaded(layerId));
+
+      endpoint = '';
+      displayName = '';
     } catch (e) {
       error =
         e instanceof Error

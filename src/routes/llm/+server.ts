@@ -638,7 +638,8 @@ const Basemap = z.union(
     return basemaps.map((basemap) =>
       z.object({
         provider: z.literal(provider),
-        url: z.literal(TILE_URLS[provider as BasemapProvider](basemap.tileId))
+        url: z.literal(TILE_URLS[provider as BasemapProvider](basemap.tileId)),
+        mode: z.literal(basemap.mode)
       })
     );
   })

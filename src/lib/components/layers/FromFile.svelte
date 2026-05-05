@@ -70,6 +70,8 @@
             }
           });
 
+          displayName = '';
+          file = null;
           closeModal();
         } catch (e) {
           error =

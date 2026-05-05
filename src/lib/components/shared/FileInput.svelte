@@ -8,10 +8,18 @@
   let { id = '', file = null, onfilechange }: Props = $props();
 
   let files: FileList | null = $state(null);
+  let fileInput: HTMLInputElement;
 
   $effect(() => {
     if (files) {
       onfilechange(files[0]);
+    }
+  });
+
+  $effect(() => {
+    if (!file && fileInput) {
+      fileInput.value = '';
+      files = null;
     }
   });
 </script>
@@ -21,8 +29,9 @@
     {id}
     type="file"
     tabindex="0"
+    bind:this={fileInput}
     bind:files
-    class="m-0 min-w-0 opacity-0"
+    class="sr-only"
     accept=".geojson,.json"
   />
   <span
