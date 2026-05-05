@@ -114,8 +114,9 @@ export async function patchFillDiffs(
 
         // Apply the patch.
         layer.style.fill.attribute = diff.payload.attribute;
+
         if (layer.source.type === 'geojson') {
-          layer.style.fill.categories = enumerateAttributeCategories(
+          layer.style.fill.scale.categories = enumerateAttributeCategories(
             layer.source.sourceData.features,
             layer.style.fill.attribute
           );
@@ -434,10 +435,7 @@ export async function patchFillDiffs(
                 id: DEFAULT_CATEGORICAL_SCHEME,
                 direction: 'Forward'
               },
-              categories: enumerateAttributeCategories(
-                layer.source.sourceData.features,
-                attribute
-              )
+              categories
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
@@ -464,7 +462,7 @@ export async function patchFillDiffs(
                 direction: DEFAULT_SCHEME_DIRECTION
               },
               steps: DEFAULT_COUNT,
-              thresholds: DEFAULT_THRESHOLDS(layer.id, attribute)
+              thresholds
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
