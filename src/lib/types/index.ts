@@ -330,10 +330,55 @@ interface CartoKitGeoJSONSource {
 }
 
 /**
+ * Represents the possible geometry types of a vector tile layer.
+ */
+export type VectorTileGeometry = 'Point' | 'Line' | 'Polygon';
+
+export type VectorTileAttribute =
+  | {
+      type: 'number';
+      attribute: string;
+      min: number;
+      max: number;
+      values: number[];
+      count: number;
+    }
+  | {
+      type: 'string';
+      attribute: string;
+      values: string[];
+      count: number;
+    }
+  | {
+      type: 'boolean';
+      attribute: string;
+      values: boolean[];
+      count: number;
+    };
+
+export interface TileStats {
+  layers: {
+    count: number;
+    geometry: VectorTileGeometry;
+    attributes: VectorTileAttribute[];
+  }[];
+}
+
+export interface VectorTileLayer {
+  id: string;
+  description: string;
+  minzoom: number;
+  maxzoom: number;
+  fields: Record<string, 'Number' | 'String' | 'Boolean'>;
+}
+
+/**
  * Represents the underlying data and metadata of a vector tile layer.
  *
  * @property type The type of the source, 'vector'.
  * @property location The location of the source, a remote API endpoint.
+ * @property geometry The {@link VectorTileGeometry} type of the vector tile layer.
+ * @property sourceLayerIds The ids of source layers in the vector tile archive.
  */
 interface CartoKitVectorTileSource {
   type: 'vector';
@@ -341,6 +386,10 @@ interface CartoKitVectorTileSource {
     type: 'api';
     url: string;
   };
+  sourceLayerIndex: number;
+  tilestats: TileStats;
+  vector_layers: VectorTileLayer[];
+  sourceLayerIds: string[];
 }
 
 /**
@@ -728,22 +777,53 @@ export interface CartoKitIR {
 }
 
 /**
+ * Represents a per-attribute catalog entry for a numeric attribute, including
+ * pre-computed classification statistics.
+ */
+export interface NumericCatalogEntry {
+  type: 'number';
+  quantiles: { domain: number[] };
+  jenks: {
+    3: { breaks: number[] };
+    4: { breaks: number[] };
+    5: { breaks: number[] };
+    6: { breaks: number[] };
+    7: { breaks: number[] };
+    8: { breaks: number[] };
+    9: { breaks: number[] };
+  };
+  min: number;
+  max: number;
+  unique: number;
+}
+
+/**
+ * Represents a per-attribute catalog entry for a string attribute.
+ */
+export interface StringCatalogEntry {
+  type: 'string';
+  values: string[];
+  unique: number;
+}
+
+/**
+ * Represents a per-attribute catalog entry for a Boolean attribute.
+ */
+export interface BooleanCatalogEntry {
+  type: 'boolean';
+  values: boolean[];
+  unique: 1 | 2;
+}
+
+export type CatalogEntry =
+  | NumericCatalogEntry
+  | StringCatalogEntry
+  | BooleanCatalogEntry;
+
+/**
  * Represents a catalog mapping layers to pre-computed classification statistics.
  */
-export type Catalog = Record<
-  CartoKitLayer['id'],
-  Record<
-    string,
-    {
-      Quantile: { domain: number[] };
-      'Equal Interval': { domain: [number, number] };
-      Jenks: Record<number, { breaks: number[] }>;
-      min: number;
-      max: number;
-      unique: number;
-    }
-  >
->;
+export type Catalog = Record<CartoKitLayer['id'], Record<string, CatalogEntry>>;
 
 /** Represents the set of language backends for code generation. */
 type CartoKitLanguageBackend = 'javascript' | 'typescript';
@@ -766,17 +846,20 @@ export interface CartoKitBackend {
  * Represents the analysis information for the CartoKit IR, used by code genera-
  * tion.
  *
- * @property isTurfRequired - A Boolean value indicating whether @turf/turf is
+ * @property isTurfRequired - A Boolean value indicating whether \@turf/turf is
  * required to support cross-geometry transformations.
  * @property isFetchGeoJSONRequired - A Boolean value indicating whether we need
  * to insert a function to fetch GeoJSON hosted at a remote URL.
  * @property isGeoJSONNamespaceRequired - A Boolean value indicating whether we
  * need to insert an import of the GeoJSON namespace.
+ * @property isPMTilesRequired - A Boolean value indicating whether we need to
+ * include the PMTiles client library.
  */
 export interface CartoKitBackendAnalysis extends CartoKitBackend {
   isTurfRequired: boolean;
   isFetchGeoJSONRequired: boolean;
   isGeoJSONNamespaceRequired: boolean;
+  isPMTilesRequired: boolean;
 }
 
 /**

@@ -18,7 +18,7 @@
   interface Props {
     layerId: string;
     layerType: 'Choropleth' | 'Proportional Symbol' | 'Point';
-    geojson: FeatureCollection;
+    geojson?: FeatureCollection;
     fill: QuantitativeFill | CategoricalFill | ConstantFill;
   }
 

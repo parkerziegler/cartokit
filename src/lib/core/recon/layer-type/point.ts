@@ -1,4 +1,4 @@
-import { redraw } from '$lib/core/recon/layer-type/redraw';
+import { redraw } from '$lib/utils/layer/redraw';
 import { map } from '$lib/state/map.svelte';
 import type { CartoKitPointLayer, LayerType } from '$lib/types';
 import { DEFAULT_SIZE } from '$lib/utils/constants';

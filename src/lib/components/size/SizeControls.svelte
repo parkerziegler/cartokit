@@ -37,15 +37,13 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  {#if layer.source.type === 'geojson'}
-    <AttributeSelect
-      layerId={layer.id}
-      geojson={layer.source.data}
-      visualizationType="Quantitative"
-      selected={layer.style.size.attribute}
-      channel="size"
-    />
-  {/if}
+  <AttributeSelect
+    layerId={layer.id}
+    geojson={layer.source.type === 'geojson' ? layer.source.data : undefined}
+    visualizationType="Quantitative"
+    selected={layer.style.size.attribute}
+    channel="size"
+  />
   <div class="flex items-center gap-2">
     <FieldLabel fieldId="min">Min</FieldLabel>
     <NumberInput

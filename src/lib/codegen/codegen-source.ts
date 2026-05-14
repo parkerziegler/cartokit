@@ -1,6 +1,6 @@
 import { camelCase } from 'lodash-es';
 
-import type { CartoKitLayer } from '$lib/types';
+import type { CartoKitBackendAnalysis, CartoKitLayer } from '$lib/types';
 
 /**
  * Generate a program fragment for the data source for a {@link CartoKitLayer},
@@ -9,18 +9,21 @@ import type { CartoKitLayer } from '$lib/types';
  *
  * @param layer A {@link CartoKitLayer}.
  * @param uploadTable The symbol table tracking file uploads.
+ * @param analysis The {@link CartoKitBackendAnalysis} for the current
+ * {@link CartoKitIR}.
  * @returns A program fragment containing the definition of the data source
  * for the {@link CartoKitLayer}.
  */
 export function codegenSource(
   layer: CartoKitLayer,
-  uploadTable: Map<string, string>
+  uploadTable: Map<string, string>,
+  analysis: CartoKitBackendAnalysis
 ): string {
   switch (layer.source.type) {
     case 'geojson':
       return codegenGeoJSONSource(layer, uploadTable);
     case 'vector':
-      return codegenVectorTileSource(layer);
+      return codegenVectorTileSource(layer, analysis);
   }
 }
 
@@ -102,22 +105,28 @@ function codegenGeoJSONSource(
 
 /**
  * Generate a program fragment for a vector tile data source for a
- * {@link CartoKitLayer}, using MapLibre GL JS's vector tile source
- * specification.
+ * {@link CartoKitLayer}.
  *
  * @param layer A {@link CartoKitLayer} backed by a vector tile source.
+ * @param analysis The {@link CartoKitBackendAnalysis} for the current
+ * {@link CartoKitIR}.
  * @returns A program fragment containing the definition of the vector tile
  * data source for the {@link CartoKitLayer}.
  */
-function codegenVectorTileSource(layer: CartoKitLayer): string {
+function codegenVectorTileSource(
+  layer: CartoKitLayer,
+  analysis: CartoKitBackendAnalysis
+): string {
   if (layer.source.type !== 'vector') {
     return '';
   }
 
+  const protocolPrefix = analysis.library === 'maplibre' ? 'pmtiles://' : '';
+
   return `
   map.addSource('${layer.id}', {
 		type: 'vector',
-		url: ${JSON.stringify(layer.source.location.url)}
+		url: ${JSON.stringify(protocolPrefix + layer.source.location.url)}
 	});
   `;
 }

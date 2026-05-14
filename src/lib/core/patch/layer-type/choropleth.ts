@@ -7,6 +7,7 @@ import {
   DEFAULT_THRESHOLDS,
   DEFAULT_SCHEME_DIRECTION
 } from '$lib/utils/constants';
+import { selectVectorQuantitativeAttribute } from '$lib/utils/pmtiles';
 
 /**
  * Patch a {@link CartoKitLayer} to a {@link CartoKitChoroplethLayer}.
@@ -89,7 +90,11 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
               attribute:
                 layer.type === 'Proportional Symbol'
                   ? layer.style.size.attribute
-                  : '' // TODO: Discern if and how to select a quantitative attribute for vector tile layers.
+                  : selectVectorQuantitativeAttribute(
+                      layer.source.tilestats.layers[
+                        layer.source.sourceLayerIndex
+                      ].attributes
+                    )
             };
 
       const targetLayer: CartoKitChoroplethLayer = {
@@ -125,7 +130,10 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
       const attribute =
         layer.source.type === 'geojson'
           ? selectQuantitativeAttribute(layer.source.data.features)
-          : ''; // TODO: Discern if and how to select a quantitative attribute for vector tile layers.
+          : selectVectorQuantitativeAttribute(
+              layer.source.tilestats.layers[layer.source.sourceLayerIndex]
+                .attributes
+            );
 
       const targetLayer: CartoKitChoroplethLayer = {
         ...layer,

@@ -34,6 +34,14 @@ interface LayerTypeDiff extends LayerDiff {
   };
 }
 
+interface SourceLayerDiff extends LayerDiff {
+  type: 'source-layer';
+  payload: {
+    sourceSourceLayerId: string;
+    targetSourceLayerId: string;
+  };
+}
+
 interface FillAttributeDiff extends LayerDiff {
   type: 'fill-attribute';
   payload: {
@@ -361,6 +369,7 @@ interface ProjectionDiff {
 
 export type CartoKitDiff =
   | LayerTypeDiff
+  | SourceLayerDiff
   | FillAttributeDiff
   | FillColorDiff
   | FillColorSchemeDiff

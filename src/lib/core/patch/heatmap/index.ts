@@ -2,6 +2,7 @@ import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import type { CartoKitHeatmapLayer } from '$lib/types';
 import { selectQuantitativeAttribute } from '$lib/utils/geojson';
+import { selectVectorQuantitativeAttribute } from '$lib/utils/pmtiles';
 
 /**
  * Patch heatmap-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
@@ -113,7 +114,10 @@ export async function patchHeatmapDiffs(
             attribute:
               layer.source.type === 'geojson'
                 ? selectQuantitativeAttribute(layer.source.sourceData.features)
-                : '', // TODO: Determine how to select a quantitative attribute for vector tile layers.
+                : selectVectorQuantitativeAttribute(
+                    layer.source.tilestats.layers[layer.source.sourceLayerIndex]
+                      .attributes
+                  ),
             min: 0,
             max: 1
           };

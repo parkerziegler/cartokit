@@ -2,6 +2,7 @@ import type maplibregl from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { feature } from '$lib/state/feature.svelte';
+import { layerId as lyrId } from '$lib/state/layerId.svelte';
 import { listeners } from '$lib/state/listeners.svelte';
 import { layout } from '$lib/stores/layout';
 import type { CartoKitIR } from '$lib/types';
@@ -11,10 +12,12 @@ import type { CartoKitIR } from '$lib/types';
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to instrument.
+ * @param sourceLayerId The source-layer id for vector tile layers.
  */
 export function instrumentPointSelect(
   map: maplibregl.Map,
-  layerId: string
+  layerId: string,
+  sourceLayerId?: string
 ): void {
   const currentStrokeWidth = map.getPaintProperty(
     layerId,
@@ -38,7 +41,7 @@ export function instrumentPointSelect(
     currentStrokeColor ?? 'transparent'
   ]);
 
-  addSelectListeners(map, layerId);
+  addSelectListeners(map, layerId, sourceLayerId);
 }
 
 /**
@@ -46,10 +49,12 @@ export function instrumentPointSelect(
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to instrument.
+ * @param sourceLayerId The source-layer id for vector tile layers.
  */
 export function instrumentLineSelect(
   map: maplibregl.Map,
-  layerId: string
+  layerId: string,
+  sourceLayerId?: string
 ): void {
   const currentStrokeWidth = map.getPaintProperty(layerId, 'line-width');
   const currentStrokeColor = map.getPaintProperty(layerId, 'line-color');
@@ -67,7 +72,7 @@ export function instrumentLineSelect(
     currentStrokeColor ?? 'transparent'
   ]);
 
-  addSelectListeners(map, layerId);
+  addSelectListeners(map, layerId, sourceLayerId);
 }
 
 /**
@@ -75,16 +80,18 @@ export function instrumentLineSelect(
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to instrument.
+ * @param sourceLayerId The source-layer id for vector tile layers.
  */
 export function instrumentPolygonSelect(
   map: maplibregl.Map,
-  layerId: string
+  layerId: string,
+  sourceLayerId?: string
 ): void {
   map.addLayer({
     id: `${layerId}-select`,
     type: 'line',
     source: layerId,
-    'source-layer': 'TODO',
+    'source-layer': sourceLayerId,
     paint: {
       'line-color': '#A534FF',
       'line-width': [
@@ -96,7 +103,7 @@ export function instrumentPolygonSelect(
     }
   });
 
-  addSelectListeners(map, layerId);
+  addSelectListeners(map, layerId, sourceLayerId);
 }
 
 /**
@@ -104,28 +111,42 @@ export function instrumentPolygonSelect(
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to add event listeners to.
+ * @param sourceLayerId The source-layer id for vector tile layers.
  */
-function addSelectListeners(map: maplibregl.Map, layerId: string): void {
+function addSelectListeners(
+  map: maplibregl.Map,
+  layerId: string,
+  sourceLayerId?: string
+): void {
   let selectedFeatureId: string | null = null;
 
   function onClick(event: maplibregl.MapLayerMouseEvent): void {
     if (event.features && event.features.length > 0) {
       if (selectedFeatureId !== null) {
         map.setFeatureState(
-          { source: layerId, id: selectedFeatureId },
+          {
+            source: layerId,
+            sourceLayer: sourceLayerId,
+            id: selectedFeatureId
+          },
           { selected: false }
         );
       }
 
-      // We forcibly assign an "id" property to all GeoJSON sources using generateId:
-      // https://maplibre.org/maplibre-gl-js-docs/style-spec/sources/#geojson-generateId
-      selectedFeatureId = event.features[0].id!.toString();
-      map.setFeatureState(
-        { source: layerId, id: selectedFeatureId },
-        { selected: true }
-      );
+      selectedFeatureId = event.features[0].id?.toString() ?? null;
+      if (selectedFeatureId) {
+        map.setFeatureState(
+          {
+            source: layerId,
+            sourceLayer: sourceLayerId,
+            id: selectedFeatureId
+          },
+          { selected: true }
+        );
+      }
 
       feature.value = event.features[0];
+      lyrId.value = layerId.replace(/-outlines|-points/g, '');
     }
   }
 
@@ -169,8 +190,9 @@ export function onFeatureLeave(
       layers: layerIds
     });
 
-    // If the mouse event intersects no features and there is a currently selected feature, deselect it.
-    if (features.length === 0 && typeof feature.value?.id !== 'undefined') {
+    // If the mouse event intersects no features...
+    if (features.length === 0) {
+      // If the data table is visible, hide it.
       if (get(layout).dataVisible) {
         layout.update((layout) => {
           layout.dataVisible = false;
@@ -179,12 +201,22 @@ export function onFeatureLeave(
         });
       }
 
-      map.removeFeatureState(
-        { source: feature.value.layer.id, id: feature.value.id },
-        'selected'
-      );
+      // If there is a currently selected feature, deselect it.
+      if (typeof feature.value?.id !== 'undefined') {
+        map.removeFeatureState(
+          {
+            source: feature.value.layer.id,
+            sourceLayer: feature.value.sourceLayer,
+            id: feature.value.id
+          },
+          'selected'
+        );
 
-      feature.value = null;
+        feature.value = null;
+      }
+
+      // Set the selected layer id to null.
+      lyrId.value = null;
       // If the mouse event intersects features but the selected feature is different, deselect it.
     } else if (
       features.length > 0 &&
@@ -192,7 +224,11 @@ export function onFeatureLeave(
       features[0].id !== feature.value.id
     ) {
       map.removeFeatureState(
-        { source: feature.value.layer.id, id: feature.value.id },
+        {
+          source: feature.value.layer.id,
+          sourceLayer: feature.value.sourceLayer,
+          id: feature.value.id
+        },
         'selected'
       );
     }

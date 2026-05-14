@@ -32,6 +32,11 @@ import {
   selectCategoricalAttribute,
   selectQuantitativeAttribute
 } from '$lib/utils/geojson';
+import {
+  selectVectorCategoricalAttribute,
+  enumerateVectorAttributeCategories,
+  selectVectorQuantitativeAttribute
+} from '$lib/utils/pmtiles';
 
 /**
  * Recompute the quantitative breaks for a given layer and fill style.
@@ -120,7 +125,14 @@ export async function patchFillDiffs(
             layer.source.sourceData.features,
             layer.style.fill.attribute
           );
-        } // TODO: Determine how to enumerate attribute categories for vector tile layers.
+        } else if (layer.source.type === 'vector') {
+          layer.style.fill.scale.categories =
+            enumerateVectorAttributeCategories(
+              layer.source.tilestats.layers[layer.source.sourceLayerIndex]
+                .attributes,
+              layer.style.fill.attribute
+            );
+        }
       }
       break;
     }
@@ -417,14 +429,22 @@ export async function patchFillDiffs(
           const attribute =
             layer.source.type === 'geojson'
               ? selectCategoricalAttribute(layer.source.sourceData.features)
-              : ''; // TODO: Determine how to select a categorical attribute for vector tile layers.
+              : selectVectorCategoricalAttribute(
+                  layer.source.tilestats.layers[layer.source.sourceLayerIndex]
+                    .attributes
+                );
+
           const categories =
             layer.source.type === 'geojson'
               ? enumerateAttributeCategories(
                   layer.source.sourceData.features,
                   attribute
                 )
-              : []; // TODO: Determine how to enumerate attribute categories for vector tile layers.
+              : enumerateVectorAttributeCategories(
+                  layer.source.tilestats.layers[layer.source.sourceLayerIndex]
+                    .attributes,
+                  attribute
+                );
 
           layer.style.fill = {
             type: diff.payload.visualizationType,
@@ -446,11 +466,10 @@ export async function patchFillDiffs(
           const attribute =
             layer.source.type === 'geojson'
               ? selectQuantitativeAttribute(layer.source.sourceData.features)
-              : ''; // TODO: Determine how to select a quantitative attribute for vector tile layers.
-          const thresholds =
-            layer.source.type === 'geojson'
-              ? DEFAULT_THRESHOLDS(layer.id, attribute)
-              : []; // TODO: Determine how to derive thresholds for vector tile layers.
+              : selectVectorQuantitativeAttribute(
+                  layer.source.tilestats.layers[layer.source.sourceLayerIndex]
+                    .attributes
+                );
 
           layer.style.fill = {
             type: diff.payload.visualizationType,
@@ -462,7 +481,7 @@ export async function patchFillDiffs(
                 direction: DEFAULT_SCHEME_DIRECTION
               },
               steps: DEFAULT_COUNT,
-              thresholds
+              thresholds: DEFAULT_THRESHOLDS(layer.id, attribute)
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible

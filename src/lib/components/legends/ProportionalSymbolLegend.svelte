@@ -5,6 +5,7 @@
   import QuantitativeLegend from '$lib/components/legends/QuantitativeLegend.svelte';
   import { catalog } from '$lib/state/catalog.svelte';
   import type { CartoKitProportionalSymbolLayer } from '$lib/types';
+  import { asNumericEntry } from '$lib/utils/catalog';
   import { hexWithOpacity } from '$lib/utils/color';
 
   interface Props {
@@ -14,7 +15,10 @@
   let { layer }: Props = $props();
 
   let { min, max } = $derived(
-    catalog.value[layer.id][layer.style.size.attribute]
+    asNumericEntry(
+      catalog.value[layer.id][layer.style.size.attribute],
+      layer.style.size.attribute
+    )
   );
   let scale = $derived(
     d3.scaleLinear([layer.style.size.min, layer.style.size.max], [min, max])

@@ -6,6 +6,7 @@
     ContinuousColorScale,
     QuantitativeColorScale
   } from '$lib/types';
+  import { asNumericEntry } from '$lib/utils/catalog';
   import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
@@ -15,7 +16,9 @@
   }
 
   let { layerId, attribute, scale }: Props = $props();
-  let { min, max } = $derived(catalog.value[layerId][attribute]);
+  let { min, max } = $derived(
+    asNumericEntry(catalog.value[layerId][attribute], attribute)
+  );
   let colors = $derived(
     materializeColorScheme(scale.scheme.id, scale.scheme.direction, scale.steps)
   );
