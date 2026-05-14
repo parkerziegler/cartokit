@@ -14,6 +14,7 @@ import {
   DEFAULT_STROKE_WIDTH
 } from '$lib/utils/constants';
 import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
+import { CartoKitPMTiles } from '$lib/utils/pmtiles';
 
 interface GenerateCartoKitLayerOptions {
   layerId: string;
@@ -154,11 +155,6 @@ function generateCartoKitLayerFromGeoJSON(
 /**
  * Generate a {@link CartoKitLayer} for a vector tile source.
  *
- * TODO: This is a stub. A complete implementation will need to inspect the
- * source layers advertised by the vector tile endpoint (via its TileJSON or
- * equivalent metadata) to discern the appropriate geometry type, source layer
- * name, and default styling. For now, we default to a Polygon layer.
- *
  * @param source The vector tile {@link CartoKitSource} associated with the
  * layer.
  * @param options The options for the {@link CartoKitLayer}.
@@ -171,34 +167,90 @@ function generateCartoKitLayerFromVectorTiles(
   const color = randomColor();
   const z = Object.values(get(ir).layers).length;
 
-  return {
-    id: options.layerId,
-    displayName: options.displayName,
-    type: 'Polygon',
-    source,
-    style: {
-      fill: {
-        type: 'Constant',
-        color,
-        opacity: DEFAULT_OPACITY,
-        visible: true
-      },
-      stroke: {
-        type: 'Constant',
-        color,
-        width: DEFAULT_STROKE_WIDTH,
-        opacity: DEFAULT_STROKE_OPACITY,
-        visible: true
-      }
-    },
-    layout: {
-      visible: true,
-      z,
-      tooltip: {
-        visible: true
-      }
-    }
-  };
+  switch (source.tilestats.layers[source.sourceLayerIndex].geometry) {
+    case 'Point':
+      return {
+        id: options.layerId,
+        displayName: options.displayName,
+        type: 'Point',
+        source,
+        style: {
+          size: DEFAULT_SIZE,
+          fill: {
+            type: 'Constant',
+            color,
+            opacity: DEFAULT_OPACITY,
+            visible: true
+          },
+          stroke: {
+            type: 'Constant',
+            color,
+            width: DEFAULT_STROKE_WIDTH,
+            opacity: DEFAULT_STROKE_OPACITY,
+            visible: true
+          }
+        },
+        layout: {
+          visible: true,
+          z,
+          tooltip: {
+            visible: true
+          }
+        }
+      };
+    case 'Line':
+      return {
+        id: options.layerId,
+        displayName: options.displayName,
+        type: 'Line',
+        source,
+        style: {
+          stroke: {
+            type: 'Constant',
+            color,
+            width: DEFAULT_STROKE_WIDTH,
+            opacity: DEFAULT_STROKE_OPACITY,
+            visible: true
+          }
+        },
+        layout: {
+          visible: true,
+          z,
+          tooltip: {
+            visible: true
+          }
+        }
+      };
+    case 'Polygon':
+      return {
+        id: options.layerId,
+        displayName: options.displayName,
+        type: 'Polygon',
+        source,
+        style: {
+          fill: {
+            type: 'Constant',
+            color,
+            opacity: DEFAULT_OPACITY,
+            visible: true
+          },
+          stroke: {
+            type: 'Constant',
+            color,
+            width: DEFAULT_STROKE_WIDTH,
+            opacity: DEFAULT_STROKE_OPACITY,
+            visible: true
+          }
+        },
+        layout: {
+          visible: true,
+          z,
+          tooltip: {
+            visible: true
+          }
+        }
+      };
+  }
 }
 
 /**
@@ -221,10 +273,21 @@ export async function patchLayerDiffs(
       let layer: CartoKitLayer;
 
       if (diff.payload.type === 'vector') {
+        const pmtiles = new CartoKitPMTiles(diff.payload.location.url);
+
+        const [metadata, vectorLayers] = await Promise.all([
+          pmtiles.getMetadata(),
+          pmtiles.getVectorLayers()
+        ]);
+
         layer = generateCartoKitLayer(
           {
             type: 'vector',
-            location: diff.payload.location
+            location: diff.payload.location,
+            sourceLayerIndex: 0,
+            tilestats: metadata.tilestats,
+            vector_layers: vectorLayers,
+            sourceLayerIds: vectorLayers.map((l) => l.id)
           },
           {
             layerId: diff.layerId,
@@ -418,6 +481,33 @@ export async function patchLayerDiffs(
 
       // Apply the patch.
       layer.displayName = diff.payload.displayName;
+
+      break;
+    }
+    case 'source-layer': {
+      const layer = ir.layers[diff.layerId];
+
+      if (layer.source.type !== 'vector') break;
+
+      const targetSourceLayerIndex = layer.source.sourceLayerIds.indexOf(
+        diff.payload.targetSourceLayerId
+      );
+
+      if (targetSourceLayerIndex === -1) break;
+
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'source-layer',
+        layerId: diff.layerId,
+        payload: {
+          sourceSourceLayerId: diff.payload.targetSourceLayerId,
+          targetSourceLayerId:
+            layer.source.sourceLayerIds[layer.source.sourceLayerIndex]
+        }
+      };
+
+      // Apply the patch.
+      layer.source.sourceLayerIndex = targetSourceLayerIndex;
 
       break;
     }

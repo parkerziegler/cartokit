@@ -2,6 +2,9 @@ import type {
   CartoKitLayer,
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
+import { deriveCentroids } from '$lib/stdlib/centroid';
+import deriveCentroidsSrc from '$lib/stdlib/centroid?raw';
+import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_FILL,
   DEFAULT_MAX_SIZE,
@@ -11,10 +14,8 @@ import {
   DEFAULT_STROKE_WIDTH
 } from '$lib/utils/constants';
 import { selectQuantitativeAttribute } from '$lib/utils/geojson';
-import { deriveCentroids } from '$lib/stdlib/centroid';
-import deriveCentroidsSrc from '$lib/stdlib/centroid?raw';
 import { parseStringToTransformation } from '$lib/utils/parse';
-import { randomColor } from '$lib/utils/color';
+import { selectVectorQuantitativeAttribute } from '$lib/utils/pmtiles';
 
 /**
  * Patch a {@link CartoKitLayer} to a {@link CartoKitProportionalSymbolLayer}.
@@ -50,7 +51,10 @@ export function patchProportionalSymbol(
             }
           : {
               source: layer.source,
-              attribute: '' // TODO: Discern if and how to select a quantitative attribute for vector tile layers.
+              attribute: selectVectorQuantitativeAttribute(
+                layer.source.tilestats.layers[layer.source.sourceLayerIndex]
+                  .attributes
+              )
             };
 
       const targetLayer: CartoKitProportionalSymbolLayer = {
@@ -178,7 +182,10 @@ export function patchProportionalSymbol(
             }
           : {
               source: layer.source,
-              attribute: '' // TODO: Discern if and how to select a quantitative attribute for vector tile layers.
+              attribute: selectVectorQuantitativeAttribute(
+                layer.source.tilestats.layers[layer.source.sourceLayerIndex]
+                  .attributes
+              )
             };
 
       const targetLayer: CartoKitProportionalSymbolLayer = {
@@ -207,7 +214,10 @@ export function patchProportionalSymbol(
       const attribute =
         layer.source.type === 'geojson'
           ? selectQuantitativeAttribute(layer.source.data.features)
-          : ''; // TODO: Discern if and how to select a quantitative attribute for vector tile layers.
+          : selectVectorQuantitativeAttribute(
+              layer.source.tilestats.layers[layer.source.sourceLayerIndex]
+                .attributes
+            );
 
       const targetLayer: CartoKitProportionalSymbolLayer = {
         ...layer,

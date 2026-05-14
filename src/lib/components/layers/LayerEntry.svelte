@@ -21,8 +21,7 @@
   import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import { feature } from '$lib/state/feature.svelte';
-  import { map } from '$lib/state/map.svelte';
+  import { layerId } from '$lib/state/layerId.svelte';
   import type { CartoKitLayer } from '$lib/types';
 
   interface Props {
@@ -147,24 +146,7 @@
       return;
     }
 
-    const randomFeature = map.value!.queryRenderedFeatures({
-      layers: [layer.id]
-    })[0];
-
-    // If we have a currently selected feature, deselect it.
-    if (feature.value) {
-      map.value!.setFeatureState(
-        { source: feature.value.layer.id, id: feature.value.id },
-        { selected: false }
-      );
-    }
-
-    feature.value = randomFeature;
-
-    map.value!.setFeatureState(
-      { source: layer.id, id: randomFeature.id },
-      { selected: true }
-    );
+    layerId.value = layer.id;
   }
 </script>
 
@@ -173,7 +155,7 @@
     class={[
       'relative flex items-center justify-between',
       layer.layout.visible ? 'display-name--visible' : 'display-name--hidden',
-      feature.value?.layer.id === layer.id && 'display-name--selected'
+      { 'display-name--selected': layerId.value === layer.id }
     ]}
     onclick={onLayerClick}
     onkeydown={onLayerKeyDown}

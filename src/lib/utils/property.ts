@@ -23,3 +23,13 @@ export function isPropertyQuantitative(property: unknown): property is number {
 export function isPropertyCategorical(property: unknown): property is string {
   return typeof property === 'string';
 }
+
+/**
+ * Determine if a GeoJSON property is a Boolean.
+ *
+ * @param property — The property to check.
+ * @returns — A Boolean value indicating whether the property is a Boolean.
+ */
+export function isPropertyBoolean(property: unknown): property is boolean {
+  return typeof property === 'boolean';
+}

@@ -25,7 +25,7 @@
   import { layout } from '$lib/stores/layout';
   import { error } from '$lib/state/error.svelte';
   import { map as mapState } from '$lib/state/map.svelte';
-  import { layer } from '$lib/state/layer.svelte';
+  import { layerId } from '$lib/state/layerId.svelte';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
@@ -148,8 +148,8 @@
       </MenuTitle>
       <LayerPanel />
     </Menu>
-    {#if layer.value}
-      <PropertiesMenu map={map!} layer={layer.value} />
+    {#if layerId.value}
+      <PropertiesMenu map={map!} layer={$ir.layers[layerId.value]} />
     {/if}
     {#if map}
       <Toolbar {map} />
@@ -159,7 +159,7 @@
         'ease-cubic-out absolute right-4 bottom-12 z-10 flex items-baseline gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 disabled:cursor-not-allowed',
         {
           '-translate-y-72': $layout.dataVisible,
-          '-translate-x-[33.333333vw]': $layout.editorVisible,
+          'translate-x-[-33.333333vw]': $layout.editorVisible,
           'delay-150': !$layout.editorVisible
         }
       ]}
@@ -170,10 +170,10 @@
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
       <span class="text-slate-400">E</span>
     </button>
-    {#if $layout.dataVisible && layer.value?.source.type === 'geojson'}
+    {#if $layout.dataVisible && layerId.value}
+      {@const layer = $ir.layers[layerId.value]}
       <DataTable
-        data={layer.value.source.data.features}
-        tableName={layer.value.displayName}
+        {layer}
         onClose={onViewDataClose}
         class={[
           'ease-cubic-out absolute bottom-0 h-72 transition-all duration-400',

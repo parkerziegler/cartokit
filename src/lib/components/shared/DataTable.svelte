@@ -4,6 +4,7 @@
   import { bbox } from '@turf/turf';
   import type { Feature } from 'geojson';
   import { orderBy } from 'lodash-es';
+  import type maplibregl from 'maplibre-gl';
   import { onMount } from 'svelte';
   import type { ClassValue } from 'svelte/elements';
   import { slide } from 'svelte/transition';
@@ -11,27 +12,35 @@
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import { map } from '$lib/state/map.svelte';
   import { layout } from '$lib/stores/layout';
-  import { pluralize } from '$lib/utils/format';
+  import type { CartoKitLayer } from '$lib/types';
+  import { pluralize } from '$lib/utils/formatters/shared';
 
   interface Props {
-    data: Feature[];
-    tableName: string;
+    layer: CartoKitLayer;
     onClose: () => void;
     class?: ClassValue;
   }
 
-  let { data, tableName, onClose, class: className = '' }: Props = $props();
+  let { layer, onClose, class: className = '' }: Props = $props();
   let selectedRow = $state<number | null>(null);
 
   const ROW_HEIGHT = 33;
   const rows = 7;
 
-  let cols = $derived(Object.keys(data[0]?.properties ?? {}));
+  let cols = $derived<string[]>(
+    layer.source.type === 'geojson'
+      ? Object.keys(layer.source.data.features[0]?.properties ?? {})
+      : Object.keys(
+          layer.source.vector_layers[layer.source.sourceLayerIndex].fields
+        )
+  );
   let root: HTMLDivElement;
 
+  let data = $state<Feature[]>([]);
   let array = $state<Feature[]>([]);
-  let iterator = $state<IterableIterator<Feature>>(data[Symbol.iterator]());
-  let n = $state<number>(Math.min(data.length, Math.floor(rows * 2))); // The number of rows displayed.
+
+  let iterator = $state<IterableIterator<Feature>>([][Symbol.iterator]());
+  let n = $state<number>(0); // The number of rows displayed Math.min(data.length, Math.floor(rows * 2)).
   let sort = $state<{ col: string; desc: boolean }>({ col: '', desc: true });
 
   function minlengthof(length: number) {
@@ -102,39 +111,76 @@
         [bounds[2], bounds[3]]
       ],
       {
-        padding: 200,
+        padding: {
+          top: 200,
+          left: 200,
+          bottom: 400,
+          right: 200
+        },
         duration: 1000
       }
     );
   }
 
+  function queryVectorTileFeaturesOnMoveEnd(e: maplibregl.MapLibreEvent) {
+    data = e.target.queryRenderedFeatures({
+      layers: [layer.id]
+    });
+
+    materialize(data);
+  }
+
   onMount(() => {
-    appendRows(0, n);
+    switch (layer.source.type) {
+      case 'geojson': {
+        data = layer.source.data.features;
+        break;
+      }
+      case 'vector': {
+        data = map.value!.queryRenderedFeatures({
+          layers: [layer.id]
+        });
+
+        // Register a moveend listener to update the data when the viewport changes.
+        map.value!.on('moveend', queryVectorTileFeaturesOnMoveEnd);
+      }
+    }
+
+    materialize(data);
+
+    return () => {
+      map.value!.off('moveend', queryVectorTileFeaturesOnMoveEnd);
+    };
   });
 </script>
 
 <div
   class={[
-    'ease-cubic-out z-10 flex flex-col overflow-hidden bg-slate-700 font-mono',
+    'ease-cubic-out z-10 flex flex-col overflow-hidden bg-slate-900 font-mono',
     { 'delay-150': !$layout.editorVisible },
     className
   ]}
   in:slide={{ axis: 'y' }}
   out:slide={{ axis: 'y' }}
 >
-  <div class="flex justify-between px-3 py-2 text-xs text-white">
+  <div class="flex justify-between bg-slate-700 px-3 py-2 text-xs text-white">
     <span>
-      {tableName}
+      {layer.displayName}
     </span>
     <div class="flex gap-4">
-      <span>{data.length} {pluralize('Feature', data.length)}</span>
+      <span
+        >{data.length}
+        {pluralize('Feature', data.length)}{layer.source.type === 'vector'
+          ? ' in Viewport'
+          : ''}</span
+      >
       <button onclick={onClose}>
         <CloseIcon />
       </button>
     </div>
   </div>
   <div
-    class="text-2xs w-full overflow-auto border-t border-slate-400 bg-slate-900 text-white"
+    class="text-2xs w-full overflow-auto border-t border-slate-400 text-white"
     bind:this={root}
     onscroll={onScroll}
   >
@@ -160,7 +206,7 @@
         {#each array as row, i (i)}
           <tr
             class={[
-              'cursor-pointer border-t border-dotted border-slate-400 first:border-t-0',
+              'cursor-pointer border-b border-dotted border-slate-400',
               selectedRow === i
                 ? 'bg-slate-700 hover:bg-slate-800'
                 : 'hover:bg-slate-800'

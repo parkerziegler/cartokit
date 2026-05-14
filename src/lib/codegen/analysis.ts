@@ -59,6 +59,19 @@ export function isGeoJSONNamespaceRequired(
 }
 
 /**
+ * Determine whether we need to include the PMTiles client library.
+ *
+ * @param ir The current {@link CartoKitIR}.
+ * @returns A Boolean value indicating whether we need to include the PMTiles
+ * client library.
+ */
+export function isPMTilesRequired(ir: CartoKitIR): boolean {
+  return Object.values(ir.layers).some(
+    (layer) => layer.source.type === 'vector'
+  );
+}
+
+/**
  * Analyze the CartoKit IR to glean relevant information for code generation.
  *
  * @param ir – The CartoKit IR.
@@ -75,6 +88,7 @@ export function analyzeIR(
     library: libraryBackend,
     isTurfRequired: isTurfRequired(ir),
     isFetchGeoJSONRequired: isFetchGeoJSONRequired(ir),
-    isGeoJSONNamespaceRequired: isGeoJSONNamespaceRequired(ir, languageBackend)
+    isGeoJSONNamespaceRequired: isGeoJSONNamespaceRequired(ir, languageBackend),
+    isPMTilesRequired: isPMTilesRequired(ir)
   };
 }

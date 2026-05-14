@@ -28,7 +28,7 @@ export function codegenMap(
     'layout.z',
     'asc'
   ).reduce((p, layer) => {
-    return p.concat('\n\n' + codegenSource(layer, uploadTable));
+    return p.concat('\n\n' + codegenSource(layer, uploadTable, analysis));
   }, '');
   const layerRenders = orderBy(
     Object.values(ir.layers),
@@ -38,7 +38,17 @@ export function codegenMap(
     return p.concat('\n\n' + codegenLayer(layer));
   }, '');
 
+  const protocol =
+    analysis.isPMTilesRequired && analysis.library === 'maplibre'
+      ? `
+  const protocol = new pmtiles.Protocol();
+  maplibregl.addProtocol('pmtiles', protocol.tile);
+  `
+      : '';
+
   return `
+  ${protocol}
+
   const map = new ${analysis.library}gl.Map({
     container: 'map',
     style: ${codegenMapStyle(ir)},

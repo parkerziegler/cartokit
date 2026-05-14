@@ -14,14 +14,12 @@
 </script>
 
 <MenuItem title="Fill">
-  {#if layer.source.type === 'geojson'}
-    <ColorControls
-      layerId={layer.id}
-      layerType="Choropleth"
-      geojson={layer.source.data}
-      fill={layer.style.fill}
-    />
-  {/if}
+  <ColorControls
+    layerId={layer.id}
+    layerType="Choropleth"
+    geojson={layer.source.type === 'geojson' ? layer.source.data : undefined}
+    fill={layer.style.fill}
+  />
 </MenuItem>
 <MenuItem title="Stroke">
   {#if layer.style.stroke.visible}

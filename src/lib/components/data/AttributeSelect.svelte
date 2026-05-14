@@ -9,16 +9,12 @@
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import { catalog } from '$lib/state/catalog.svelte';
   import type { Channel, VisualizationType } from '$lib/types';
-  import {
-    isPropertyCategorical,
-    isPropertyQuantitative
-  } from '$lib/utils/property';
 
   interface Props {
     selected: string;
     layerId: string;
     visualizationType: VisualizationType;
-    geojson: FeatureCollection;
+    geojson?: FeatureCollection;
     channel: Exclude<Channel, 'stroke'>;
   }
 
@@ -32,19 +28,19 @@
   let transformationEditorVisible = $state(false);
 
   let properties = $derived(
-    Object.keys(geojson.features[0]?.properties ?? {}).filter((prop) => {
-      const propValue = geojson.features[0].properties?.[prop];
-      const catalogEntry = catalog.value[layerId][prop];
-
-      if (visualizationType === 'Quantitative') {
-        return isPropertyQuantitative(propValue) && catalogEntry.unique >= 9;
-      } else if (visualizationType === 'Categorical') {
-        return (
-          isPropertyCategorical(propValue) ||
-          (isPropertyQuantitative(propValue) && (catalogEntry.unique ?? 0) < 9)
-        );
-      }
-    })
+    Object.entries(catalog.value[layerId])
+      .filter(([_, value]) => {
+        if (visualizationType === 'Quantitative') {
+          return value.type === 'number' && value.unique >= 9;
+        } else if (visualizationType === 'Categorical') {
+          return (
+            value.type === 'string' ||
+            value.type === 'boolean' ||
+            (value.type === 'number' && value.unique < 9)
+          );
+        }
+      })
+      .map(([property]) => property)
   );
 
   let options = $derived(
@@ -115,7 +111,7 @@
     <MoreIcon />
   </button>
 </div>
-{#if transformationEditorVisible}
+{#if transformationEditorVisible && geojson}
   <Portal
     class="absolute top-4"
     {target}

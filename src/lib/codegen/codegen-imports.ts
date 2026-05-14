@@ -26,6 +26,9 @@ export function codegenImports(
     analysis.isTurfRequired ? "import * as turf from '@turf/turf';" : '',
     analysis.language === 'typescript' && analysis.isGeoJSONNamespaceRequired
       ? "import type * as GeoJSON from 'geojson';"
+      : '',
+    analysis.isPMTilesRequired && analysis.library === 'maplibre'
+      ? "import * as pmtiles from 'pmtiles';"
       : ''
   ]
     .filter(Boolean)

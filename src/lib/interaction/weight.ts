@@ -2,6 +2,7 @@ import type { ExpressionSpecification } from 'maplibre-gl';
 
 import { catalog } from '$lib/state/catalog.svelte';
 import type { CartoKitHeatmapLayer } from '$lib/types';
+import { asNumericEntry } from '$lib/utils/catalog';
 
 /**
  * Derive an ExpressionSpecification or number for the weight of a
@@ -25,7 +26,10 @@ export function deriveHeatmapWeight(
         }
       } = layer;
 
-      const { min, max } = catalog.value[layer.id][attribute];
+      const { min, max } = asNumericEntry(
+        catalog.value[layer.id][attribute],
+        attribute
+      );
 
       return [
         'interpolate',
