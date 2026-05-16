@@ -34,7 +34,7 @@ importers:
         version: 2.0.1(@sveltejs/kit@2.60.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.7(@typescript-eslint/types@8.59.3))(vite@8.0.0(@types/node@24.12.4)(jiti@2.7.0)))(svelte@5.55.7(@typescript-eslint/types@8.59.3))(typescript@6.0.3)(vite@8.0.0(@types/node@24.12.4)(jiti@2.7.0)))(svelte@5.55.7(@typescript-eslint/types@8.59.3))
       cloudflare:
         specifier: ^6.0.0
-        version: 6.1.0
+        version: 6.2.0
       codemirror:
         specifier: ^6.0.1
         version: 6.0.2
@@ -1673,8 +1673,8 @@ packages:
     resolution: {integrity: sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==}
     engines: {node: '>=18'}
 
-  cloudflare@6.1.0:
-    resolution: {integrity: sha512-4hVKiowaEjRoYOFRj8/2bSaj4sQl4GUO/XnzV5OEnjvaYz+MWQOqs3KX6nlbix98JF2iSS/MZrIjbz9C+hkEaQ==}
+  cloudflare@6.2.0:
+    resolution: {integrity: sha512-UyN+6M1zqHaN5bgGu8ThZL/pBc7J3uR3uFf907OJWOwpiyRGRDSeTVLwLoQH34NJ9PSh4VubW80KI2NS9zI3Sg==}
 
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
@@ -5240,7 +5240,7 @@ snapshots:
 
   chownr@3.0.0: {}
 
-  cloudflare@6.1.0:
+  cloudflare@6.2.0:
     dependencies:
       '@types/node': 18.19.130
       '@types/node-fetch': 2.6.13
