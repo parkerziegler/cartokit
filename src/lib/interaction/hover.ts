@@ -10,12 +10,10 @@ import { listeners } from '$lib/state/listeners.svelte';
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to instrument.
- * @param sourceLayerId The source-layer id for vector tile layers.
  */
 export function instrumentPointHover(
   map: maplibregl.Map,
-  layerId: string,
-  sourceLayerId?: string
+  layerId: string
 ): void {
   const currentStrokeWidth = map.getPaintProperty(
     layerId,
@@ -39,7 +37,7 @@ export function instrumentPointHover(
     currentStrokeColor ?? 'transparent'
   ]);
 
-  addHoverListeners(map, layerId, sourceLayerId);
+  addHoverListeners(map, layerId);
 }
 
 /**
@@ -47,12 +45,10 @@ export function instrumentPointHover(
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to instrument.
- * @param sourceLayerId The source-layer id for vector tile layers.
  */
 export function instrumentLineHover(
   map: maplibregl.Map,
-  layerId: string,
-  sourceLayerId?: string
+  layerId: string
 ): void {
   const currentStrokeWidth = map.getPaintProperty(layerId, 'line-width');
   const currentStrokeColor = map.getPaintProperty(layerId, 'line-color');
@@ -70,7 +66,7 @@ export function instrumentLineHover(
     currentStrokeColor ?? 'transparent'
   ]);
 
-  addHoverListeners(map, layerId, sourceLayerId);
+  addHoverListeners(map, layerId);
 }
 
 /**
@@ -78,7 +74,8 @@ export function instrumentLineHover(
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to instrument.
- * @param sourceLayerId The source-layer id for vector tile layers.
+ * @param sourceLayerId The id of the source layer to instrument. This is only
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentPolygonHover(
   map: maplibregl.Map,
@@ -109,7 +106,8 @@ export function instrumentPolygonHover(
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to add event listeners to.
- * @param sourceLayerId The source-layer id for vector tile layers.
+ * @param sourceLayerId The id of the source layer to instrument. This is only
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 function addHoverListeners(
   map: maplibregl.Map,
@@ -123,28 +121,29 @@ function addHoverListeners(
     if (event.features && event.features.length > 0) {
       if (hoveredFeatureId !== null) {
         map.setFeatureState(
-          { source: layerId, sourceLayer: sourceLayerId, id: hoveredFeatureId },
+          { source: layerId, id: hoveredFeatureId, sourceLayer: sourceLayerId },
           { hover: false }
         );
       }
 
       hoveredFeatureId = event.features[0].id?.toString() ?? null;
+
       if (hoveredFeatureId) {
         map.setFeatureState(
-          { source: layerId, sourceLayer: sourceLayerId, id: hoveredFeatureId },
+          { source: layerId, id: hoveredFeatureId, sourceLayer: sourceLayerId },
           { hover: true }
         );
         map.getCanvas().style.cursor = 'pointer';
-      }
 
-      const currentIR = get(ir);
+        const currentIR = get(ir);
 
-      if (currentIR.layers[canonicalLayerId].layout.tooltip.visible) {
-        popup[canonicalLayerId] = {
-          open: true,
-          displayName: currentIR.layers[canonicalLayerId].displayName,
-          properties: event.features[0].properties
-        };
+        if (currentIR.layers[canonicalLayerId].layout.tooltip.visible) {
+          popup[canonicalLayerId] = {
+            open: true,
+            displayName: currentIR.layers[canonicalLayerId].displayName,
+            properties: event.features[0].properties
+          };
+        }
       }
     }
   }
@@ -152,17 +151,17 @@ function addHoverListeners(
   function onMouseLeave(): void {
     if (hoveredFeatureId !== null) {
       map.setFeatureState(
-        { source: layerId, sourceLayer: sourceLayerId, id: hoveredFeatureId },
+        { source: layerId, id: hoveredFeatureId, sourceLayer: sourceLayerId },
         { hover: false }
       );
       map.getCanvas().style.cursor = '';
-    }
 
-    popup[canonicalLayerId] = {
-      open: false,
-      displayName: '',
-      properties: {}
-    };
+      popup[canonicalLayerId] = {
+        open: false,
+        displayName: '',
+        properties: {}
+      };
+    }
 
     hoveredFeatureId = null;
   }

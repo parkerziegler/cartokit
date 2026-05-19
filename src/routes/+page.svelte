@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { type Feature } from 'geojson';
   import maplibregl from 'maplibre-gl';
   import * as pmtiles from 'pmtiles';
   import { onMount } from 'svelte';
@@ -19,13 +20,13 @@
   import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
   import { chat } from '$lib/state/chat.svelte';
+  import { error } from '$lib/state/error.svelte';
   import { initHistory } from '$lib/state/history.svelte';
+  import { layerId } from '$lib/state/layerId.svelte';
   import { user } from '$lib/state/user.svelte';
+  import { map as mapState } from '$lib/state/map.svelte';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
-  import { error } from '$lib/state/error.svelte';
-  import { map as mapState } from '$lib/state/map.svelte';
-  import { layerId } from '$lib/state/layerId.svelte';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
@@ -35,6 +36,40 @@
   let { data }: Props = $props();
 
   let map = $state<maplibregl.Map>();
+  let features = $state<Feature[]>([]);
+  let table = $derived.by<{ columns: string[]; rows: Feature[] }>(() => {
+    if (layerId.value) {
+      const layer = $ir.layers[layerId.value];
+
+      switch (layer.source.type) {
+        case 'geojson': {
+          return {
+            rows: layer.source.data.features,
+            columns: Object.keys(
+              layer.source.data.features[0]?.properties ?? {}
+            )
+          };
+        }
+        case 'vector': {
+          return {
+            rows:
+              features.length > 0
+                ? features
+                : (map?.queryRenderedFeatures({
+                    layers: [layer.id]
+                  }) ?? []),
+            columns: Object.keys(
+              layer.source.vector_layers[layer.source.sourceLayerIndex].fields
+            )
+          };
+        }
+        default:
+          return { columns: [], rows: [] };
+      }
+    } else {
+      return { columns: [], rows: [] };
+    }
+  });
 
   // We intentionally capture the values of data.userId and data.enableChat
   // from the load function in +page.server.ts.
@@ -56,7 +91,7 @@
     });
 
     // Add an event listener to handle feature deselection.
-    map.on('click', onFeatureLeave(map, $ir));
+    map.on('click', onFeatureLeave(map, $ir.layers));
 
     // When the map first reaches an idle state, set it in the store.
     // This should ensure that the map's styles and data have fully loaded.
@@ -92,13 +127,27 @@
       event.target.setProjection({ type: $ir.projection });
     });
 
+    // Add an idle listener that will update features in the data table when a
+    // vector layer is active. GeoJSON layers store data in memory, so we just
+    // read directly from the IR.
+    map.on('idle', (e) => {
+      const currentLayer = layerId.value
+        ? $ir.layers[layerId.value]
+        : undefined;
+
+      if (currentLayer?.source.type === 'vector') {
+        features = e.target.queryRenderedFeatures({
+          layers: [currentLayer.id]
+        });
+      }
+    });
+
     map.on('error', (err) => {
       console.error(err);
       error.set('A map rendering error occurred.');
     });
 
     const destroyHistory = initHistory();
-
     const deregisterKeybinding = registerKeybinding(
       'e',
       toggleEditorVisibility
@@ -149,7 +198,7 @@
       <LayerPanel />
     </Menu>
     {#if layerId.value}
-      <PropertiesMenu map={map!} layer={$ir.layers[layerId.value]} />
+      <PropertiesMenu layer={$ir.layers[layerId.value]} />
     {/if}
     {#if map}
       <Toolbar {map} />
@@ -173,8 +222,11 @@
     {#if $layout.dataVisible && layerId.value}
       {@const layer = $ir.layers[layerId.value]}
       <DataTable
-        {layer}
+        rows={table.rows}
+        columns={table.columns}
+        tableName={layer.displayName}
         onClose={onViewDataClose}
+        sourceType={layer.source.type}
         class={[
           'ease-cubic-out absolute bottom-0 h-72 transition-all duration-400',
           $layout.editorVisible ? 'w-2/3' : 'w-full'

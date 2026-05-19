@@ -123,7 +123,7 @@ export async function reconLayerDiffs(
       }
 
       // If the selected feature belongs to the removed layer, set the feature to null.
-      if (feature.value?.layer.id === diff.layerId) {
+      if (feature.value?.layerId === diff.layerId) {
         feature.value = null;
       }
 
