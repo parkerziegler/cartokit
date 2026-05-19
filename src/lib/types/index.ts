@@ -313,7 +313,7 @@ export interface TransformationCall extends Transformation {
  * @property sourceData The source GeoJSON data of the layer.
  * @property transformations The transformations applied to the layer.
  */
-interface CartoKitGeoJSONSource {
+export interface CartoKitGeoJSONSource {
   type: 'geojson';
   location:
     | {

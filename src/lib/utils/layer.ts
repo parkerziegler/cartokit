@@ -19,6 +19,7 @@ export function getInstrumentedLayerIds(
     case 'Point':
     case 'Proportional Symbol':
     case 'Line':
+      return [`${layerId}-hover`, `${layerId}-select`];
     case 'Heatmap':
       return [
         `${layerId}-points`,

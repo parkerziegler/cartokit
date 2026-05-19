@@ -1,5 +1,7 @@
-import type { MapGeoJSONFeature } from 'maplibre-gl';
+import type { Feature } from 'geojson';
 
-export const feature = $state<{ value: MapGeoJSONFeature | null }>({
+export const feature = $state<{
+  value: (Feature & { layerId: string }) | null;
+}>({
   value: null
 });

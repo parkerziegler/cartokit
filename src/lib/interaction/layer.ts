@@ -21,7 +21,6 @@ import type { CartoKitLayer } from '$lib/types';
  * @param layer The {@link CartoKitLayer} to add to the map.
  */
 export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
-  // Identify the source layer to use for vector tile layers.
   const sourceLayer =
     layer.source.type === 'vector'
       ? layer.source.sourceLayerIds[layer.source.sourceLayerIndex]
@@ -65,17 +64,15 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
       break;
     }
     case 'Dot Density': {
-      // Note that Dot Density layers are only supported for GeoJSON sources.
-
       // Add a separate source for the polygon outlines of the dot density layer.
       // Ensure it does not already exist from a previous transition before adding it.
-      if (
-        !map.getSource(`${layer.id}-outlines`) &&
-        layer.source.type === 'geojson'
-      ) {
+      if (!map.getSource(`${layer.id}-outlines`)) {
         map.addSource(`${layer.id}-outlines`, {
           type: 'geojson',
-          data: layer.source.data,
+          data:
+            layer.source.type === 'geojson'
+              ? layer.source.data
+              : { type: 'FeatureCollection', features: [] },
           generateId: true
         });
       }
@@ -125,8 +122,10 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentPolygonHover(map, `${layer.id}-outlines`, sourceLayer);
-      instrumentPolygonSelect(map, `${layer.id}-outlines`, sourceLayer);
+      // We cannot create Dot Density layers with vector tile sources.
+      // Therefore, we do not pass the sourceLayerId argument to these calls.
+      instrumentPolygonHover(map, `${layer.id}-outlines`);
+      instrumentPolygonSelect(map, `${layer.id}-outlines`);
       break;
     }
     case 'Heatmap': {
@@ -134,9 +133,9 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
       // This is the layer we'll instrument for hover and select effects.
       map.addLayer({
         id: `${layer.id}-points`,
-        type: 'circle',
         source: layer.id,
         'source-layer': sourceLayer,
+        type: 'circle',
         paint: {
           'circle-color': 'transparent',
           'circle-opacity': 0
@@ -156,8 +155,8 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentPointHover(map, `${layer.id}-points`, sourceLayer);
-      instrumentPointSelect(map, `${layer.id}-points`, sourceLayer);
+      instrumentPointHover(map, `${layer.id}-points`);
+      instrumentPointSelect(map, `${layer.id}-points`);
       break;
     }
     case 'Line': {
@@ -172,8 +171,8 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentLineHover(map, layer.id, sourceLayer);
-      instrumentLineSelect(map, layer.id, sourceLayer);
+      instrumentLineHover(map, layer.id);
+      instrumentLineSelect(map, layer.id);
       break;
     }
     case 'Point': {
@@ -202,7 +201,6 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
       map.addLayer({
         id: layer.id,
         source: layer.id,
-        'source-layer': sourceLayer,
         type: 'circle',
         paint: {
           ...fillPaint,
@@ -211,8 +209,8 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentPointHover(map, layer.id, sourceLayer);
-      instrumentPointSelect(map, layer.id, sourceLayer);
+      instrumentPointHover(map, layer.id);
+      instrumentPointSelect(map, layer.id);
       break;
     }
     case 'Polygon': {
@@ -285,7 +283,6 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
       map.addLayer({
         id: layer.id,
         source: layer.id,
-        'source-layer': sourceLayer,
         type: 'circle',
         paint: {
           ...fillPaint,
