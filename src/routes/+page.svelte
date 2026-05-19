@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type Feature } from 'geojson';
+  import type { Feature } from 'geojson';
   import maplibregl from 'maplibre-gl';
   import * as pmtiles from 'pmtiles';
   import { onMount } from 'svelte';
