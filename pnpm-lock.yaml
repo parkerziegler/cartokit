@@ -52,7 +52,7 @@ importers:
         version: 5.24.0
       openai:
         specifier: ^6.0.0
-        version: 6.38.0(zod@4.1.12)
+        version: 6.39.0(zod@4.1.12)
       prettier:
         specifier: ^3.5.2
         version: 3.8.3
@@ -2451,8 +2451,8 @@ packages:
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
 
-  openai@6.38.0:
-    resolution: {integrity: sha512-AoMplt2UalrpgUDMh3L09QWjNRlgJPipclQvA6sYAaeF6nHNBMgmikAZGmcYLn8on4d9sQY9Q8bOLfrBS7Lc8g==}
+  openai@6.39.0:
+    resolution: {integrity: sha512-O61LIsimY3acVabwvomwFhwrnN36yvHY2quIfy9keEcFytGgWeV35yLHQ6NVMLSBxRpHmcg2yuhCnlu2HT4pLQ==}
     hasBin: true
     peerDependencies:
       ws: ^8.18.0
@@ -6022,7 +6022,7 @@ snapshots:
 
   obug@2.1.1: {}
 
-  openai@6.38.0(zod@4.1.12):
+  openai@6.39.0(zod@4.1.12):
     optionalDependencies:
       zod: 4.1.12
 
