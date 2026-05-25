@@ -100,7 +100,7 @@ export function instrumentPolygonSelect(
     }
   });
 
-  addSelectListeners(map, layerId);
+  addSelectListeners(map, layerId, sourceLayerId);
 }
 
 /**
@@ -108,15 +108,21 @@ export function instrumentPolygonSelect(
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param lyrId The id of the layer to add event listeners to.
+ * @param sourceLayerId The id of the source layer to instrument. This is only
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
-function addSelectListeners(map: maplibregl.Map, lyrId: string): void {
+function addSelectListeners(
+  map: maplibregl.Map,
+  lyrId: string,
+  sourceLayerId?: string
+): void {
   let featureId: string | number | undefined;
 
   function onClick(event: maplibregl.MapLayerMouseEvent): void {
     if (event.features && event.features.length > 0) {
       if (featureId !== undefined) {
         map.setFeatureState(
-          { source: lyrId, id: featureId },
+          { source: lyrId, id: featureId, sourceLayer: sourceLayerId },
           { selected: false }
         );
       }
@@ -125,7 +131,10 @@ function addSelectListeners(map: maplibregl.Map, lyrId: string): void {
       // https://maplibre.org/maplibre-gl-js-docs/style-spec/sources/#geojson-generateId
       const { id, type, properties, geometry } = event.features[0];
 
-      map.setFeatureState({ source: lyrId, id: id! }, { selected: true });
+      map.setFeatureState(
+        { source: lyrId, id: id!, sourceLayer: sourceLayerId },
+        { selected: true }
+      );
       featureId = id;
 
       feature.value = {

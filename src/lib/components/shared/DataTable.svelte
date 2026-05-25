@@ -128,6 +128,7 @@
     class="text-2xs w-full overflow-auto border-t border-slate-400 text-white"
     bind:this={root}
     onscroll={onScroll}
+    style="min-height: {ROW_COUNT * ROW_HEIGHT}px;"
   >
     <table class="w-full border-collapse">
       <thead>

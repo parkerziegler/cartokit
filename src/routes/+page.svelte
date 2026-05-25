@@ -63,12 +63,10 @@
             )
           };
         }
-        default:
-          return { columns: [], rows: [] };
       }
-    } else {
-      return { columns: [], rows: [] };
     }
+
+    return { columns: [], rows: [] };
   });
 
   // We intentionally capture the values of data.userId and data.enableChat
