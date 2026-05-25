@@ -42,7 +42,7 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
             type: 'Quantitative',
             attribute: layer.style.dot.attribute,
             scale: {
-              type: DEFAULT_METHOD,
+              type: DEFAULT_METHOD(layer.source.type),
               scheme: {
                 id: DEFAULT_QUANTITATIVE_SCHEME,
                 direction: DEFAULT_SCHEME_DIRECTION
@@ -50,7 +50,8 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
               steps: DEFAULT_COUNT,
               thresholds: DEFAULT_THRESHOLDS(
                 layer.id,
-                layer.style.dot.attribute
+                layer.style.dot.attribute,
+                layer.source.type
               )
             },
             opacity: layer.style.fill.opacity,
@@ -109,13 +110,17 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
                   type: 'Quantitative',
                   attribute,
                   scale: {
-                    type: DEFAULT_METHOD,
+                    type: DEFAULT_METHOD(layer.source.type),
                     scheme: {
                       id: DEFAULT_QUANTITATIVE_SCHEME,
                       direction: DEFAULT_SCHEME_DIRECTION
                     },
                     steps: DEFAULT_COUNT,
-                    thresholds: DEFAULT_THRESHOLDS(layer.id, attribute)
+                    thresholds: DEFAULT_THRESHOLDS(
+                      layer.id,
+                      attribute,
+                      layer.source.type
+                    )
                   },
                   opacity: layer.style.fill.opacity,
                   visible: layer.style.fill.visible
@@ -144,13 +149,17 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
             type: 'Quantitative',
             attribute,
             scale: {
-              type: DEFAULT_METHOD,
+              type: DEFAULT_METHOD(layer.source.type),
               scheme: {
                 id: DEFAULT_QUANTITATIVE_SCHEME,
                 direction: DEFAULT_SCHEME_DIRECTION
               },
               steps: DEFAULT_COUNT,
-              thresholds: DEFAULT_THRESHOLDS(layer.id, attribute)
+              thresholds: DEFAULT_THRESHOLDS(
+                layer.id,
+                attribute,
+                layer.source.type
+              )
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible

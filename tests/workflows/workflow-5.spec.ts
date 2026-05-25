@@ -107,14 +107,8 @@ test('workflow-5', async ({ page }) => {
   await page.locator('#fill-opacity-input').fill('100');
   await page.locator('#fill-opacity-input').press('Enter');
 
-  // Click on a page location that will trigger deselection of the American Crow
-  // Range layer.
-  await page.locator('#map').click({
-    position: {
-      x: 20,
-      y: 360
-    }
-  });
+  // Close the Properties Menu for the American Crow Range layer.
+  await page.getByTestId('close-properties-menu-button').click();
 
   // Open the Add Layer modal.
   await page.getByTestId('add-layer-button').click();
@@ -198,13 +192,8 @@ test('workflow-5', async ({ page }) => {
   await page.locator('#color-scheme').getByRole('button').click();
   await page.locator('li:nth-child(23)').getByRole('button').click();
 
-  // Click on a page location that will trigger deselection of both layers.
-  await page.locator('#map').click({
-    position: {
-      x: 0,
-      y: 360
-    }
-  });
+  // Close the Properties Menu.
+  await page.getByTestId('close-properties-menu-button').click();
 
   // Ensure the Properties Panel is hidden.
   await expect(page.locator('#properties')).not.toBeVisible();

@@ -327,7 +327,8 @@ export async function patchFillDiffs(
               range,
               thresholds: DEFAULT_THRESHOLDS(
                 layer.id,
-                layer.style.fill.attribute
+                layer.style.fill.attribute,
+                layer.source.type
               )
             })
           };
@@ -475,13 +476,17 @@ export async function patchFillDiffs(
             type: diff.payload.visualizationType,
             attribute: attribute,
             scale: {
-              type: DEFAULT_METHOD,
+              type: DEFAULT_METHOD(layer.source.type),
               scheme: {
                 id: DEFAULT_QUANTITATIVE_SCHEME,
                 direction: DEFAULT_SCHEME_DIRECTION
               },
               steps: DEFAULT_COUNT,
-              thresholds: DEFAULT_THRESHOLDS(layer.id, attribute)
+              thresholds: DEFAULT_THRESHOLDS(
+                layer.id,
+                attribute,
+                layer.source.type
+              )
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
