@@ -108,7 +108,7 @@ test.describe('download-map', () => {
           location: {
             type: 'api',
             url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-climate-impact-regions.json'
-          },
+          }
         }
       },
       {

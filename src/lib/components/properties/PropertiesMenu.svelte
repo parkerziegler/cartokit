@@ -53,7 +53,10 @@
   <MenuTitle class="mr-4"
     >{layer.displayName}
     {#snippet action()}
-      <button onclick={onPropertiesMenuClose} data-testid="close-properties-menu-button">
+      <button
+        onclick={onPropertiesMenuClose}
+        data-testid="close-properties-menu-button"
+      >
         <CloseIcon />
       </button>
     {/snippet}

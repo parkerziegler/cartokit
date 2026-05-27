@@ -24,10 +24,8 @@ function deriveQuantiles({
   attribute,
   range
 }: DeriveBreaksParams): number[] {
-  const domain = asNumericEntry(
-    catalog.value[layerId][attribute],
-    attribute
-  ).quantiles.domain;
+  const domain = asNumericEntry(catalog.value[layerId][attribute], attribute)
+    .quantiles.domain;
 
   // Derive quantiles.
   const quantiles = d3
