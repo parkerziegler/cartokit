@@ -155,14 +155,15 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentPointHover(map, `${layer.id}-points`);
-      instrumentPointSelect(map, `${layer.id}-points`);
+      instrumentPointHover(map, `${layer.id}-points`, sourceLayer);
+      instrumentPointSelect(map, `${layer.id}-points`, sourceLayer);
       break;
     }
     case 'Line': {
       map.addLayer({
         id: layer.id,
         source: layer.id,
+        'source-layer': sourceLayer,
         type: 'line',
         paint: {
           'line-color': layer.style.stroke.color,
@@ -171,8 +172,8 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentLineHover(map, layer.id);
-      instrumentLineSelect(map, layer.id);
+      instrumentLineHover(map, layer.id, sourceLayer);
+      instrumentLineSelect(map, layer.id, sourceLayer);
       break;
     }
     case 'Point': {
@@ -201,6 +202,7 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
       map.addLayer({
         id: layer.id,
         source: layer.id,
+        'source-layer': sourceLayer,
         type: 'circle',
         paint: {
           ...fillPaint,
@@ -209,8 +211,8 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentPointHover(map, layer.id);
-      instrumentPointSelect(map, layer.id);
+      instrumentPointHover(map, layer.id, sourceLayer);
+      instrumentPointSelect(map, layer.id, sourceLayer);
       break;
     }
     case 'Polygon': {
@@ -283,6 +285,7 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
       map.addLayer({
         id: layer.id,
         source: layer.id,
+        'source-layer': sourceLayer,
         type: 'circle',
         paint: {
           ...fillPaint,
@@ -291,8 +294,8 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         }
       });
 
-      instrumentPointHover(map, layer.id);
-      instrumentPointSelect(map, layer.id);
+      instrumentPointHover(map, layer.id, sourceLayer);
+      instrumentPointSelect(map, layer.id, sourceLayer);
       break;
     }
   }

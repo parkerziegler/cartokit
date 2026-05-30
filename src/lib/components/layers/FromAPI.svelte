@@ -110,11 +110,11 @@
     />
   </div>
   <div class="flex flex-col gap-2">
-    <FieldLabel fieldId="Display Name">Display Name</FieldLabel>
+    <FieldLabel fieldId="display-name-input">Display Name</FieldLabel>
     <TextInput
       oninput={onDisplayNameInput}
       value={displayName}
-      id="Display Name"
+      id="display-name-input"
       class="w-full"
       placeholder="(e.g., Earthquakes)"
     />

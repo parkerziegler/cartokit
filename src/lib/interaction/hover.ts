@@ -10,10 +10,13 @@ import { listeners } from '$lib/state/listeners.svelte';
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to instrument.
+ * @param sourceLayerId The id of the source layer to instrument. This is only
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentPointHover(
   map: maplibregl.Map,
-  layerId: string
+  layerId: string,
+  sourceLayerId?: string
 ): void {
   const currentStrokeWidth = map.getPaintProperty(
     layerId,
@@ -37,7 +40,7 @@ export function instrumentPointHover(
     currentStrokeColor ?? 'transparent'
   ]);
 
-  addHoverListeners(map, layerId);
+  addHoverListeners(map, layerId, sourceLayerId);
 }
 
 /**
@@ -45,10 +48,13 @@ export function instrumentPointHover(
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to instrument.
+ * @param sourceLayerId The id of the source layer to instrument. This is only
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentLineHover(
   map: maplibregl.Map,
-  layerId: string
+  layerId: string,
+  sourceLayerId?: string
 ): void {
   const currentStrokeWidth = map.getPaintProperty(layerId, 'line-width');
   const currentStrokeColor = map.getPaintProperty(layerId, 'line-color');
@@ -66,7 +72,7 @@ export function instrumentLineHover(
     currentStrokeColor ?? 'transparent'
   ]);
 
-  addHoverListeners(map, layerId);
+  addHoverListeners(map, layerId, sourceLayerId);
 }
 
 /**
@@ -134,16 +140,16 @@ function addHoverListeners(
           { hover: true }
         );
         map.getCanvas().style.cursor = 'pointer';
+      }
 
-        const currentIR = get(ir);
+      const currentIR = get(ir);
 
-        if (currentIR.layers[canonicalLayerId].layout.tooltip.visible) {
-          popup[canonicalLayerId] = {
-            open: true,
-            displayName: currentIR.layers[canonicalLayerId].displayName,
-            properties: event.features[0].properties
-          };
-        }
+      if (currentIR.layers[canonicalLayerId].layout.tooltip.visible) {
+        popup[canonicalLayerId] = {
+          open: true,
+          displayName: currentIR.layers[canonicalLayerId].displayName,
+          properties: event.features[0].properties
+        };
       }
     }
   }
@@ -155,13 +161,13 @@ function addHoverListeners(
         { hover: false }
       );
       map.getCanvas().style.cursor = '';
-
-      popup[canonicalLayerId] = {
-        open: false,
-        displayName: '',
-        properties: {}
-      };
     }
+
+    popup[canonicalLayerId] = {
+      open: false,
+      displayName: '',
+      properties: {}
+    };
 
     hoveredFeatureId = null;
   }
