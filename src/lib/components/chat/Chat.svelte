@@ -46,6 +46,18 @@
       {}
     )
   );
+  let layerIdsToSourceLayerIds = $derived(
+    Object.entries($ir.layers).reduce<Record<string, string[]>>(
+      (acc, [layerId, layer]) => {
+        if (layer.source.type === 'vector') {
+          acc[layerId] = layer.source.vectorLayers.map(({ id }) => id);
+        }
+
+        return acc;
+      },
+      {}
+    )
+  );
 
   onMount(() => {
     textarea?.focus();
@@ -83,6 +95,7 @@
           layerIds,
           layerIdsToTypes,
           layerIdsToAttributes,
+          layerIdsToSourceLayerIds,
           userId: user.userId
         })
       }).then((response) => response.json());

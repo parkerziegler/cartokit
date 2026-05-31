@@ -21,10 +21,19 @@ const openai = new OpenAI({
  * the prompt and diffs to MongoDB for later analysis.
  */
 export const POST = (async ({ request }) => {
-  const { prompt, layerIds, layerIdsToTypes, layerIdsToAttributes } =
-    await request.json();
+  const {
+    prompt,
+    layerIds,
+    layerIdsToTypes,
+    layerIdsToAttributes,
+    layerIdsToSourceLayerIds
+  } = await request.json();
 
-  const schema = makeSchema(layerIds, layerIdsToAttributes);
+  const schema = makeSchema(
+    layerIds,
+    layerIdsToAttributes,
+    layerIdsToSourceLayerIds
+  );
 
   try {
     const completion = await openai.chat.completions.parse<
@@ -48,7 +57,11 @@ export const POST = (async ({ request }) => {
           
           When transitioning a layer's type with "layer-type", consult the
           following dictionary to determine the current sourceLayerType for the
-          layer targeted by the diff: ${JSON.stringify(layerIdsToTypes)}.`
+          layer targeted by the diff: ${JSON.stringify(layerIdsToTypes)}.
+
+          When switching a layer's source layer with "source-layer", consult the
+          following dictionary to determine the available sourceLayerIds for the
+          layer targeted by the diff: ${JSON.stringify(layerIdsToSourceLayerIds)}.`
         },
         { role: 'user', content: prompt }
       ],
@@ -117,6 +130,25 @@ function makeAttrsSchema(layerIdsToAttributes: Record<string, string[]>) {
   }
 }
 
+function makeSourceLayerIdsSchema(
+  layerIdsToSourceLayerIds: Record<string, string[]>
+) {
+  const sourceLayerIds = Object.values(layerIdsToSourceLayerIds).flat();
+
+  switch (sourceLayerIds.length) {
+    case 0:
+      return z.literal('None');
+    case 1:
+      return z.literal(sourceLayerIds[0]);
+    default:
+      return z.union([
+        z.literal(sourceLayerIds[0]),
+        z.literal(sourceLayerIds[1]),
+        ...sourceLayerIds.slice(2).map((id) => z.literal(id))
+      ]);
+  }
+}
+
 const LayerType = z.union([
   z.literal('Choropleth'),
   z.literal('Dot Density'),
@@ -134,6 +166,24 @@ function LayerTypeDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
     payload: z.object({
       sourceLayerType: LayerType,
       targetLayerType: LayerType
+    })
+  });
+}
+
+function SourceLayerDiff(
+  layerIdSchema: z.infer<typeof makeLayerIdSchema>,
+  layerIdsToSourceLayerIds: Record<string, string[]>
+) {
+  const sourceLayerIdSchema = makeSourceLayerIdsSchema(
+    layerIdsToSourceLayerIds
+  );
+
+  return z.object({
+    type: z.literal('source-layer'),
+    layerId: layerIdSchema,
+    payload: z.object({
+      sourceSourceLayerId: sourceLayerIdSchema,
+      targetSourceLayerId: sourceLayerIdSchema
     })
   });
 }
@@ -682,7 +732,8 @@ function UnknownDiff(layerIdSchema: z.infer<typeof makeLayerIdSchema>) {
 
 function makeSchema(
   layerIds: string[],
-  layerIdsToAttributes: Record<string, string[]>
+  layerIdsToAttributes: Record<string, string[]>,
+  layerIdsToSourceLayerIds: Record<string, string[]>
 ) {
   const layerIdSchema = makeLayerIdSchema(layerIds);
 
@@ -690,6 +741,7 @@ function makeSchema(
     diffs: z.array(
       z.discriminatedUnion('type', [
         LayerTypeDiff(layerIdSchema),
+        SourceLayerDiff(layerIdSchema, layerIdsToSourceLayerIds),
         FillAttributeDiff(layerIdSchema, layerIdsToAttributes),
         FillColorDiff(layerIdSchema),
         FillColorSchemeDiff(layerIdSchema),
