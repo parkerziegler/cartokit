@@ -55,7 +55,7 @@ export function codegenSource(
               type: 'geojson',
               data: ${transformations[0].name}(${dataIdent}, ${args})
             });
-            `;
+          `;
         }
         default:
           return `
@@ -75,7 +75,7 @@ export function codegenSource(
                 return `${transformation.name}(${i === 0 ? dataIdent : acc}, ${args})`;
               }, '')}
             });
-            `;
+          `;
       }
     }
     case 'vector': {
