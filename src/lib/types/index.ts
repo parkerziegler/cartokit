@@ -256,7 +256,7 @@ export type LayerType =
 /**
  * Represents the encoding channels of a layer.
  */
-export type Channel = 'fill' | 'stroke' | 'size' | 'dot';
+export type Channel = 'fill' | 'stroke' | 'size' | 'dot' | 'heatmap-weight';
 
 /**
  * Represents the visualization type for a given channel.

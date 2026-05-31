@@ -227,7 +227,7 @@ interface HeatmapWeightTypeDiff extends LayerDiff {
 interface HeatmapWeightAttributeDiff extends LayerDiff {
   type: 'heatmap-weight-attribute';
   payload: {
-    weightAttribute: string;
+    attribute: string;
   };
 }
 

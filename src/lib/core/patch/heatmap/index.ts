@@ -128,12 +128,12 @@ export async function patchHeatmapDiffs(
           type: 'heatmap-weight-attribute',
           layerId: diff.layerId,
           payload: {
-            weightAttribute: layer.style.heatmap.weight.attribute
+            attribute: layer.style.heatmap.weight.attribute
           }
         };
 
         // Apply the patch.
-        layer.style.heatmap.weight.attribute = diff.payload.weightAttribute;
+        layer.style.heatmap.weight.attribute = diff.payload.attribute;
       }
 
       break;
