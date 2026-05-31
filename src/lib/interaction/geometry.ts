@@ -1,8 +1,10 @@
 import type { ExpressionSpecification } from 'maplibre-gl';
 
 import { catalog } from '$lib/state/catalog.svelte';
-import type { CartoKitProportionalSymbolLayer } from '$lib/types';
-import { asNumericEntry } from '$lib/utils/catalog';
+import type {
+  CartoKitProportionalSymbolLayer,
+  NumericCatalogEntry
+} from '$lib/types';
 
 /**
  * Derive a MapLibre GL JS expression for a proportional symbol radius scale.
@@ -14,10 +16,9 @@ import { asNumericEntry } from '$lib/utils/catalog';
 export function deriveSize(
   layer: CartoKitProportionalSymbolLayer
 ): ExpressionSpecification {
-  const { min, max } = asNumericEntry(
-    catalog.value[layer.id][layer.style.size.attribute],
+  const { min, max } = catalog.value[layer.id][
     layer.style.size.attribute
-  );
+  ] as NumericCatalogEntry;
   const [rMin, rMax] = [layer.style.size.min, layer.style.size.max];
 
   return [
@@ -44,10 +45,9 @@ export function deriveDotDensityStartingValue(
   layerId: string,
   attribute: string
 ): number {
-  const { min, max } = asNumericEntry(
-    catalog.value[layerId][attribute],
+  const { min, max } = catalog.value[layerId][
     attribute
-  );
+  ] as NumericCatalogEntry;
 
   // Aim for a ratio where the number of dots is 10% of the range.
   return (max - min) * 0.1 || 1;

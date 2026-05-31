@@ -2,34 +2,8 @@ import * as d3 from 'd3';
 import { set, isFinite } from 'lodash-es';
 import { ckmeans } from 'simple-statistics';
 
-import type {
-  CartoKitLayer,
-  Catalog,
-  CatalogEntry,
-  NumericCatalogEntry
-} from '$lib/types';
+import type { CartoKitLayer, Catalog } from '$lib/types';
 import { selectTileStats } from '$lib/utils/pmtiles';
-
-/**
- * Narrow a {@link CatalogEntry} to a {@link NumericCatalogEntry}. Throws if the
- * entry does not describe a numeric attribute.
- *
- * @param entry The catalog entry to narrow.
- * @param attribute The attribute.
- * @returns The narrowed {@link NumericCatalogEntry}.
- */
-export function asNumericEntry(
-  entry: CatalogEntry,
-  attribute: string
-): NumericCatalogEntry {
-  if (entry.type !== 'number') {
-    throw new Error(
-      `Expected a numeric catalog entry for ${attribute}; got ${entry.type}.`
-    );
-  }
-
-  return entry;
-}
 
 /**
  * Build a catalog of pre-computed statistics for a {@link CartoKitLayer}.

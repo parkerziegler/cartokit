@@ -6,10 +6,10 @@ import type {
   ConstantStyle,
   CategoricalStyle,
   QuantitativeStyle,
-  HeatmapStyle
+  HeatmapStyle,
+  NumericCatalogEntry
 } from '$lib/types';
 import { DEFAULT_FILL } from '$lib/utils/constants';
-import { asNumericEntry } from '$lib/utils/catalog';
 import { materializeColorRamp } from '$lib/utils/color/ramp';
 import { materializeColorScheme } from '$lib/utils/color/scheme';
 import { catalog } from '$lib/state/catalog.svelte';
@@ -31,10 +31,9 @@ export function deriveColorScale(
       const { scale, attribute } = style;
 
       if (scale.type === 'Continuous') {
-        const { min, max } = asNumericEntry(
-          catalog.value[layerId][attribute],
+        const { min, max } = catalog.value[layerId][
           attribute
-        );
+        ] as NumericCatalogEntry;
         const colors = materializeColorRamp(
           scale.interpolator.id,
           scale.interpolator.direction,
