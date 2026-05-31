@@ -60,7 +60,7 @@
         {...attrs}
       />
     </svg>
-    <span>{formatFeatureCount(layer)}</span>
+    <span>{formatFeatureCount(layer.source)}</span>
   </div>
   {#if layer.style.fill.visible && layer.style.fill.type === 'Categorical'}
     <CategoricalLegend

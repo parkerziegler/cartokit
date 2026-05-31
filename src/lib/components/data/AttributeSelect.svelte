@@ -27,24 +27,31 @@
   let left = $state(0);
   let transformationEditorVisible = $state(false);
 
-  let properties = $derived(
-    Object.entries(catalog.value[layerId])
-      .filter(([_, value]) => {
+  let attributes = $derived(
+    Object.entries(catalog.value[layerId]).reduce<string[]>(
+      (acc, [attribute, value]) => {
         if (visualizationType === 'Quantitative') {
-          return value.type === 'number' && value.unique >= 9;
+          if (value.type === 'number' && value.unique >= 9) {
+            acc.push(attribute);
+          }
         } else if (visualizationType === 'Categorical') {
-          return (
+          if (
             value.type === 'string' ||
             value.type === 'boolean' ||
             (value.type === 'number' && value.unique < 9)
-          );
+          ) {
+            acc.push(attribute);
+          }
         }
-      })
-      .map(([property]) => property)
+
+        return acc;
+      },
+      []
+    )
   );
 
   let options = $derived(
-    properties.map((attribute) => ({
+    attributes.map((attribute) => ({
       value: attribute,
       label: attribute
     }))

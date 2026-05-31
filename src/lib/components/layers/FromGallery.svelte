@@ -33,7 +33,6 @@
 
     const layerId = uniqueId(`${kebabCase(displayName)}__`);
 
-    // TODO: Add support for vector tile layers.
     await applyDiff({
       type: 'add-layer',
       layerId,
