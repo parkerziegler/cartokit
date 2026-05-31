@@ -13,6 +13,11 @@ import type {
   ContinuousColorScale,
   QuantitativeColorScale
 } from '$lib/types';
+import {
+  enumerateAttributeCategories,
+  selectQuantitativeAttribute,
+  selectCategoricalAttribute
+} from '$lib/utils/attributes';
 import { randomColor } from '$lib/utils/color';
 import {
   convertRampToScheme,
@@ -27,16 +32,6 @@ import {
   DEFAULT_SCHEME_DIRECTION,
   DEFAULT_THRESHOLDS
 } from '$lib/utils/constants';
-import {
-  enumerateAttributeCategories,
-  selectCategoricalAttribute,
-  selectQuantitativeAttribute
-} from '$lib/utils/geojson';
-import {
-  selectVectorCategoricalAttribute,
-  enumerateVectorAttributeCategories,
-  selectVectorQuantitativeAttribute
-} from '$lib/utils/pmtiles';
 
 /**
  * Recompute the quantitative breaks for a given layer and fill style.
@@ -119,20 +114,10 @@ export async function patchFillDiffs(
 
         // Apply the patch.
         layer.style.fill.attribute = diff.payload.attribute;
-
-        if (layer.source.type === 'geojson') {
-          layer.style.fill.scale.categories = enumerateAttributeCategories(
-            layer.source.sourceData.features,
-            layer.style.fill.attribute
-          );
-        } else if (layer.source.type === 'vector') {
-          layer.style.fill.scale.categories =
-            enumerateVectorAttributeCategories(
-              layer.source.tilestats.layers[layer.source.sourceLayerIndex]
-                .attributes,
-              layer.style.fill.attribute
-            );
-        }
+        layer.style.fill.scale.categories = enumerateAttributeCategories(
+          layer.source,
+          diff.payload.attribute
+        );
       }
       break;
     }
@@ -427,25 +412,7 @@ export async function patchFillDiffs(
       // Apply the patch.
       switch (diff.payload.visualizationType) {
         case 'Categorical': {
-          const attribute =
-            layer.source.type === 'geojson'
-              ? selectCategoricalAttribute(layer.source.sourceData.features)
-              : selectVectorCategoricalAttribute(
-                  layer.source.tilestats.layers[layer.source.sourceLayerIndex]
-                    .attributes
-                );
-
-          const categories =
-            layer.source.type === 'geojson'
-              ? enumerateAttributeCategories(
-                  layer.source.sourceData.features,
-                  attribute
-                )
-              : enumerateVectorAttributeCategories(
-                  layer.source.tilestats.layers[layer.source.sourceLayerIndex]
-                    .attributes,
-                  attribute
-                );
+          const attribute = selectCategoricalAttribute(layer.source);
 
           layer.style.fill = {
             type: diff.payload.visualizationType,
@@ -456,7 +423,7 @@ export async function patchFillDiffs(
                 id: DEFAULT_CATEGORICAL_SCHEME,
                 direction: 'Forward'
               },
-              categories
+              categories: enumerateAttributeCategories(layer.source, attribute)
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
@@ -464,17 +431,11 @@ export async function patchFillDiffs(
           break;
         }
         case 'Quantitative': {
-          const attribute =
-            layer.source.type === 'geojson'
-              ? selectQuantitativeAttribute(layer.source.sourceData.features)
-              : selectVectorQuantitativeAttribute(
-                  layer.source.tilestats.layers[layer.source.sourceLayerIndex]
-                    .attributes
-                );
+          const attribute = selectQuantitativeAttribute(layer.source);
 
           layer.style.fill = {
             type: diff.payload.visualizationType,
-            attribute: attribute,
+            attribute,
             scale: {
               type: DEFAULT_METHOD(layer.source.type),
               scheme: {

@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { set } from 'lodash-es';
+import { set, isFinite } from 'lodash-es';
 import { ckmeans } from 'simple-statistics';
 
 import type {
@@ -8,11 +8,7 @@ import type {
   CatalogEntry,
   NumericCatalogEntry
 } from '$lib/types';
-import {
-  isPropertyBoolean,
-  isPropertyCategorical,
-  isPropertyQuantitative
-} from '$lib/utils/property';
+import { selectTileStats } from '$lib/utils/pmtiles';
 
 /**
  * Narrow a {@link CatalogEntry} to a {@link NumericCatalogEntry}. Throws if the
@@ -52,7 +48,7 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
       Object.keys(sampleProperties).forEach((property) => {
         const sample = sampleProperties[property];
 
-        if (isPropertyQuantitative(sample)) {
+        if (isFinite(sample)) {
           const domain = features
             .map((feature) => feature.properties?.[property])
             .filter(Number.isFinite);
@@ -85,19 +81,19 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
 
             set(catalog, `${layer.id}.${property}.jenks.${k}.breaks`, breaks);
           });
-        } else if (isPropertyCategorical(sample)) {
+        } else if (typeof sample === 'string') {
           const values = features
             .map((feature) => feature.properties?.[property])
-            .filter(isPropertyCategorical);
+            .filter((v) => typeof v === 'string');
           const distinct = Array.from(new Set(values));
 
           set(catalog, `${layer.id}.${property}.type`, 'string');
           set(catalog, `${layer.id}.${property}.values`, distinct);
           set(catalog, `${layer.id}.${property}.unique`, distinct.length);
-        } else if (isPropertyBoolean(sample)) {
+        } else if (typeof sample === 'boolean') {
           const values = features
             .map((feature) => feature.properties?.[property])
-            .filter(isPropertyBoolean);
+            .filter((v) => typeof v === 'boolean');
           const distinct = Array.from(new Set(values));
 
           set(catalog, `${layer.id}.${property}.type`, 'boolean');
@@ -108,8 +104,7 @@ export function buildCatalog(layer: CartoKitLayer): Catalog {
       break;
     }
     case 'vector': {
-      const attributes =
-        layer.source.tilestats.layers[layer.source.sourceLayerIndex].attributes;
+      const attributes = selectTileStats(layer.source).attributes;
 
       attributes.forEach((attribute) => {
         switch (attribute.type) {

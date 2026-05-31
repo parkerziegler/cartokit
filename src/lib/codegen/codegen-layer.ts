@@ -10,9 +10,7 @@ import type { CartoKitLayer } from '$lib/types';
  */
 export function codegenLayer(layer: CartoKitLayer): string {
   const sourceLayer =
-    layer.source.type === 'vector'
-      ? layer.source.sourceLayerIds[layer.source.sourceLayerIndex]
-      : undefined;
+    layer.source.type === 'vector' ? layer.source.sourceLayerId : undefined;
 
   switch (layer.type) {
     case 'Point':

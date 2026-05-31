@@ -1,5 +1,5 @@
 import type { CartoKitLayer, CartoKitChoroplethLayer } from '$lib/types';
-import { selectQuantitativeAttribute } from '$lib/utils/geojson';
+import { selectQuantitativeAttribute } from '$lib/utils/attributes';
 import {
   DEFAULT_METHOD,
   DEFAULT_QUANTITATIVE_SCHEME,
@@ -7,7 +7,6 @@ import {
   DEFAULT_THRESHOLDS,
   DEFAULT_SCHEME_DIRECTION
 } from '$lib/utils/constants';
-import { selectVectorQuantitativeAttribute } from '$lib/utils/pmtiles';
 
 /**
  * Patch a {@link CartoKitLayer} to a {@link CartoKitChoroplethLayer}.
@@ -70,33 +69,21 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
       );
     case 'Point':
     case 'Proportional Symbol': {
-      const { source, attribute } =
+      const source =
         layer.source.type === 'geojson'
           ? {
-              source: {
-                ...layer.source,
-                data: layer.source.sourceData,
-                // Remove the centroid transformation.
-                transformations: layer.source.transformations.filter(
-                  (transformation) => transformation.name !== 'deriveCentroids'
-                )
-              },
-              attribute:
-                layer.type === 'Proportional Symbol'
-                  ? layer.style.size.attribute
-                  : selectQuantitativeAttribute(layer.source.data.features)
+              ...layer.source,
+              data: layer.source.sourceData,
+              // Remove the centroid transformation.
+              transformations: layer.source.transformations.filter(
+                (transformation) => transformation.name !== 'deriveCentroids'
+              )
             }
-          : {
-              source: layer.source,
-              attribute:
-                layer.type === 'Proportional Symbol'
-                  ? layer.style.size.attribute
-                  : selectVectorQuantitativeAttribute(
-                      layer.source.tilestats.layers[
-                        layer.source.sourceLayerIndex
-                      ].attributes
-                    )
-            };
+          : layer.source;
+      const attribute =
+        layer.type === 'Proportional Symbol'
+          ? layer.style.size.attribute
+          : selectQuantitativeAttribute(layer.source);
 
       const targetLayer: CartoKitChoroplethLayer = {
         ...layer,
@@ -132,13 +119,7 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
       return targetLayer;
     }
     case 'Polygon': {
-      const attribute =
-        layer.source.type === 'geojson'
-          ? selectQuantitativeAttribute(layer.source.data.features)
-          : selectVectorQuantitativeAttribute(
-              layer.source.tilestats.layers[layer.source.sourceLayerIndex]
-                .attributes
-            );
+      const attribute = selectQuantitativeAttribute(layer.source);
 
       const targetLayer: CartoKitChoroplethLayer = {
         ...layer,

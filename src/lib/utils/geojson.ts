@@ -1,17 +1,12 @@
 import * as turf from '@turf/turf';
-import type { GeoJSON, Feature, FeatureCollection, Geometry } from 'geojson';
-
-import {
-  isPropertyCategorical,
-  isPropertyQuantitative
-} from '$lib/utils/property';
+import type { GeoJSON, FeatureCollection, Geometry } from 'geojson';
 
 /**
  * Normalize a GeoJSON Geometry, GeometryCollection, or Feature to a GeoJSON
  * FeatureCollection.
  *
- * @param {GeoJSON} geojson - The GeoJSON object to normalize.
- * @returns {FeatureCollection} – A GeoJSON FeatureCollection.
+ * @param geojson The {@link GeoJSON} object to normalize.
+ * @returns A {@link FeatureCollection}.
  */
 export function normalizeGeoJSONToFeatureCollection(
   geojson: GeoJSON
@@ -38,8 +33,8 @@ export function normalizeGeoJSONToFeatureCollection(
 /**
  * Get the Geometry type of a FeatureCollection.
  *
- * @param {FeatureCollection} featureCollection - The FeatureCollection to inspect.
- * @returns {Geometry['type']} – The Geometry type of the FeatureCollection.
+ * @param featureCollection The {@link FeatureCollection} to inspect.
+ * @returns The {@link Geometry['type']} type of the {@link FeatureCollection}.
  */
 export function getFeatureCollectionGeometryType(
   featureCollection: FeatureCollection
@@ -47,66 +42,4 @@ export function getFeatureCollectionGeometryType(
   return (
     featureCollection.features?.[0]?.geometry?.type ?? 'GeometryCollection'
   );
-}
-
-/**
- * Select the first quantitative attribute from a GeoJSON FeatureCollection.
- *
- * @param {Feature[]} features– The Features of a GeoJSON FeatureCollection.
- * @returns {string} – The name of the first quantitative attribute found in the
- * GeoJSON FeatureCollection.
- */
-export function selectQuantitativeAttribute(features: Feature[]): string {
-  for (const property in features[0].properties) {
-    if (isPropertyQuantitative(features[0].properties[property])) {
-      return property;
-    }
-  }
-
-  throw new Error('No quantitative attributes found in dataset.');
-}
-
-/**
- * Select the first categorical attribute from a GeoJSON FeatureCollection.
- *
- * @param {Feature[]} features – The Features of a GeoJSON FeatureCollection.
- * @returns {string} – The name of the first categorical attribute found in the GeoJSON
- * FeatureCollection.
- */
-export function selectCategoricalAttribute(features: Feature[]): string {
-  for (const property in features[0].properties) {
-    if (isPropertyCategorical(features[0].properties[property])) {
-      return property;
-    }
-  }
-
-  throw new Error('No categorical attributes found in dataset.');
-}
-
-/**
- * Enumerate the categories of a given attribute in a GeoJSON FeatureCollection.
- *
- * @param features The GeoJSON dataset.
- * @param attribute The attribute to probe for categories.
- * @returns The categories of the attribute.
- */
-export function enumerateAttributeCategories(
-  features: Feature[],
-  attribute: string
-): unknown[] {
-  const categories = new Set<unknown>();
-
-  for (const feature of features) {
-    // Permit 0 and '0' as valid categories.
-    if (
-      feature.properties?.[attribute] !== undefined &&
-      feature.properties?.[attribute] !== null &&
-      feature.properties?.[attribute] !== '' &&
-      !categories.has(feature.properties[attribute])
-    ) {
-      categories.add(feature.properties[attribute]);
-    }
-  }
-
-  return Array.from(categories);
 }

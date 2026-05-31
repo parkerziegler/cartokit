@@ -1,70 +1,81 @@
 import { PMTiles } from 'pmtiles';
 
-import type {
-  TileStats,
-  VectorTileAttribute,
-  VectorTileLayer
-} from '$lib/types';
+import type { CartoKitSource, TileStats, VectorLayer } from '$lib/types';
 
 interface Metadata {
   type?: string;
-  vector_layers: VectorTileLayer[];
+  vector_layers: VectorLayer[];
   tilestats: TileStats;
 }
 
+/**
+ * A thin wrapper around a {@link PMTiles} archive, exposing helpers for reading
+ * the metadata cartokit relies on to interpret a vector tile source.
+ */
 export class CartoKitPMTiles {
   private archive: PMTiles;
 
+  /**
+   * @param url The URL of the PMTiles archive.
+   */
   constructor(url: string) {
     this.archive = new PMTiles(url);
   }
 
+  /**
+   * Read the archive's metadata, assuming it follows the TileJSON
+   * specification.
+   *
+   * @returns The archive's {@link Metadata}.
+   */
   async getMetadata() {
     return (await this.archive.getMetadata()) as Metadata;
   }
 
+  /**
+   * Read the {@link VectorLayer}s described in the archive's metadata.
+   *
+   * @returns The archive's {@link VectorLayer}s.
+   */
   async getVectorLayers() {
     const m = await this.getMetadata();
     return m.vector_layers;
   }
 }
 
-export function selectVectorQuantitativeAttribute(
-  attributes: VectorTileAttribute[]
-): string {
-  for (const attr of attributes) {
-    if (attr.type === 'number') {
-      return attr.attribute;
-    }
-  }
-
-  throw new Error('No quantitative attributes found in dataset.');
+/**
+ * Select the {@link VectorLayer} matching a vector tile source's selected
+ * source layer.
+ *
+ * This function is primarily used to extract attribute names and types for a
+ * given vector source layer, assuming the tiles are encoded in MVT and follow
+ * the TileJSON specification.
+ *
+ * @param source The vector tile source.
+ * @returns The selected {@link VectorLayer}.
+ */
+export function selectVectorLayer(
+  source: Extract<CartoKitSource, { type: 'vector' }>
+): VectorLayer {
+  return source.vectorLayers.find(
+    (layer) => layer.id === source.sourceLayerId
+  )!;
 }
 
-export function enumerateVectorAttributeCategories(
-  attributes: VectorTileAttribute[],
-  attribute: string
-): unknown[] {
-  const categories = new Set<unknown>();
-  const attr = attributes.find((attr) => attr.attribute === attribute);
-
-  if (attr) {
-    for (const value of attr.values) {
-      categories.add(value);
-    }
-  }
-
-  return Array.from(categories);
-}
-
-export function selectVectorCategoricalAttribute(
-  attributes: VectorTileAttribute[]
-): string {
-  for (const attr of attributes) {
-    if (attr.type === 'string') {
-      return attr.attribute;
-    }
-  }
-
-  throw new Error('No categorical attributes found in dataset.');
+/**
+ * Select the {@link TileStats} layer matching a vector tile source's selected
+ * source layer.
+ *
+ * This function is primarily used to extract attribute value distributions for
+ * a given vector source layer, assuming the tiles provide tilestats metadata.
+ *
+ * @param source The vector tile source.
+ * @returns The matching {@link TileStats} layer.
+ */
+export function selectTileStats(
+  source: Extract<CartoKitSource, { type: 'vector' }>
+) {
+  return source.tilestats.layers.find(
+    (layer) => layer.layer === source.sourceLayerId
+  )!;
 }

@@ -12,7 +12,7 @@
 
   let options = $derived(
     layer.source.type === 'vector'
-      ? layer.source.sourceLayerIds.map((id) => ({
+      ? layer.source.vectorLayers.map(({ id }) => ({
           value: id,
           label: id
         }))
@@ -20,9 +20,7 @@
   );
 
   let selected = $derived(
-    layer.source.type === 'vector'
-      ? layer.source.sourceLayerIds[layer.source.sourceLayerIndex]
-      : ''
+    layer.source.type === 'vector' ? layer.source.sourceLayerId : ''
   );
 
   async function onSourceLayerChange(
@@ -34,8 +32,7 @@
       type: 'source-layer',
       layerId: layer.id,
       payload: {
-        sourceSourceLayerId:
-          layer.source.sourceLayerIds[layer.source.sourceLayerIndex],
+        sourceSourceLayerId: layer.source.sourceLayerId,
         targetSourceLayerId: event.currentTarget.value
       }
     };

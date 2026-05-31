@@ -51,16 +51,21 @@
           };
         }
         case 'vector': {
+          if (features.length > 0) {
+            return {
+              rows: features,
+              columns: Object.keys(features[0].properties ?? {})
+            };
+          }
+
+          const queriedFeatures =
+            map?.queryRenderedFeatures({
+              layers: [layer.id]
+            }) ?? [];
+
           return {
-            rows:
-              features.length > 0
-                ? features
-                : (map?.queryRenderedFeatures({
-                    layers: [layer.id]
-                  }) ?? []),
-            columns: Object.keys(
-              layer.source.vector_layers[layer.source.sourceLayerIndex].fields
-            )
+            rows: queriedFeatures,
+            columns: Object.keys(queriedFeatures[0]?.properties ?? {})
           };
         }
       }

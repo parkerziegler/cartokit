@@ -4,9 +4,9 @@ import { deriveDotDensityStartingValue } from '$lib/interaction/geometry';
 import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
 import generateDotDensityPointsSrc from '$lib/stdlib/dot-density?raw';
 import type { CartoKitDotDensityLayer, CartoKitLayer } from '$lib/types';
+import { selectQuantitativeAttribute } from '$lib/utils/attributes';
 import { randomColor } from '$lib/utils/color';
 import { DEFAULT_SIZE } from '$lib/utils/constants';
-import { selectQuantitativeAttribute } from '$lib/utils/geojson';
 import { parseStringToTransformation } from '$lib/utils/parse';
 
 /**
@@ -85,9 +85,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
       let dotValue = -1;
 
       if (layer.source.type === 'geojson') {
-        attribute = selectQuantitativeAttribute(
-          layer.source.sourceData.features
-        );
+        attribute = selectQuantitativeAttribute(layer.source);
         dotValue = deriveDotDensityStartingValue(layer.id, attribute);
 
         // Replace the centroid transformation with a dot density transformation.
@@ -151,9 +149,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
       let dotValue = -1;
 
       if (layer.source.type === 'geojson') {
-        attribute = selectQuantitativeAttribute(
-          layer.source.sourceData.features
-        );
+        attribute = selectQuantitativeAttribute(layer.source);
         dotValue = deriveDotDensityStartingValue(layer.id, attribute);
 
         source = {

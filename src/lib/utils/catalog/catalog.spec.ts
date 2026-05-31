@@ -5,12 +5,11 @@ import * as url from 'node:url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 import type { FeatureCollection } from 'geojson';
-import { get } from 'lodash-es';
+import { get, isFinite } from 'lodash-es';
 import { expect, test, describe } from 'vitest';
 
 import type { CartoKitLayer } from '$lib/types';
 import { buildCatalog } from '$lib/utils/catalog';
-import { isPropertyQuantitative } from '$lib/utils/property';
 
 const usCountiesUnemployment1 = JSON.parse(
   fs.readFileSync(
@@ -112,7 +111,7 @@ describe('buildCatalog', () => {
     const attributes: string[] =
       layer.source.type === 'geojson'
         ? Object.keys(layer.source.data.features[0].properties || {}).filter(
-            isPropertyQuantitative
+            isFinite
           )
         : [];
 
@@ -128,7 +127,7 @@ describe('buildCatalog', () => {
     const attributes: string[] =
       layer.source.type === 'geojson'
         ? Object.keys(layer.source.data.features[0].properties || {}).filter(
-            isPropertyQuantitative
+            isFinite
           )
         : [];
 
@@ -146,7 +145,7 @@ describe('buildCatalog', () => {
     const attributes: string[] =
       layer.source.type === 'geojson'
         ? Object.keys(layer.source.data.features[0].properties || {}).filter(
-            isPropertyQuantitative
+            isFinite
           )
         : [];
 
@@ -167,7 +166,7 @@ describe('buildCatalog', () => {
     const attributes: string[] =
       layer.source.type === 'geojson'
         ? Object.keys(layer.source.data.features[0].properties || {}).filter(
-            isPropertyQuantitative
+            isFinite
           )
         : [];
 
@@ -186,7 +185,7 @@ describe('buildCatalog', () => {
       singleFeatureLayer.source.type === 'geojson'
         ? Object.keys(
             singleFeatureLayer.source.data.features[0].properties || {}
-          ).filter(isPropertyQuantitative)
+          ).filter(isFinite)
         : [];
 
     attributes.forEach((attribute) => {

@@ -358,13 +358,14 @@ export type VectorTileAttribute =
 
 export interface TileStats {
   layers: {
+    layer: string;
     count: number;
     geometry: VectorTileGeometry;
     attributes: VectorTileAttribute[];
   }[];
 }
 
-export interface VectorTileLayer {
+export interface VectorLayer {
   id: string;
   description: string;
   minzoom: number;
@@ -377,8 +378,9 @@ export interface VectorTileLayer {
  *
  * @property type The type of the source, 'vector'.
  * @property location The location of the source, a remote API endpoint.
- * @property geometry The {@link VectorTileGeometry} type of the vector tile layer.
- * @property sourceLayerIds The ids of source layers in the vector tile archive.
+ * @property sourceLayerId The id of the source layer in the vector tile archive.
+ * @property tilestats The {@link TileStats} metadata of the vector tile source.
+ * @property vectorLayers The {@link VectorLayer} metadata of the vector tile source.
  */
 interface CartoKitVectorTileSource {
   type: 'vector';
@@ -386,10 +388,9 @@ interface CartoKitVectorTileSource {
     type: 'api';
     url: string;
   };
-  sourceLayerIndex: number;
+  sourceLayerId: string;
   tilestats: TileStats;
-  vector_layers: VectorTileLayer[];
-  sourceLayerIds: string[];
+  vectorLayers: VectorLayer[];
 }
 
 /**

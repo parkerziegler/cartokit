@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { isFinite } from 'lodash-es';
+
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type { CartoKitHeatmapLayer } from '$lib/types';
-  import { isPropertyQuantitative } from '$lib/utils/property';
 
   interface Props {
     layer: CartoKitHeatmapLayer;
@@ -25,7 +26,7 @@
 
       return Object.keys(geojson.features[0].properties ?? {})
         .filter((attribute) =>
-          isPropertyQuantitative(geojson.features[0].properties?.[attribute])
+          isFinite(geojson.features[0].properties?.[attribute])
         )
         .map((attribute) => ({
           value: attribute,

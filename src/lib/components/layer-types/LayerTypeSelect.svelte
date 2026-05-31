@@ -8,6 +8,7 @@
     GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES,
     VECTOR_TILE_GEOMETRY_TYPES_TO_LAYER_TYPES
   } from '$lib/utils/layer';
+  import { selectTileStats } from '$lib/utils/pmtiles';
 
   interface Props {
     layer: CartoKitLayer;
@@ -32,11 +33,10 @@
         );
       }
       case 'vector': {
-        const geometryType =
-          layer.source.tilestats.layers[layer.source.sourceLayerIndex].geometry;
+        const { geometry } = selectTileStats(layer.source);
 
         return (
-          VECTOR_TILE_GEOMETRY_TYPES_TO_LAYER_TYPES.get(geometryType)?.map(
+          VECTOR_TILE_GEOMETRY_TYPES_TO_LAYER_TYPES.get(geometry)?.map(
             (layerType) => ({
               value: layerType,
               label: layerType

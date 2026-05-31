@@ -166,8 +166,11 @@ function generateCartoKitLayerFromVectorTiles(
 ): CartoKitLayer {
   const color = randomColor();
   const z = Object.values(get(ir).layers).length;
+  const geometryType = source.tilestats.layers.find(
+    ({ layer }) => layer === source.sourceLayerId
+  )!.geometry;
 
-  switch (source.tilestats.layers[source.sourceLayerIndex].geometry) {
+  switch (geometryType) {
     case 'Point':
       return {
         id: options.layerId,
@@ -284,10 +287,9 @@ export async function patchLayerDiffs(
           {
             type: 'vector',
             location: diff.payload.location,
-            sourceLayerIndex: 0,
+            sourceLayerId: vectorLayers[0].id,
             tilestats: metadata.tilestats,
-            vector_layers: vectorLayers,
-            sourceLayerIds: vectorLayers.map((l) => l.id)
+            vectorLayers
           },
           {
             layerId: diff.layerId,
@@ -487,13 +489,9 @@ export async function patchLayerDiffs(
     case 'source-layer': {
       const layer = ir.layers[diff.layerId];
 
-      if (layer.source.type !== 'vector') break;
-
-      const targetSourceLayerIndex = layer.source.sourceLayerIds.indexOf(
-        diff.payload.targetSourceLayerId
-      );
-
-      if (targetSourceLayerIndex === -1) break;
+      if (layer.source.type !== 'vector') {
+        break;
+      }
 
       // Derive the inverse diff prior to applying the patch.
       inverse = {
@@ -501,13 +499,12 @@ export async function patchLayerDiffs(
         layerId: diff.layerId,
         payload: {
           sourceSourceLayerId: diff.payload.targetSourceLayerId,
-          targetSourceLayerId:
-            layer.source.sourceLayerIds[layer.source.sourceLayerIndex]
+          targetSourceLayerId: layer.source.sourceLayerId
         }
       };
 
       // Apply the patch.
-      layer.source.sourceLayerIndex = targetSourceLayerIndex;
+      layer.source.sourceLayerId = diff.payload.targetSourceLayerId;
 
       break;
     }

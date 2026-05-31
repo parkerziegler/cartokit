@@ -23,7 +23,7 @@ import type { CartoKitLayer } from '$lib/types';
 export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
   const sourceLayer =
     layer.source.type === 'vector'
-      ? layer.source.sourceLayerIds[layer.source.sourceLayerIndex]
+      ? layer.source.sourceLayerId
       : undefined;
 
   switch (layer.type) {
