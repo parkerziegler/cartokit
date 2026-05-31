@@ -3,9 +3,7 @@ import { camelCase } from 'lodash-es';
 import type { CartoKitBackendAnalysis, CartoKitLayer } from '$lib/types';
 
 /**
- * Generate a program fragment for the data source for a {@link CartoKitLayer},
- * dispatching on the source's type to the appropriate source-specific
- * generator.
+ * Generate a program fragment for a {@link CartoKitSource}.
  *
  * @param layer A {@link CartoKitLayer}.
  * @param uploadTable The symbol table tracking file uploads.
@@ -20,113 +18,76 @@ export function codegenSource(
   analysis: CartoKitBackendAnalysis
 ): string {
   switch (layer.source.type) {
-    case 'geojson':
-      return codegenGeoJSONSource(layer, uploadTable);
-    case 'vector':
-      return codegenVectorTileSource(layer, analysis);
-  }
-}
+    case 'geojson': {
+      const transformations = layer.source.transformations;
+      const url =
+        layer.source.location.type === 'api'
+          ? layer.source.location.url
+          : undefined;
+      const dataIdent =
+        uploadTable.get(layer.id) ?? camelCase(layer.displayName);
+      const fetchData =
+        url && !uploadTable.has(layer.id)
+          ? `const ${dataIdent} = await fetchGeoJSON(${JSON.stringify(url)});\n`
+          : '';
 
-/**
- * Generate a program fragment for a GeoJSON data source for a
- * {@link CartoKitLayer}.
- *
- * @param layer A {@link CartoKitLayer} backed by a GeoJSON source.
- * @param uploadTable The symbol table tracking file uploads.
- * @returns A program fragment containing the definition of the GeoJSON data
- * source for the {@link CartoKitLayer}.
- */
-function codegenGeoJSONSource(
-  layer: CartoKitLayer,
-  uploadTable: Map<string, string>
-): string {
-  if (layer.source.type !== 'geojson') {
-    return '';
-  }
+      switch (transformations.length) {
+        case 0:
+          return `
+            map.addSource('${layer.id}', {
+              type: 'geojson',
+              data: ${url ? `"${url}"` : dataIdent}
+            });
+          `;
+        case 1: {
+          const args = transformations[0].args
+            .map((arg, i) => {
+              const type = transformations[0].paramTypes[i + 1];
 
-  const transformations = layer.source.transformations;
-  const url =
-    layer.source.location.type === 'api'
-      ? layer.source.location.url
-      : undefined;
-  const dataIdent = uploadTable.get(layer.id) ?? camelCase(layer.displayName);
-  const fetchData =
-    url && !uploadTable.has(layer.id)
-      ? `const ${dataIdent} = await fetchGeoJSON(${JSON.stringify(url)});\n`
-      : '';
+              return type === 'string' ? `'${arg}'` : arg;
+            })
+            .join(', ');
 
-  switch (transformations.length) {
-    case 0:
-      return `
-  map.addSource('${layer.id}', {
-		type: 'geojson',
-		data: ${url ? `"${url}"` : dataIdent}
-	});
-  `;
-    case 1: {
-      const args = transformations[0].args
-        .map((arg, i) => {
-          const type = transformations[0].paramTypes[i + 1];
+          return `
+            ${fetchData}
 
-          return type === 'string' ? `'${arg}'` : arg;
-        })
-        .join(', ');
+            map.addSource('${layer.id}', {
+              type: 'geojson',
+              data: ${transformations[0].name}(${dataIdent}, ${args})
+            });
+            `;
+        }
+        default:
+          return `
+            ${fetchData}
+            
+            map.addSource('${layer.id}', {
+              type: 'geojson',
+              data: ${transformations.reduce((acc, transformation, i) => {
+                const args = transformation.args
+                  .map((arg, i) => {
+                    const type = transformation.paramTypes[i + 1];
 
-      return `
-  ${fetchData}
+                    return type === 'string' ? `'${arg}'` : arg;
+                  })
+                  .join(', ');
 
-  map.addSource('${layer.id}', {
-		type: 'geojson',
-		data: ${transformations[0].name}(${dataIdent}, ${args})
-	});
-  `;
+                return `${transformation.name}(${i === 0 ? dataIdent : acc}, ${args})`;
+              }, '')}
+            });
+            `;
+      }
     }
-    default:
+    case 'vector': {
+      const protocolPrefix =
+        analysis.library === 'maplibre' ? 'pmtiles://' : '';
+
       return `
-  ${fetchData}
-  
-  map.addSource('${layer.id}', {
-		type: 'geojson',
-		data: ${transformations.reduce((acc, transformation, i) => {
-      const args = transformation.args
-        .map((arg, i) => {
-          const type = transformation.paramTypes[i + 1];
-
-          return type === 'string' ? `'${arg}'` : arg;
-        })
-        .join(', ');
-
-      return `${transformation.name}(${i === 0 ? dataIdent : acc}, ${args})`;
-    }, '')}
-	});
-  `;
+        map.addSource('${layer.id}', {
+          type: 'vector',
+          url: ${JSON.stringify(protocolPrefix + layer.source.location.url)}
+        });
+    `;
+    }
   }
-}
-
-/**
- * Generate a program fragment for a vector tile data source for a
- * {@link CartoKitLayer}.
- *
- * @param layer A {@link CartoKitLayer} backed by a vector tile source.
- * @param analysis The {@link CartoKitBackendAnalysis} for the current
- * {@link CartoKitIR}.
- * @returns A program fragment containing the definition of the vector tile
- * data source for the {@link CartoKitLayer}.
- */
-function codegenVectorTileSource(
-  layer: CartoKitLayer,
-  analysis: CartoKitBackendAnalysis
-): string {
-  if (layer.source.type !== 'vector') {
-    return '';
-  }
-
-  const protocolPrefix = analysis.library === 'maplibre' ? 'pmtiles://' : '';
-
-  return `
-  map.addSource('${layer.id}', {
-		type: 'vector',
-		url: ${JSON.stringify(protocolPrefix + layer.source.location.url)}
-	});
-  `;
 }
