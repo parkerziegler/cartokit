@@ -18,15 +18,13 @@
 </script>
 
 <MenuItem title="Dots">
-  {#if layer.source.type === 'geojson'}
-    <AttributeSelect
-      layerId={layer.id}
-      visualizationType="Quantitative"
-      geojson={layer.source.data}
-      selected={layer.style.dot.attribute}
-      channel="dot"
-    />
-  {/if}
+  <AttributeSelect
+    layerId={layer.id}
+    visualizationType="Quantitative"
+    geojson={layer.source.type === 'geojson' ? layer.source.data : undefined}
+    selected={layer.style.dot.attribute}
+    channel="dot"
+  />
   <PointSize
     layerId={layer.id}
     size={layer.style.size}

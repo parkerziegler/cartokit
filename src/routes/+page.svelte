@@ -200,10 +200,10 @@
       </MenuTitle>
       <LayerPanel />
     </Menu>
-    {#if layerId.value}
-      <PropertiesMenu layer={$ir.layers[layerId.value]} />
-    {/if}
     {#if map}
+      {#if layerId.value}
+        <PropertiesMenu {map} layer={$ir.layers[layerId.value]} />
+      {/if}
       <Toolbar {map} />
     {/if}
     <button

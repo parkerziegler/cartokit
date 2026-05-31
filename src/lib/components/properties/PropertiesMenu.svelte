@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type maplibregl from 'maplibre-gl';
+
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import LayerTypeSelect from '$lib/components/layer-types/LayerTypeSelect.svelte';
   import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
@@ -20,14 +22,26 @@
   import type { CartoKitLayer } from '$lib/types';
 
   interface Props {
+    map: maplibregl.Map;
     layer: CartoKitLayer;
   }
 
-  let { layer }: Props = $props();
+  let { map, layer }: Props = $props();
 
   function onPropertiesMenuClose() {
-    layerId.value = null;
+    if (feature.value?.id) {
+      map.removeFeatureState(
+        {
+          source: feature.value.layerId,
+          sourceLayer: feature.value.sourceLayerId,
+          id: feature.value.id
+        },
+        'selected'
+      );
+    }
+
     feature.value = null;
+    layerId.value = null;
 
     if ($layout.dataVisible) {
       layout.update((layout) => {
