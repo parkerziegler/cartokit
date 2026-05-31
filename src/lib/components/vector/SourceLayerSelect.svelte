@@ -10,7 +10,7 @@
 
   let { layer }: Props = $props();
 
-  let options = $derived(
+  const options = $derived(
     layer.source.type === 'vector'
       ? layer.source.vectorLayers.map(({ id }) => ({
           value: id,
@@ -18,8 +18,7 @@
         }))
       : []
   );
-
-  let selected = $derived(
+  const selected = $derived(
     layer.source.type === 'vector' ? layer.source.sourceLayerId : ''
   );
 

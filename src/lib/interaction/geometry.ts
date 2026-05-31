@@ -45,9 +45,7 @@ export function deriveDotDensityStartingValue(
   layerId: string,
   attribute: string
 ): number {
-  const { min, max } = catalog.value[layerId][
-    attribute
-  ] as NumericCatalogEntry;
+  const { min, max } = catalog.value[layerId][attribute] as NumericCatalogEntry;
 
   // Aim for a ratio where the number of dots is 10% of the range.
   return (max - min) * 0.1 || 1;

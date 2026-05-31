@@ -50,9 +50,7 @@ function deriveEqualIntervals({
   attribute,
   range
 }: DeriveBreaksParams): number[] {
-  const { min, max } = catalog.value[layerId][
-    attribute
-  ] as NumericCatalogEntry;
+  const { min, max } = catalog.value[layerId][attribute] as NumericCatalogEntry;
 
   // Derive ticks.
   const ticks = d3
@@ -107,9 +105,7 @@ function deriveManualBreaks({
     return quantiles;
   }
 
-  const { min, max } = catalog.value[layerId][
-    attribute
-  ] as NumericCatalogEntry;
+  const { min, max } = catalog.value[layerId][attribute] as NumericCatalogEntry;
 
   // If the thresholds do not fit within the range of the attribute,
   // derive a fully new set of thresholds, defaulting to quantiles.
