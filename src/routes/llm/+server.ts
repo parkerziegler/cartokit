@@ -546,7 +546,7 @@ function HeatmapWeightAttributeDiff(
     type: z.literal('heatmap-weight-attribute'),
     layerId: layerIdSchema,
     payload: z.object({
-      weightAttribute: makeAttrsSchema(layerIdsToAttributes)
+      attribute: makeAttrsSchema(layerIdsToAttributes)
     })
   });
 }

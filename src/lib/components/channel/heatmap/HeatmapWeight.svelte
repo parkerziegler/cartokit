@@ -1,10 +1,10 @@
 <script lang="ts">
+  import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type { CartoKitHeatmapLayer } from '$lib/types';
-  import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
 
   interface Props {
     layer: CartoKitHeatmapLayer;

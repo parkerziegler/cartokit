@@ -4,6 +4,24 @@ import type { CartoKitSource } from '$lib/types';
 import { selectTileStats, selectVectorLayer } from '$lib/utils/pmtiles';
 
 /**
+ * Get the attribute names for a {@link CartoKitSource}.
+ *
+ * @param source The {@link CartoKitSource} to query.
+ * @returns The attribute names for the {@link CartoKitSource}.
+ */
+export function selectAttributes(source: CartoKitSource) {
+  switch (source.type) {
+    case 'geojson': {
+      return Object.keys(source.data.features[0].properties ?? {});
+    }
+    case 'vector': {
+      const { fields } = selectVectorLayer(source);
+      return Object.keys(fields);
+    }
+  }
+}
+
+/**
  * Select the first quantitative attribute from a dataset.
  *
  * @param source A {@link CartoKitSource}.for a given layer.
@@ -68,13 +86,13 @@ export function selectCategoricalAttribute(source: CartoKitSource) {
 }
 
 /**
- * Enumerate the unique categories observed for an attribute in a dataset.
+ * Find the unique category values observed for an attribute in a dataset.
  *
  * @param source A {@link CartoKitSource}.for a given layer.
  * @param attribute The attribute to probe for categories.
  * @returns The unique categorical values of the attribute.
  */
-export function enumerateAttributeCategories(
+export function findAttributeCategories(
   source: CartoKitSource,
   attribute: string
 ): unknown[] {

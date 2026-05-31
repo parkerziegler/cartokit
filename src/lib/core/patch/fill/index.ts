@@ -14,7 +14,7 @@ import type {
   QuantitativeColorScale
 } from '$lib/types';
 import {
-  enumerateAttributeCategories,
+  findAttributeCategories,
   selectQuantitativeAttribute,
   selectCategoricalAttribute
 } from '$lib/utils/attributes';
@@ -114,7 +114,7 @@ export async function patchFillDiffs(
 
         // Apply the patch.
         layer.style.fill.attribute = diff.payload.attribute;
-        layer.style.fill.scale.categories = enumerateAttributeCategories(
+        layer.style.fill.scale.categories = findAttributeCategories(
           layer.source,
           diff.payload.attribute
         );
@@ -423,7 +423,7 @@ export async function patchFillDiffs(
                 id: DEFAULT_CATEGORICAL_SCHEME,
                 direction: 'Forward'
               },
-              categories: enumerateAttributeCategories(layer.source, attribute)
+              categories: findAttributeCategories(layer.source, attribute)
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
