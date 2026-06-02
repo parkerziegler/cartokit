@@ -52,7 +52,7 @@ importers:
         version: 5.24.0
       openai:
         specifier: ^6.0.0
-        version: 6.39.0(zod@4.1.12)
+        version: 6.41.0(zod@4.1.12)
       prettier:
         specifier: ^3.5.2
         version: 3.8.3
@@ -131,7 +131,7 @@ importers:
         version: 5.56.1(@typescript-eslint/types@8.60.1)
       svelte-check:
         specifier: ^4.1.4
-        version: 4.4.8(picomatch@4.0.3)(svelte@5.56.1(@typescript-eslint/types@8.60.1))(typescript@6.0.3)
+        version: 4.4.8(picomatch@4.0.4)(svelte@5.56.1(@typescript-eslint/types@8.60.1))(typescript@6.0.3)
       tailwindcss:
         specifier: ^4.1.11
         version: 4.3.0
@@ -2446,9 +2446,8 @@ packages:
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
 
-  openai@6.39.0:
-    resolution: {integrity: sha512-O61LIsimY3acVabwvomwFhwrnN36yvHY2quIfy9keEcFytGgWeV35yLHQ6NVMLSBxRpHmcg2yuhCnlu2HT4pLQ==}
-    hasBin: true
+  openai@6.41.0:
+    resolution: {integrity: sha512-IGWPopZq6Rjoynjfb3NSLf/z2MTw7UiOsm9TAjPGAjUESH7Uq41Trg4QWehBEn58p74i+m7uoRPV2vXcpPXhyA==}
     peerDependencies:
       ws: ^8.18.0
       zod: ^3.25 || ^4.0
@@ -6008,7 +6007,7 @@ snapshots:
 
   obug@2.1.1: {}
 
-  openai@6.39.0(zod@4.1.12):
+  openai@6.41.0(zod@4.1.12):
     optionalDependencies:
       zod: 4.1.12
 
@@ -6254,11 +6253,11 @@ snapshots:
     dependencies:
       has-flag: 4.0.0
 
-  svelte-check@4.4.8(picomatch@4.0.3)(svelte@5.56.1(@typescript-eslint/types@8.60.1))(typescript@6.0.3):
+  svelte-check@4.4.8(picomatch@4.0.4)(svelte@5.56.1(@typescript-eslint/types@8.60.1))(typescript@6.0.3):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       chokidar: 4.0.3
-      fdir: 6.5.0(picomatch@4.0.3)
+      fdir: 6.5.0(picomatch@4.0.4)
       picocolors: 1.1.1
       sade: 1.8.1
       svelte: 5.56.1(@typescript-eslint/types@8.60.1)
