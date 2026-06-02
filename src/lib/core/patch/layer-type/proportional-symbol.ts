@@ -77,14 +77,11 @@ export function patchProportionalSymbol(
           args: []
         };
 
-        const generateDotDensityPointsTransformationIndex =
+        const transformations = [...layer.source.transformations].splice(
           layer.source.transformations.findIndex(
             (transformation) =>
               transformation.name === 'generateDotDensityPoints'
-          );
-
-        const transformations = [...layer.source.transformations].splice(
-          generateDotDensityPointsTransformationIndex,
+          ),
           1,
           deriveCentroidsTransformation
         );

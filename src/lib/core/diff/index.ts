@@ -302,16 +302,13 @@ interface AddLayerDiff extends LayerDiff {
     | {
         type: 'geojson';
         displayName: string;
-        location: { type: 'api'; url: string };
-      }
-    | {
-        type: 'geojson';
-        displayName: string;
-        location: {
-          type: 'file';
-          fileName: string;
-          featureCollection: FeatureCollection;
-        };
+        location:
+          | { type: 'api'; url: string }
+          | {
+              type: 'file';
+              fileName: string;
+              featureCollection: FeatureCollection;
+            };
       }
     | {
         type: 'vector';

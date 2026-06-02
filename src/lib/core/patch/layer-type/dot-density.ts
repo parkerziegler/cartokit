@@ -20,11 +20,9 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
     case 'Choropleth': {
       let source = layer.source;
       const attribute = layer.style.fill.attribute;
-      let dotValue = -1;
+      const dotValue = deriveDotDensityStartingValue(layer.id, attribute);
 
       if (layer.source.type === 'geojson') {
-        dotValue = deriveDotDensityStartingValue(layer.id, attribute);
-
         const transformations = [
           ...layer.source.transformations,
           {
@@ -81,13 +79,10 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
       );
     case 'Point': {
       let source = layer.source;
-      let attribute = '';
-      let dotValue = -1;
+      const attribute = selectQuantitativeAttribute(layer.source);
+      const dotValue = deriveDotDensityStartingValue(layer.id, attribute);
 
       if (layer.source.type === 'geojson') {
-        attribute = selectQuantitativeAttribute(layer.source);
-        dotValue = deriveDotDensityStartingValue(layer.id, attribute);
-
         // Replace the centroid transformation with a dot density transformation.
         const generateDotDensityPointsTransformation = {
           ...parseStringToTransformation(
@@ -145,13 +140,10 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
     }
     case 'Polygon': {
       let source = layer.source;
-      let attribute = '';
-      let dotValue = -1;
+      const attribute = selectQuantitativeAttribute(layer.source);
+      const dotValue = deriveDotDensityStartingValue(layer.id, attribute);
 
       if (layer.source.type === 'geojson') {
-        attribute = selectQuantitativeAttribute(layer.source);
-        dotValue = deriveDotDensityStartingValue(layer.id, attribute);
-
         source = {
           ...layer.source,
           data: generateDotDensityPoints(
@@ -193,12 +185,12 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
     }
     case 'Proportional Symbol': {
       let source = layer.source;
-      const attribute = layer.style.size.attribute;
-      let dotValue = -1;
+      const dotValue = deriveDotDensityStartingValue(
+        layer.id,
+        layer.style.size.attribute
+      );
 
       if (layer.source.type === 'geojson') {
-        dotValue = deriveDotDensityStartingValue(layer.id, attribute);
-
         const transformations = [...layer.source.transformations].splice(
           // Replace the deriveCentroids transformation with the generateDotDensityPoints transformation.
           layer.source.transformations.findIndex(
@@ -211,7 +203,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
               'geometric',
               'generateDotDensityPoints'
             ),
-            args: [attribute, dotValue]
+            args: [layer.style.size.attribute, dotValue]
           }
         );
 
@@ -221,7 +213,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
             layer.source.sourceData as FeatureCollection<
               Polygon | MultiPolygon
             >,
-            attribute,
+            layer.style.size.attribute,
             dotValue
           ),
           transformations
@@ -235,7 +227,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
         style: {
           ...layer.style,
           dot: {
-            attribute,
+            attribute: layer.style.size.attribute,
             value: dotValue
           },
           fill:

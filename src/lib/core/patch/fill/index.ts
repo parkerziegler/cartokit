@@ -15,8 +15,8 @@ import type {
 } from '$lib/types';
 import {
   findAttributeCategories,
-  selectQuantitativeAttribute,
-  selectCategoricalAttribute
+  selectCategoricalAttribute,
+  selectQuantitativeAttribute
 } from '$lib/utils/attributes';
 import { randomColor } from '$lib/utils/color';
 import {

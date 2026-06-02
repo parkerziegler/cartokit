@@ -14,7 +14,7 @@ import {
   DEFAULT_STROKE_WIDTH
 } from '$lib/utils/constants';
 import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
-import { CartoKitPMTiles } from '$lib/utils/pmtiles';
+import { CartoKitPMTiles, selectTileStats } from '$lib/utils/pmtiles';
 
 interface GenerateCartoKitLayerOptions {
   layerId: string;
@@ -22,12 +22,10 @@ interface GenerateCartoKitLayerOptions {
 }
 
 /**
- * Generate a {@link CartoKitLayer} for a given {@link CartoKitSource}, dis-
- * patching on the source's type to the appropriate source-specific generator.
+ * Generate a {@link CartoKitLayer} for a given {@link CartoKitSource}.
  *
  * @param source The {@link CartoKitSource} associated with the layer.
- * @param options The options for the {@link CartoKitLayer}.
- * @param options.layerId The ID of the {@link CartoKitLayer}.
+ * @param options.layerId The fresh ID of the {@link CartoKitLayer}.
  * @param options.displayName The display name of the {@link CartoKitLayer}.
  * @returns A default {@link CartoKitLayer} appropriate for the input source.
  */
@@ -35,29 +33,10 @@ function generateCartoKitLayer(
   source: CartoKitSource,
   options: GenerateCartoKitLayerOptions
 ): CartoKitLayer {
-  switch (source.type) {
-    case 'geojson':
-      return generateCartoKitLayerFromGeoJSON(source, options);
-    case 'vector':
-      return generateCartoKitLayerFromVectorTiles(source, options);
-  }
-}
-
-/**
- * Generate a {@link CartoKitLayer} for a GeoJSON-backed source, using the
- * source's geometry type to select the appropriate member of the
- * {@link CartoKitLayer} union.
- *
- * @param source The GeoJSON {@link CartoKitSource} associated with the layer.
- * @param options The options for the {@link CartoKitLayer}.
- * @returns A default {@link CartoKitLayer} appropriate for the input geometry
- * type.
- */
-function generateCartoKitLayerFromGeoJSON(
-  source: Extract<CartoKitSource, { type: 'geojson' }>,
-  options: GenerateCartoKitLayerOptions
-): CartoKitLayer {
-  const geometryType = getFeatureCollectionGeometryType(source.data);
+  const geometryType =
+    source.type === 'geojson'
+      ? getFeatureCollectionGeometryType(source.data)
+      : selectTileStats(source).geometry;
   const color = randomColor();
   const z = Object.values(get(ir).layers).length;
 
@@ -93,6 +72,7 @@ function generateCartoKitLayerFromGeoJSON(
           }
         }
       };
+    case 'Line':
     case 'LineString':
     case 'MultiLineString':
       return {
@@ -153,110 +133,6 @@ function generateCartoKitLayerFromGeoJSON(
 }
 
 /**
- * Generate a {@link CartoKitLayer} for a vector tile source.
- *
- * @param source The vector tile {@link CartoKitSource} associated with the
- * layer.
- * @param options The options for the {@link CartoKitLayer}.
- * @returns A default {@link CartoKitLayer} for the vector tile source.
- */
-function generateCartoKitLayerFromVectorTiles(
-  source: Extract<CartoKitSource, { type: 'vector' }>,
-  options: GenerateCartoKitLayerOptions
-): CartoKitLayer {
-  const color = randomColor();
-  const z = Object.values(get(ir).layers).length;
-  const geometryType = source.tilestats.layers.find(
-    ({ layer }) => layer === source.sourceLayerId
-  )!.geometry;
-
-  switch (geometryType) {
-    case 'Point':
-      return {
-        id: options.layerId,
-        displayName: options.displayName,
-        type: 'Point',
-        source,
-        style: {
-          size: DEFAULT_SIZE,
-          fill: {
-            type: 'Constant',
-            color,
-            opacity: DEFAULT_OPACITY,
-            visible: true
-          },
-          stroke: {
-            type: 'Constant',
-            color,
-            width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY,
-            visible: true
-          }
-        },
-        layout: {
-          visible: true,
-          z,
-          tooltip: {
-            visible: true
-          }
-        }
-      };
-    case 'Line':
-      return {
-        id: options.layerId,
-        displayName: options.displayName,
-        type: 'Line',
-        source,
-        style: {
-          stroke: {
-            type: 'Constant',
-            color,
-            width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY,
-            visible: true
-          }
-        },
-        layout: {
-          visible: true,
-          z,
-          tooltip: {
-            visible: true
-          }
-        }
-      };
-    case 'Polygon':
-      return {
-        id: options.layerId,
-        displayName: options.displayName,
-        type: 'Polygon',
-        source,
-        style: {
-          fill: {
-            type: 'Constant',
-            color,
-            opacity: DEFAULT_OPACITY,
-            visible: true
-          },
-          stroke: {
-            type: 'Constant',
-            color,
-            width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY,
-            visible: true
-          }
-        },
-        layout: {
-          visible: true,
-          z,
-          tooltip: {
-            visible: true
-          }
-        }
-      };
-  }
-}
-
-/**
  * Patch layer-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
  *
  * @param params A promise that resolves to the {@link PatchFnParams}, including
@@ -308,56 +184,32 @@ export async function patchLayerDiffs(
 
         // Apply the patch.
         ir.layers[diff.layerId] = layer;
-      } else if (
-        diff.payload.type === 'geojson' &&
-        diff.payload.location.type === 'api'
-      ) {
-        // Fetch the GeoJSON data in a worker thread.
-        const sourceWorker = new Worker(
-          new URL('$lib/utils/source/worker.ts', import.meta.url),
-          { type: 'module' }
-        );
-        const fetchGeoJSON =
-          Comlink.wrap<(url: string) => Promise<FeatureCollection>>(
-            sourceWorker
+      } else if (diff.payload.type === 'geojson') {
+        let sourceData: FeatureCollection;
+
+        // If the GeoJSON data is hosted at a remote API endpoint, fetch it in a
+        // WebWorker to store in memory.
+        if (diff.payload.location.type === 'api') {
+          const sourceWorker = new Worker(
+            new URL('$lib/utils/source/worker.ts', import.meta.url),
+            { type: 'module' }
           );
+          const fetchGeoJSON =
+            Comlink.wrap<(url: string) => Promise<FeatureCollection>>(
+              sourceWorker
+            );
 
-        const featureCollection = await fetchGeoJSON(diff.payload.location.url);
+          sourceData = await fetchGeoJSON(diff.payload.location.url);
+        } else {
+          sourceData = diff.payload.location.featureCollection;
+        }
+
         layer = generateCartoKitLayer(
           {
             type: 'geojson',
             location: diff.payload.location,
-            data: featureCollection,
-            sourceData: featureCollection,
-            transformations: []
-          },
-          {
-            layerId: diff.layerId,
-            displayName: diff.payload.displayName
-          }
-        );
-
-        // Derive the inverse diff after creating the layer.
-        inverse = {
-          type: 'remove-layer',
-          layerId: diff.layerId,
-          payload: {
-            sourceLayerType: layer.type
-          }
-        };
-
-        // Apply the patch.
-        ir.layers[diff.layerId] = layer;
-      } else if (
-        diff.payload.type === 'geojson' &&
-        diff.payload.location.type === 'file'
-      ) {
-        layer = generateCartoKitLayer(
-          {
-            type: 'geojson',
-            location: diff.payload.location,
-            data: diff.payload.location.featureCollection,
-            sourceData: diff.payload.location.featureCollection,
+            data: sourceData,
+            sourceData,
             transformations: []
           },
           {
@@ -429,37 +281,24 @@ export async function patchLayerDiffs(
             location: layer.source.location
           }
         };
-      } else if (
-        layer.source.type === 'geojson' &&
-        layer.source.location.type === 'api'
-      ) {
+      } else if (layer.source.type === 'geojson') {
         inverse = {
           type: 'add-layer',
           layerId: diff.layerId,
           payload: {
             type: 'geojson',
             displayName: layer.displayName,
-            location: {
-              type: 'api',
-              url: layer.source.location.url
-            }
-          }
-        };
-      } else if (
-        layer.source.type === 'geojson' &&
-        layer.source.location.type === 'file'
-      ) {
-        inverse = {
-          type: 'add-layer',
-          layerId: diff.layerId,
-          payload: {
-            type: 'geojson',
-            displayName: layer.displayName,
-            location: {
-              type: 'file',
-              fileName: layer.source.location.fileName,
-              featureCollection: layer.source.sourceData
-            }
+            location:
+              layer.source.location.type === 'api'
+                ? {
+                    type: 'api',
+                    url: layer.source.location.url
+                  }
+                : {
+                    type: 'file',
+                    fileName: layer.source.location.fileName,
+                    featureCollection: layer.source.sourceData
+                  }
           }
         };
       }
@@ -489,22 +328,20 @@ export async function patchLayerDiffs(
     case 'source-layer': {
       const layer = ir.layers[diff.layerId];
 
-      if (layer.source.type !== 'vector') {
-        break;
+      if (layer.source.type === 'vector') {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'source-layer',
+          layerId: diff.layerId,
+          payload: {
+            sourceSourceLayerId: diff.payload.targetSourceLayerId,
+            targetSourceLayerId: layer.source.sourceLayerId
+          }
+        };
+
+        // Apply the patch.
+        layer.source.sourceLayerId = diff.payload.targetSourceLayerId;
       }
-
-      // Derive the inverse diff prior to applying the patch.
-      inverse = {
-        type: 'source-layer',
-        layerId: diff.layerId,
-        payload: {
-          sourceSourceLayerId: diff.payload.targetSourceLayerId,
-          targetSourceLayerId: layer.source.sourceLayerId
-        }
-      };
-
-      // Apply the patch.
-      layer.source.sourceLayerId = diff.payload.targetSourceLayerId;
 
       break;
     }
