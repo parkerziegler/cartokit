@@ -24,7 +24,7 @@ export async function reconDotDensityDiffs(
       if (layer.source.type === 'geojson') {
         // The patch operation will have already updated the layer's GeoJSON data.
         // Reconciliation only needs to update the source data on the map.
-        (map.value!.getSource(diff.layerId) as GeoJSONSource)?.setData(
+        (map.value!.getSource(diff.layerId) as GeoJSONSource).setData(
           layer.source.data
         );
       }
