@@ -10,6 +10,7 @@ import type { CartoKitLayer, Catalog } from '$lib/types';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
 import { layerId } from '$lib/state/layerId.svelte';
 import { redraw } from '$lib/utils/layer/redraw';
+import { getCanonicalLayerId } from '$lib/utils/layer/id';
 
 /**
  * Reconcile layer-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
@@ -123,7 +124,10 @@ export async function reconLayerDiffs(
       }
 
       // If the selected feature belongs to the removed layer, set the feature to null.
-      if (feature.value?.layerId === diff.layerId) {
+      if (
+        feature.value &&
+        getCanonicalLayerId(feature.value.layerId) === diff.layerId
+      ) {
         feature.value = null;
       }
 
