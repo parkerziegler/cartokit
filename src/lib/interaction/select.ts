@@ -6,6 +6,7 @@ import { layerId } from '$lib/state/layerId.svelte';
 import { listeners } from '$lib/state/listeners.svelte';
 import { layout } from '$lib/stores/layout';
 import type { CartoKitLayer } from '$lib/types';
+import { getCanonicalLayerId } from '$lib/utils/layer/id';
 
 /**
  * Add a selection indicator to a feature in a point layer.
@@ -128,7 +129,11 @@ function addSelectListeners(
     if (event.features && event.features.length > 0) {
       if (featureId !== undefined) {
         map.setFeatureState(
-          { source: lyrId, id: featureId, sourceLayer: sourceLayerId },
+          {
+            source: lyrId,
+            id: featureId,
+            sourceLayer: sourceLayerId
+          },
           { selected: false }
         );
       }
@@ -137,7 +142,11 @@ function addSelectListeners(
 
       if (id) {
         map.setFeatureState(
-          { source: lyrId, id, sourceLayer: sourceLayerId },
+          {
+            source: lyrId,
+            id,
+            sourceLayer: sourceLayerId
+          },
           { selected: true }
         );
         featureId = id;
@@ -151,7 +160,7 @@ function addSelectListeners(
         layerId: lyrId,
         sourceLayerId
       };
-      layerId.value = lyrId;
+      layerId.value = getCanonicalLayerId(lyrId);
     }
   }
 
@@ -229,7 +238,7 @@ export function onFeatureLeave(
     ) {
       map.removeFeatureState(
         {
-          source: feature.value.layerId,
+          source: getCanonicalLayerId(feature.value.layerId),
           id: feature.value.id,
           sourceLayer: feature.value.sourceLayerId
         },

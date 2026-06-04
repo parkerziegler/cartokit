@@ -20,7 +20,7 @@
     switch (layer.source.type) {
       case 'geojson': {
         const geometryType = getFeatureCollectionGeometryType(
-          layer.source.data
+          layer.source.sourceData
         );
 
         return (

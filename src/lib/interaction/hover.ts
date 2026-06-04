@@ -4,6 +4,7 @@ import { get } from 'svelte/store';
 import { popup } from '$lib/state/popup.svelte';
 import { ir } from '$lib/stores/ir';
 import { listeners } from '$lib/state/listeners.svelte';
+import { getCanonicalLayerId } from '$lib/utils/layer/id';
 
 /**
  * Add a hover effect to all features in a point layer.
@@ -121,13 +122,17 @@ function addHoverListeners(
   sourceLayerId?: string
 ): void {
   let hoveredFeatureId: string | null = null;
-  const canonicalLayerId = layerId.replace(/-outlines|-points/g, '');
+  const canonicalLayerId = getCanonicalLayerId(layerId);
 
   function onMouseMove(event: maplibregl.MapLayerMouseEvent): void {
     if (event.features && event.features.length > 0) {
       if (hoveredFeatureId !== null) {
         map.setFeatureState(
-          { source: layerId, id: hoveredFeatureId, sourceLayer: sourceLayerId },
+          {
+            source: layerId,
+            id: hoveredFeatureId,
+            sourceLayer: sourceLayerId
+          },
           { hover: false }
         );
       }
@@ -136,7 +141,11 @@ function addHoverListeners(
 
       if (hoveredFeatureId) {
         map.setFeatureState(
-          { source: layerId, id: hoveredFeatureId, sourceLayer: sourceLayerId },
+          {
+            source: layerId,
+            id: hoveredFeatureId,
+            sourceLayer: sourceLayerId
+          },
           { hover: true }
         );
         map.getCanvas().style.cursor = 'pointer';
@@ -157,7 +166,11 @@ function addHoverListeners(
   function onMouseLeave(): void {
     if (hoveredFeatureId !== null) {
       map.setFeatureState(
-        { source: layerId, id: hoveredFeatureId, sourceLayer: sourceLayerId },
+        {
+          source: layerId,
+          id: hoveredFeatureId,
+          sourceLayer: sourceLayerId
+        },
         { hover: false }
       );
       map.getCanvas().style.cursor = '';

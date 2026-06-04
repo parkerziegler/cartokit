@@ -145,11 +145,6 @@ export async function reconLayerDiffs(
         map.value!.removeSource(`${diff.layerId}-outlines`);
       }
 
-      // Remove the points source for heatmaps.
-      if (map.value!.getSource(`${diff.layerId}-points`)) {
-        map.value!.removeSource(`${diff.layerId}-points`);
-      }
-
       break;
     }
     case 'rename-layer': {

@@ -69,7 +69,7 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
           type: 'geojson',
           data:
             layer.source.type === 'geojson'
-              ? layer.source.data
+              ? layer.source.sourceData
               : { type: 'FeatureCollection', features: [] },
           generateId: true
         });
@@ -116,7 +116,8 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         type: 'circle',
         paint: {
           ...fillPaint,
-          ...strokePaint
+          ...strokePaint,
+          'circle-radius': layer.style.size
         }
       });
 
