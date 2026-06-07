@@ -9,6 +9,7 @@ import { get, isFinite } from 'lodash-es';
 import { expect, test, describe } from 'vitest';
 
 import type { CartoKitLayer } from '$lib/types';
+import { selectAttributes } from '$lib/utils/attributes';
 import { buildCatalog } from '$lib/utils/catalog';
 
 const usCountiesUnemployment1 = JSON.parse(
@@ -107,13 +108,7 @@ describe('buildCatalog', () => {
 
   test('should build a catalog with minimum and maximum values', () => {
     const catalog = buildCatalog(layer);
-
-    const attributes: string[] =
-      layer.source.type === 'geojson'
-        ? Object.keys(layer.source.data.features[0].properties || {}).filter(
-            isFinite
-          )
-        : [];
+    const attributes = selectAttributes(layer.source).filter(isFinite);
 
     attributes.forEach((attribute) => {
       expect(get(catalog, `${layer.id}.${attribute}.min`)).toBeDefined();
@@ -123,13 +118,7 @@ describe('buildCatalog', () => {
 
   test('should produce defined breaks for quantiles on all attributes', () => {
     const catalog = buildCatalog(layer);
-
-    const attributes: string[] =
-      layer.source.type === 'geojson'
-        ? Object.keys(layer.source.data.features[0].properties || {}).filter(
-            isFinite
-          )
-        : [];
+    const attributes = selectAttributes(layer.source).filter(isFinite);
 
     attributes.forEach((attribute) => {
       const domain = get(catalog, `${layer.id}.${attribute}.Quantile.domain`);
@@ -141,13 +130,7 @@ describe('buildCatalog', () => {
 
   test('should produce defined breaks for equal intervals on all attributes', () => {
     const catalog = buildCatalog(layer);
-
-    const attributes: string[] =
-      layer.source.type === 'geojson'
-        ? Object.keys(layer.source.data.features[0].properties || {}).filter(
-            isFinite
-          )
-        : [];
+    const attributes = selectAttributes(layer.source).filter(isFinite);
 
     attributes.forEach((attribute) => {
       const domain = get(
@@ -162,13 +145,7 @@ describe('buildCatalog', () => {
 
   test('should produce defined breaks for Jenks natural breaks on all attributes', () => {
     const catalog = buildCatalog(layer);
-
-    const attributes: string[] =
-      layer.source.type === 'geojson'
-        ? Object.keys(layer.source.data.features[0].properties || {}).filter(
-            isFinite
-          )
-        : [];
+    const attributes = selectAttributes(layer.source).filter(isFinite);
 
     attributes.forEach((attribute) => {
       const domain = get(catalog, `${layer.id}.${attribute}.Jenks.domain`);
@@ -180,13 +157,9 @@ describe('buildCatalog', () => {
 
   test('should not produce Jenks natural breaks if the number of data values in the domain is less than the number of breaks', () => {
     const catalog = buildCatalog(singleFeatureLayer);
-
-    const attributes: string[] =
-      singleFeatureLayer.source.type === 'geojson'
-        ? Object.keys(
-            singleFeatureLayer.source.data.features[0].properties || {}
-          ).filter(isFinite)
-        : [];
+    const attributes = selectAttributes(singleFeatureLayer.source).filter(
+      isFinite
+    );
 
     attributes.forEach((attribute) => {
       // Test each possible k value that buildCatalog tries (3 through 9)

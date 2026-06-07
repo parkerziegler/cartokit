@@ -9,7 +9,7 @@ import { selectTileStats } from '$lib/utils/pmtiles';
  * Format the feature count and geometry type of a {@link CartoKitSource}.
  *
  * @param source A {@link CartoKitSource}.
- * @returns The feature count and geometry type of the source.
+ * @returns The feature count and geometry type of the source, formatted as a string.
  */
 export function formatFeatureCount(source: CartoKitSource): string {
   const { geometry, count } =

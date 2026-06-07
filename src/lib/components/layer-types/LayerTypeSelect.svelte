@@ -6,7 +6,7 @@
   import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
   import {
     GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES,
-    VECTOR_TILE_GEOMETRY_TYPES_TO_LAYER_TYPES
+    VECTOR_GEOMETRY_TYPES_TO_LAYER_TYPES
   } from '$lib/utils/layer';
   import { selectTileStats } from '$lib/utils/pmtiles';
 
@@ -36,7 +36,7 @@
         const { geometry } = selectTileStats(layer.source);
 
         return (
-          VECTOR_TILE_GEOMETRY_TYPES_TO_LAYER_TYPES.get(geometry)?.map(
+          VECTOR_GEOMETRY_TYPES_TO_LAYER_TYPES.get(geometry)?.map(
             (layerType) => ({
               value: layerType,
               label: layerType

@@ -238,7 +238,7 @@ export function onFeatureLeave(
     ) {
       map.removeFeatureState(
         {
-          source: getCanonicalLayerId(feature.value.layerId),
+          source: feature.value.layerId,
           id: feature.value.id,
           sourceLayer: feature.value.sourceLayerId
         },

@@ -332,9 +332,9 @@ export interface CartoKitGeoJSONSource {
 /**
  * Represents the possible geometry types of a vector tile layer.
  */
-export type VectorTileGeometry = 'Point' | 'Line' | 'Polygon';
+export type VectorGeometry = 'Point' | 'Line' | 'Polygon';
 
-export type VectorTileAttribute =
+export type VectorAttribute =
   | {
       type: 'number';
       attribute: string;
@@ -360,8 +360,8 @@ export interface TileStats {
   layers: {
     layer: string;
     count: number;
-    geometry: VectorTileGeometry;
-    attributes: VectorTileAttribute[];
+    geometry: VectorGeometry;
+    attributes: VectorAttribute[];
   }[];
 }
 
@@ -382,7 +382,7 @@ export interface VectorLayer {
  * @property tilestats The {@link TileStats} metadata of the vector tile source.
  * @property vectorLayers The {@link VectorLayer} metadata of the vector tile source.
  */
-interface CartoKitVectorTileSource {
+interface CartoKitVectorSource {
   type: 'vector';
   location: {
     type: 'api';
@@ -396,7 +396,7 @@ interface CartoKitVectorTileSource {
 /**
  * Represents the possible data sources for a layer.
  */
-export type CartoKitSource = CartoKitGeoJSONSource | CartoKitVectorTileSource;
+export type CartoKitSource = CartoKitGeoJSONSource | CartoKitVectorSource;
 
 /**
  * Represents the layout of a layer.

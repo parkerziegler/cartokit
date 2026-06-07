@@ -1,6 +1,6 @@
 import type { Geometry } from 'geojson';
 
-import type { LayerType, VectorTileGeometry } from '$lib/types';
+import type { LayerType, VectorGeometry } from '$lib/types';
 
 /**
  * Get the layer ids for all instrumented layers associated with a given layer.
@@ -19,13 +19,8 @@ export function getInstrumentedLayerIds(
     case 'Point':
     case 'Proportional Symbol':
     case 'Line':
-      return [`${layerId}-hover`, `${layerId}-select`];
     case 'Heatmap':
-      return [
-        `${layerId}-points`,
-        `${layerId}-points-hover`,
-        `${layerId}-points-select`
-      ];
+      return [];
     case 'Dot Density':
       return [
         `${layerId}-outlines`,
@@ -58,8 +53,8 @@ export const GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   ['GeometryCollection', []]
 ]);
 
-export const VECTOR_TILE_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
-  VectorTileGeometry,
+export const VECTOR_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
+  VectorGeometry,
   LayerType[]
 >([
   ['Point', ['Point', 'Proportional Symbol', 'Heatmap']],
