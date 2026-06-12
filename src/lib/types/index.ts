@@ -330,10 +330,14 @@ export interface CartoKitGeoJSONSource {
 }
 
 /**
- * Represents the possible geometry types of a vector tile layer.
+ * Represents the possible geometry types of a vector layer.
  */
 export type VectorGeometry = 'Point' | 'Line' | 'Polygon';
 
+/**
+ * Represents the possible attribute types of a vector layer, assuming encoding
+ * using Tippecanoe: https://github.com/felt/tippecanoe.
+ */
 export type VectorAttribute =
   | {
       type: 'number';
@@ -356,6 +360,10 @@ export type VectorAttribute =
       count: number;
     };
 
+/**
+ * Represents the tilestats associated with a vector layer, assuming encoding
+ * using Tippecanoe: https://github.com/felt/tippecanoe.
+ */
 export interface TileStats {
   layers: {
     layer: string;
@@ -365,6 +373,10 @@ export interface TileStats {
   }[];
 }
 
+/**
+ * Represents an entry in the vector_layers Array of a TileJSON-compliant vector
+ * tile source: https://github.com/mapbox/tilejson-spec/tree/master/3.0.0#33-vector_layers
+ */
 export interface VectorLayer {
   id: string;
   description: string;
@@ -780,6 +792,14 @@ export interface CartoKitIR {
 /**
  * Represents a per-attribute catalog entry for a numeric attribute, including
  * pre-computed classification statistics.
+ *
+ * @property type - The type of the attribute ('number').
+ * @property quantiles - The domain of the attribute, used for quantile classification.
+ * @property jenks - The pre-computed Jenks breaks for the attribute, used for
+ * natural breaks classification.
+ * @property min - The minimum value of the attribute.
+ * @property max - The maximum value of the attribute.
+ * @property unique - The number of unique values for the attribute.
  */
 export interface NumericCatalogEntry {
   type: 'number';
@@ -800,6 +820,10 @@ export interface NumericCatalogEntry {
 
 /**
  * Represents a per-attribute catalog entry for a string attribute.
+ *
+ * @property type The type of the attribute ('string').
+ * @property values The unique values of the attribute.
+ * @property unique The number of unique values for the attribute.
  */
 export interface StringCatalogEntry {
   type: 'string';
@@ -809,6 +833,10 @@ export interface StringCatalogEntry {
 
 /**
  * Represents a per-attribute catalog entry for a Boolean attribute.
+ *
+ * @property type The type of the attribute ('boolean').
+ * @property values The unique values of the attribute.
+ * @property unique The number of unique values for the attribute.
  */
 export interface BooleanCatalogEntry {
   type: 'boolean';
@@ -816,14 +844,13 @@ export interface BooleanCatalogEntry {
   unique: 1 | 2;
 }
 
+/** Represents a per-attribute entry in the {@link Catalog}. */
 export type CatalogEntry =
   | NumericCatalogEntry
   | StringCatalogEntry
   | BooleanCatalogEntry;
 
-/**
- * Represents a catalog mapping layers to pre-computed classification statistics.
- */
+/** Represents a catalog mapping layers to pre-computed classification statistics. */
 export type Catalog = Record<CartoKitLayer['id'], Record<string, CatalogEntry>>;
 
 /** Represents the set of language backends for code generation. */
@@ -835,8 +862,8 @@ type CartoKitLibraryBackend = 'mapbox' | 'maplibre';
 /**
  * Represents the set of identifiers for code generation backends.
  *
- * @property language - The language backend for code generation.
- * @property library - The library backend for code generation.
+ * @property language The language backend for code generation.
+ * @property library The library backend for code generation.
  */
 export interface CartoKitBackend {
   language: CartoKitLanguageBackend;
@@ -847,13 +874,13 @@ export interface CartoKitBackend {
  * Represents the analysis information for the CartoKit IR, used by code genera-
  * tion.
  *
- * @property isTurfRequired - A Boolean value indicating whether \@turf/turf is
+ * @property isTurfRequired A Boolean value indicating whether \@turf/turf is
  * required to support cross-geometry transformations.
- * @property isFetchGeoJSONRequired - A Boolean value indicating whether we need
+ * @property isFetchGeoJSONRequired A Boolean value indicating whether we need
  * to insert a function to fetch GeoJSON hosted at a remote URL.
- * @property isGeoJSONNamespaceRequired - A Boolean value indicating whether we
+ * @property isGeoJSONNamespaceRequired A Boolean value indicating whether we
  * need to insert an import of the GeoJSON namespace.
- * @property isPMTilesRequired - A Boolean value indicating whether we need to
+ * @property isPMTilesRequired A Boolean value indicating whether we need to
  * include the PMTiles client library.
  */
 export interface CartoKitBackendAnalysis extends CartoKitBackend {
