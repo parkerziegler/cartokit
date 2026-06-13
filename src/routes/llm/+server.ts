@@ -17,8 +17,7 @@ const openai = new OpenAI({
 /**
  * The main function that handles the POST request to the /llm endpoint. This
  * function receives a prompt from a user and sends it to the OpenAI API, re-
- * turning the generated diffs as a JSON response. In addition, we save off
- * the prompt and diffs to MongoDB for later analysis.
+ * turning the generated diffs as a JSON response.
  */
 export const POST = (async ({ request }) => {
   const {

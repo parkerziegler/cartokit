@@ -23,8 +23,8 @@
   import { error } from '$lib/state/error.svelte';
   import { initHistory } from '$lib/state/history.svelte';
   import { layerId } from '$lib/state/layerId.svelte';
-  import { user } from '$lib/state/user.svelte';
   import { map as mapState } from '$lib/state/map.svelte';
+  import { user } from '$lib/state/user.svelte';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import { registerKeybinding } from '$lib/utils/keybinding';
@@ -130,9 +130,9 @@
       event.target.setProjection({ type: $ir.projection });
     });
 
-    // Add an idle listener that will update features in the data table when a
-    // vector layer is active. GeoJSON layers store data in memory, so we just
-    // read directly from the IR.
+    // Add an idle listener that will update features in the DataTable when a
+    // vector layer is active. GeoJSON layers already have their data available
+    // in memory, so we can populate the DataTable directly.
     map.on('idle', (e) => {
       const currentLayer = layerId.value
         ? $ir.layers[layerId.value]

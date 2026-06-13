@@ -8,10 +8,6 @@ interface Metadata {
   tilestats: TileStats;
 }
 
-/**
- * A thin wrapper around a {@link PMTiles} archive, exposing helpers for reading
- * the metadata cartokit relies on to interpret a vector tile source.
- */
 export class CartoKitPMTiles {
   private archive: PMTiles;
 

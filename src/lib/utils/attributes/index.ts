@@ -24,7 +24,7 @@ export function selectAttributes(source: CartoKitSource) {
 /**
  * Select the first quantitative attribute from a dataset.
  *
- * @param source A {@link CartoKitSource}.for a given layer.
+ * @param source A {@link CartoKitSource} to query.
  * @returns The name of the first quantitative attribute found in the dataset.
  * @throws If no quantitative attributes are found in the dataset.
  */
@@ -56,7 +56,7 @@ export function selectQuantitativeAttribute(source: CartoKitSource) {
 /**
  * Select the first categorical attribute from a dataset.
  *
- * @param source A {@link CartoKitSource}.for a given layer.
+ * @param source A {@link CartoKitSource} to query.
  * @returns The name of the first categorical attribute found in the dataset.
  * @throws If no categorical attributes are found in the dataset.
  */
@@ -88,7 +88,7 @@ export function selectCategoricalAttribute(source: CartoKitSource) {
 /**
  * Find the unique category values observed for an attribute in a dataset.
  *
- * @param source A {@link CartoKitSource}.for a given layer.
+ * @param source A {@link CartoKitSource} to query.
  * @param attribute The attribute to probe for categories.
  * @returns The unique categorical values of the attribute.
  */
