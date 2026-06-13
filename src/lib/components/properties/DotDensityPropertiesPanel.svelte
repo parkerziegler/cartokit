@@ -21,7 +21,7 @@
   <AttributeSelect
     layerId={layer.id}
     visualizationType="Quantitative"
-    geojson={layer.data.geojson}
+    geojson={layer.source.type === 'geojson' ? layer.source.data : undefined}
     selected={layer.style.dot.attribute}
     channel="dot"
   />

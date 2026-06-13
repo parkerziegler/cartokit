@@ -1,17 +1,12 @@
 <script lang="ts">
   import type { CartoKitLineLayer } from '$lib/types';
-  import { pluralize } from '$lib/utils/format';
-  import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
+  import { formatFeatureCount } from '$lib/utils/formatters/feature';
 
   interface Props {
     layer: CartoKitLineLayer;
   }
 
   let { layer }: Props = $props();
-
-  let geometryType = $derived(
-    getFeatureCollectionGeometryType(layer.data.geojson)
-  );
 </script>
 
 <div
@@ -35,8 +30,5 @@
       stroke-opacity={layer.style.stroke.opacity}
     />
   </svg>
-  <span
-    >{layer.data.geojson.features.length}
-    {pluralize(geometryType, layer.data.geojson.features.length)}</span
-  >
+  <span>{formatFeatureCount(layer.source)}</span>
 </div>

@@ -256,7 +256,7 @@ export type LayerType =
 /**
  * Represents the encoding channels of a layer.
  */
-export type Channel = 'fill' | 'stroke' | 'size' | 'dot';
+export type Channel = 'fill' | 'stroke' | 'size' | 'dot' | 'heatmap-weight';
 
 /**
  * Represents the visualization type for a given channel.
@@ -298,28 +298,117 @@ export interface TransformationCall extends Transformation {
 }
 
 /**
- * Represents the underlying data and metadata of a layer. This object maintains
- * two copies of a layer's GeoJSON data in memory:
+ * Represents the underlying data and metadata of a GeoJSON layer. This object
+ * maintains two copies of a layer's GeoJSON data in memory:
  *
  *   1. The source GeoJSON at the time of layer creation. All accumulated trans-
  *      formations are executed against this copy to produce the current
  *      GeoJSON.
  *   2. The current GeoJSON of the layer, used for display.
  *
- * @property url The URL of the data source, if fetched from a remote
- * server.
- * @property fileName The name of the data source's file on disk, if
- * loaded locally.
- * @property geojson The current GeoJSON of the layer.
- * @property sourceGeojson The source GeoJSON of the layer.
+ * @property type The type of the source, 'geojson'.
+ * @property location The location of the source, either a remote API endpoint
+ * or a local file on disk.
+ * @property data The current GeoJSON data of the layer.
+ * @property sourceData The source GeoJSON data of the layer.
+ * @property transformations The transformations applied to the layer.
  */
-interface LayerData {
-  url?: string;
-  fileName?: string;
-  geojson: FeatureCollection;
-  sourceGeojson: FeatureCollection;
+export interface CartoKitGeoJSONSource {
+  type: 'geojson';
+  location:
+    | {
+        type: 'api';
+        url: string;
+      }
+    | {
+        type: 'file';
+        fileName: string;
+      };
+  data: FeatureCollection;
+  sourceData: FeatureCollection;
   transformations: TransformationCall[];
 }
+
+/**
+ * Represents the possible geometry types of a vector layer.
+ */
+export type VectorGeometry = 'Point' | 'Line' | 'Polygon';
+
+/**
+ * Represents the possible attribute types of a vector layer, assuming encoding
+ * using Tippecanoe: https://github.com/felt/tippecanoe.
+ */
+export type VectorAttribute =
+  | {
+      type: 'number';
+      attribute: string;
+      min: number;
+      max: number;
+      values: number[];
+      count: number;
+    }
+  | {
+      type: 'string';
+      attribute: string;
+      values: string[];
+      count: number;
+    }
+  | {
+      type: 'boolean';
+      attribute: string;
+      values: boolean[];
+      count: number;
+    };
+
+/**
+ * Represents the tilestats associated with a vector layer, assuming encoding
+ * using Tippecanoe: https://github.com/felt/tippecanoe.
+ */
+export interface TileStats {
+  layers: {
+    layer: string;
+    count: number;
+    geometry: VectorGeometry;
+    attributes: VectorAttribute[];
+  }[];
+}
+
+/**
+ * Represents an entry in the vector_layers Array of a TileJSON-compliant vector
+ * tile source: https://github.com/mapbox/tilejson-spec/tree/master/3.0.0#33-vector_layers
+ */
+export interface VectorLayer {
+  id: string;
+  description: string;
+  minzoom: number;
+  maxzoom: number;
+  fields: Record<string, 'Number' | 'String' | 'Boolean'>;
+}
+
+/**
+ * Represents the underlying data and metadata of a vector tile layer.
+ *
+ * @property type The type of the source, 'vector'.
+ * @property location The location of the source, a remote API endpoint.
+ * @property sourceLayerId The id of the source layer in the vector tile archive.
+ * @property tilestats The {@link TileStats} metadata of the vector tile source.
+ * @property vectorLayers The {@link VectorLayer} metadata of the vector tile source.
+ */
+interface CartoKitVectorSource {
+  type: 'vector';
+  location: {
+    type: 'api';
+    url: string;
+  };
+  sourceLayerId: string;
+  tilestats: TileStats;
+  vectorLayers: VectorLayer[];
+}
+
+/**
+ * Represents the possible data sources for a layer.
+ */
+export type CartoKitSource = CartoKitGeoJSONSource | CartoKitVectorSource;
 
 /**
  * Represents the layout of a layer.
@@ -342,15 +431,15 @@ interface LayerLayout {
  *
  * @property id A globally unique identifier for the layer.
  * @property displayName A user-supplied display name for the layer.
- * @property type The type of the layer, {@link LayerType}.
- * @property data The data and metadata of the layer, {@link LayerData}.
- * @property layout The layout of the layer, {@link LayerLayout}.
+ * @property type The {@link LayerType} of the layer.
+ * @property source The {@link CartoKitSource} of the layer.
+ * @property layout The {@link LayerLayout} of the layer.
  */
 interface Layer {
   id: string;
   displayName: string;
   type: LayerType;
-  data: LayerData;
+  source: CartoKitSource;
   layout: LayerLayout;
 }
 
@@ -701,22 +790,68 @@ export interface CartoKitIR {
 }
 
 /**
- * Represents a catalog mapping layers to pre-computed classification statistics.
+ * Represents a per-attribute catalog entry for a numeric attribute, including
+ * pre-computed classification statistics.
+ *
+ * @property type - The type of the attribute ('number').
+ * @property quantiles - The domain of the attribute, used for quantile classification.
+ * @property jenks - The pre-computed Jenks breaks for the attribute, used for
+ * natural breaks classification.
+ * @property min - The minimum value of the attribute.
+ * @property max - The maximum value of the attribute.
+ * @property unique - The number of unique values for the attribute.
  */
-export type Catalog = Record<
-  CartoKitLayer['id'],
-  Record<
-    string,
-    {
-      Quantile: { domain: number[] };
-      'Equal Interval': { domain: [number, number] };
-      Jenks: Record<number, { breaks: number[] }>;
-      min: number;
-      max: number;
-      unique: number;
-    }
-  >
->;
+export interface NumericCatalogEntry {
+  type: 'number';
+  quantiles: { domain: number[] };
+  jenks: {
+    3: { breaks: number[] };
+    4: { breaks: number[] };
+    5: { breaks: number[] };
+    6: { breaks: number[] };
+    7: { breaks: number[] };
+    8: { breaks: number[] };
+    9: { breaks: number[] };
+  };
+  min: number;
+  max: number;
+  unique: number;
+}
+
+/**
+ * Represents a per-attribute catalog entry for a string attribute.
+ *
+ * @property type The type of the attribute ('string').
+ * @property values The unique values of the attribute.
+ * @property unique The number of unique values for the attribute.
+ */
+export interface StringCatalogEntry {
+  type: 'string';
+  values: string[];
+  unique: number;
+}
+
+/**
+ * Represents a per-attribute catalog entry for a Boolean attribute.
+ *
+ * @property type The type of the attribute ('boolean').
+ * @property values The unique values of the attribute.
+ * @property unique The number of unique values for the attribute.
+ */
+export interface BooleanCatalogEntry {
+  type: 'boolean';
+  values: boolean[];
+  unique: 1 | 2;
+}
+
+/** Represents a per-attribute entry in the {@link Catalog}. */
+export type CatalogEntry =
+  | NumericCatalogEntry
+  | StringCatalogEntry
+  | BooleanCatalogEntry;
+
+/** Represents a catalog mapping layers to pre-computed classification statistics. */
+export type Catalog = Record<CartoKitLayer['id'], Record<string, CatalogEntry>>;
 
 /** Represents the set of language backends for code generation. */
 type CartoKitLanguageBackend = 'javascript' | 'typescript';
@@ -727,8 +862,8 @@ type CartoKitLibraryBackend = 'mapbox' | 'maplibre';
 /**
  * Represents the set of identifiers for code generation backends.
  *
- * @property language - The language backend for code generation.
- * @property library - The library backend for code generation.
+ * @property language The language backend for code generation.
+ * @property library The library backend for code generation.
  */
 export interface CartoKitBackend {
   language: CartoKitLanguageBackend;
@@ -739,17 +874,20 @@ export interface CartoKitBackend {
  * Represents the analysis information for the CartoKit IR, used by code genera-
  * tion.
  *
- * @property isTurfRequired - A Boolean value indicating whether @turf/turf is
+ * @property isTurfRequired A Boolean value indicating whether \@turf/turf is
  * required to support cross-geometry transformations.
- * @property isFetchGeoJSONRequired - A Boolean value indicating whether we need
+ * @property isFetchGeoJSONRequired A Boolean value indicating whether we need
  * to insert a function to fetch GeoJSON hosted at a remote URL.
- * @property isGeoJSONNamespaceRequired - A Boolean value indicating whether we
+ * @property isGeoJSONNamespaceRequired A Boolean value indicating whether we
  * need to insert an import of the GeoJSON namespace.
+ * @property isPMTilesRequired A Boolean value indicating whether we need to
+ * include the PMTiles client library.
  */
 export interface CartoKitBackendAnalysis extends CartoKitBackend {
   isTurfRequired: boolean;
   isFetchGeoJSONRequired: boolean;
   isGeoJSONNamespaceRequired: boolean;
+  isPMTilesRequired: boolean;
 }
 
 /**

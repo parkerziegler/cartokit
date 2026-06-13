@@ -1,5 +1,5 @@
 <script lang="ts">
-  import maplibregl from 'maplibre-gl';
+  import type maplibregl from 'maplibre-gl';
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import LayerTypeSelect from '$lib/components/layer-types/LayerTypeSelect.svelte';
@@ -15,8 +15,10 @@
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
-  import { layout } from '$lib/stores/layout';
+  import SourceLayerSelect from '$lib/components/vector/SourceLayerSelect.svelte';
   import { feature } from '$lib/state/feature.svelte';
+  import { layerId } from '$lib/state/layerId.svelte';
+  import { layout } from '$lib/stores/layout';
   import type { CartoKitLayer } from '$lib/types';
 
   interface Props {
@@ -27,14 +29,19 @@
   let { map, layer }: Props = $props();
 
   function onPropertiesMenuClose() {
-    if (feature.value) {
+    if (feature.value?.id) {
       map.removeFeatureState(
-        { source: feature.value.layer.id, id: feature.value.id },
+        {
+          source: feature.value.layerId,
+          sourceLayer: feature.value.sourceLayerId,
+          id: feature.value.id
+        },
         'selected'
       );
-
-      feature.value = null;
     }
+
+    feature.value = null;
+    layerId.value = null;
 
     if ($layout.dataVisible) {
       layout.update((layout) => {
@@ -52,7 +59,7 @@
     'ease-cubic-out absolute top-4 right-4 z-10 max-h-[calc(100%-2rem)] w-80 overflow-auto transition-[max-height,translate] duration-[200ms,400ms]',
     {
       'max-h-[calc(100%-25.25rem)]': $layout.dataVisible,
-      '-translate-x-[33.333333vw]': $layout.editorVisible,
+      'translate-x-[-33.333333vw]': $layout.editorVisible,
       'delay-150': !$layout.editorVisible
     }
   ]}
@@ -60,17 +67,27 @@
   <MenuTitle class="mr-4"
     >{layer.displayName}
     {#snippet action()}
-      <button onclick={onPropertiesMenuClose}>
+      <button
+        onclick={onPropertiesMenuClose}
+        data-testid="close-properties-menu-button"
+      >
         <CloseIcon />
       </button>
     {/snippet}
     {#snippet subtitle()}
       <div class="flex gap-2">
         <ViewData />
-        <DownloadData {layer} />
+        {#if layer.source.type === 'geojson'}
+          <DownloadData {layer} />
+        {/if}
       </div>
     {/snippet}
   </MenuTitle>
+  {#if layer.source.type === 'vector'}
+    <MenuItem title="Source Layer">
+      <SourceLayerSelect {layer} />
+    </MenuItem>
+  {/if}
   <MenuItem title="Layer Type">
     <LayerTypeSelect {layer} />
   </MenuItem>

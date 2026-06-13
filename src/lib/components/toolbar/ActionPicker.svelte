@@ -194,7 +194,7 @@
 
   .action-picker::before,
   .action-picker--active::before {
-    @apply absolute top-0 -left-[2%] -z-10 h-10 w-[104%] -translate-y-1.5 rounded-sm bg-transparent transition-colors content-[''];
+    @apply absolute top-0 left-[-2%] -z-10 h-10 w-[104%] -translate-y-1.5 rounded-sm bg-transparent transition-colors content-[''];
   }
 
   .action-picker:hover::before,

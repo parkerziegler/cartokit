@@ -19,26 +19,24 @@ export function patchLine(layer: CartoKitLayer): CartoKitLineLayer {
       return layer;
     case 'Point':
     case 'Proportional Symbol': {
-      // Remove the centroid transformation.
-      const transformations = layer.data.transformations.filter(
-        (transformation) => transformation.name !== 'deriveCentroids'
-      );
+      const source =
+        layer.source.type === 'geojson'
+          ? {
+              ...layer.source,
+              // Remove the centroid transformation.
+              transformations: layer.source.transformations.filter(
+                (transformation) => transformation.name !== 'deriveCentroids'
+              )
+            }
+          : layer.source;
 
       const targetLayer: CartoKitLineLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Line',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          geojson: layer.data.sourceGeojson,
-          sourceGeojson: layer.data.sourceGeojson,
-          transformations
-        },
+        source,
         style: {
           stroke: layer.style.stroke
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;

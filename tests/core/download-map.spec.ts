@@ -103,9 +103,12 @@ test.describe('download-map', () => {
         type: 'add-layer',
         layerId: 'climate-impact-regions__1',
         payload: {
-          type: 'api',
+          type: 'geojson',
           displayName: 'Climate Impact Regions',
-          url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-climate-impact-regions.json'
+          location: {
+            type: 'api',
+            url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-climate-impact-regions.json'
+          }
         }
       },
       {

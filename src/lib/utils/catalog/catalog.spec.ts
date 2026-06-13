@@ -5,12 +5,12 @@ import * as url from 'node:url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 import type { FeatureCollection } from 'geojson';
-import { get } from 'lodash-es';
+import { get, isFinite } from 'lodash-es';
 import { expect, test, describe } from 'vitest';
 
 import type { CartoKitLayer } from '$lib/types';
+import { selectAttributes } from '$lib/utils/attributes';
 import { buildCatalog } from '$lib/utils/catalog';
-import { isPropertyQuantitative } from '$lib/utils/property';
 
 const usCountiesUnemployment1 = JSON.parse(
   fs.readFileSync(
@@ -41,9 +41,14 @@ describe('buildCatalog', () => {
         visible: true
       }
     },
-    data: {
-      geojson: usCountiesUnemployment1 as FeatureCollection,
-      sourceGeojson: usCountiesUnemployment1 as FeatureCollection,
+    source: {
+      type: 'geojson',
+      location: {
+        type: 'file',
+        fileName: 'us-counties-unemployment.json'
+      },
+      data: usCountiesUnemployment1 as FeatureCollection,
+      sourceData: usCountiesUnemployment1 as FeatureCollection,
       transformations: []
     },
     style: {
@@ -74,9 +79,14 @@ describe('buildCatalog', () => {
         visible: true
       }
     },
-    data: {
-      geojson: americanCrowRange as FeatureCollection,
-      sourceGeojson: americanCrowRange as FeatureCollection,
+    source: {
+      type: 'geojson',
+      location: {
+        type: 'file',
+        fileName: 'american-crow-range.json'
+      },
+      data: americanCrowRange as FeatureCollection,
+      sourceData: americanCrowRange as FeatureCollection,
       transformations: []
     },
     style: {
@@ -98,12 +108,9 @@ describe('buildCatalog', () => {
 
   test('should build a catalog with minimum and maximum values', () => {
     const catalog = buildCatalog(layer);
+    const attributes = selectAttributes(layer.source).filter(isFinite);
 
-    const attrributes = Object.keys(
-      layer.data.geojson.features[0].properties || {}
-    ).filter(isPropertyQuantitative);
-
-    attrributes.forEach((attribute) => {
+    attributes.forEach((attribute) => {
       expect(get(catalog, `${layer.id}.${attribute}.min`)).toBeDefined();
       expect(get(catalog, `${layer.id}.${attribute}.max`)).toBeDefined();
     });
@@ -111,10 +118,7 @@ describe('buildCatalog', () => {
 
   test('should produce defined breaks for quantiles on all attributes', () => {
     const catalog = buildCatalog(layer);
-
-    const attributes = Object.keys(
-      layer.data.geojson.features[0].properties || {}
-    ).filter(isPropertyQuantitative);
+    const attributes = selectAttributes(layer.source).filter(isFinite);
 
     attributes.forEach((attribute) => {
       const domain = get(catalog, `${layer.id}.${attribute}.Quantile.domain`);
@@ -126,10 +130,7 @@ describe('buildCatalog', () => {
 
   test('should produce defined breaks for equal intervals on all attributes', () => {
     const catalog = buildCatalog(layer);
-
-    const attributes = Object.keys(
-      layer.data.geojson.features[0].properties || {}
-    ).filter(isPropertyQuantitative);
+    const attributes = selectAttributes(layer.source).filter(isFinite);
 
     attributes.forEach((attribute) => {
       const domain = get(
@@ -144,10 +145,7 @@ describe('buildCatalog', () => {
 
   test('should produce defined breaks for Jenks natural breaks on all attributes', () => {
     const catalog = buildCatalog(layer);
-
-    const attributes = Object.keys(
-      layer.data.geojson.features[0].properties || {}
-    ).filter(isPropertyQuantitative);
+    const attributes = selectAttributes(layer.source).filter(isFinite);
 
     attributes.forEach((attribute) => {
       const domain = get(catalog, `${layer.id}.${attribute}.Jenks.domain`);
@@ -159,9 +157,9 @@ describe('buildCatalog', () => {
 
   test('should not produce Jenks natural breaks if the number of data values in the domain is less than the number of breaks', () => {
     const catalog = buildCatalog(singleFeatureLayer);
-    const attributes = Object.keys(
-      singleFeatureLayer.data.geojson.features[0].properties || {}
-    ).filter(isPropertyQuantitative);
+    const attributes = selectAttributes(singleFeatureLayer.source).filter(
+      isFinite
+    );
 
     attributes.forEach((attribute) => {
       // Test each possible k value that buildCatalog tries (3 through 9)

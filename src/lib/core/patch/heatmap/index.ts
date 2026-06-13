@@ -1,7 +1,7 @@
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import type { CartoKitHeatmapLayer } from '$lib/types';
-import { selectQuantitativeAttribute } from '$lib/utils/geojson';
+import { selectQuantitativeAttribute } from '$lib/utils/attributes';
 
 /**
  * Patch heatmap-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
@@ -110,7 +110,7 @@ export async function patchHeatmapDiffs(
         case 'Quantitative':
           layer.style.heatmap.weight = {
             type: 'Quantitative',
-            attribute: selectQuantitativeAttribute(layer.data.geojson.features),
+            attribute: selectQuantitativeAttribute(layer.source),
             min: 0,
             max: 1
           };
@@ -128,12 +128,12 @@ export async function patchHeatmapDiffs(
           type: 'heatmap-weight-attribute',
           layerId: diff.layerId,
           payload: {
-            weightAttribute: layer.style.heatmap.weight.attribute
+            attribute: layer.style.heatmap.weight.attribute
           }
         };
 
         // Apply the patch.
-        layer.style.heatmap.weight.attribute = diff.payload.weightAttribute;
+        layer.style.heatmap.weight.attribute = diff.payload.attribute;
       }
 
       break;

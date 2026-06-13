@@ -1,6 +1,6 @@
 import type { Geometry } from 'geojson';
 
-import type { LayerType } from '$lib/types';
+import type { LayerType, VectorGeometry } from '$lib/types';
 
 /**
  * Get the layer ids for all instrumented layers associated with a given layer.
@@ -20,11 +20,7 @@ export function getInstrumentedLayerIds(
     case 'Proportional Symbol':
     case 'Line':
     case 'Heatmap':
-      return [
-        `${layerId}-points`,
-        `${layerId}-points-hover`,
-        `${layerId}-points-select`
-      ];
+      return [];
     case 'Dot Density':
       return [
         `${layerId}-outlines`,
@@ -38,7 +34,10 @@ export function getInstrumentedLayerIds(
 }
 
 // A map of GeoJSON Geometry types to the supported cartokit layer types.
-export const geometryToLayerTypes = new Map<Geometry['type'], LayerType[]>([
+export const GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
+  Geometry['type'],
+  LayerType[]
+>([
   ['Point', ['Point', 'Proportional Symbol', 'Heatmap']],
   ['MultiPoint', ['Point', 'Proportional Symbol', 'Heatmap']],
   ['LineString', ['Line', 'Point', 'Proportional Symbol']],
@@ -54,9 +53,18 @@ export const geometryToLayerTypes = new Map<Geometry['type'], LayerType[]>([
   ['GeometryCollection', []]
 ]);
 
+export const VECTOR_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
+  VectorGeometry,
+  LayerType[]
+>([
+  ['Point', ['Point', 'Proportional Symbol', 'Heatmap']],
+  ['Line', ['Line']],
+  ['Polygon', ['Polygon', 'Choropleth']]
+]);
+
 // A set of valid GeoJSON Geometry types for cartokit layers.
 export const VALID_GEOJSON_TYPES = new Set([
-  ...geometryToLayerTypes.keys(),
+  ...GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES.keys(),
   'Feature',
   'FeatureCollection'
 ]);

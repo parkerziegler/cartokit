@@ -1,71 +1,62 @@
-<!-- Inspiration for this implementation courtesy of Observable:
-     https://github.com/observablehq/inputs/blob/main/src/table.js -->
 <script lang="ts">
   import { bbox } from '@turf/turf';
+  import * as d3 from 'd3';
   import type { Feature } from 'geojson';
-  import { orderBy } from 'lodash-es';
-  import { onMount } from 'svelte';
+  import { orderBy, isEqual } from 'lodash-es';
   import type { ClassValue } from 'svelte/elements';
   import { slide } from 'svelte/transition';
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import { map } from '$lib/state/map.svelte';
   import { layout } from '$lib/stores/layout';
-  import { pluralize } from '$lib/utils/format';
+  import type { CartoKitSource } from '$lib/types';
+  import { pluralize } from '$lib/utils/formatters/shared';
 
   interface Props {
-    data: Feature[];
+    rows: Feature[];
+    columns: string[];
     tableName: string;
     onClose: () => void;
+    sourceType: CartoKitSource['type'];
     class?: ClassValue;
   }
 
-  let { data, tableName, onClose, class: className = '' }: Props = $props();
-  let selectedRow = $state<number | null>(null);
+  let {
+    rows,
+    columns,
+    tableName,
+    onClose,
+    sourceType,
+    class: className = ''
+  }: Props = $props();
 
   const ROW_HEIGHT = 33;
-  const rows = 7;
+  const ROW_COUNT = 7;
 
-  let cols = $derived(Object.keys(data[0]?.properties ?? {}));
   let root: HTMLDivElement;
 
-  let array = $state<Feature[]>([]);
-  let iterator = $state<IterableIterator<Feature>>(data[Symbol.iterator]());
-  let n = $state<number>(Math.min(data.length, Math.floor(rows * 2))); // The number of rows displayed.
   let sort = $state<{ col: string; desc: boolean }>({ col: '', desc: true });
+  let selectedRow = $state<Feature | null>(null);
 
-  function minlengthof(length: number) {
-    length = Math.floor(length);
+  const data = $derived(
+    orderBy<Feature>(rows, `properties['${sort.col}']`, [
+      sort.desc ? 'desc' : 'asc'
+    ])
+  );
+  let n = $state<number>(ROW_COUNT * 2);
+  const materializedRows = $derived<Feature[]>(
+    data.slice(0, minlengthof(data, n))
+  );
 
-    return Math.min(data.length, length);
-  }
-
-  function materialize(data: Feature[]) {
-    // Empty array and reinstantiate the iterator and n.
-    array = [];
-    iterator = data[Symbol.iterator]();
-    n = minlengthof(rows * 2);
-
-    // Add the first n rows.
-    appendRows(0, n);
-
-    // Reset selected row when reload.
-    selectedRow = null;
-
-    // Scroll to the top.
-    root.scrollTo(root.scrollLeft, 0);
-  }
-
-  function appendRows(start: number, end: number) {
-    for (; start < end; start++) {
-      const { done, value } = iterator.next();
-
-      if (done) {
-        break;
-      }
-
-      array.push(value);
+  $effect(() => {
+    // Scroll to top when new data is loaded.
+    if (data && root) {
+      root.scrollTop = 0;
     }
+  });
+
+  function minlengthof(d: Feature[], length: number) {
+    return Math.min(d.length, length);
   }
 
   function resort(col: string) {
@@ -74,27 +65,21 @@
         col,
         desc: sort.col === col ? !sort.desc : true
       };
-
-      const d = orderBy(data, `properties['${sort.col}']`, [
-        sort.desc ? 'desc' : 'asc'
-      ]);
-
-      materialize(d);
     };
   }
 
   function onScroll() {
     if (
-      root.scrollHeight - root.scrollTop < rows * ROW_HEIGHT * 1.5 &&
-      n < minlengthof(n + 1)
+      root.scrollHeight - root.scrollTop < ROW_COUNT * ROW_HEIGHT * 1.5 &&
+      n < minlengthof(data, n + 1)
     ) {
-      appendRows(n, (n = minlengthof(n + rows)));
+      n = minlengthof(data, n + ROW_COUNT);
     }
   }
 
-  function handleRowClick(row: Feature, index: number) {
-    selectedRow = index;
-    const bounds = bbox(row);
+  function handleRowClick(materializedRow: Feature) {
+    selectedRow = materializedRow;
+    const bounds = bbox(materializedRow);
 
     map.value!.fitBounds(
       [
@@ -102,46 +87,53 @@
         [bounds[2], bounds[3]]
       ],
       {
-        padding: 200,
+        padding: {
+          top: 200,
+          left: 200,
+          bottom: 400,
+          right: 200
+        },
         duration: 1000
       }
     );
   }
-
-  onMount(() => {
-    appendRows(0, n);
-  });
 </script>
 
 <div
   class={[
-    'ease-cubic-out z-10 flex flex-col overflow-hidden bg-slate-700 font-mono',
+    'ease-cubic-out z-10 flex flex-col overflow-hidden bg-slate-900 font-mono',
     { 'delay-150': !$layout.editorVisible },
     className
   ]}
   in:slide={{ axis: 'y' }}
   out:slide={{ axis: 'y' }}
 >
-  <div class="flex justify-between px-3 py-2 text-xs text-white">
+  <div class="flex justify-between bg-slate-700 px-3 py-2 text-xs text-white">
     <span>
       {tableName}
     </span>
     <div class="flex gap-4">
-      <span>{data.length} {pluralize('Feature', data.length)}</span>
+      <span
+        >{d3.format(',')(data.length)}
+        {pluralize('Feature', data.length)}{sourceType === 'vector'
+          ? ' in Viewport'
+          : ''}</span
+      >
       <button onclick={onClose}>
         <CloseIcon />
       </button>
     </div>
   </div>
   <div
-    class="text-2xs w-full overflow-auto border-t border-slate-400 bg-slate-900 text-white"
+    class="text-2xs w-full overflow-auto border-t border-slate-400 text-white"
     bind:this={root}
     onscroll={onScroll}
+    style="min-height: {ROW_COUNT * ROW_HEIGHT}px;"
   >
     <table class="w-full border-collapse">
       <thead>
         <tr class="sticky top-0">
-          {#each cols as col (col)}
+          {#each columns as col (col)}
             <th
               class={[
                 'relative bg-slate-900 px-4 py-2 text-left font-semibold text-slate-400 hover:cursor-pointer',
@@ -157,19 +149,19 @@
         </tr>
       </thead>
       <tbody>
-        {#each array as row, i (i)}
+        {#each materializedRows as materializedRow, i (i)}
           <tr
             class={[
-              'cursor-pointer border-t border-dotted border-slate-400 first:border-t-0',
-              selectedRow === i
+              'cursor-pointer border-b border-dotted border-slate-400',
+              isEqual(selectedRow?.properties, materializedRow.properties)
                 ? 'bg-slate-700 hover:bg-slate-800'
                 : 'hover:bg-slate-800'
             ]}
-            onclick={() => handleRowClick(row, i)}
+            onclick={() => handleRowClick(materializedRow)}
           >
-            {#each cols as col (col)}
+            {#each columns as col (col)}
               <td class="cell truncate px-4 py-2"
-                >{row.properties?.[col] ?? ''}</td
+                >{materializedRow.properties?.[col] ?? ''}</td
               >
             {/each}
           </tr>

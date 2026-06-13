@@ -58,14 +58,29 @@
 
     try {
       const layerId = uniqueId(`${kebabCase(displayName)}__`);
+
+      const payload = endpoint.endsWith('.pmtiles')
+        ? {
+            type: 'vector' as const,
+            displayName,
+            location: {
+              type: 'api' as const,
+              url: endpoint
+            }
+          }
+        : {
+            type: 'geojson' as const,
+            displayName,
+            location: {
+              type: 'api' as const,
+              url: endpoint
+            }
+          };
+
       await applyDiff({
         type: 'add-layer',
         layerId,
-        payload: {
-          type: 'api',
-          displayName,
-          url: endpoint
-        }
+        payload
       });
 
       map.value!.on('sourcedata', handleSourceLoaded(layerId));
@@ -95,11 +110,11 @@
     />
   </div>
   <div class="flex flex-col gap-2">
-    <FieldLabel fieldId="Display Name">Display Name</FieldLabel>
+    <FieldLabel fieldId="display-name-input">Display Name</FieldLabel>
     <TextInput
       oninput={onDisplayNameInput}
       value={displayName}
-      id="Display Name"
+      id="display-name-input"
       class="w-full"
       placeholder="(e.g., Earthquakes)"
     />

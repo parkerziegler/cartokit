@@ -148,13 +148,8 @@ test('workflow-1', async ({ page }) => {
   await page.locator('#fill-opacity-input').fill('7.5');
   await page.locator('#fill-opacity-input').press('Enter');
 
-  // Deselect the layer.
-  await page.locator('#map').click({
-    position: {
-      x: 0,
-      y: 0
-    }
-  });
+  // Close the Properties Menu.
+  await page.getByTestId('close-properties-menu-button').click();
 
   // Upload the Path of Totality GeoJSON file.
   await page.getByTestId('add-layer-button').click();
@@ -199,13 +194,8 @@ test('workflow-1', async ({ page }) => {
   // Remove the layer's stroke.
   await page.getByTestId('remove-stroke-button').click();
 
-  // Deselect the layer.
-  await page.locator('#map').click({
-    position: {
-      x: 0,
-      y: 0
-    }
-  });
+  // Close the Properties Menu.
+  await page.getByTestId('close-properties-menu-button').click();
 
   // Ensure the Properties Panel is hidden.
   await expect(page.locator('#properties')).not.toBeVisible();

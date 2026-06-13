@@ -2,8 +2,7 @@
   import CategoricalLegend from '$lib/components/legends/CategoricalLegend.svelte';
   import QuantitativeLegend from '$lib/components/legends/QuantitativeLegend.svelte';
   import type { CartoKitPointLayer } from '$lib/types';
-  import { pluralize } from '$lib/utils/format';
-  import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
+  import { formatFeatureCount } from '$lib/utils/formatters/feature';
 
   interface Props {
     layer: CartoKitPointLayer;
@@ -11,14 +10,10 @@
 
   let { layer }: Props = $props();
 
-  let geometryType = $derived(
-    getFeatureCollectionGeometryType(layer.data.geojson)
-  );
   let dimension = $derived(
     layer.style.size * 2 +
       (layer.style.stroke.visible ? layer.style.stroke.width : 0) * 2
   );
-
   let attrs = $derived(
     layer.style.fill.type === 'Constant'
       ? {
@@ -65,10 +60,7 @@
         {...attrs}
       />
     </svg>
-    <span
-      >{layer.data.geojson.features.length}
-      {pluralize(geometryType, layer.data.geojson.features.length)}</span
-    >
+    <span>{formatFeatureCount(layer.source)}</span>
   </div>
   {#if layer.style.fill.visible && layer.style.fill.type === 'Categorical'}
     <CategoricalLegend

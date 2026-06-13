@@ -9,16 +9,12 @@
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import { catalog } from '$lib/state/catalog.svelte';
   import type { Channel, VisualizationType } from '$lib/types';
-  import {
-    isPropertyCategorical,
-    isPropertyQuantitative
-  } from '$lib/utils/property';
 
   interface Props {
     selected: string;
     layerId: string;
     visualizationType: VisualizationType;
-    geojson: FeatureCollection;
+    geojson?: FeatureCollection;
     channel: Exclude<Channel, 'stroke'>;
   }
 
@@ -31,24 +27,31 @@
   let left = $state(0);
   let transformationEditorVisible = $state(false);
 
-  let properties = $derived(
-    Object.keys(geojson.features[0]?.properties ?? {}).filter((prop) => {
-      const propValue = geojson.features[0].properties?.[prop];
-      const catalogEntry = catalog.value[layerId][prop];
+  let attributes = $derived(
+    Object.entries(catalog.value[layerId]).reduce<string[]>(
+      (acc, [attribute, value]) => {
+        if (visualizationType === 'Quantitative') {
+          if (value.type === 'number' && value.unique >= 9) {
+            acc.push(attribute);
+          }
+        } else if (visualizationType === 'Categorical') {
+          if (
+            value.type === 'string' ||
+            value.type === 'boolean' ||
+            (value.type === 'number' && value.unique < 9)
+          ) {
+            acc.push(attribute);
+          }
+        }
 
-      if (visualizationType === 'Quantitative') {
-        return isPropertyQuantitative(propValue) && catalogEntry.unique >= 9;
-      } else if (visualizationType === 'Categorical') {
-        return (
-          isPropertyCategorical(propValue) ||
-          (isPropertyQuantitative(propValue) && (catalogEntry.unique ?? 0) < 9)
-        );
-      }
-    })
+        return acc;
+      },
+      []
+    )
   );
 
   let options = $derived(
-    properties.map((attribute) => ({
+    attributes.map((attribute) => ({
       value: attribute,
       label: attribute
     }))
@@ -115,7 +118,7 @@
     <MoreIcon />
   </button>
 </div>
-{#if transformationEditorVisible}
+{#if transformationEditorVisible && geojson}
   <Portal
     class="absolute top-4"
     {target}

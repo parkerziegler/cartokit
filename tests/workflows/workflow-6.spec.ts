@@ -134,13 +134,8 @@ test('workflow-6', async ({ page }) => {
     i++;
   }
 
-  // Click on a page location that will trigger deselection of both layers.
-  await page.locator('#map').click({
-    position: {
-      x: 0,
-      y: 0
-    }
-  });
+  // Close the Properties Menu.
+  await page.getByTestId('close-properties-menu-button').click();
 
   // Ensure the Properties Panel is hidden.
   await expect(page.locator('#properties')).not.toBeVisible();

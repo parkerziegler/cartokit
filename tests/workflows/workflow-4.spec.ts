@@ -153,13 +153,8 @@ test('workflow-4', async ({ page }) => {
     i++;
   }
 
-  // Deselect the layer.
-  await page.locator('#map').click({
-    position: {
-      x: 0,
-      y: 360
-    }
-  });
+  // Close the Properties Menu.
+  await page.getByTestId('close-properties-menu-button').click();
 
   // Ensure the Properties Panel is hidden.
   await expect(page.locator('#properties')).not.toBeVisible();

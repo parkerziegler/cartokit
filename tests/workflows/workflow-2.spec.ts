@@ -150,13 +150,8 @@ test('workflow-2', async ({ page }) => {
   await page.locator('#fill-opacity-input').fill('100');
   await page.locator('#fill-opacity-input').press('Enter');
 
-  // Click on a page location that will trigger deselection of the layer.
-  await page.locator('#map').click({
-    position: {
-      x: 0,
-      y: 0
-    }
-  });
+  // Close the Properties Menu.
+  await page.getByTestId('close-properties-menu-button').click();
 
   // Ensure the Properties Panel is hidden.
   await expect(page.locator('#properties')).not.toBeVisible();

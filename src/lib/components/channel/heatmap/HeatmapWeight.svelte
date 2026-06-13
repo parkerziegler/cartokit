@@ -1,10 +1,10 @@
 <script lang="ts">
+  import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type { CartoKitHeatmapLayer } from '$lib/types';
-  import { isPropertyQuantitative } from '$lib/utils/property';
 
   interface Props {
     layer: CartoKitHeatmapLayer;
@@ -16,20 +16,6 @@
     { value: 'Constant', label: 'Constant' },
     { value: 'Quantitative', label: 'Range' }
   ];
-  let weightAttributeOptions = $derived(
-    layer.style.heatmap.weight.type === 'Quantitative'
-      ? Object.keys(layer.data.geojson.features[0].properties ?? {})
-          .filter((attribute) =>
-            isPropertyQuantitative(
-              layer.data.geojson.features[0].properties?.[attribute]
-            )
-          )
-          .map((attribute) => ({
-            value: attribute,
-            label: attribute
-          }))
-      : []
-  );
 
   async function onWeightTypeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
@@ -40,18 +26,6 @@
       payload: {
         weightType: event.currentTarget.value as 'Constant' | 'Quantitative'
       }
-    };
-
-    await applyDiff(diff);
-  }
-
-  async function onWeightAttributeChange(
-    event: Event & { currentTarget: EventTarget & HTMLSelectElement }
-  ) {
-    const diff: CartoKitDiff = {
-      type: 'heatmap-weight-attribute',
-      layerId: layer.id,
-      payload: { weightAttribute: event.currentTarget.value }
     };
 
     await applyDiff(diff);
@@ -96,12 +70,12 @@
   onchange={onWeightTypeChange}
 />
 {#if layer.style.heatmap.weight.type === 'Quantitative'}
-  <Select
-    title="Attribute"
-    options={weightAttributeOptions}
+  <AttributeSelect
+    layerId={layer.id}
+    geojson={layer.source.type === 'geojson' ? layer.source.data : undefined}
+    visualizationType="Quantitative"
     selected={layer.style.heatmap.weight.attribute}
-    id="heatmap-weight-attribute-select"
-    onchange={onWeightAttributeChange}
+    channel="heatmap-weight"
   />
   <div class="flex items-center gap-2">
     <FieldLabel fieldId="heatmap-weight-min">Min</FieldLabel>

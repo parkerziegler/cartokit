@@ -1,6 +1,6 @@
-import { redraw } from '$lib/core/recon/layer-type/redraw';
 import { map } from '$lib/state/map.svelte';
 import type { CartoKitDotDensityLayer, LayerType } from '$lib/types';
+import { redraw } from '$lib/utils/layer/redraw';
 
 /**
  * Reconcile a {@link CartoKitLayer} to a {@link CartoKitDotDensityLayer}.

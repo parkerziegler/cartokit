@@ -8,6 +8,9 @@ import { listeners, type LayerListeners } from '$lib/state/listeners.svelte';
 import { map } from '$lib/state/map.svelte';
 import type { CartoKitLayer, Catalog } from '$lib/types';
 import { getInstrumentedLayerIds } from '$lib/utils/layer';
+import { layerId } from '$lib/state/layerId.svelte';
+import { redraw } from '$lib/utils/layer/redraw';
+import { getCanonicalLayerId } from '$lib/utils/layer/id';
 
 /**
  * Reconcile layer-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
@@ -26,16 +29,6 @@ export async function reconLayerDiffs(
     case 'add-layer': {
       const layer = targetIR.layers[diff.layerId];
 
-      map.value!.addSource(layer.id, {
-        type: 'geojson',
-        // Still use the API endpoint when available to speed up vector tile generation.
-        data:
-          diff.payload.type === 'api'
-            ? diff.payload.url
-            : diff.payload.featureCollection,
-        generateId: true
-      });
-
       // Build the catalog for the layer in a worker thread.
       const catalogWorker = new Worker(
         new URL('$lib/utils/catalog/worker.ts', import.meta.url),
@@ -45,6 +38,23 @@ export async function reconLayerDiffs(
         Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
       const catalogPatch = await buildCatalog(layer);
       catalog.value = { ...catalog.value, ...catalogPatch };
+
+      // Add the source to the map.
+      if (diff.payload.type === 'geojson') {
+        map.value!.addSource(layer.id, {
+          type: 'geojson',
+          data:
+            diff.payload.location.type === 'api'
+              ? diff.payload.location.url // Use the API endpoint when available to speed up vector tile generation.
+              : diff.payload.location.featureCollection,
+          generateId: true
+        });
+      } else if (diff.payload.type === 'vector') {
+        map.value!.addSource(layer.id, {
+          type: 'vector',
+          url: `pmtiles://${diff.payload.location.url}`
+        });
+      }
 
       addLayer(map.value!, layer);
 
@@ -108,8 +118,16 @@ export async function reconLayerDiffs(
       // Remove the layer.
       map.value!.removeLayer(diff.layerId);
 
+      // If the removed layer was selected, set the layer to null.
+      if (layerId.value === diff.layerId) {
+        layerId.value = null;
+      }
+
       // If the selected feature belongs to the removed layer, set the feature to null.
-      if (feature.value?.layer.id === diff.layerId) {
+      if (
+        feature.value &&
+        getCanonicalLayerId(feature.value.layerId) === diff.layerId
+      ) {
         feature.value = null;
       }
 
@@ -131,14 +149,21 @@ export async function reconLayerDiffs(
         map.value!.removeSource(`${diff.layerId}-outlines`);
       }
 
-      // Remove the points source for heatmaps.
-      if (map.value!.getSource(`${diff.layerId}-points`)) {
-        map.value!.removeSource(`${diff.layerId}-points`);
-      }
-
       break;
     }
     case 'rename-layer': {
+      break;
+    }
+    case 'source-layer': {
+      const targetLayer = targetIR.layers[diff.layerId];
+
+      redraw({
+        map: map.value!,
+        sourceLayerId: diff.layerId,
+        sourceLayerType: targetLayer.type,
+        targetLayer
+      });
+
       break;
     }
   }

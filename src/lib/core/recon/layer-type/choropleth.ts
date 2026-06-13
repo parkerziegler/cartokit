@@ -1,7 +1,7 @@
-import { redraw } from '$lib/core/recon/layer-type/redraw';
 import { deriveColorScale } from '$lib/interaction/color';
 import { map } from '$lib/state/map.svelte';
 import type { CartoKitChoroplethLayer, LayerType } from '$lib/types';
+import { redraw } from '$lib/utils/layer/redraw';
 
 /**
  * Reconcile a {@link CartoKitLayer} to a {@link CartoKitChoroplethLayer}.

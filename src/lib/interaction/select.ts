@@ -2,19 +2,24 @@ import type maplibregl from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { feature } from '$lib/state/feature.svelte';
+import { layerId } from '$lib/state/layerId.svelte';
 import { listeners } from '$lib/state/listeners.svelte';
 import { layout } from '$lib/stores/layout';
-import type { CartoKitIR } from '$lib/types';
+import type { CartoKitLayer } from '$lib/types';
+import { getCanonicalLayerId } from '$lib/utils/layer/id';
 
 /**
  * Add a selection indicator to a feature in a point layer.
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to instrument.
+ * @param sourceLayerId The id of the source layer to instrument. This is only
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentPointSelect(
   map: maplibregl.Map,
-  layerId: string
+  layerId: string,
+  sourceLayerId?: string
 ): void {
   const currentStrokeWidth = map.getPaintProperty(
     layerId,
@@ -38,7 +43,7 @@ export function instrumentPointSelect(
     currentStrokeColor ?? 'transparent'
   ]);
 
-  addSelectListeners(map, layerId);
+  addSelectListeners(map, layerId, sourceLayerId);
 }
 
 /**
@@ -46,10 +51,13 @@ export function instrumentPointSelect(
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to instrument.
+ * @param sourceLayerId The id of the source layer to instrument. This is only
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentLineSelect(
   map: maplibregl.Map,
-  layerId: string
+  layerId: string,
+  sourceLayerId?: string
 ): void {
   const currentStrokeWidth = map.getPaintProperty(layerId, 'line-width');
   const currentStrokeColor = map.getPaintProperty(layerId, 'line-color');
@@ -67,7 +75,7 @@ export function instrumentLineSelect(
     currentStrokeColor ?? 'transparent'
   ]);
 
-  addSelectListeners(map, layerId);
+  addSelectListeners(map, layerId, sourceLayerId);
 }
 
 /**
@@ -75,15 +83,19 @@ export function instrumentLineSelect(
  *
  * @param map The top-level {@link maplibregl.Map} instance.
  * @param layerId The id of the layer to instrument.
+ * @param sourceLayerId The id of the source layer to instrument. This is only
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentPolygonSelect(
   map: maplibregl.Map,
-  layerId: string
+  layerId: string,
+  sourceLayerId?: string
 ): void {
   map.addLayer({
     id: `${layerId}-select`,
     type: 'line',
     source: layerId,
+    'source-layer': sourceLayerId,
     paint: {
       'line-color': '#A534FF',
       'line-width': [
@@ -95,44 +107,68 @@ export function instrumentPolygonSelect(
     }
   });
 
-  addSelectListeners(map, layerId);
+  addSelectListeners(map, layerId, sourceLayerId);
 }
 
 /**
  * Wire up event listeners for select effects.
  *
  * @param map The top-level {@link maplibregl.Map} instance.
- * @param layerId The id of the layer to add event listeners to.
+ * @param lyrId The id of the layer to add event listeners to.
+ * @param sourceLayerId The id of the source layer to instrument. This is only
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
-function addSelectListeners(map: maplibregl.Map, layerId: string): void {
-  let selectedFeatureId: string | null = null;
+function addSelectListeners(
+  map: maplibregl.Map,
+  lyrId: string,
+  sourceLayerId?: string
+): void {
+  let featureId: string | number | undefined;
 
   function onClick(event: maplibregl.MapLayerMouseEvent): void {
     if (event.features && event.features.length > 0) {
-      if (selectedFeatureId !== null) {
+      if (featureId !== undefined) {
         map.setFeatureState(
-          { source: layerId, id: selectedFeatureId },
+          {
+            source: lyrId,
+            id: featureId,
+            sourceLayer: sourceLayerId
+          },
           { selected: false }
         );
       }
 
-      // We forcibly assign an "id" property to all GeoJSON sources using generateId:
-      // https://maplibre.org/maplibre-gl-js-docs/style-spec/sources/#geojson-generateId
-      selectedFeatureId = event.features[0].id!.toString();
-      map.setFeatureState(
-        { source: layerId, id: selectedFeatureId },
-        { selected: true }
-      );
+      const { id, type, properties, geometry } = event.features[0];
 
-      feature.value = event.features[0];
+      if (id) {
+        map.setFeatureState(
+          {
+            source: lyrId,
+            id,
+            sourceLayer: sourceLayerId
+          },
+          { selected: true }
+        );
+        featureId = id;
+      }
+
+      feature.value = {
+        id,
+        type,
+        properties,
+        geometry,
+        layerId: lyrId,
+        sourceLayerId
+      };
+      layerId.value = getCanonicalLayerId(lyrId);
     }
   }
 
-  map.on('click', layerId, onClick);
+  map.on('click', lyrId, onClick);
 
-  const layerListeners = listeners.value.get(layerId)!;
+  const layerListeners = listeners.value.get(lyrId)!;
 
-  listeners.value.set(layerId, {
+  listeners.value.set(lyrId, {
     ...layerListeners,
     click: onClick
   });
@@ -142,12 +178,12 @@ function addSelectListeners(map: maplibregl.Map, layerId: string): void {
  * A global event listener for deselecting features.
  *
  * @param map The top-level {@link maplibregl.Map} instance.
- * @param ir The {@link CartoKitIR}.
+ * @param layers The current {@link CartoKitLayer}s on the map.
  * @returns A callback to run when a map mouse event intersects no features.
  */
 export function onFeatureLeave(
   map: maplibregl.Map,
-  { layers }: CartoKitIR
+  layers: Record<string, CartoKitLayer>
 ): (event: maplibregl.MapMouseEvent) => void {
   return (event: maplibregl.MapMouseEvent): void => {
     const layerIds = Object.values(layers).map((layer) => {
@@ -168,8 +204,21 @@ export function onFeatureLeave(
       layers: layerIds
     });
 
-    // If the mouse event intersects no features and there is a currently selected feature, deselect it.
-    if (features.length === 0 && typeof feature.value?.id !== 'undefined') {
+    // If the mouse event intersects no features and there is a currently selected feature...
+    if (features.length === 0) {
+      if (typeof feature.value?.id !== 'undefined') {
+        // Deselect the feature.
+        map.removeFeatureState(
+          {
+            source: feature.value.layerId,
+            id: feature.value.id,
+            sourceLayer: feature.value.sourceLayerId
+          },
+          'selected'
+        );
+      }
+
+      // Hide the DataTable if it's open.
       if (get(layout).dataVisible) {
         layout.update((layout) => {
           layout.dataVisible = false;
@@ -178,12 +227,9 @@ export function onFeatureLeave(
         });
       }
 
-      map.removeFeatureState(
-        { source: feature.value.layer.id, id: feature.value.id },
-        'selected'
-      );
-
+      // Clear the selected feature and layer.
       feature.value = null;
+      layerId.value = null;
       // If the mouse event intersects features but the selected feature is different, deselect it.
     } else if (
       features.length > 0 &&
@@ -191,7 +237,11 @@ export function onFeatureLeave(
       features[0].id !== feature.value.id
     ) {
       map.removeFeatureState(
-        { source: feature.value.layer.id, id: feature.value.id },
+        {
+          source: feature.value.layerId,
+          id: feature.value.id,
+          sourceLayer: feature.value.sourceLayerId
+        },
         'selected'
       );
     }

@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
 import { catalog } from '$lib/state/catalog.svelte';
-import type { QuantitativeColorScale } from '$lib/types';
+import type { NumericCatalogEntry, QuantitativeColorScale } from '$lib/types';
 
 interface DeriveBreaksParams {
   layerId: string;
@@ -23,7 +23,8 @@ function deriveQuantiles({
   attribute,
   range
 }: DeriveBreaksParams): number[] {
-  const domain = catalog.value[layerId][attribute]['Quantile'].domain;
+  const domain = (catalog.value[layerId][attribute] as NumericCatalogEntry)
+    .quantiles.domain;
 
   // Derive quantiles.
   const quantiles = d3
@@ -49,12 +50,12 @@ function deriveEqualIntervals({
   attribute,
   range
 }: DeriveBreaksParams): number[] {
-  const domain = catalog.value[layerId][attribute]['Equal Interval'].domain;
+  const { min, max } = catalog.value[layerId][attribute] as NumericCatalogEntry;
 
   // Derive ticks.
   const ticks = d3
     .scaleQuantize<string>()
-    .domain(domain)
+    .domain([min, max])
     .range(range)
     .thresholds();
 
@@ -75,7 +76,9 @@ function deriveJenksBreaks({
   attribute,
   range
 }: DeriveBreaksParams): number[] {
-  return catalog.value[layerId][attribute]['Jenks'][range.length].breaks;
+  return (catalog.value[layerId][attribute] as NumericCatalogEntry).jenks[
+    range.length as 3 | 4 | 5 | 6 | 7 | 8 | 9
+  ].breaks;
 }
 
 /**
@@ -102,8 +105,7 @@ function deriveManualBreaks({
     return quantiles;
   }
 
-  const min = catalog.value[layerId][attribute]['min'];
-  const max = catalog.value[layerId][attribute]['max'];
+  const { min, max } = catalog.value[layerId][attribute] as NumericCatalogEntry;
 
   // If the thresholds do not fit within the range of the attribute,
   // derive a fully new set of thresholds, defaulting to quantiles.

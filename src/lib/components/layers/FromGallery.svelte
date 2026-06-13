@@ -37,9 +37,12 @@
       type: 'add-layer',
       layerId,
       payload: {
-        type: 'api',
-        displayName,
-        url
+        type: 'geojson',
+        location: {
+          type: 'api',
+          url
+        },
+        displayName
       }
     });
 

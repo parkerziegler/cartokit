@@ -25,35 +25,37 @@ export async function patchDotDiffs(
     case 'dot-value': {
       const layer = ir.layers[diff.layerId] as CartoKitDotDensityLayer;
 
-      // Derive the inverse diff prior to applying the patch.
-      inverse = {
-        type: 'dot-value',
-        layerId: diff.layerId,
-        payload: {
-          value: layer.style.dot.value
-        }
-      };
+      if (layer.source.type === 'geojson') {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'dot-value',
+          layerId: diff.layerId,
+          payload: {
+            value: layer.style.dot.value
+          }
+        };
 
-      // Apply the patch.
-      const features = generateDotDensityPoints(
-        layer.data.sourceGeojson as FeatureCollection<Polygon | MultiPolygon>,
-        layer.style.dot.attribute,
-        diff.payload.value
-      );
-
-      layer.style.dot.value = diff.payload.value;
-      layer.data.geojson = features;
-
-      // Update the args of the dot density transformation in this layer.
-      const transformationIndex = layer.data.transformations.findIndex(
-        (t) => t.name === 'generateDotDensityPoints'
-      );
-
-      if (transformationIndex > -1) {
-        layer.data.transformations[transformationIndex].args = [
+        // Apply the patch.
+        const features = generateDotDensityPoints(
+          layer.source.sourceData as FeatureCollection<Polygon | MultiPolygon>,
           layer.style.dot.attribute,
           diff.payload.value
-        ];
+        );
+
+        layer.style.dot.value = diff.payload.value;
+        layer.source.data = features;
+
+        // Update the args of the dot density transformation in this layer.
+        const tIdx = layer.source.transformations.findIndex(
+          (t) => t.name === 'generateDotDensityPoints'
+        );
+
+        if (tIdx > -1) {
+          layer.source.transformations[tIdx].args = [
+            layer.style.dot.attribute,
+            diff.payload.value
+          ];
+        }
       }
 
       break;
@@ -61,42 +63,44 @@ export async function patchDotDiffs(
     case 'dot-attribute': {
       const layer = ir.layers[diff.layerId] as CartoKitDotDensityLayer;
 
-      // Derive the inverse diff prior to applying the patch.
-      inverse = {
-        type: 'dot-attribute',
-        layerId: diff.layerId,
-        payload: {
-          attribute: layer.style.dot.attribute
-        }
-      };
+      if (layer.source.type === 'geojson') {
+        // Derive the inverse diff prior to applying the patch.
+        inverse = {
+          type: 'dot-attribute',
+          layerId: diff.layerId,
+          payload: {
+            attribute: layer.style.dot.attribute
+          }
+        };
 
-      // Rederive a starting dot value based on the range of the new attribute.
-      const dotValue = deriveDotDensityStartingValue(
-        layer.data.sourceGeojson.features,
-        diff.payload.attribute
-      );
+        // Rederive a starting dot value based on the range of the new attribute.
+        const dotValue = deriveDotDensityStartingValue(
+          layer.id,
+          diff.payload.attribute
+        );
 
-      // Generate the new dot density points.
-      const features = generateDotDensityPoints(
-        layer.data.sourceGeojson as FeatureCollection<Polygon | MultiPolygon>,
-        diff.payload.attribute,
-        dotValue
-      );
-
-      layer.style.dot.attribute = diff.payload.attribute;
-      layer.style.dot.value = dotValue;
-      layer.data.geojson = features;
-
-      // Update the args of the dot density transformation in this layer.
-      const transformationIndex = layer.data.transformations.findIndex(
-        (t) => t.name === 'generateDotDensityPoints'
-      );
-
-      if (transformationIndex > -1) {
-        layer.data.transformations[transformationIndex].args = [
+        // Generate the new dot density points.
+        const features = generateDotDensityPoints(
+          layer.source.sourceData as FeatureCollection<Polygon | MultiPolygon>,
           diff.payload.attribute,
           dotValue
-        ];
+        );
+
+        layer.style.dot.attribute = diff.payload.attribute;
+        layer.style.dot.value = dotValue;
+        layer.source.data = features;
+
+        // Update the args of the dot density transformation in this layer.
+        const tIdx = layer.source.transformations.findIndex(
+          (t) => t.name === 'generateDotDensityPoints'
+        );
+
+        if (tIdx > -1) {
+          layer.source.transformations[tIdx].args = [
+            diff.payload.attribute,
+            dotValue
+          ];
+        }
       }
 
       break;

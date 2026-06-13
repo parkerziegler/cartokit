@@ -9,6 +9,7 @@
   import { user } from '$lib/state/user.svelte';
   import { ir } from '$lib/stores/ir';
   import type { LayerType } from '$lib/types';
+  import { selectAttributes } from '$lib/utils/attributes';
 
   interface Props {
     form?: HTMLFormElement;
@@ -38,9 +39,19 @@
   let layerIdsToAttributes = $derived(
     Object.entries($ir.layers).reduce<Record<string, string[]>>(
       (acc, [layerId, layer]) => {
-        acc[layerId] = Object.keys(
-          layer.data.geojson.features[0].properties ?? {}
-        );
+        acc[layerId] = selectAttributes(layer.source);
+
+        return acc;
+      },
+      {}
+    )
+  );
+  let layerIdsToSourceLayerIds = $derived(
+    Object.entries($ir.layers).reduce<Record<string, string[]>>(
+      (acc, [layerId, layer]) => {
+        if (layer.source.type === 'vector') {
+          acc[layerId] = layer.source.vectorLayers.map(({ id }) => id);
+        }
 
         return acc;
       },
@@ -84,6 +95,7 @@
           layerIds,
           layerIdsToTypes,
           layerIdsToAttributes,
+          layerIdsToSourceLayerIds,
           userId: user.userId
         })
       }).then((response) => response.json());
@@ -131,7 +143,7 @@
           >GPT-5.4 Mini</code
         >
         <button
-          class="flex h-[22px] w-[22px] items-center justify-center rounded-xs border border-white bg-slate-400 text-white disabled:opacity-50"
+          class="flex h-5.5 w-5.5 items-center justify-center rounded-xs border border-white bg-slate-400 text-white disabled:opacity-50"
           disabled={requestInFlight || error || diffUnknown || !prompt.length}
         >
           <ArrowUpIcon />

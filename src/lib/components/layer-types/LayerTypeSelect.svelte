@@ -4,7 +4,11 @@
   import { error } from '$lib/state/error.svelte';
   import type { CartoKitLayer, LayerType } from '$lib/types';
   import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
-  import { geometryToLayerTypes } from '$lib/utils/layer';
+  import {
+    GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES,
+    VECTOR_GEOMETRY_TYPES_TO_LAYER_TYPES
+  } from '$lib/utils/layer';
+  import { selectTileStats } from '$lib/utils/pmtiles';
 
   interface Props {
     layer: CartoKitLayer;
@@ -12,15 +16,36 @@
 
   let { layer }: Props = $props();
 
-  let geometryType = $derived(
-    getFeatureCollectionGeometryType(layer.data.sourceGeojson)
-  );
-  let options = $derived(
-    geometryToLayerTypes.get(geometryType)?.map((layerType) => ({
-      value: layerType,
-      label: layerType
-    })) ?? []
-  );
+  let options = $derived.by(() => {
+    switch (layer.source.type) {
+      case 'geojson': {
+        const geometryType = getFeatureCollectionGeometryType(
+          layer.source.sourceData
+        );
+
+        return (
+          GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES.get(geometryType)?.map(
+            (layerType) => ({
+              value: layerType,
+              label: layerType
+            })
+          ) ?? []
+        );
+      }
+      case 'vector': {
+        const { geometry } = selectTileStats(layer.source);
+
+        return (
+          VECTOR_GEOMETRY_TYPES_TO_LAYER_TYPES.get(geometry)?.map(
+            (layerType) => ({
+              value: layerType,
+              label: layerType
+            })
+          ) ?? []
+        );
+      }
+    }
+  });
 
   async function onLayerTypeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }

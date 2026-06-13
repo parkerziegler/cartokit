@@ -5,9 +5,10 @@
   import Portal from '$lib/components/shared/Portal.svelte';
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import type { QuantitativeColorScale } from '$lib/types';
-  import { CLASSIFICATION_METHODS } from '$lib/utils/classification';
+  import { SOURCE_TYPES_TO_CLASSIFICATION_METHODS } from '$lib/utils/classification';
 
   interface Props {
     layerId: string;
@@ -19,10 +20,14 @@
 
   let displayBreaksEditor = $state(false);
 
-  const options = CLASSIFICATION_METHODS.map((option) => ({
-    value: option,
-    label: option
-  }));
+  let options = $derived(
+    SOURCE_TYPES_TO_CLASSIFICATION_METHODS.get(
+      $ir.layers[layerId].source.type
+    )!.map((option) => ({
+      value: option,
+      label: option
+    }))
+  );
 
   function showBreaksEditor() {
     displayBreaksEditor = true;
@@ -69,7 +74,7 @@
       class={[
         'ease-cubic-out fixed top-64 right-150 transition-transform duration-400',
         {
-          '-translate-x-[33.333333vw]': $layout.editorVisible,
+          'translate-x-[-33.333333vw]': $layout.editorVisible,
           'delay-150': !$layout.editorVisible
         }
       ]}

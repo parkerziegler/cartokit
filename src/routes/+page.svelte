@@ -1,5 +1,7 @@
 <script lang="ts">
+  import type { Feature } from 'geojson';
   import maplibregl from 'maplibre-gl';
+  import * as pmtiles from 'pmtiles';
   import { onMount } from 'svelte';
 
   import type { PageData } from './$types';
@@ -18,13 +20,13 @@
   import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
   import { onFeatureLeave } from '$lib/interaction/select';
   import { chat } from '$lib/state/chat.svelte';
+  import { error } from '$lib/state/error.svelte';
   import { initHistory } from '$lib/state/history.svelte';
+  import { layerId } from '$lib/state/layerId.svelte';
+  import { map as mapState } from '$lib/state/map.svelte';
   import { user } from '$lib/state/user.svelte';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
-  import { error } from '$lib/state/error.svelte';
-  import { map as mapState } from '$lib/state/map.svelte';
-  import { layer } from '$lib/state/layer.svelte';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
@@ -34,6 +36,43 @@
   let { data }: Props = $props();
 
   let map = $state<maplibregl.Map>();
+  let features = $state<Feature[]>([]);
+  let table = $derived.by<{ columns: string[]; rows: Feature[] }>(() => {
+    if (layerId.value) {
+      const layer = $ir.layers[layerId.value];
+
+      switch (layer.source.type) {
+        case 'geojson': {
+          return {
+            rows: layer.source.data.features,
+            columns: Object.keys(
+              layer.source.data.features[0]?.properties ?? {}
+            )
+          };
+        }
+        case 'vector': {
+          if (features.length > 0) {
+            return {
+              rows: features,
+              columns: Object.keys(features[0].properties ?? {})
+            };
+          }
+
+          const queriedFeatures =
+            map?.queryRenderedFeatures({
+              layers: [layer.id]
+            }) ?? [];
+
+          return {
+            rows: queriedFeatures,
+            columns: Object.keys(queriedFeatures[0]?.properties ?? {})
+          };
+        }
+      }
+    }
+
+    return { columns: [], rows: [] };
+  });
 
   // We intentionally capture the values of data.userId and data.enableChat
   // from the load function in +page.server.ts.
@@ -44,6 +83,9 @@
   chat.enable = data.enableChat;
 
   onMount(() => {
+    const protocol = new pmtiles.Protocol();
+    maplibregl.addProtocol('pmtiles', protocol.tile);
+
     map = new maplibregl.Map({
       container: 'map',
       style: data.basemap.url,
@@ -52,7 +94,7 @@
     });
 
     // Add an event listener to handle feature deselection.
-    map.on('click', onFeatureLeave(map, $ir));
+    map.on('click', onFeatureLeave(map, $ir.layers));
 
     // When the map first reaches an idle state, set it in the store.
     // This should ensure that the map's styles and data have fully loaded.
@@ -88,13 +130,27 @@
       event.target.setProjection({ type: $ir.projection });
     });
 
+    // Add an idle listener that will update features in the DataTable when a
+    // vector layer is active. GeoJSON layers already have their data available
+    // in memory, so we can populate the DataTable directly.
+    map.on('idle', (e) => {
+      const currentLayer = layerId.value
+        ? $ir.layers[layerId.value]
+        : undefined;
+
+      if (currentLayer?.source.type === 'vector') {
+        features = e.target.queryRenderedFeatures({
+          layers: [currentLayer.id]
+        });
+      }
+    });
+
     map.on('error', (err) => {
       console.error(err);
       error.set('A map rendering error occurred.');
     });
 
     const destroyHistory = initHistory();
-
     const deregisterKeybinding = registerKeybinding(
       'e',
       toggleEditorVisibility
@@ -144,10 +200,10 @@
       </MenuTitle>
       <LayerPanel />
     </Menu>
-    {#if layer.value}
-      <PropertiesMenu map={map!} layer={layer.value} />
-    {/if}
     {#if map}
+      {#if layerId.value}
+        <PropertiesMenu {map} layer={$ir.layers[layerId.value]} />
+      {/if}
       <Toolbar {map} />
     {/if}
     <button
@@ -155,7 +211,7 @@
         'ease-cubic-out absolute right-4 bottom-12 z-10 flex items-baseline gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 disabled:cursor-not-allowed',
         {
           '-translate-y-72': $layout.dataVisible,
-          '-translate-x-[33.333333vw]': $layout.editorVisible,
+          'translate-x-[-33.333333vw]': $layout.editorVisible,
           'delay-150': !$layout.editorVisible
         }
       ]}
@@ -166,11 +222,14 @@
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
       <span class="text-slate-400">E</span>
     </button>
-    {#if $layout.dataVisible && layer.value}
+    {#if $layout.dataVisible && layerId.value}
+      {@const layer = $ir.layers[layerId.value]}
       <DataTable
-        data={layer.value.data.geojson.features}
-        tableName={layer.value.displayName}
+        rows={table.rows}
+        columns={table.columns}
+        tableName={layer.displayName}
         onClose={onViewDataClose}
+        sourceType={layer.source.type}
         class={[
           'ease-cubic-out absolute bottom-0 h-72 transition-all duration-400',
           $layout.editorVisible ? 'w-2/3' : 'w-full'

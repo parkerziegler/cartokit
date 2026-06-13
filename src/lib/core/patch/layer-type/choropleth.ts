@@ -1,5 +1,5 @@
 import type { CartoKitLayer, CartoKitChoroplethLayer } from '$lib/types';
-import { selectQuantitativeAttribute } from '$lib/utils/geojson';
+import { selectQuantitativeAttribute } from '$lib/utils/attributes';
 import {
   DEFAULT_METHOD,
   DEFAULT_QUANTITATIVE_SCHEME,
@@ -19,28 +19,29 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
     case 'Choropleth':
       return layer;
     case 'Dot Density': {
-      // Remove the dot density transformation.
-      const transformations = layer.data.transformations.filter(
-        (transformation) => transformation.name !== 'generateDotDensityPoints'
-      );
+      const source =
+        layer.source.type === 'geojson'
+          ? {
+              ...layer.source,
+              data: layer.source.sourceData,
+              // Remove the dot density transformation.
+              transformations: layer.source.transformations.filter(
+                (transformation) =>
+                  transformation.name !== 'generateDotDensityPoints'
+              )
+            }
+          : layer.source;
 
       const targetLayer: CartoKitChoroplethLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Choropleth',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          geojson: layer.data.sourceGeojson,
-          sourceGeojson: layer.data.sourceGeojson,
-          transformations
-        },
+        source,
         style: {
           fill: {
             type: 'Quantitative',
             attribute: layer.style.dot.attribute,
             scale: {
-              type: DEFAULT_METHOD,
+              type: DEFAULT_METHOD(layer.source.type),
               scheme: {
                 id: DEFAULT_QUANTITATIVE_SCHEME,
                 direction: DEFAULT_SCHEME_DIRECTION
@@ -48,15 +49,15 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
               steps: DEFAULT_COUNT,
               thresholds: DEFAULT_THRESHOLDS(
                 layer.id,
-                layer.style.dot.attribute
+                layer.style.dot.attribute,
+                layer.source.type
               )
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
           },
           stroke: layer.style.stroke
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;
@@ -68,27 +69,26 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
       );
     case 'Point':
     case 'Proportional Symbol': {
-      // Remove the centroid transformation.
-      const transformations = layer.data.transformations.filter(
-        (transformation) => transformation.name !== 'deriveCentroids'
-      );
-
-      // Select a quantitative attribute for the visualization.
-      const attribute = selectQuantitativeAttribute(
-        layer.data.geojson.features
-      );
+      const source =
+        layer.source.type === 'geojson'
+          ? {
+              ...layer.source,
+              data: layer.source.sourceData,
+              // Remove the centroid transformation.
+              transformations: layer.source.transformations.filter(
+                (transformation) => transformation.name !== 'deriveCentroids'
+              )
+            }
+          : layer.source;
+      const attribute =
+        layer.type === 'Proportional Symbol'
+          ? layer.style.size.attribute
+          : selectQuantitativeAttribute(layer.source);
 
       const targetLayer: CartoKitChoroplethLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Choropleth',
-        data: {
-          url: layer.data.url,
-          fileName: layer.data.fileName,
-          geojson: layer.data.sourceGeojson,
-          sourceGeojson: layer.data.sourceGeojson,
-          transformations
-        },
+        source,
         style: {
           fill:
             layer.style.fill.type === 'Quantitative'
@@ -97,53 +97,55 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
                   type: 'Quantitative',
                   attribute,
                   scale: {
-                    type: DEFAULT_METHOD,
+                    type: DEFAULT_METHOD(layer.source.type),
                     scheme: {
                       id: DEFAULT_QUANTITATIVE_SCHEME,
                       direction: DEFAULT_SCHEME_DIRECTION
                     },
                     steps: DEFAULT_COUNT,
-                    thresholds: DEFAULT_THRESHOLDS(layer.id, attribute)
+                    thresholds: DEFAULT_THRESHOLDS(
+                      layer.id,
+                      attribute,
+                      layer.source.type
+                    )
                   },
                   opacity: layer.style.fill.opacity,
                   visible: layer.style.fill.visible
                 },
           stroke: layer.style.stroke
-        },
-        layout: layer.layout
+        }
       };
 
       return targetLayer;
     }
     case 'Polygon': {
-      const attribute = selectQuantitativeAttribute(
-        layer.data.geojson.features
-      );
+      const attribute = selectQuantitativeAttribute(layer.source);
 
       const targetLayer: CartoKitChoroplethLayer = {
-        id: layer.id,
-        displayName: layer.displayName,
+        ...layer,
         type: 'Choropleth',
-        data: layer.data,
         style: {
+          ...layer.style,
           fill: {
             type: 'Quantitative',
             attribute,
             scale: {
-              type: DEFAULT_METHOD,
+              type: DEFAULT_METHOD(layer.source.type),
               scheme: {
                 id: DEFAULT_QUANTITATIVE_SCHEME,
                 direction: DEFAULT_SCHEME_DIRECTION
               },
               steps: DEFAULT_COUNT,
-              thresholds: DEFAULT_THRESHOLDS(layer.id, attribute)
+              thresholds: DEFAULT_THRESHOLDS(
+                layer.id,
+                attribute,
+                layer.source.type
+              )
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
-          },
-          stroke: layer.style.stroke
-        },
-        layout: layer.layout
+          }
+        }
       };
 
       return targetLayer;
