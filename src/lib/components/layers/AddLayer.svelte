@@ -46,9 +46,9 @@
 </button>
 <Modal
   bind:showModal
-  class="max-w-lg"
   testId="add-layer-modal"
   initialHeight={329}
+  initialWidth={512}
 >
   {#snippet header()}
     <h2 class="text-xl font-semibold">Add Layer</h2>

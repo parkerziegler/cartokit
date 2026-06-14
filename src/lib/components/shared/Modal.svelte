@@ -9,6 +9,7 @@
   interface Props {
     showModal?: boolean;
     initialHeight?: number;
+    initialWidth?: number;
     class?: string;
     testId?: string;
     header?: Snippet;
@@ -18,6 +19,7 @@
   let {
     showModal = $bindable(false),
     initialHeight = 0,
+    initialWidth = 0,
     class: className,
     testId = '',
     header,
@@ -25,8 +27,13 @@
   }: Props = $props();
   let dialog: HTMLDialogElement;
   let offsetHeight = $state(0);
+  let offsetWidth = $state(0);
 
   let offsetHeightTween = new Tween(initialHeight, {
+    duration: 150,
+    easing: cubicOut
+  });
+  let offsetWidthTween = new Tween(initialWidth, {
     duration: 150,
     easing: cubicOut
   });
@@ -40,8 +47,9 @@
   });
 
   $effect(() => {
-    if (dialog && offsetHeight) {
+    if (dialog && offsetHeight && offsetWidth) {
       offsetHeightTween.set(offsetHeight);
+      offsetWidthTween.set(offsetWidth);
     }
   });
 </script>
@@ -64,9 +72,9 @@
     }
   }}
   data-testid={testId}
-  style="height: {offsetHeightTween.current}px;"
+  style="height: {offsetHeightTween.current}px; width: {offsetWidthTween.current}px;"
 >
-  <div bind:offsetHeight>
+  <div class="w-fit" bind:offsetHeight bind:offsetWidth>
     <div class="flex items-center justify-between p-4">
       {@render header?.()}
       <button onclick={() => dialog?.close()} aria-label="Close">
@@ -79,7 +87,6 @@
 
 <style>
   dialog {
-    width: calc(100vw - 4em);
     max-height: calc(100vh - 4em);
   }
 

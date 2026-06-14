@@ -32,31 +32,41 @@
     loadingId = itemId;
 
     const layerId = uniqueId(`${kebabCase(displayName)}__`);
+    const payload = url.endsWith('.pmtiles')
+      ? {
+          type: 'vector' as const,
+          displayName,
+          location: {
+            type: 'api' as const,
+            url
+          }
+        }
+      : {
+          type: 'geojson' as const,
+          displayName,
+          location: {
+            type: 'api' as const,
+            url
+          }
+        };
 
     await applyDiff({
       type: 'add-layer',
       layerId,
-      payload: {
-        type: 'geojson',
-        location: {
-          type: 'api',
-          url
-        },
-        displayName
-      }
+      payload
     });
 
     map.value!.on('sourcedata', handleSourceLoaded(layerId));
   }
 </script>
 
-<div class="grid grid-cols-2 gap-x-2 gap-y-1">
+<div class="grid grid-cols-3 gap-x-2 gap-y-1 w-2xl h-106.5">
   {#each GALLERY_ITEMS as item (item.id)}
     <button
       onclick={() => onSelectDataset(item.id, item.name, item.url)}
       disabled={loadingId !== null}
       class={[
-        'relative flex flex-col rounded-sm border p-2 text-left transition-colors hover:border-slate-400',
+        'relative flex flex-col gap-1 rounded-sm border p-2 text-left transition-colors hover:border-slate-400',
         loadingId === item.id ? 'border-slate-400' : 'border-transparent'
       ]}
     >
@@ -80,7 +90,14 @@
           {/if}
         </span>
       </div>
-      <p class="text-2xs mt-0 font-light text-gray-500">{item.attribution}</p>
+      <div class="flex justify-between items-start gap-2 text-2xs font-light">
+        <p class="text-slate-400">
+          {item.attribution}
+        </p>
+        <p class="font-mono bg-slate-700 px-1 py-0.5 rounded-xs">
+          {item.format}
+        </p>
+      </div>
     </button>
   {/each}
 </div>
