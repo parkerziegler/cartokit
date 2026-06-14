@@ -9,10 +9,10 @@ import type { CartoKitLayer } from '$lib/types';
  * accompanying call to add the layer to the map.
  */
 export function codegenLayer(layer: CartoKitLayer): string {
-  const sourceLayerExpr =
+  const sourceLayer =
     layer.source.type === 'vector'
-      ? `'source-layer': '${layer.source.sourceLayerId}',`
-      : undefined;
+      ? `'source-layer': '${layer.source.sourceLayerId}',\n`
+      : '';
 
   switch (layer.type) {
     case 'Point':
@@ -25,8 +25,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
         map.addLayer({
           id: '${layer.id}',
           source: '${layer.id}',
-          ${sourceLayerExpr}
-          type: 'circle',
+          ${sourceLayer}type: 'circle',
           ${
             fill || stroke
               ? `paint: { ${[fill, stroke].filter(Boolean).join(',\n')} }`
@@ -42,8 +41,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
         map.addLayer({
           id: '${layer.id}',
           source: '${layer.id}',
-          ${sourceLayerExpr}
-          type: 'line',
+          ${sourceLayer}type: 'line',
           ${stroke ? `paint: { ${stroke} }` : ''}
         });
       `;
@@ -57,8 +55,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
         fillLayer = `map.addLayer({
           id: '${layer.id}',
           source: '${layer.id}',
-          ${sourceLayerExpr}
-          type: 'fill',
+          ${sourceLayer}type: 'fill',
           ${fill ? `paint: { ${fill} }` : ''}
         });`;
       }
@@ -68,8 +65,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
         strokeLayer = `map.addLayer({
           id: '${layer.id}-stroke',
           source: '${layer.id}',
-          ${sourceLayerExpr}
-          type: 'line',
+          ${sourceLayer}type: 'line',
           ${stroke ? `paint: { ${stroke} }` : ''}
         });`;
       }
@@ -81,8 +77,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
       const fillLayer = `map.addLayer({
         id: '${layer.id}',
         source: '${layer.id}',
-        ${sourceLayerExpr}
-        type: 'fill',
+        ${sourceLayer}type: 'fill',
         ${fill ? `paint: { ${fill} }` : ''}
       });`;
 
@@ -93,8 +88,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
         strokeLayer = `map.addLayer({
           id: '${layer.id}-stroke',
           source: '${layer.id}',
-          ${sourceLayerExpr}
-          type: 'line',
+          ${sourceLayer}type: 'line',
           ${stroke ? `paint: { ${stroke} }` : ''}
         });`;
       }
@@ -108,8 +102,7 @@ export function codegenLayer(layer: CartoKitLayer): string {
         map.addLayer({
           id: '${layer.id}',
           source: '${layer.id}',
-          ${sourceLayerExpr}
-          type: 'heatmap',
+          ${sourceLayer}type: 'heatmap',
           paint: { ${display} }
         });
       `;
