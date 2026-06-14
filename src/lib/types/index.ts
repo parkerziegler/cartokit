@@ -748,10 +748,8 @@ export interface GalleryItem {
   attribution: string;
   url: string;
   src: SvelteHTMLElements['enhanced:img']['src'];
-  type:
-    | CartoKitPointLayer['type']
-    | CartoKitLineLayer['type']
-    | CartoKitPolygonLayer['type'];
+  type: CartoKitLayer['type'];
+  format: 'GeoJSON' | 'PMTiles';
 }
 
 /**

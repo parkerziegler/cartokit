@@ -45,7 +45,7 @@
 </script>
 
 {#if provider === 'Custom'}
-  <form class="flex flex-col gap-4">
+  <form class="flex flex-col gap-4 min-w-xl">
     <div class="flex flex-col gap-2">
       <FieldLabel fieldId="tile-url">Tile URL</FieldLabel>
       <TextInput
@@ -53,7 +53,6 @@
         value={tileUrl}
         placeholder="(e.g., https://www.openhistoricalmap.org/map-styles/woodblock/woodblock.json)"
         id="tile-url"
-        class="w-full"
       />
     </div>
     <Button
@@ -63,7 +62,7 @@
     >
   </form>
 {:else}
-  <div class="grid grid-cols-3 gap-4">
+  <div class="grid grid-cols-3 gap-4 min-w-2xl">
     {#each BASEMAPS[provider] as basemap (basemap.tileId)}
       <button
         class={[

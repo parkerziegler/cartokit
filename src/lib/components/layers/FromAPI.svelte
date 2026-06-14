@@ -98,7 +98,7 @@
   }
 </script>
 
-<form class="flex flex-col gap-4" onsubmit={onSubmit}>
+<form class="flex flex-col gap-4 w-lg" onsubmit={onSubmit}>
   <div class="flex flex-col gap-2">
     <FieldLabel fieldId="from-endpoint-input">Endpoint</FieldLabel>
     <TextInput

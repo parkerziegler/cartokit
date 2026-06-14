@@ -120,11 +120,11 @@
     class="absolute! inset-0 h-10 w-10 rounded-sm border border-white transition-transform group-hover:-translate-x-2 group-hover:-rotate-12"
   ></div>
 </button>
-<Modal bind:showModal class="max-w-2xl" initialHeight={277}>
+<Modal bind:showModal initialWidth={672} initialHeight={277}>
   {#snippet header()}
     <h2 class="text-xl font-semibold">Select Basemap</h2>
   {/snippet}
-  <Tabs {tabs} bodyClass="max-h-[24rem] overflow-y-auto" />
+  <Tabs {tabs} bodyClass="max-h-[22.5rem] overflow-y-auto" />
 </Modal>
 
 <style lang="postcss">
