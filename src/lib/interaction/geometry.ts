@@ -25,9 +25,9 @@ export function deriveSize(
     'interpolate',
     ['linear'],
     ['sqrt', ['get', layer.style.size.attribute]],
-    min,
+    Math.sqrt(min),
     rMin,
-    max,
+    Math.sqrt(max),
     rMax
   ];
 }
