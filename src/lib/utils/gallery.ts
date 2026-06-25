@@ -36,5 +36,13 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-powerplants.json',
     src: PowerPlants,
     type: 'Point'
+  },
+  {
+    id: 'election-results-2024',
+    name: '2024 Precinct-Level Presidential Election Results',
+    attribution: 'The New York Times',
+    url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/nyt-election-2024-national.json',
+    src: PowerPlants,
+    type: 'Point'
   }
 ];
