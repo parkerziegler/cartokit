@@ -17,17 +17,12 @@ export async function load({ url }) {
 
   if (userId) {
     try {
-      const { ok } = await client.kv.namespaces.values.get(
-        KV_NAMESPACE_ID,
-        userId,
-        {
-          account_id: CLOUDFLARE_ACCOUNT_ID
-        }
-      );
+      await client.kv.namespaces.values.get(userId, {
+        namespace_id: KV_NAMESPACE_ID,
+        account_id: CLOUDFLARE_ACCOUNT_ID
+      });
 
-      if (ok) {
-        userExists = true;
-      }
+      userExists = true;
     } catch {
       userExists = false;
     }
