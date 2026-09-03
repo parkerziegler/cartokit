@@ -177,7 +177,7 @@
   <Portal>
     <div class="fixed inset-0 z-20 bg-[rgba(0,0,0,0.3)]">
       <div
-        class="absolute bottom-12 left-4 rounded-md bg-slate-900 p-2 text-xs tracking-wider text-white shadow-lg"
+        class="absolute bottom-12 left-4 rounded bg-slate-900 p-2 text-xs tracking-wider text-white shadow-lg"
       >
         <Alert kind="info" message="Uploading map..." testId="upload-map-alert">
           {#snippet icon()}

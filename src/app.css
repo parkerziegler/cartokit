@@ -15,6 +15,9 @@
   /* Colors */
   --color-ck: #7e58ff;
   --color-ck-light: #d4d7ff;
+  --color-oxide-yellow: oklch(0.837 0.14 75);
+  --color-oxide-green: oklch(0.77 0.1919 163.7);
+  --color-oxide-red: oklch(0.712 0.185 11.3);
 
   /* Transitions */
   --ease-cubic-out: cubic-bezier(0.215, 0.61, 0.355, 1);

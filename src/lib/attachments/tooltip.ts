@@ -17,20 +17,26 @@ interface TooltipOptions {
 /**
  * A Svelte attachment to display a tooltip for an element.
  *
- * @param options – The options for the attachment, consisting of the content
+ * @param options The options for the attachment, consisting of the content
  * of the tooltip, the keybinding to display, the placement of the tooltip, and
  * the offset value of the tooltip.
- * @returns An @see{Attachment} to be used in a Svelte component.
+ * @returns An {@link Attachment} to be used in a Svelte component.
  */
 export function tooltip(options: TooltipOptions): Attachment {
   return (element) => {
     const { content, keybinding, placement = 'top', offsetValue = 6 } = options;
 
     const tt = document.createElement('div');
-    tt.innerHTML = content;
+
+    tt.textContent = content;
+
     if (keybinding) {
-      tt.innerHTML += `<span class="keybinding">${keybinding}</span>`;
+      const kb = document.createElement('span');
+      kb.className = 'keybinding';
+      kb.textContent = keybinding;
+      tt.appendChild(kb);
     }
+
     tt.style.display = 'none';
     tt.style.position = 'absolute';
     tt.classList.add(

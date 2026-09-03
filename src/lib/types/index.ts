@@ -758,11 +758,7 @@ export interface GalleryItem {
  * Represents the set of possible basemap providers in cartokit.
  */
 export type BasemapProvider =
-  | 'CARTO'
-  | 'MapTiler'
-  | 'Stadia Maps'
-  | 'Stamen'
-  | 'Custom';
+  'CARTO' | 'MapTiler' | 'Stadia Maps' | 'Stamen' | 'Custom';
 
 /**
  * Represents the set of possible projections in cartokit.
@@ -846,9 +842,7 @@ export interface BooleanCatalogEntry {
 
 /** Represents a per-attribute entry in the {@link Catalog}. */
 export type CatalogEntry =
-  | NumericCatalogEntry
-  | StringCatalogEntry
-  | BooleanCatalogEntry;
+  NumericCatalogEntry | StringCatalogEntry | BooleanCatalogEntry;
 
 /** Represents a catalog mapping layers to pre-computed classification statistics. */
 export type Catalog = Record<CartoKitLayer['id'], Record<string, CatalogEntry>>;

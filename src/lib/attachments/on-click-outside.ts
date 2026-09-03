@@ -8,9 +8,9 @@ interface ClickOutsideOptions {
 /**
  * A Svelte attachment to detect clicks outside of an element.
  *
- * @param options – The options for the attachment, consisting of the callback
+ * @param options The options for the attachment, consisting of the callback
  * function to run when click outside of the target element is detected.
- * @returns An @see{Attachment} to be used in a Svelte component.
+ * @returns An {@link Attachment} to be used in a Svelte component.
  */
 export function onClickOutside(options: ClickOutsideOptions): Attachment {
   return (element) => {

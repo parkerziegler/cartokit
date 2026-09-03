@@ -364,6 +364,11 @@ interface ProjectionDiff {
   };
 }
 
+interface UnknownDiff {
+  type: 'unknown';
+  payload: Record<string, never>;
+}
+
 export type CartoKitDiff =
   | LayerTypeDiff
   | SourceLayerDiff
@@ -410,7 +415,8 @@ export type CartoKitDiff =
   | BasemapDiff
   | ZoomDiff
   | CenterDiff
-  | ProjectionDiff;
+  | ProjectionDiff
+  | UnknownDiff;
 
 /**
  * Apply a {@link CartoKitDiff} to the current {@link CartoKitIR}, triggering

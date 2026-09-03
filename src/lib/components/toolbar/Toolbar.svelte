@@ -17,7 +17,7 @@
 
 <div
   class={[
-    'ease-cubic-out absolute bottom-12 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-md bg-slate-900 p-2 shadow-lg transition-transform duration-400',
+    'ease-cubic-out absolute bottom-12 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded bg-slate-900 p-2 shadow-lg transition-transform duration-400',
     {
       '-translate-y-72': $layout.dataVisible,
       'translate-x-[calc(-16.666666vw-50%)]': $layout.editorVisible,

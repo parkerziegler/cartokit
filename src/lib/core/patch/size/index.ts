@@ -24,8 +24,7 @@ export async function patchSizeDiffs(
   switch (diff.type) {
     case 'size': {
       const layer = ir.layers[diff.layerId] as
-        | CartoKitPointLayer
-        | CartoKitDotDensityLayer;
+        CartoKitPointLayer | CartoKitDotDensityLayer;
 
       // Derive the inverse diff prior to applying the patch.
       inverse = {

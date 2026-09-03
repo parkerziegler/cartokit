@@ -1,29 +1,30 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
+  import { onMount, tick } from 'svelte';
 
+  import ChatDialog from '$lib/components/chat/ChatDialog.svelte';
   import ArrowUpIcon from '$lib/components/icons/ArrowUpIcon.svelte';
-  import Alert from '$lib/components/shared/Alert.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
+  import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff } from '$lib/core/diff';
+  import { chat, MODELS } from '$lib/state/chat.svelte';
   import { user } from '$lib/state/user.svelte';
   import { ir } from '$lib/stores/ir';
   import type { LayerType } from '$lib/types';
   import { selectAttributes } from '$lib/utils/attributes';
+  import { hash } from '$lib/utils/hash';
 
   interface Props {
-    form?: HTMLFormElement;
+    ref?: HTMLDivElement;
     requestInFlight: boolean;
   }
 
   let {
-    form = $bindable(undefined),
+    ref = $bindable(undefined),
     requestInFlight = $bindable(false)
   }: Props = $props();
 
-  let prompt = $state('');
-  let diffUnknown = $state(false);
   let error = $state(false);
+  let chatDialog: HTMLDivElement | undefined = $state();
   let textarea: HTMLTextAreaElement | undefined = $state();
 
   let layerIds = $derived(Object.keys($ir.layers));
@@ -66,9 +67,21 @@
   function onKeyDown(
     event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
   ) {
-    if (event.key === 'Enter' && !event.shiftKey && prompt.length > 0) {
+    if (event.key === 'Enter' && !event.shiftKey && chat.prompt.length > 0) {
       onSubmit(event);
     }
+  }
+
+  function onModelChange(event: Event & { currentTarget: HTMLSelectElement }) {
+    chat.model = event.currentTarget.value;
+  }
+
+  async function scrollToBottom() {
+    await tick();
+    chatDialog?.scrollTo({
+      top: chatDialog.scrollHeight,
+      behavior: 'smooth'
+    });
   }
 
   async function onSubmit(
@@ -85,35 +98,56 @@
     }
 
     try {
+      const promptId = hash(chat.prompt);
+      chat.dialog.push({
+        id: promptId,
+        text: chat.prompt,
+        diffs: [],
+        summary: 'Thinking'
+      });
+
+      await scrollToBottom();
+
+      const body = JSON.stringify({
+        layerIds,
+        layerIdsToAttributes,
+        layerIdsToSourceLayerIds,
+        layerIdsToTypes,
+        model: chat.model,
+        prompt: chat.prompt,
+        userId: user.userId
+      });
+
+      // Clear the prompt before issuing the request.
+      chat.prompt = '';
+
       const data = await fetch('/llm', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          prompt,
-          layerIds,
-          layerIdsToTypes,
-          layerIdsToAttributes,
-          layerIdsToSourceLayerIds,
-          userId: user.userId
-        })
+        body
       }).then((response) => response.json());
 
       for (const diff of data.diffs) {
         if (diff.type === 'unknown') {
-          diffUnknown = true;
-
-          setTimeout(() => {
-            diffUnknown = false;
-          }, 3000);
+          continue;
         } else {
-          await applyDiff(diff);
+          try {
+            await applyDiff(diff);
+          } catch {
+            diff.errored = true;
+          }
         }
       }
 
-      prompt = '';
-    } catch {
+      const activePrompt = chat.dialog.at(-1)!;
+      activePrompt.diffs = data.diffs;
+      activePrompt.summary = data.summary;
+
+      await scrollToBottom();
+    } catch (err) {
+      console.error(err);
       error = true;
 
       setTimeout(() => {
@@ -125,64 +159,47 @@
   }
 </script>
 
-<Menu class="absolute bottom-16 left-1/2 -translate-x-1/2 p-4">
-  <div class="flex flex-col gap-2 rounded-sm border border-slate-600">
-    <form class="flex flex-col gap-2" onsubmit={onSubmit} bind:this={form}>
+<Menu
+  bind:ref
+  class="absolute bottom-16 left-1/2 flex max-h-80 -translate-x-1/2 flex-col overflow-hidden p-2"
+>
+  {#if chat.dialog.length > 0}
+    <ChatDialog bind:ref={chatDialog} />
+  {/if}
+  <div
+    class={[
+      'flex flex-col gap-2 rounded-sm border border-slate-600',
+      { 'rounded-t-none': chat.dialog.length > 0 }
+    ]}
+  >
+    <form class="flex flex-col gap-2" onsubmit={onSubmit}>
       <textarea
-        class="h-32 w-72 resize-none rounded-sm rounded-b-none bg-slate-900 p-2 text-white"
-        placeholder="Prompt the model to update map layers..."
-        bind:value={prompt}
+        class={[
+          'h-14 w-96 resize-none bg-slate-900 p-2 text-white',
+          chat.dialog.length === 0
+            ? 'rounded-sm rounded-b-none'
+            : 'rounded-none'
+        ]}
+        placeholder="Prompt the model to update the map..."
+        bind:value={chat.prompt}
         bind:this={textarea}
         disabled={requestInFlight}
-        onkeydown={onKeyDown}
-      >
-      </textarea>
-      <div class="flex items-center justify-between px-2 pb-2">
-        <code
-          class="self-start rounded-xs bg-slate-400 px-1 py-0.5 text-xs text-white"
-          >GPT-5.4 Mini</code
-        >
+        onkeydown={onKeyDown}></textarea>
+      <div class="flex items-center justify-between px-1 pb-1">
+        <Select
+          class="flex items-center justify-center rounded-xs p-1! font-mono text-xs text-white hover:border-transparent hover:bg-slate-800 focus:border-transparent"
+          id="llm-model"
+          selected={chat.model}
+          options={MODELS}
+          onchange={onModelChange}
+        />
         <button
-          class="flex h-5.5 w-5.5 items-center justify-center rounded-xs border border-white bg-slate-400 text-white disabled:opacity-50"
-          disabled={requestInFlight || error || diffUnknown || !prompt.length}
+          class="flex h-5.5 w-5.5 items-center justify-center rounded-xs border border-white bg-slate-400 text-white transition-colors disabled:border-transparent disabled:bg-slate-900 disabled:text-slate-400"
+          disabled={requestInFlight || error || !chat.prompt.length}
         >
           <ArrowUpIcon />
         </button>
       </div>
     </form>
-    {#if requestInFlight}
-      <p class="loading px-2 text-slate-400" transition:slide>Thinking</p>
-    {/if}
-    {#if error}
-      <Alert
-        kind="error"
-        message="There was an error processing the request. Ensure you've added layers to the map."
-        class="mx-2 mb-2"
-      />
-    {/if}
-    {#if diffUnknown}
-      <Alert
-        kind="warn"
-        message="⚠️ The model was unable to understand the request. Please rephrase your prompt."
-        class="mx-2 mb-2"
-      />
-    {/if}
   </div>
 </Menu>
-
-<style lang="postcss">
-  @reference 'tailwindcss';
-
-  .loading::after {
-    @apply inline-block w-0 overflow-hidden align-middle;
-
-    content: '\2026';
-    animation: ellipsis steps(4, end) 400ms infinite;
-  }
-
-  @keyframes ellipsis {
-    to {
-      width: 1.25em;
-    }
-  }
-</style>
