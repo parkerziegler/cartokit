@@ -21,6 +21,9 @@ export function registerKeybinding(
     ) {
       event.stopPropagation();
       return;
+    } else if (event.metaKey) {
+      event.stopPropagation();
+      return;
     }
 
     if (event.key === key && (!requireShift || event.shiftKey)) {
