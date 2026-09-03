@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { uniqueId } from 'lodash-es';
   import { onMount, tick } from 'svelte';
 
   import ChatDialog from '$lib/components/chat/ChatDialog.svelte';
@@ -11,7 +12,6 @@
   import { ir } from '$lib/stores/ir';
   import type { LayerType } from '$lib/types';
   import { selectAttributes } from '$lib/utils/attributes';
-  import { hash } from '$lib/utils/hash';
 
   interface Props {
     ref?: HTMLDivElement;
@@ -23,7 +23,6 @@
     requestInFlight = $bindable(false)
   }: Props = $props();
 
-  let error = $state(false);
   let chatDialog: HTMLDivElement | undefined = $state();
   let textarea: HTMLTextAreaElement | undefined = $state();
 
@@ -98,9 +97,8 @@
     }
 
     try {
-      const promptId = hash(chat.prompt);
       chat.dialog.push({
-        id: promptId,
+        id: uniqueId('prompt__'),
         text: chat.prompt,
         diffs: [],
         summary: 'Thinking'
@@ -118,7 +116,7 @@
         userId: user.userId
       });
 
-      // Clear the prompt before issuing the request.
+      // Clear the prompt before issuing the request for animation choreography.
       chat.prompt = '';
 
       const data = await fetch('/llm', {
@@ -146,13 +144,15 @@
       activePrompt.summary = data.summary;
 
       await scrollToBottom();
-    } catch (err) {
-      console.error(err);
-      error = true;
-
-      setTimeout(() => {
-        error = false;
-      }, 3000);
+    } catch {
+      const activePrompt = chat.dialog.at(-1)!;
+      activePrompt.diffs.push({
+        type: 'error',
+        payload: {},
+        errored: true
+      });
+      activePrompt.summary =
+        'An error occurred while processing the request. Please retry.';
     } finally {
       requestInFlight = false;
     }
@@ -195,7 +195,7 @@
         />
         <button
           class="flex h-5.5 w-5.5 items-center justify-center rounded-xs border border-white bg-slate-400 text-white transition-colors disabled:border-transparent disabled:bg-slate-900 disabled:text-slate-400"
-          disabled={requestInFlight || error || !chat.prompt.length}
+          disabled={requestInFlight || !chat.prompt.length}
         >
           <ArrowUpIcon />
         </button>

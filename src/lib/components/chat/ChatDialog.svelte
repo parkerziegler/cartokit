@@ -44,25 +44,28 @@
       {:else}
         <p class="text-white">{prompt.summary}</p>
         <div class="flex items-baseline gap-1">
-          <div class="flex gap-0.5">
-            {#each prompt.diffs as diff, i (i)}
-              <span
-                class={[
-                  'bg-oxide-green/60 border-oxide-green h-2 w-2 rounded-full border',
-                  {
-                    'bg-oxide-yellow/60 border-oxide-yellow border':
-                      diff.type === 'unknown'
-                  },
-                  {
-                    'bg-oxide-red/60 border-oxide-red border': diff.errored
-                  }
-                ]}
-                {@attach tooltip({
-                  content: startCase(diff.type)
-                })}
-              ></span>
-            {/each}
-          </div>
+          {#if prompt.diffs.length > 0}
+            <div class="flex gap-0.5">
+              {#each prompt.diffs as diff, i (i)}
+                <span
+                  class={[
+                    'bg-oxide-green/60 border-oxide-green h-2 w-2 rounded-full border',
+                    {
+                      'bg-oxide-yellow/60 border-oxide-yellow border':
+                        diff.type === 'unknown'
+                    },
+                    {
+                      'bg-oxide-red/60 border-oxide-red border':
+                        diff.type === 'error' || diff.errored
+                    }
+                  ]}
+                  {@attach tooltip({
+                    content: startCase(diff.type)
+                  })}
+                ></span>
+              {/each}
+            </div>
+          {/if}
           <p class="text-slate-600">
             {deriveEditMessage(prompt)}
           </p>

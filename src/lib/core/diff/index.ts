@@ -369,6 +369,11 @@ interface UnknownDiff {
   payload: Record<string, never>;
 }
 
+interface ErrorDiff {
+  type: 'error';
+  payload: Record<string, never>;
+}
+
 export type CartoKitDiff =
   | LayerTypeDiff
   | SourceLayerDiff
@@ -416,7 +421,8 @@ export type CartoKitDiff =
   | ZoomDiff
   | CenterDiff
   | ProjectionDiff
-  | UnknownDiff;
+  | UnknownDiff
+  | ErrorDiff;
 
 /**
  * Apply a {@link CartoKitDiff} to the current {@link CartoKitIR}, triggering
