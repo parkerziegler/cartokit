@@ -7,6 +7,7 @@ import { OPENAI_API_KEY } from '$env/static/private';
 import type { RequestHandler } from './$types';
 
 import type { BasemapProvider, LayerType } from '$lib/types';
+import type { LLMRequest, LLMRequestState } from '$lib/types/llm';
 import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
 
 // Initialize the OpenAI client.
@@ -15,19 +16,205 @@ const openai = new OpenAI({
 });
 
 /**
+ * Diffs that apply to the map instance.
+ */
+const MAP_DIFFs = ['center', 'zoom', 'basemap', 'projection'];
+
+/**
+ * Diffs accepted by every layer, regardless of its {@link LayerType}.
+ */
+const LAYER_DIFFS = [
+  'layer-type',
+  'layer-visibility',
+  'layer-tooltip-visibility',
+  'rename-layer',
+  'remove-layer'
+];
+
+/**
+ * Diifs specific to each layer, based on its {@link LayerType}.
+ */
+const LAYER_TYPE_DIFFS: Record<LayerType, string[]> = {
+  Choropleth: [
+    'fill-attribute',
+    'fill-visualization-type',
+    'fill-classification-method',
+    'fill-color-ramp',
+    'fill-color-ramp-direction',
+    'fill-color-scheme',
+    'fill-color-scheme-direction',
+    'fill-step-count',
+    'fill-step-value',
+    'fill-opacity',
+    'stroke-color',
+    'stroke-width',
+    'stroke-opacity',
+    'add-stroke',
+    'remove-stroke'
+  ],
+  'Dot Density': [
+    'fill-color',
+    'fill-opacity',
+    'add-fill',
+    'remove-fill',
+    'stroke-color',
+    'stroke-width',
+    'stroke-opacity',
+    'add-stroke',
+    'remove-stroke',
+    'size',
+    'dot-attribute',
+    'dot-value'
+  ],
+  Heatmap: [
+    'heatmap-ramp',
+    'heatmap-ramp-direction',
+    'heatmap-radius',
+    'heatmap-opacity',
+    'heatmap-weight-type',
+    'heatmap-weight-attribute',
+    'heatmap-weight-min',
+    'heatmap-weight-max',
+    'heatmap-weight-value'
+  ],
+  Line: ['stroke-color', 'stroke-width', 'stroke-opacity'],
+  Point: [
+    'fill-attribute',
+    'fill-color',
+    'fill-classification-method',
+    'fill-color-ramp',
+    'fill-color-ramp-direction',
+    'fill-color-scheme',
+    'fill-color-scheme-direction',
+    'fill-step-count',
+    'fill-step-value',
+    'fill-opacity',
+    'add-fill',
+    'remove-fill',
+    'stroke-color',
+    'stroke-width',
+    'stroke-opacity',
+    'add-stroke',
+    'remove-stroke',
+    'size'
+  ],
+  Polygon: [
+    'fill-color',
+    'fill-opacity',
+    'add-fill',
+    'remove-fill',
+    'stroke-color',
+    'stroke-width',
+    'stroke-opacity',
+    'add-stroke',
+    'remove-stroke'
+  ],
+  'Proportional Symbol': [
+    'fill-attribute',
+    'fill-visualization-type',
+    'fill-classification-method',
+    'fill-color',
+    'fill-color-ramp',
+    'fill-color-ramp-direction',
+    'fill-color-scheme',
+    'fill-color-scheme-direction',
+    'fill-step-count',
+    'fill-step-value',
+    'fill-opacity',
+    'add-fill',
+    'remove-fill',
+    'stroke-color',
+    'stroke-width',
+    'stroke-opacity',
+    'add-stroke',
+    'remove-stroke',
+    'size-attribute',
+    'min-size',
+    'max-size'
+  ]
+};
+
+/**
+ * The static portion of the system prompt, held constant to support caching
+ * across requests.
+ */
+const SYSTEM_PROMPT = `You are the editing assistant for cartokit, a browser-based cartography tool. The user is looking at a map and describing changes to it in natural language. Translate their request into an ordered sequence of diffs that the application will apply to the map.
+
+# Diffs
+
+A diff is a single, atomic edit. Layer-scoped diffs carry a "layerId" naming the layer they target. Map-scoped diffs ("${MAP_DIFFs.join('", "')}") apply to the map as a whole and target no layer.
+
+Emit diffs in the order they should be applied. A later diff may depend on the effect of an earlier one — for example, converting a layer with "layer-type" before styling the result.
+
+# Layer types
+
+Every layer has a type, and only some diffs are valid for each type. Never emit a diff for a layer whose type does not accept it.
+
+Every layer accepts: ${LAYER_DIFFS.join(', ')}. A layer backed by a vector source also accepts "source-layer".
+
+Beyond those, each layer type accepts:
+
+${Object.entries(LAYER_TYPE_DIFFS)
+  .map(([layerType, diffTypes]) => `- ${layerType}: ${diffTypes.join(', ')}`)
+  .join('\n')}
+
+# Rules
+
+- Target layers by the "id" given in the map request state, never by display name. If the user names a layer ambiguously and more than one layer could match, do not guess.
+- Only reference attributes listed for the layer you are targeting. An attribute present on one layer does not exist on every layer.
+- When creating a layer with "add-layer", generate a layer ID in kebab-case from the display name, followed by a double underscore and a random six-character alphanumeric suffix (for example, "population-data__a1b2c3" for "Population Data"). Reference that same ID in any later diffs in the same response.
+- If you cannot determine what the user wants, emit a single "unknown" diff and nothing else, then use the summary to explain what was ambiguous.
+
+# Summary
+
+Alongside the diffs, return a terse, past-tense summary of what changed, so the user knows what to expect — for example, "Converted the counties layer to a choropleth of median income." If you emitted no diffs, or only an "unknown" diff, use the summary to explain why instead.`;
+
+/**
+ * Convert the current requestState of the map to a secondary system prompt.
+ *
+ * @param requestState The {@link LLMRequestState} supplied by the client.
+ * @returns A prompt fragment describing the map the user is looking at.
+ */
+function buildRequestStatePrompt(requestState: LLMRequestState): string {
+  const [lng, lat] = requestState.center;
+
+  const layers =
+    requestState.layers.length > 0
+      ? requestState.layers
+          .map((layer) =>
+            [
+              `- id: ${layer.id}`,
+              `  displayName: ${layer.displayName}`,
+              `  type: ${layer.type}`,
+              `  attributes: ${layer.attributes.join(', ') || '(none)'}`,
+              ...(layer.sourceLayerIds.length > 0
+                ? [`  sourceLayerIds: ${layer.sourceLayerIds.join(', ')}`]
+                : []),
+              `  visible: ${layer.layout.visible}`,
+              `  tooltipVisible: ${layer.layout.tooltip.visible}`
+            ].join('\n')
+          )
+          .join('\n')
+      : '(the map has no layers)';
+
+  return `# Current map request state
+
+Zoom: ${requestState.zoom}
+Center: lng ${lng}, lat ${lat}
+Projection: ${requestState.projection}
+Basemap: ${requestState.basemap.provider}, ${requestState.basemap.mode} mode
+
+Layers, in draw order:
+${layers}`;
+}
+
+/**
  * The main function that handles the POST request to the /llm endpoint. This
  * function receives a prompt from a user and sends it to the OpenAI API, re-
  * turning the generated diffs as a JSON response.
  */
 export const POST = (async ({ request }) => {
-  const {
-    model,
-    layerIds,
-    layerIdsToAttributes,
-    layerIdsToSourceLayerIds,
-    layerIdsToTypes,
-    prompt
-  } = await request.json();
+  const { model, prompt, requestState }: LLMRequest = await request.json();
 
   try {
     const completion = await openai.chat.completions.parse<
@@ -37,34 +224,8 @@ export const POST = (async ({ request }) => {
       model,
       reasoning_effort: 'low',
       messages: [
-        {
-          role: 'system',
-          content: `Generate zero or more diffs to apply to the map visualization
-      based on the user's prompt. In addition, provide a very terse summary of
-      the generated diff sequence, such that a user can understand the set of
-      changes to expect. Choose the "unknown" diff if you cannot easily
-      determine the type of diff based on the prompt.
-
-      For diffs that require a "layerId" value, consult the following array
-      to determine the set of valid strings to use: ${JSON.stringify(layerIds)}.
-      When creating new layers with "add-layer", generate friendly layer IDs
-      in kebab-case format with a unqiue hash suffix based on the displayName
-      (e.g., "population-data__a1b2c3" for a layer named "Population Data"). Use
-      the same layer ID when referencing the newly created layer in subsequent
-      diffs within the same request, as appropriate.
-
-      When transitioning a layer's type with "layer-type", consult the
-      following dictionary to determine the current sourceLayerType for the
-      layer targeted by the diff: ${JSON.stringify(layerIdsToTypes)}.
-
-      When generating a diff changing an attribute for a visualization property
-      of a layer, consult the following dictionary to determine the available
-      attributes on the layer: ${JSON.stringify(layerIdsToAttributes)}.
-
-      When switching a layer's source layer with "source-layer", consult the
-      following dictionary to determine the available sourceLayerIds for the
-      layer targeted by the diff: ${JSON.stringify(layerIdsToSourceLayerIds)}.`
-        },
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: buildRequestStatePrompt(requestState) },
         { role: 'user', content: prompt }
       ],
       response_format: {
@@ -79,33 +240,52 @@ export const POST = (async ({ request }) => {
       }
     });
 
-    // Validate the response using information from the map state.
-    const LayerIdSchema = makeLayerIdSchema(layerIds);
-    const AttributeSchema = makeAttrsSchema(layerIdsToAttributes);
-    const SourceLayerIdsSchema = makeSourceLayerIdsSchema(
-      layerIdsToSourceLayerIds
+    // Validate the response using information from the map request state.
+    const LayerIdSchema = makeLayerIdSchema(
+      requestState.layers.map((layer) => layer.id)
+    );
+    const attrsSchemas = new Map(
+      requestState.layers.map((layer) => [
+        layer.id,
+        makeAttrsSchema(layer.attributes)
+      ])
+    );
+    const sourceLayerIdsSchemas = new Map(
+      requestState.layers.map((layer) => [
+        layer.id,
+        makeSourceLayerIdsSchema(layer.sourceLayerIds)
+      ])
     );
 
     const diffs = completion.choices[0].message.parsed?.diffs.filter((diff) => {
-      let layerIdValid = true;
-      let attributeValid = true;
-      let sourceLayerIdValid = true;
-
-      if ('layerId' in diff) {
-        layerIdValid = z.validate(LayerIdSchema, diff.layerId);
+      // Map-scoped diffs target no layer, and so have nothing to validate.
+      if (!('layerId' in diff)) {
+        return true;
       }
 
-      if ('attribute' in diff.payload) {
-        attributeValid = z.validate(AttributeSchema, diff.payload.attribute);
+      if (!z.validate(LayerIdSchema, diff.layerId)) {
+        return false;
       }
 
-      if (diff.type === 'source-layer') {
-        sourceLayerIdValid =
+      const AttributeSchema = attrsSchemas.get(diff.layerId);
+      const SourceLayerIdsSchema = sourceLayerIdsSchemas.get(diff.layerId);
+
+      if (
+        AttributeSchema &&
+        'attribute' in diff.payload &&
+        !z.validate(AttributeSchema, diff.payload.attribute)
+      ) {
+        return false;
+      }
+
+      if (SourceLayerIdsSchema && diff.type === 'source-layer') {
+        return (
           z.validate(SourceLayerIdsSchema, diff.payload.sourceSourceLayerId) &&
-          z.validate(SourceLayerIdsSchema, diff.payload.targetSourceLayerId);
+          z.validate(SourceLayerIdsSchema, diff.payload.targetSourceLayerId)
+        );
       }
 
-      return layerIdValid && attributeValid && sourceLayerIdValid;
+      return true;
     });
 
     return json({
@@ -124,9 +304,10 @@ export const POST = (async ({ request }) => {
 /**
  * Construct the schema for the layerId field for a diff.
  *
- * Constrained decoding responses from the OpenAI API should only target
- * existing map layers. This schema also permits a fresh layer ID subschema to
- * support the "add-layer" diff, which must generate a layer ID on the fly.
+ * Responses from the OpenAI API are validated after the fact, and should only
+ * target existing map layers. This schema also permits a fresh layer ID
+ * subschema to support the "add-layer" diff, which must generate a layer ID on
+ * the fly.
  *
  * @param layerIds An array of the IDs of the current layers on the map.
  * @returns A Zod schema for the layerId field of a generated diff.
@@ -151,16 +332,18 @@ function makeLayerIdSchema(layerIds: string[]) {
  * Construct the schema for a dataset attribute, potentially present in the
  * payload of a diff.
  *
- * Constrained decoding responses from the OpenAI API should only reference
- * attributes that exist on the map's layers. If no layers expose attributes,
- * the schema falls back to the "None" sentinel.
+ * Responses from the OpenAI API are validated after the fact — the JSON schema
+ * sent to the API is static, so it cannot constrain decoding to the attributes
+ * of a particular layer. Build one schema per layer, since an attribute
+ * present on one layer does not necessarily exist on another. If the layer
+ * exposes no attributes, the schema falls back to the "None" sentinel, which
+ * rejects every attribute.
  *
- * @param layerIdsToAttributes A dictionary mapping the IDs of the current
- * map layers to their available attributes.
- * @returns A Zod schema for the attribute field of a generated diff.
+ * @param attributes The attributes available on a single map layer.
+ * @returns A Zod schema for the attribute field of a diff targeting that layer.
  */
-function makeAttrsSchema(layerIdsToAttributes: Record<string, string[]>) {
-  const attrs = Object.values(layerIdsToAttributes).flat();
+function makeAttrsSchema(attributes: string[]) {
+  const attrs = [...new Set(attributes)];
 
   switch (attrs.length) {
     case 0:
@@ -180,19 +363,18 @@ function makeAttrsSchema(layerIdsToAttributes: Record<string, string[]>) {
  * Construct the schema for a source layer ID, present in the payload of the
  * "source-layer" diff.
  *
- * Constrained decoding responses from the OpenAI API should only reference
- * source layers that exist on the map's current vector layers. If no layers
- * expose source layer IDs, the schema falls back to the "None" sentinel.
+ * Responses from the OpenAI API are validated after the fact. Build one schema
+ * per layer, since the source layers of one vector layer are unrelated to
+ * those of another. A layer not backed by a vector source exposes no source
+ * layer IDs, so its schema falls back to the "None" sentinel, which rejects
+ * every "source-layer" diff targeting it.
  *
- * @param layerIdsToSourceLayerIds A dictionary mapping the IDs of the current
- * map layers to their available source layers.
- * @returns A Zod schema for the sourceSoucrceLayerId or targetSourceLayerId
- * field of a generated "source-layer" diff.
+ * @param ids The source layer IDs available on a single map layer.
+ * @returns A Zod schema for the sourceSourceLayerId or targetSourceLayerId
+ * field of a "source-layer" diff targeting that layer.
  */
-function makeSourceLayerIdsSchema(
-  layerIdsToSourceLayerIds: Record<string, string[]>
-) {
-  const sourceLayerIds = Object.values(layerIdsToSourceLayerIds).flat();
+function makeSourceLayerIdsSchema(ids: string[]) {
+  const sourceLayerIds = [...new Set(ids)];
 
   switch (sourceLayerIds.length) {
     case 0:
@@ -208,7 +390,7 @@ function makeSourceLayerIdsSchema(
   }
 }
 
-const LayerType = z.union([
+const LayerTypeSchema = z.union([
   z.literal('Choropleth'),
   z.literal('Dot Density'),
   z.literal('Heatmap'),
@@ -222,8 +404,8 @@ const LayerTypeDiff = z.object({
   type: z.literal('layer-type'),
   layerId: z.string(),
   payload: z.object({
-    sourceLayerType: LayerType,
-    targetLayerType: LayerType
+    sourceLayerType: LayerTypeSchema,
+    targetLayerType: LayerTypeSchema
   })
 });
 
@@ -626,7 +808,7 @@ const RemoveLayerDiff = z.object({
   type: z.literal('remove-layer'),
   layerId: z.string(),
   payload: z.object({
-    sourceLayerType: LayerType
+    sourceLayerType: LayerTypeSchema
   })
 });
 

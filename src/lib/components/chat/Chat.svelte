@@ -8,9 +8,8 @@
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { chat, MODELS } from '$lib/state/chat.svelte';
-  import { user } from '$lib/state/user.svelte';
   import { ir } from '$lib/stores/ir';
-  import type { LayerType } from '$lib/types';
+  import type { LLM, LLMRequest, LLMRequestState } from '$lib/types/llm';
   import { selectAttributes } from '$lib/utils/attributes';
 
   interface Props {
@@ -26,38 +25,25 @@
   let chatDialog: HTMLDivElement | undefined = $state();
   let textarea: HTMLTextAreaElement | undefined = $state();
 
-  let layerIds = $derived(Object.keys($ir.layers));
-  let layerIdsToTypes = $derived(
-    Object.entries($ir.layers).reduce<Record<string, LayerType>>(
-      (acc, [layerId, layer]) => {
-        acc[layerId] = layer.type;
-        return acc;
-      },
-      {}
-    )
-  );
-  let layerIdsToAttributes = $derived(
-    Object.entries($ir.layers).reduce<Record<string, string[]>>(
-      (acc, [layerId, layer]) => {
-        acc[layerId] = selectAttributes(layer.source);
-
-        return acc;
-      },
-      {}
-    )
-  );
-  let layerIdsToSourceLayerIds = $derived(
-    Object.entries($ir.layers).reduce<Record<string, string[]>>(
-      (acc, [layerId, layer]) => {
-        if (layer.source.type === 'vector') {
-          acc[layerId] = layer.source.vectorLayers.map(({ id }) => id);
-        }
-
-        return acc;
-      },
-      {}
-    )
-  );
+  let requestState: LLMRequestState = $derived({
+    center: $ir.center,
+    zoom: $ir.zoom,
+    projection: $ir.projection,
+    basemap: $ir.basemap,
+    layers: Object.values($ir.layers)
+      .sort((a, b) => a.layout.z - b.layout.z)
+      .map(({ id, displayName, type, layout, source }) => ({
+        id,
+        displayName,
+        type,
+        layout,
+        attributes: selectAttributes(source),
+        sourceLayerIds:
+          source.type === 'vector'
+            ? source.vectorLayers.map(({ id }) => id)
+            : []
+      }))
+  });
 
   onMount(() => {
     textarea?.focus();
@@ -72,7 +58,7 @@
   }
 
   function onModelChange(event: Event & { currentTarget: HTMLSelectElement }) {
-    chat.model = event.currentTarget.value;
+    chat.model = event.currentTarget.value as LLM;
   }
 
   async function scrollToBottom() {
@@ -107,14 +93,10 @@
       await scrollToBottom();
 
       const body = JSON.stringify({
-        layerIds,
-        layerIdsToAttributes,
-        layerIdsToSourceLayerIds,
-        layerIdsToTypes,
         model: chat.model,
         prompt: chat.prompt,
-        userId: user.userId
-      });
+        requestState
+      } satisfies LLMRequest);
 
       // Clear the prompt before issuing the request for animation choreography.
       chat.prompt = '';
