@@ -14,12 +14,18 @@
   let { ref = $bindable(undefined) }: Props = $props();
 
   function deriveEditMessage(prompt: Prompt) {
-    const numErroredDiffs = prompt.diffs.filter((diff) => diff.errored).length;
-    const numAppliedDiffs =
-      prompt.diffs.filter((diff) => diff.type !== 'unknown').length -
-      numErroredDiffs;
+    const { success, error } = Object.groupBy(prompt.diffs, (diff) => {
+      switch (diff.type) {
+        case 'error':
+          return 'error';
+        case 'unknown':
+          return 'unknown';
+        default:
+          return diff.errored ? 'error' : 'success';
+      }
+    });
 
-    return `${numAppliedDiffs} ${pluralize('edit', numAppliedDiffs)} applied${numErroredDiffs > 0 ? `, ${numErroredDiffs} ${pluralize('edit', numErroredDiffs)} errored` : ''}`;
+    return `${success?.length ?? 0} ${pluralize('edit', success?.length ?? 0)} applied${error && error.length > 0 ? `, ${error.length} ${pluralize('edit', error.length)} errored` : ''}`;
   }
 
   onMount(() => {

@@ -188,7 +188,7 @@
       <div class="flex items-center justify-between px-1 pb-1">
         <Select
           class="flex items-center justify-center rounded-xs p-1! font-mono text-xs text-white hover:border-transparent hover:bg-slate-800 focus:border-transparent"
-          id="llm-model"
+          id="chat-model"
           selected={chat.model}
           options={MODELS}
           onchange={onModelChange}
