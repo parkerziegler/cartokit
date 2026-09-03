@@ -1,3 +1,4 @@
+import type { CartoKitDiff } from '$lib/core/diff';
 import type { CartoKitIR, CartoKitLayer } from '$lib/types';
 
 /**
@@ -37,15 +38,35 @@ export type LLMRequestState = Omit<CartoKitIR, 'layers'> & {
 };
 
 /**
+ * Represents a single turn of the chat dialog — the user's prompt, the diffs
+ * generated in response, and the model's summary of them. A diff that threw
+ * while being applied is marked with `errored`.
+ *
+ * @property id - A unique identifier for the turn.
+ * @property text - The user's prompt.
+ * @property diffs - The diffs generated for the prompt.
+ * @property summary - The model's past-tense summary of the diff sequence.
+ */
+export interface Prompt {
+  id: string;
+  text: string;
+  diffs: (CartoKitDiff & { errored?: boolean })[];
+  summary: string;
+}
+
+/**
  * Represents the body of a POST request to the /llm endpoint.
  *
  * @property model - The {@link LLM} to prompt.
  * @property prompt - The user's natural language description of the edit.
  * @property requestState - The current {@link LLMRequestState} of the map being
  * edited.
+ * @property history - The completed turns of the conversation so far, oldest
+ * first, so that the model can resolve references to earlier edits.
  */
 export interface LLMRequest {
   model: LLM;
   prompt: string;
   requestState: LLMRequestState;
+  history: Prompt[];
 }

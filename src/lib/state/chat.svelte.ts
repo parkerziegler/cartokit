@@ -1,12 +1,4 @@
-import type { CartoKitDiff } from '$lib/core/diff';
-import type { LLM } from '$lib/types/llm';
-
-export interface Prompt {
-  id: string;
-  text: string;
-  diffs: (CartoKitDiff & { errored?: boolean })[];
-  summary: string;
-}
+import type { LLM, Prompt } from '$lib/types/llm';
 
 export const MODELS: { value: LLM; label: string }[] = [
   { value: 'gpt-5.6-luna', label: 'GPT-5.6 Luna' },

@@ -4,7 +4,8 @@
   import { slide } from 'svelte/transition';
 
   import { tooltip } from '$lib/attachments/tooltip';
-  import { chat, type Prompt } from '$lib/state/chat.svelte';
+  import { chat } from '$lib/state/chat.svelte';
+  import type { Prompt } from '$lib/types/llm';
   import { pluralize } from '$lib/utils/formatters/shared';
 
   interface Props {

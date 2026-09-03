@@ -83,6 +83,14 @@
     }
 
     try {
+      // Capture the conversation before the in-flight turn joins it.
+      // Turns that failed before the model responded are dropped — their
+      // summary and "error" diff are synthesized by the catch block below.
+      // Remove them so we don't teach the model edits it did not generate.
+      const history = chat.dialog.filter(
+        (prompt) => !prompt.diffs.some((diff) => diff.type === 'error')
+      );
+
       chat.dialog.push({
         id: uniqueId('prompt__'),
         text: chat.prompt,
@@ -95,7 +103,8 @@
       const body = JSON.stringify({
         model: chat.model,
         prompt: chat.prompt,
-        requestState
+        requestState,
+        history
       } satisfies LLMRequest);
 
       // Clear the prompt before issuing the request for animation choreography.

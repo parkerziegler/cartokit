@@ -1,13 +1,16 @@
 import { json, error } from '@sveltejs/kit';
 import OpenAI from 'openai';
-import type { ChatCompletionParseParams } from 'openai/resources/chat/completions';
+import type {
+  ChatCompletionMessageParam,
+  ChatCompletionParseParams
+} from 'openai/resources/chat/completions';
 import { z } from 'zod';
 
 import { OPENAI_API_KEY } from '$env/static/private';
 import type { RequestHandler } from './$types';
 
 import type { BasemapProvider, LayerType } from '$lib/types';
-import type { LLMRequest, LLMRequestState } from '$lib/types/llm';
+import type { LLMRequest, LLMRequestState, Prompt } from '$lib/types/llm';
 import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
 
 // Initialize the OpenAI client.
@@ -140,13 +143,13 @@ const LAYER_TYPE_DIFFS: Record<LayerType, string[]> = {
  */
 const SYSTEM_PROMPT = `You are the editing assistant for cartokit, a browser-based cartography tool. The user is looking at a map and describing changes to it in natural language. Translate their request into an ordered sequence of diffs that the application will apply to the map.
 
-# Diffs
+## Diffs
 
 A diff is a single, atomic edit. Layer-scoped diffs carry a "layerId" naming the layer they target. Map-scoped diffs ("${MAP_DIFFs.join('", "')}") apply to the map as a whole and target no layer.
 
 Emit diffs in the order they should be applied. A later diff may depend on the effect of an earlier one — for example, converting a layer with "layer-type" before styling the result.
 
-# Layer types
+## Layer types
 
 Every layer has a type, and only some diffs are valid for each type. Never emit a diff for a layer whose type does not accept it.
 
@@ -158,16 +161,48 @@ ${Object.entries(LAYER_TYPE_DIFFS)
   .map(([layerType, diffTypes]) => `- ${layerType}: ${diffTypes.join(', ')}`)
   .join('\n')}
 
-# Rules
+## Adding Layers
+
+A user may ask you to add layers by finding a publically-available geospatial dataset on the internet. When adding layers from a remote API endpoint, do your best to validate that the endpoint returns either GeoJSON data (for "add-layer" diffs with payload.location.type = "geojson") or a PMTiles archive (for "add-layer" diffs with payload.location.type = "vector").
+
+## Conversation
+
+Earlier turns of this conversation appear before the map request state: the user's prompt, followed by the JSON you returned for it. A diff marked "errored": true failed to apply.
+
+The map request state reflects the map as it is now — after every earlier turn, and after any edits the user made directly through the interface. Use earlier turns to resolve references such as "that layer", "the same color", "do it again" or "undo that", never as a description of the current map. Where an earlier turn and the map request state disagree, the map request state is correct.
+
+## Rules
 
 - Target layers by the "id" given in the map request state, never by display name. If the user names a layer ambiguously and more than one layer could match, do not guess.
 - Only reference attributes listed for the layer you are targeting. An attribute present on one layer does not exist on every layer.
 - When creating a layer with "add-layer", generate a layer ID in kebab-case from the display name, followed by a double underscore and a random six-character alphanumeric suffix (for example, "population-data__a1b2c3" for "Population Data"). Reference that same ID in any later diffs in the same response.
 - If you cannot determine what the user wants, emit a single "unknown" diff and nothing else, then use the summary to explain what was ambiguous.
 
-# Summary
+## Summary
 
 Alongside the diffs, return a terse, past-tense summary of what changed, so the user knows what to expect — for example, "Converted the counties layer to a choropleth of median income." If you emitted no diffs, or only an "unknown" diff, use the summary to explain why instead.`;
+
+/**
+ * Convert the completed turns of the conversation into messages, replaying
+ * each as the user's prompt followed by the JSON the model returned for it.
+ *
+ * These messages sit between the static system prompt and the request state,
+ * rather than after them. Completed turns never change, so ordering them this
+ * way keeps the cacheable prefix of the request growing with the conversation
+ * instead of pinning it to the system prompt alone.
+ *
+ * @param history The completed turns of the conversation, oldest first.
+ * @returns The messages to replay ahead of the current request state.
+ */
+function buildHistoryMessages(history: Prompt[]): ChatCompletionMessageParam[] {
+  return history.flatMap((turn) => [
+    { role: 'user', content: turn.text },
+    {
+      role: 'assistant',
+      content: JSON.stringify({ diffs: turn.diffs, summary: turn.summary })
+    }
+  ]);
+}
 
 /**
  * Convert the current requestState of the map to a secondary system prompt.
@@ -214,7 +249,8 @@ ${layers}`;
  * turning the generated diffs as a JSON response.
  */
 export const POST = (async ({ request }) => {
-  const { model, prompt, requestState }: LLMRequest = await request.json();
+  const { model, prompt, requestState, history }: LLMRequest =
+    await request.json();
 
   try {
     const completion = await openai.chat.completions.parse<
@@ -225,6 +261,7 @@ export const POST = (async ({ request }) => {
       reasoning_effort: 'low',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
+        ...buildHistoryMessages(history),
         { role: 'system', content: buildRequestStatePrompt(requestState) },
         { role: 'user', content: prompt }
       ],
