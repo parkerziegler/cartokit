@@ -9,7 +9,7 @@
 
   let chatVisible = $state(false);
   let requestInFlight = $state(false);
-  let form: HTMLFormElement | undefined = $state();
+  let chat: HTMLDivElement | undefined = $state();
 
   onMount(() => {
     const deregisterKeybinding = registerKeybinding('c', onClick);
@@ -25,7 +25,7 @@
     if (
       chatVisible &&
       !requestInFlight &&
-      !form?.contains(event.target as Node)
+      !chat?.contains(event.target as Node)
     ) {
       chatVisible = false;
     }
@@ -35,7 +35,7 @@
 <button
   onclick={onClick}
   class={[
-    'flex h-[22px] w-[22px] items-center justify-center rounded-[5px] border border-transparent bg-slate-400 text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+    'flex h-5.5 w-5.5 items-center justify-center rounded-[5px] border border-transparent bg-slate-400 text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50',
     {
       'border-white': chatVisible
     }
@@ -46,5 +46,5 @@
   <ChatIcon />
 </button>
 {#if chatVisible}
-  <Chat bind:form bind:requestInFlight />
+  <Chat bind:ref={chat} bind:requestInFlight />
 {/if}

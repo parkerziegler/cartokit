@@ -79,8 +79,8 @@ export async function patchFillDiffs(
     case 'fill-attribute': {
       const layer = ir.layers[diff.layerId] as
         | CartoKitChoroplethLayer
-        | CartoKitProportionalSymbolLayer
-        | CartoKitPolygonLayer;
+        | CartoKitPointLayer
+        | CartoKitProportionalSymbolLayer;
 
       if (layer.style.fill.type === 'Quantitative') {
         // Derive the inverse diff prior to applying the patch.
@@ -397,8 +397,7 @@ export async function patchFillDiffs(
     }
     case 'fill-visualization-type': {
       const layer = ir.layers[diff.layerId] as
-        | CartoKitChoroplethLayer
-        | CartoKitProportionalSymbolLayer;
+        CartoKitChoroplethLayer | CartoKitProportionalSymbolLayer;
 
       // Derive the inverse diff prior to applying the patch.
       inverse = {

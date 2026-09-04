@@ -208,7 +208,7 @@
     {/if}
     <button
       class={[
-        'ease-cubic-out absolute right-4 bottom-12 z-10 flex items-baseline gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 disabled:cursor-not-allowed',
+        'ease-cubic-out absolute right-4 bottom-12 z-10 flex items-baseline gap-2 rounded bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 disabled:cursor-not-allowed',
         {
           '-translate-y-72': $layout.dataVisible,
           'translate-x-[-33.333333vw]': $layout.editorVisible,
@@ -242,7 +242,7 @@
   {/if}
   {#if error.message}
     <div
-      class="absolute bottom-12 left-4 rounded-md bg-slate-900 p-2 text-xs tracking-wider text-white shadow-lg"
+      class="absolute bottom-12 left-4 rounded bg-slate-900 p-2 text-xs tracking-wider text-white shadow-lg"
     >
       <Alert kind="error" message={error.message}>
         {#snippet icon()}

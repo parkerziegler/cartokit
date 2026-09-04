@@ -38,7 +38,7 @@
     </FieldLabel>
     <select
       class={[
-        'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
+        'border border-transparent bg-inherit p-2 transition-colors hover:border-slate-600 focus:border-slate-600',
         className
       ]}
       value={selected}
@@ -55,7 +55,7 @@
 {:else}
   <select
     class={[
-      'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
+      'border border-transparent bg-inherit p-2 transition-colors hover:border-slate-600 focus:border-slate-600',
       className
     ]}
     value={selected}

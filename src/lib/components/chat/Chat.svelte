@@ -1,63 +1,49 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
+  import { uniqueId } from 'lodash-es';
+  import { onMount, tick } from 'svelte';
 
+  import ChatDialog from '$lib/components/chat/ChatDialog.svelte';
   import ArrowUpIcon from '$lib/components/icons/ArrowUpIcon.svelte';
-  import Alert from '$lib/components/shared/Alert.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
+  import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff } from '$lib/core/diff';
-  import { user } from '$lib/state/user.svelte';
+  import { chat, MODELS } from '$lib/state/chat.svelte';
   import { ir } from '$lib/stores/ir';
-  import type { LayerType } from '$lib/types';
+  import type { LLM, LLMRequest, LLMRequestState } from '$lib/types/llm';
   import { selectAttributes } from '$lib/utils/attributes';
 
   interface Props {
-    form?: HTMLFormElement;
+    ref?: HTMLDivElement;
     requestInFlight: boolean;
   }
 
   let {
-    form = $bindable(undefined),
+    ref = $bindable(undefined),
     requestInFlight = $bindable(false)
   }: Props = $props();
 
-  let prompt = $state('');
-  let diffUnknown = $state(false);
-  let error = $state(false);
+  let chatDialog: HTMLDivElement | undefined = $state();
   let textarea: HTMLTextAreaElement | undefined = $state();
 
-  let layerIds = $derived(Object.keys($ir.layers));
-  let layerIdsToTypes = $derived(
-    Object.entries($ir.layers).reduce<Record<string, LayerType>>(
-      (acc, [layerId, layer]) => {
-        acc[layerId] = layer.type;
-        return acc;
-      },
-      {}
-    )
-  );
-  let layerIdsToAttributes = $derived(
-    Object.entries($ir.layers).reduce<Record<string, string[]>>(
-      (acc, [layerId, layer]) => {
-        acc[layerId] = selectAttributes(layer.source);
-
-        return acc;
-      },
-      {}
-    )
-  );
-  let layerIdsToSourceLayerIds = $derived(
-    Object.entries($ir.layers).reduce<Record<string, string[]>>(
-      (acc, [layerId, layer]) => {
-        if (layer.source.type === 'vector') {
-          acc[layerId] = layer.source.vectorLayers.map(({ id }) => id);
-        }
-
-        return acc;
-      },
-      {}
-    )
-  );
+  let requestState: LLMRequestState = $derived({
+    center: $ir.center,
+    zoom: $ir.zoom,
+    projection: $ir.projection,
+    basemap: $ir.basemap,
+    layers: Object.values($ir.layers)
+      .sort((a, b) => a.layout.z - b.layout.z)
+      .map(({ id, displayName, type, layout, source }) => ({
+        id,
+        displayName,
+        type,
+        layout,
+        attributes: selectAttributes(source),
+        sourceLayerIds:
+          source.type === 'vector'
+            ? source.vectorLayers.map(({ id }) => id)
+            : []
+      }))
+  });
 
   onMount(() => {
     textarea?.focus();
@@ -66,9 +52,21 @@
   function onKeyDown(
     event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
   ) {
-    if (event.key === 'Enter' && !event.shiftKey && prompt.length > 0) {
+    if (event.key === 'Enter' && !event.shiftKey && chat.prompt.length > 0) {
       onSubmit(event);
     }
+  }
+
+  function onModelChange(event: Event & { currentTarget: HTMLSelectElement }) {
+    chat.model = event.currentTarget.value as LLM;
+  }
+
+  async function scrollToBottom() {
+    await tick();
+    chatDialog?.scrollTo({
+      top: chatDialog.scrollHeight,
+      behavior: 'smooth'
+    });
   }
 
   async function onSubmit(
@@ -85,104 +83,114 @@
     }
 
     try {
+      // Capture the conversation before the in-flight turn joins it.
+      // Turns that failed before the model responded are dropped — their
+      // summary and "error" diff are synthesized by the catch block below.
+      // Remove them so we don't teach the model edits it did not generate.
+      const history = chat.dialog.filter(
+        (prompt) => !prompt.diffs.some((diff) => diff.type === 'error')
+      );
+
+      chat.dialog.push({
+        id: uniqueId('prompt__'),
+        text: chat.prompt,
+        diffs: [],
+        summary: 'Thinking'
+      });
+
+      await scrollToBottom();
+
+      const body = JSON.stringify({
+        model: chat.model,
+        prompt: chat.prompt,
+        requestState,
+        history
+      } satisfies LLMRequest);
+
+      // Clear the prompt before issuing the request for animation choreography.
+      chat.prompt = '';
+
       const data = await fetch('/llm', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          prompt,
-          layerIds,
-          layerIdsToTypes,
-          layerIdsToAttributes,
-          layerIdsToSourceLayerIds,
-          userId: user.userId
-        })
+        body
       }).then((response) => response.json());
 
       for (const diff of data.diffs) {
         if (diff.type === 'unknown') {
-          diffUnknown = true;
-
-          setTimeout(() => {
-            diffUnknown = false;
-          }, 3000);
+          continue;
         } else {
-          await applyDiff(diff);
+          try {
+            await applyDiff(diff);
+          } catch {
+            diff.errored = true;
+          }
         }
       }
 
-      prompt = '';
-    } catch {
-      error = true;
+      const activePrompt = chat.dialog.at(-1)!;
+      activePrompt.diffs = data.diffs;
+      activePrompt.summary = data.summary;
 
-      setTimeout(() => {
-        error = false;
-      }, 3000);
+      await scrollToBottom();
+    } catch {
+      const activePrompt = chat.dialog.at(-1)!;
+      activePrompt.diffs.push({
+        type: 'error',
+        payload: {},
+        errored: true
+      });
+      activePrompt.summary =
+        'An error occurred while processing the request. Please retry.';
     } finally {
       requestInFlight = false;
     }
   }
 </script>
 
-<Menu class="absolute bottom-16 left-1/2 -translate-x-1/2 p-4">
-  <div class="flex flex-col gap-2 rounded-sm border border-slate-600">
-    <form class="flex flex-col gap-2" onsubmit={onSubmit} bind:this={form}>
+<Menu
+  bind:ref
+  class="absolute bottom-16 left-1/2 flex max-h-80 -translate-x-1/2 flex-col overflow-hidden p-2"
+>
+  {#if chat.dialog.length > 0}
+    <ChatDialog bind:ref={chatDialog} />
+  {/if}
+  <div
+    class={[
+      'flex flex-col gap-2 rounded-sm border border-slate-600',
+      { 'rounded-t-none': chat.dialog.length > 0 }
+    ]}
+  >
+    <form class="flex flex-col gap-2" onsubmit={onSubmit}>
       <textarea
-        class="h-32 w-72 resize-none rounded-sm rounded-b-none bg-slate-900 p-2 text-white"
-        placeholder="Prompt the model to update map layers..."
-        bind:value={prompt}
+        class={[
+          'h-14 w-96 resize-none bg-slate-900 p-2 text-white',
+          chat.dialog.length === 0
+            ? 'rounded-sm rounded-b-none'
+            : 'rounded-none'
+        ]}
+        placeholder="Prompt the model to update the map..."
+        bind:value={chat.prompt}
         bind:this={textarea}
         disabled={requestInFlight}
-        onkeydown={onKeyDown}
-      >
-      </textarea>
-      <div class="flex items-center justify-between px-2 pb-2">
-        <code
-          class="self-start rounded-xs bg-slate-400 px-1 py-0.5 text-xs text-white"
-          >GPT-5.4 Mini</code
-        >
+        onkeydown={onKeyDown}></textarea>
+      <div class="flex items-center justify-between px-1 pb-1">
+        <Select
+          class="flex items-center justify-center rounded-xs p-1! font-mono text-xs text-white hover:border-transparent hover:bg-slate-800 focus:border-transparent"
+          id="chat-model"
+          selected={chat.model}
+          options={MODELS}
+          onchange={onModelChange}
+        />
         <button
-          class="flex h-5.5 w-5.5 items-center justify-center rounded-xs border border-white bg-slate-400 text-white disabled:opacity-50"
-          disabled={requestInFlight || error || diffUnknown || !prompt.length}
+          class="flex h-5.5 w-5.5 items-center justify-center rounded-xs border border-white bg-slate-400 text-white transition-colors disabled:border-transparent disabled:bg-slate-900 disabled:text-slate-400"
+          disabled={requestInFlight || !chat.prompt.length}
         >
           <ArrowUpIcon />
         </button>
       </div>
     </form>
-    {#if requestInFlight}
-      <p class="loading px-2 text-slate-400" transition:slide>Thinking</p>
-    {/if}
-    {#if error}
-      <Alert
-        kind="error"
-        message="There was an error processing the request. Ensure you've added layers to the map."
-        class="mx-2 mb-2"
-      />
-    {/if}
-    {#if diffUnknown}
-      <Alert
-        kind="warn"
-        message="⚠️ The model was unable to understand the request. Please rephrase your prompt."
-        class="mx-2 mb-2"
-      />
-    {/if}
   </div>
 </Menu>
-
-<style lang="postcss">
-  @reference 'tailwindcss';
-
-  .loading::after {
-    @apply inline-block w-0 overflow-hidden align-middle;
-
-    content: '\2026';
-    animation: ellipsis steps(4, end) 400ms infinite;
-  }
-
-  @keyframes ellipsis {
-    to {
-      width: 1.25em;
-    }
-  }
-</style>
