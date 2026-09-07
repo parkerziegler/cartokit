@@ -656,7 +656,7 @@ export type QuantitativeFill = QuantitativeStyle;
  * @property min The minimum size of the points.
  * @property max The maximum size of the points.
  */
-interface ProportionalSymbolStyle {
+export interface ProportionalSymbolStyle {
   attribute: string;
   min: number;
   max: number;

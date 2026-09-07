@@ -289,7 +289,7 @@ export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
         paint: {
           ...fillPaint,
           ...strokePaint,
-          'circle-radius': deriveSize(layer)
+          'circle-radius': deriveSize(layer.id, layer.style.size)
         }
       });
 

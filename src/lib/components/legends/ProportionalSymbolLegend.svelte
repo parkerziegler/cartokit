@@ -9,6 +9,7 @@
     NumericCatalogEntry
   } from '$lib/types';
   import { hexWithOpacity } from '$lib/utils/color';
+  import { signedSqrt, signedSquare } from '$lib/utils/number';
 
   interface Props {
     layer: CartoKitProportionalSymbolLayer;
@@ -19,24 +20,26 @@
   let { min, max } = $derived(
     catalog.value[layer.id][layer.style.size.attribute] as NumericCatalogEntry
   );
-  let scale = $derived(
-    d3.scaleLinear([layer.style.size.min, layer.style.size.max], [min, max])
-  );
+  let domain = $derived([signedSqrt(min), signedSqrt(max)]);
+  let range = $derived([layer.style.size.min, layer.style.size.max]);
+  let scale = $derived(d3.scaleLinear(domain, range));
+  let extent = $derived(range[1] - range[0]);
 
   let circles = $derived([
     {
-      size: layer.style.size.max / 3,
-      value: scale(layer.style.size.max / 3)
+      size: extent / 3 + range[0],
+      value: signedSquare(scale.invert(extent / 3 + range[0]))
     },
     {
-      size: (layer.style.size.max * 2) / 3,
-      value: scale((layer.style.size.max * 2) / 3)
+      size: (extent * 2) / 3 + range[0],
+      value: signedSquare(scale.invert((extent * 2) / 3 + range[0]))
     },
     {
-      size: layer.style.size.max,
-      value: scale(layer.style.size.max)
+      size: extent + range[0],
+      value: signedSquare(scale.invert(extent + range[0]))
     }
   ]);
+
   let style = $derived(
     layer.style.fill.type === 'Constant'
       ? `background-color: ${hexWithOpacity(layer.style.fill.color, layer.style.fill.opacity)};
@@ -52,17 +55,14 @@
     layer.layout.visible ? 'opacity-100' : 'opacity-75'
   ]}
 >
-  <span class="text-xs font-semibold">{layer.style.size.attribute} →</span>
-  <div class="flex gap-2">
+  <span class="text-xs font-semibold">{layer.style.size.attribute} ↓</span>
+  <div class="grid grid-cols-[max-content_1fr] gap-2">
     {#each circles as circle (circle.value)}
-      <div class="flex flex-col items-center gap-2">
-        <span class="text-3xs">{circle.value.toFixed(2)}</span>
-        <div
-          class="bg-primary rounded-full border border-white"
-          style="width: {2 * circle.size}px; height: {2 *
-            circle.size}px;{style}"
-        ></div>
-      </div>
+      <div
+        class="bg-primary justify-self-center rounded-full border border-white"
+        style="width: {2 * circle.size}px; height: {2 * circle.size}px;{style}"
+      ></div>
+      <span class="text-3xs self-center">{circle.value.toFixed(2)}</span>
     {/each}
   </div>
   {#if layer.style.fill.visible && layer.style.fill.type === 'Categorical'}
