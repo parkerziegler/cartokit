@@ -96,7 +96,9 @@ test.describe('download-map', () => {
     cartokitVersion: packageJson.version,
     camera: {
       center: [-98.35, 39.5],
-      zoom: 4
+      zoom: 4,
+      pitch: 0,
+      bearing: 0
     },
     diffs: [
       {

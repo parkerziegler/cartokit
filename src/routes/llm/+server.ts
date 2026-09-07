@@ -21,7 +21,14 @@ const openai = new OpenAI({
 /**
  * Diffs that apply to the map instance.
  */
-const MAP_DIFFs = ['center', 'zoom', 'basemap', 'projection'];
+const MAP_DIFFs = [
+  'center',
+  'zoom',
+  'pitch',
+  'bearing',
+  'basemap',
+  'projection'
+];
 
 /**
  * Diffs accepted by every layer, regardless of its {@link LayerType}.
@@ -236,6 +243,8 @@ function buildRequestStatePrompt(requestState: LLMRequestState): string {
 
 Zoom: ${requestState.zoom}
 Center: lng ${lng}, lat ${lat}
+Pitch: ${requestState.pitch}
+Bearing: ${requestState.bearing}
 Projection: ${requestState.projection}
 Basemap: ${requestState.basemap.provider}, ${requestState.basemap.mode} mode
 
@@ -887,6 +896,16 @@ const CenterDiff = z.object({
   })
 });
 
+const PitchDiff = z.object({
+  type: z.literal('pitch'),
+  payload: z.object({ pitch: z.number().min(0).max(60) })
+});
+
+const BearingDiff = z.object({
+  type: z.literal('bearing'),
+  payload: z.object({ bearing: z.number().min(-180).max(180) })
+});
+
 const ProjectionDiff = z.object({
   type: z.literal('projection'),
   payload: z.object({
@@ -946,6 +965,8 @@ const DiffSchema = z.object({
       BasemapDiff,
       ZoomDiff,
       CenterDiff,
+      PitchDiff,
+      BearingDiff,
       ProjectionDiff,
       UnknownDiff
     ])

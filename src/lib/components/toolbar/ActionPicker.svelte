@@ -53,7 +53,9 @@
   function onDownloadMap() {
     const camera = {
       center: $ir.center,
-      zoom: $ir.zoom
+      zoom: $ir.zoom,
+      pitch: $ir.pitch,
+      bearing: $ir.bearing
     };
 
     downloadContentToFile(
@@ -93,6 +95,20 @@
           type: 'zoom',
           payload: {
             zoom: content.camera.zoom
+          }
+        });
+
+        await applyDiff({
+          type: 'pitch',
+          payload: {
+            pitch: content.camera.pitch
+          }
+        });
+
+        await applyDiff({
+          type: 'bearing',
+          payload: {
+            bearing: content.camera.bearing
           }
         });
       } catch (err) {

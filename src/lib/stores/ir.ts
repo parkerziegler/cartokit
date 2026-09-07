@@ -5,6 +5,8 @@ import type { CartoKitIR } from '$lib/types';
 export const ir = writable<CartoKitIR>({
   center: [-98.35, 39.5],
   zoom: 4,
+  pitch: 0,
+  bearing: 0,
   basemap: {
     url: 'https://tiles.stadiamaps.com/styles/stamen_toner_lite.json',
     provider: 'Stamen',

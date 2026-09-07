@@ -54,6 +54,8 @@ export function codegenMap(
     style: ${codegenMapStyle(ir)},
     center: [${ir.center.join(', ')}],
     zoom: ${ir.zoom},
+    pitch: ${ir.pitch},
+    bearing: ${ir.bearing},
     ${analysis.library === 'mapbox' ? projection : ''}
   });
 

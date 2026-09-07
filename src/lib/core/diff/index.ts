@@ -357,6 +357,20 @@ interface CenterDiff {
   };
 }
 
+interface PitchDiff {
+  type: 'pitch';
+  payload: {
+    pitch: number;
+  };
+}
+
+interface BearingDiff {
+  type: 'bearing';
+  payload: {
+    bearing: number;
+  };
+}
+
 interface ProjectionDiff {
   type: 'projection';
   payload: {
@@ -420,6 +434,8 @@ export type CartoKitDiff =
   | BasemapDiff
   | ZoomDiff
   | CenterDiff
+  | PitchDiff
+  | BearingDiff
   | ProjectionDiff
   | UnknownDiff
   | ErrorDiff;
@@ -462,8 +478,9 @@ export async function applyDiff(
 
   ir.set(draftIR);
 
-  // Track diffs as they are applied, excluding center and zoom diffs.
-  if (execute.type !== 'center' && execute.type !== 'zoom') {
+  // Track diffs as they are applied, excluding center, zoom, pitch, and
+  // bearing diffs.
+  if (!['center', 'zoom', 'pitch', 'bearing'].includes(execute.type)) {
     diffs.push(execute);
   }
 }
