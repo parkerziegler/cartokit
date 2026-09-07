@@ -20,23 +20,23 @@
   let { min, max } = $derived(
     catalog.value[layer.id][layer.style.size.attribute] as NumericCatalogEntry
   );
-  let domain = $derived([layer.style.size.min, layer.style.size.max]);
-  let range = $derived([signedSqrt(min), signedSqrt(max)]);
+  let domain = $derived([signedSqrt(min), signedSqrt(max)]);
+  let range = $derived([layer.style.size.min, layer.style.size.max]);
   let scale = $derived(d3.scaleLinear(domain, range));
-  let extent = $derived(domain[1] - domain[0]);
+  let extent = $derived(range[1] - range[0]);
 
   let circles = $derived([
     {
-      size: extent / 3 + min,
-      value: signedSquare(scale(extent / 3 + min))
+      size: extent / 3 + range[0],
+      value: signedSquare(scale.invert(extent / 3 + range[0]))
     },
     {
-      size: (extent * 2) / 3 + min,
-      value: signedSquare(scale((extent * 2) / 3 + min))
+      size: (extent * 2) / 3 + range[0],
+      value: signedSquare(scale.invert((extent * 2) / 3 + range[0]))
     },
     {
-      size: extent + min,
-      value: signedSquare(scale(extent + min))
+      size: extent + range[0],
+      value: signedSquare(scale.invert(extent + range[0]))
     }
   ]);
 
