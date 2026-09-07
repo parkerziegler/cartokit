@@ -35,7 +35,7 @@ export async function reconSizeDiffs(
       map.value!.setPaintProperty(
         diff.layerId,
         'circle-radius',
-        deriveSize(layer)
+        deriveSize(layer.id, layer.style.size)
       );
       break;
     }

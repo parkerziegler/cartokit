@@ -51,7 +51,7 @@ export function codegenFill(layer: CartoKitLayer): string {
         layer.style.fill.type === 'Constant'
           ? withDefault('circle-color', layer.style.fill.color)
           : `'circle-color': ${JSON.stringify(deriveColorScale(layer.style.fill, layer.id))}`,
-        `'circle-radius': ${JSON.stringify(deriveSize(layer))}`,
+        `'circle-radius': ${JSON.stringify(deriveSize(layer.id, layer.style.size))}`,
         withDefault(
           'circle-opacity',
           layer.style.fill.visible ? layer.style.fill.opacity : 0

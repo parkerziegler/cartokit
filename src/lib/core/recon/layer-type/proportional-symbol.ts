@@ -34,7 +34,7 @@ export function reconProportionalSymbol(
       map.value?.setPaintProperty(
         targetLayer.id,
         'circle-radius',
-        deriveSize(targetLayer)
+        deriveSize(targetLayer.id, targetLayer.style.size)
       );
       break;
     case 'Proportional Symbol':

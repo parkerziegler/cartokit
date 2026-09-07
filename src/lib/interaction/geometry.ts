@@ -1,33 +1,45 @@
 import type { ExpressionSpecification } from 'maplibre-gl';
 
 import { catalog } from '$lib/state/catalog.svelte';
-import type {
-  CartoKitProportionalSymbolLayer,
-  NumericCatalogEntry
-} from '$lib/types';
+import type { NumericCatalogEntry, ProportionalSymbolStyle } from '$lib/types';
+import { signedSqrt } from '$lib/utils/number';
 
 /**
  * Derive a MapLibre GL JS expression for a proportional symbol radius scale.
  *
- * @param layer The {@link CartoKitProportionalSymbolLayer} to derive a radius
- * scale for.
+ * @param layerId The id of the layer to derive a radius scale for.
+ * @param style The {@link ProportionalSymbolStyle} to derive a radius scale for.
  * @returns An {@link ExpressionSpecification} for a proportional symbol radius scale.
  */
 export function deriveSize(
-  layer: CartoKitProportionalSymbolLayer
+  layerId: string,
+  style: ProportionalSymbolStyle
 ): ExpressionSpecification {
-  const { min, max } = catalog.value[layer.id][
-    layer.style.size.attribute
+  const { min, max } = catalog.value[layerId][
+    style.attribute
   ] as NumericCatalogEntry;
-  const [rMin, rMax] = [layer.style.size.min, layer.style.size.max];
+  const [rMin, rMax] = [style.min, style.max];
+  const attribute = style.attribute;
+
+  // If the full range of the attribute is positive, we can take the square root
+  // directly; otherwise, ensure we preserve the sign to linear scales on ranges
+  // with negative values.
+  const attrExpression: ExpressionSpecification =
+    min >= 0 && max >= max
+      ? ['sqrt', ['get', attribute]]
+      : [
+          '*',
+          ['case', ['<', ['get', attribute], 0], -1, 1],
+          ['sqrt', ['abs', ['get', attribute]]]
+        ];
 
   return [
     'interpolate',
     ['linear'],
-    ['sqrt', ['get', layer.style.size.attribute]],
-    Math.sqrt(min),
+    attrExpression,
+    signedSqrt(min),
     rMin,
-    Math.sqrt(max),
+    signedSqrt(max),
     rMax
   ];
 }
