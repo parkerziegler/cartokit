@@ -4,6 +4,7 @@ import { codegenLayer } from '$lib/codegen/codegen-layer';
 import { codegenMapStyle } from '$lib/codegen/codegen-map-style';
 import { codegenProjection } from '$lib/codegen/codegen-projection';
 import { codegenSource } from '$lib/codegen/codegen-source';
+import { withDefault } from '$lib/codegen/utils';
 import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
 
 /**
@@ -46,17 +47,23 @@ export function codegenMap(
   `
       : '';
 
+  const mapOptions = [
+    "container: 'map'",
+    `style: ${codegenMapStyle(ir)}`,
+    `center: [${ir.center.join(', ')}]`,
+    `zoom: ${ir.zoom}`,
+    withDefault('bearing', ir.bearing),
+    withDefault('pitch', ir.pitch),
+    `${analysis.library === 'mapbox' ? projection : ''}`
+  ]
+    .filter(Boolean)
+    .join(',\n');
+
   return `
   ${protocol}
 
   const map = new ${analysis.library}gl.Map({
-    container: 'map',
-    style: ${codegenMapStyle(ir)},
-    center: [${ir.center.join(', ')}],
-    zoom: ${ir.zoom},
-    pitch: ${ir.pitch},
-    bearing: ${ir.bearing},
-    ${analysis.library === 'mapbox' ? projection : ''}
+    ${mapOptions}
   });
 
   ${analysis.library === 'maplibre' ? projection : ''}
