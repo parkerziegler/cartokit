@@ -770,12 +770,16 @@ export type Projection = 'mercator' | 'globe';
  *
  * @property center - The current center coordinates of the map.
  * @property zoom - The current zoom level of the map.
+ * @property pitch - The current pitch of the map, in degrees.
+ * @property bearing - The current bearing of the map, in degrees.
  * @property basemap - The current basemap of the map.
  * @property layers - The current layers of the map.
  */
 export interface CartoKitIR {
   center: [number, number];
   zoom: number;
+  pitch: number;
+  bearing: number;
   basemap: {
     url: string;
     provider: BasemapProvider;

@@ -63,6 +63,14 @@ export async function reconMapDiffs(
       map.value!.setCenter(diff.payload.center);
       break;
     }
+    case 'pitch': {
+      map.value!.setPitch(diff.payload.pitch);
+      break;
+    }
+    case 'bearing': {
+      map.value!.setBearing(diff.payload.bearing);
+      break;
+    }
     case 'projection': {
       map.value!.setProjection({ type: diff.payload.projection });
       break;

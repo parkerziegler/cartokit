@@ -28,6 +28,8 @@
   let requestState: LLMRequestState = $derived({
     center: $ir.center,
     zoom: $ir.zoom,
+    pitch: $ir.pitch,
+    bearing: $ir.bearing,
     projection: $ir.projection,
     basemap: $ir.basemap,
     layers: Object.values($ir.layers)

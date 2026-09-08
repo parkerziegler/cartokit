@@ -63,6 +63,32 @@ export async function patchMapDiffs(
       ir.center = [diff.payload.center.lng, diff.payload.center.lat];
       break;
     }
+    case 'pitch': {
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'pitch',
+        payload: {
+          pitch: ir.pitch
+        }
+      };
+
+      // Apply the patch.
+      ir.pitch = diff.payload.pitch;
+      break;
+    }
+    case 'bearing': {
+      // Derive the inverse diff prior to applying the patch.
+      inverse = {
+        type: 'bearing',
+        payload: {
+          bearing: ir.bearing
+        }
+      };
+
+      // Apply the patch.
+      ir.bearing = diff.payload.bearing;
+      break;
+    }
     case 'projection': {
       // Derive the inverse diff prior to applying the patch.
       inverse = {

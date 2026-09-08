@@ -90,7 +90,9 @@
       container: 'map',
       style: data.basemap.url,
       center: $ir.center,
-      zoom: $ir.zoom
+      zoom: $ir.zoom,
+      pitch: $ir.pitch,
+      bearing: $ir.bearing
     });
 
     // Add an event listener to handle feature deselection.
@@ -121,6 +123,22 @@
     map.on('zoom', (event) => {
       ir.update((ir) => {
         ir.zoom = event.target.getZoom();
+
+        return ir;
+      });
+    });
+
+    map.on('pitch', (event) => {
+      ir.update((ir) => {
+        ir.pitch = event.target.getPitch();
+
+        return ir;
+      });
+    });
+
+    map.on('rotate', (event) => {
+      ir.update((ir) => {
+        ir.bearing = event.target.getBearing();
 
         return ir;
       });
