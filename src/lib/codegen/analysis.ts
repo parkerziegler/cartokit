@@ -1,8 +1,5 @@
-import type {
-  CartoKitBackend,
-  CartoKitBackendAnalysis,
-  CartoKitIR
-} from '$lib/types';
+import type { CartoKitIR } from '$lib/types';
+import type { CartoKitBackend, CartoKitBackendAnalysis } from '$lib/types/codegen';
 
 /**
  * Determine whether @turf/turf is required for cross-geometry transformations.

@@ -1,15 +1,17 @@
 <script lang="ts">
+  import { css } from '@codemirror/lang-css';
+  import { html } from '@codemirror/lang-html';
   import { javascript } from '@codemirror/lang-javascript';
   import { json } from '@codemirror/lang-json';
   import { syntaxHighlighting } from '@codemirror/language';
   import { basicSetup, EditorView } from 'codemirror';
   import { onMount } from 'svelte';
-  import { syntaxTheme, editorTheme } from '$lib/utils/codemirror';
+  import { syntaxTheme, cssSyntaxTheme, editorTheme } from '$lib/utils/codemirror';
 
   interface ReadonlyCodeEditorConfig {
     kind: 'readonly';
     doc: string;
-    language: 'typescript' | 'javascript' | 'json';
+    language: 'typescript' | 'javascript' | 'json' | 'html' | 'css';
   }
 
   interface EditableCodeEditorConfig {
@@ -38,14 +40,31 @@
   let editor: HTMLDivElement;
 
   onMount(() => {
-    const extensions = [
-      basicSetup,
-      editorTheme,
-      config.language === 'json'
-        ? json()
-        : javascript({ typescript: config.language === 'typescript' }),
-      syntaxHighlighting(syntaxTheme)
-    ];
+    const extensions = [basicSetup, editorTheme];
+
+    switch (config.language) {
+      case 'css':
+        extensions.push(css());
+        break;
+      case 'html':
+        extensions.push(html());
+        break;
+      case 'javascript':
+        extensions.push(javascript());
+        break;
+      case 'json':
+        extensions.push(json());
+        break;
+      case 'typescript':
+        extensions.push(javascript({ typescript: true }));
+        break;
+    }
+
+    extensions.push(
+      syntaxHighlighting(
+        config.language === 'css' ? cssSyntaxTheme : syntaxTheme
+      )
+    );
 
     if (config.kind === 'editable') {
       const { onchange } = config;

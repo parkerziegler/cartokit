@@ -2,10 +2,38 @@ import { HighlightStyle } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
 
-export const syntaxTheme = HighlightStyle.define([
+const highlightRules = [
   {
     tag: [tags.comment, tags.lineComment, tags.blockComment, tags.docComment],
-    color: '#637777'
+    color: '#637777',
+    fontStyle: 'italic'
+  },
+  {
+    tag: tags.documentMeta,
+    color: '#c792ea',
+    fontStyle: 'italic'
+  },
+  {
+    tag: tags.angleBracket,
+    color: '#7fdbca'
+  },
+  {
+    tag: tags.tagName,
+    color: '#caece6'
+  },
+  {
+    tag: tags.attributeName,
+    color: '#c5e478',
+    fontStyle: 'italic'
+  },
+  {
+    tag: tags.labelName,
+    color: '#fad430',
+    fontStyle: 'italic'
+  },
+  {
+    tag: tags.atom,
+    color: '#ff6363'
   },
   {
     tag: [tags.name, tags.propertyName],
@@ -16,8 +44,12 @@ export const syntaxTheme = HighlightStyle.define([
     color: '#d6deeb'
   },
   {
-    tag: [tags.typeName, tags.className, tags.literal, tags.string],
-    color: '#addb67'
+    tag: [tags.typeName, tags.className],
+    color: '#ffcb8b'
+  },
+  {
+    tag: [tags.literal, tags.string],
+    color: '#ecc48d'
   },
   {
     tag: tags.number,
@@ -38,6 +70,20 @@ export const syntaxTheme = HighlightStyle.define([
   {
     tag: tags.function(tags.propertyName),
     color: '#82aaff'
+  }
+];
+
+export const syntaxTheme = HighlightStyle.define(highlightRules);
+
+// `@lezer/css` and `@lezer/javascript` both tag their `#` (id selector) and
+// `.` (property access) tokens as `derefOperator`, so this override only
+// applies in the CSS-only editor to avoid recoloring every `.` in JS/TS.
+export const cssSyntaxTheme = HighlightStyle.define([
+  ...highlightRules,
+  {
+    tag: tags.derefOperator,
+    color: '#fad430',
+    fontStyle: 'italic'
   }
 ]);
 

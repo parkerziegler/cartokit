@@ -2,7 +2,8 @@ import { camelCase } from 'lodash-es';
 
 import { codegenFns } from '$lib/codegen/codegen-fns';
 import { codegenMap } from '$lib/codegen/codegen-map';
-import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
+import type { CartoKitIR } from '$lib/types';
+import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
 
 /**
  * Generate a program fragment for all library and data source imports.
