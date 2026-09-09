@@ -851,43 +851,6 @@ export type CatalogEntry =
 /** Represents a catalog mapping layers to pre-computed classification statistics. */
 export type Catalog = Record<CartoKitLayer['id'], Record<string, CatalogEntry>>;
 
-/** Represents the set of language backends for code generation. */
-type CartoKitLanguageBackend = 'javascript' | 'typescript';
-
-/** Represents the set of library backends for code generation. */
-type CartoKitLibraryBackend = 'mapbox' | 'maplibre';
-
-/**
- * Represents the set of identifiers for code generation backends.
- *
- * @property language The language backend for code generation.
- * @property library The library backend for code generation.
- */
-export interface CartoKitBackend {
-  language: CartoKitLanguageBackend;
-  library: CartoKitLibraryBackend;
-}
-
-/**
- * Represents the analysis information for the CartoKit IR, used by code genera-
- * tion.
- *
- * @property isTurfRequired A Boolean value indicating whether \@turf/turf is
- * required to support cross-geometry transformations.
- * @property isFetchGeoJSONRequired A Boolean value indicating whether we need
- * to insert a function to fetch GeoJSON hosted at a remote URL.
- * @property isGeoJSONNamespaceRequired A Boolean value indicating whether we
- * need to insert an import of the GeoJSON namespace.
- * @property isPMTilesRequired A Boolean value indicating whether we need to
- * include the PMTiles client library.
- */
-export interface CartoKitBackendAnalysis extends CartoKitBackend {
-  isTurfRequired: boolean;
-  isFetchGeoJSONRequired: boolean;
-  isGeoJSONNamespaceRequired: boolean;
-  isPMTilesRequired: boolean;
-}
-
 /**
  * Represents the color theme mode.
  */

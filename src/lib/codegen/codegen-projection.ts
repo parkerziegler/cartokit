@@ -1,4 +1,5 @@
-import type { CartoKitBackend, CartoKitIR } from '$lib/types';
+import type { CartoKitIR } from '$lib/types';
+import type { CartoKitBackend } from '$lib/types/codegen';
 
 /**
  * Generate a program fragment for the map's projection.

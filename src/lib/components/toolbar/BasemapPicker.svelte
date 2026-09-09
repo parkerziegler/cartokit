@@ -6,6 +6,7 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import BasemapGrid from '$lib/components/map/BasemapGrid.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
+  import TabItem from '$lib/components/shared/TabItem.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
@@ -28,11 +29,7 @@
     showModal = false;
   });
 
-  const tabs = Object.keys(BASEMAPS).map((provider) => ({
-    name: provider,
-    content: BasemapGrid,
-    props: { provider } as { provider: BasemapProvider }
-  }));
+  const providers = Object.keys(BASEMAPS) as BasemapProvider[];
   const mapStyles = ['outdoor-v2', 'winter-v2', 'satellite'];
 
   onMount(() => {
@@ -124,7 +121,13 @@
   {#snippet header()}
     <h2 class="text-xl font-semibold">Select Basemap</h2>
   {/snippet}
-  <Tabs {tabs} bodyClass="max-h-[24rem] overflow-y-auto" />
+  <Tabs bodyClass="max-h-[24rem] overflow-y-auto">
+    {#each providers as provider, i (provider)}
+      <TabItem title={provider} open={i === 0}>
+        <BasemapGrid {provider} />
+      </TabItem>
+    {/each}
+  </Tabs>
 </Modal>
 
 <style lang="postcss">
