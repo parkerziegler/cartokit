@@ -127,7 +127,6 @@ function addHoverListeners(
 ): void {
   let hoveredFeatureId: string | null = null;
   const canonicalLayerId = getCanonicalLayerId(layerId);
-  console.log({ layerId, canonicalLayerId });
   const sourceId = getSourceId(map, layerId);
 
   function onMouseMove(event: maplibregl.MapLayerMouseEvent): void {
