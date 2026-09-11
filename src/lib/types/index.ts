@@ -1,113 +1,13 @@
 import type { SvelteHTMLElements } from 'svelte/elements';
 import type { FeatureCollection } from 'geojson';
 
-/**
- * Represents a quantitative D3 color scheme.
- */
-export type QuantitativeColorScheme =
-  // Sequential, single-hue schemes.
-  | 'schemeBlues'
-  | 'schemeGreens'
-  | 'schemeGreys'
-  | 'schemeOranges'
-  | 'schemePurples'
-  | 'schemeReds'
-  // Sequential, multi-hue schemes.
-  | 'schemeBuGn'
-  | 'schemeBuPu'
-  | 'schemeGnBu'
-  | 'schemeOrRd'
-  | 'schemePuBuGn'
-  | 'schemePuBu'
-  | 'schemePuRd'
-  | 'schemeYlGnBu'
-  | 'schemeYlGn'
-  | 'schemeYlOrBr'
-  | 'schemeYlOrRd'
-  // Diverging schemes.
-  | 'schemeBrBG'
-  | 'schemePRGn'
-  | 'schemePiYG'
-  | 'schemePuOr'
-  | 'schemeRdBu'
-  | 'schemeRdGy'
-  | 'schemeRdPu'
-  | 'schemeRdYlBu'
-  | 'schemeRdYlGn'
-  | 'schemeSpectral';
-
-/**
- * Represents a categorical D3 color scheme.
- */
-export type CategoricalColorScheme =
-  | 'schemeCategory10'
-  | 'schemeAccent'
-  | 'schemeDark2'
-  | 'schemeObservable10'
-  | 'schemePaired'
-  | 'schemePastel1'
-  | 'schemePastel2'
-  | 'schemeSet1'
-  | 'schemeSet2'
-  | 'schemeSet3'
-  | 'schemeTableau10';
-
-/**
- * Represents the direction of a color scheme.
- */
-export type SchemeDirection = 'Forward' | 'Reverse';
-
-/**
- * Represents a color ramp.
- */
-export type QuantitativeColorRamp =
-  // Sequential, single-hue ramps.
-  | 'interpolateBlues'
-  | 'interpolateGreens'
-  | 'interpolateGreys'
-  | 'interpolateOranges'
-  | 'interpolatePurples'
-  | 'interpolateReds'
-  // Sequential, multi-hue ramps.
-  | 'interpolateBuGn'
-  | 'interpolateBuPu'
-  | 'interpolateGnBu'
-  | 'interpolateOrRd'
-  | 'interpolatePuBuGn'
-  | 'interpolatePuBu'
-  | 'interpolatePuRd'
-  | 'interpolateRdPu'
-  | 'interpolateYlGnBu'
-  | 'interpolateYlGn'
-  | 'interpolateYlOrBr'
-  | 'interpolateYlOrRd'
-  | 'interpolateCividis'
-  | 'interpolateViridis'
-  | 'interpolateInferno'
-  | 'interpolateMagma'
-  | 'interpolatePlasma'
-  | 'interpolateWarm'
-  | 'interpolateCool'
-  | 'interpolateCubehelixDefault'
-  | 'interpolateTurbo'
-  // Diverging ramps.
-  | 'interpolateBrBG'
-  | 'interpolatePRGn'
-  | 'interpolatePiYG'
-  | 'interpolatePuOr'
-  | 'interpolateRdBu'
-  | 'interpolateRdGy'
-  | 'interpolateRdYlBu'
-  | 'interpolateRdYlGn'
-  | 'interpolateSpectral'
-  // Cyclical ramps.
-  | 'interpolateRainbow'
-  | 'interpolateSinebow';
-
-/**
- * Represents the direction of a color ramp.
- */
-export type RampDirection = 'Forward' | 'Reverse';
+import type {
+  CategoricalColorScheme,
+  QuantitativeColorRamp,
+  QuantitativeColorScheme,
+  RampDirection,
+  SchemeDirection
+} from '$lib/types/color';
 
 /**
  * Represents a continuous color scale for continuous numerical data.

@@ -1,36 +1,59 @@
 import type { Geometry } from 'geojson';
+import type maplibregl from 'maplibre-gl';
 
 import type { LayerType, VectorGeometry } from '$lib/types';
 
 /**
- * Get the layer ids for all instrumented layers associated with a given layer.
+ * Determine whether a map layer id is affiliated with an existing
+ * {@link CartoKitLayer}.
  *
- * @param layerId The id of the layer that the instrumented layers are
- * associated with.
- * @param layerType The {@link LayerType} of the layer that the instrumented
- * layers are associated with.
- * @returns An array of instrumented layer ids.
+ * @param layerId The id of the {@link CartoKitLayer}.
+ * @param id The layer or source id to test.
+ * @returns Whether the id belongs to the {@link CartoKitLayer}.
  */
-export function getInstrumentedLayerIds(
+export function isAffiliatedId(layerId: string, id: string): boolean {
+  return id === layerId || id.startsWith(`${layerId}-`);
+}
+
+/**
+ * Determine whether a layer belongs to a {@link CartoKitLayer}.
+ *
+ * Affiliation by id alone is enough to identify every layer cartokit draws,
+ * but it cannot distinguish them from a basemap layer that happens to be named
+ * like one. Require the layer to draw from an affiliated source as well.
+ *
+ * @param layerId The id of the {@link CartoKitLayer}.
+ * @param layer The layer to test, from the map or from a style specification.
+ * @returns Whether the layer belongs to the {@link CartoKitLayer}.
+ */
+export function isAffiliatedLayer(
   layerId: string,
-  layerType: LayerType
+  layer: { id: string; source?: string }
+): boolean {
+  return (
+    isAffiliatedId(layerId, layer.id) &&
+    layer.source !== undefined &&
+    isAffiliatedId(layerId, layer.source)
+  );
+}
+
+/**
+ * Get the ids of all layers on the map belonging to a {@link CartoKitLayer},
+ * including the layer's own id.
+ *
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param layerId The id of the {@link CartoKitLayer}.
+ * @returns An array of affiliated layer ids, in draw order.
+ */
+export function getAffiliatedLayerIds(
+  map: maplibregl.Map,
+  layerId: string
 ): string[] {
-  switch (layerType) {
-    case 'Point':
-    case 'Proportional Symbol':
-    case 'Line':
-    case 'Heatmap':
-      return [];
-    case 'Dot Density':
-      return [
-        `${layerId}-outlines`,
-        `${layerId}-outlines-hover`,
-        `${layerId}-outlines-select`
-      ];
-    case 'Polygon':
-    case 'Choropleth':
-      return [`${layerId}-stroke`, `${layerId}-hover`, `${layerId}-select`];
-  }
+  return map
+    .getLayersOrder()
+    .filter((id) =>
+      isAffiliatedLayer(layerId, { id, source: map.getLayer(id)?.source })
+    );
 }
 
 // A map of GeoJSON Geometry types to the supported cartokit layer types.

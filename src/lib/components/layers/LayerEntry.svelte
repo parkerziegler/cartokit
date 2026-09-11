@@ -236,6 +236,7 @@
         })}
         onclick={removeLayer}
         class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500 focus:bg-slate-500"
+        data-testid="remove-layer-button"
       >
         <MinusIcon />
       </button>

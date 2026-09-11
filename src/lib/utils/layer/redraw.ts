@@ -1,14 +1,14 @@
 import type * as maplibregl from 'maplibre-gl';
 
 import { addLayer } from '$lib/interaction/layer';
-import { listeners, type LayerListeners } from '$lib/state/listeners.svelte';
-import type { CartoKitLayer, LayerType } from '$lib/types';
-import { getInstrumentedLayerIds } from '$lib/utils/layer';
+import { removeHoverListeners } from '$lib/interaction/hover';
+import { removeSelectListeners } from '$lib/interaction/select';
+import type { CartoKitLayer } from '$lib/types';
+import { getAffiliatedLayerIds } from '$lib/utils/layer';
 
 interface RedrawParams {
   map: maplibregl.Map;
   sourceLayerId: string;
-  sourceLayerType: LayerType;
   targetLayer: CartoKitLayer;
 }
 
@@ -17,30 +17,21 @@ interface RedrawParams {
  *
  * @param params.map The {@link maplibregl.Map} instance.
  * @param params.sourceLayerId The id of the source layer.
- * @param params.sourceLayerType The type of the source layer.
  * @param params.targetLayer The definition of the target layer.
  */
 export function redraw(params: RedrawParams): void {
-  const { map, sourceLayerId, sourceLayerType, targetLayer } = params;
+  const { map, sourceLayerId, targetLayer } = params;
 
-  // Remove all event listeners for the existing layer.
-  if (listeners.value.has(sourceLayerId)) {
-    Object.entries(listeners.value.get(sourceLayerId)!).forEach(
-      ([event, listener]) => {
-        map.off(event as keyof LayerListeners, sourceLayerId, listener);
-      }
-    );
+  const affiliatedLayerIds = getAffiliatedLayerIds(map, sourceLayerId);
 
-    listeners.value.delete(sourceLayerId);
-  }
+  // Remove all event listeners for the existing layer and its affiliated
+  // layers.
+  removeHoverListeners(map, affiliatedLayerIds);
+  removeSelectListeners(map, affiliatedLayerIds);
 
-  // Remove the existing layer and all instrumented layers.
-  map.removeLayer(sourceLayerId);
-
-  getInstrumentedLayerIds(sourceLayerId, sourceLayerType).forEach((id) => {
-    if (map.getLayer(id)) {
-      map.removeLayer(id);
-    }
+  // Remove the existing layer and its affiliated layers.
+  affiliatedLayerIds.forEach((id) => {
+    map.removeLayer(id);
   });
 
   if (targetLayer.source.type === 'geojson') {

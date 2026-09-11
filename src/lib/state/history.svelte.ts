@@ -2,7 +2,13 @@ import { on } from 'svelte/events';
 
 import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
 
-export const history = $state<{
+// Use $state.raw to avoid deep reactivity and Proxies.
+//
+// 'add-layer' uses a WebWorker to fetch GeoJSON and build the catalog off the
+// main thread, so we need to keep the full layer payload serializable by
+// structured clone. $state by default will create Proxies for all Arrays and
+// Objects, which will throw at runtime when structuredClone runs.
+export const history = $state.raw<{
   undo: {
     execute: CartoKitDiff;
     invert: CartoKitDiff;
@@ -19,7 +25,7 @@ export const history = $state<{
 /**
  * Initialize our history interface for undo / redo functionality.
  *
- * @returns – A function to remove the undo / redo event listener.
+ * @returns A function to remove the undo / redo event listener.
  */
 export function initHistory() {
   const off = on(document, 'keydown', (event) => {

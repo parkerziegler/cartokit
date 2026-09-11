@@ -6,7 +6,7 @@ import { layerId } from '$lib/state/layerId.svelte';
 import { listeners } from '$lib/state/listeners.svelte';
 import { layout } from '$lib/stores/layout';
 import type { CartoKitLayer } from '$lib/types';
-import { getCanonicalLayerId } from '$lib/utils/layer/id';
+import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
 
 /**
  * Add a selection indicator to a feature in a point layer.
@@ -94,7 +94,7 @@ export function instrumentPolygonSelect(
   map.addLayer({
     id: `${layerId}-select`,
     type: 'line',
-    source: layerId,
+    source: getSourceId(map, layerId),
     'source-layer': sourceLayerId,
     paint: {
       'line-color': '#A534FF',
@@ -124,13 +124,14 @@ function addSelectListeners(
   sourceLayerId?: string
 ): void {
   let featureId: string | number | undefined;
+  const sourceId = getSourceId(map, lyrId);
 
   function onClick(event: maplibregl.MapLayerMouseEvent): void {
     if (event.features && event.features.length > 0) {
       if (featureId !== undefined) {
         map.setFeatureState(
           {
-            source: lyrId,
+            source: sourceId,
             id: featureId,
             sourceLayer: sourceLayerId
           },
@@ -143,7 +144,7 @@ function addSelectListeners(
       if (id) {
         map.setFeatureState(
           {
-            source: lyrId,
+            source: sourceId,
             id,
             sourceLayer: sourceLayerId
           },
@@ -158,6 +159,7 @@ function addSelectListeners(
         properties,
         geometry,
         layerId: lyrId,
+        sourceId,
         sourceLayerId
       };
       layerId.value = getCanonicalLayerId(lyrId);
@@ -210,7 +212,7 @@ export function onFeatureLeave(
         // Deselect the feature.
         map.removeFeatureState(
           {
-            source: feature.value.layerId,
+            source: feature.value.sourceId,
             id: feature.value.id,
             sourceLayer: feature.value.sourceLayerId
           },
@@ -238,7 +240,7 @@ export function onFeatureLeave(
     ) {
       map.removeFeatureState(
         {
-          source: feature.value.layerId,
+          source: feature.value.sourceId,
           id: feature.value.id,
           sourceLayer: feature.value.sourceLayerId
         },
@@ -246,4 +248,36 @@ export function onFeatureLeave(
       );
     }
   };
+}
+
+/**
+ * Detach the select listeners registered for a set of layers.
+ *
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param layerIds The ids of the layers to detach select listeners from.
+ */
+export function removeSelectListeners(
+  map: maplibregl.Map,
+  layerIds: string[]
+): void {
+  layerIds.forEach((layerId) => {
+    const layerListeners = listeners.value.get(layerId);
+
+    if (!layerListeners) {
+      return;
+    }
+
+    const { click, mousemove, mouseleave } = layerListeners;
+
+    if (click) {
+      map.off('click', layerId, click);
+    }
+    // Leave the listeners registered by hover in place; they are detached by
+    // removeHoverListeners.
+    if (mousemove || mouseleave) {
+      listeners.value.set(layerId, { mousemove, mouseleave });
+    } else {
+      listeners.value.delete(layerId);
+    }
+  });
 }

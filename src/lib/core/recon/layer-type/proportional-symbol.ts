@@ -24,7 +24,6 @@ export function reconProportionalSymbol(
       redraw({
         map: map.value!,
         sourceLayerId,
-        sourceLayerType,
         targetLayer
       });
       break;

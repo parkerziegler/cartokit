@@ -4,7 +4,7 @@ import { get } from 'svelte/store';
 import { popup } from '$lib/state/popup.svelte';
 import { ir } from '$lib/stores/ir';
 import { listeners } from '$lib/state/listeners.svelte';
-import { getCanonicalLayerId } from '$lib/utils/layer/id';
+import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
 
 /**
  * Add a hover effect to all features in a point layer.
@@ -92,7 +92,7 @@ export function instrumentPolygonHover(
   map.addLayer({
     id: `${layerId}-hover`,
     type: 'line',
-    source: layerId,
+    source: getSourceId(map, layerId),
     'source-layer': sourceLayerId,
     paint: {
       'line-color': '#FFFFFF',
@@ -123,13 +123,14 @@ function addHoverListeners(
 ): void {
   let hoveredFeatureId: string | null = null;
   const canonicalLayerId = getCanonicalLayerId(layerId);
+  const sourceId = getSourceId(map, layerId);
 
   function onMouseMove(event: maplibregl.MapLayerMouseEvent): void {
     if (event.features && event.features.length > 0) {
       if (hoveredFeatureId !== null) {
         map.setFeatureState(
           {
-            source: layerId,
+            source: sourceId,
             id: hoveredFeatureId,
             sourceLayer: sourceLayerId
           },
@@ -142,7 +143,7 @@ function addHoverListeners(
       if (hoveredFeatureId) {
         map.setFeatureState(
           {
-            source: layerId,
+            source: sourceId,
             id: hoveredFeatureId,
             sourceLayer: sourceLayerId
           },
@@ -167,7 +168,7 @@ function addHoverListeners(
     if (hoveredFeatureId !== null) {
       map.setFeatureState(
         {
-          source: layerId,
+          source: sourceId,
           id: hoveredFeatureId,
           sourceLayer: sourceLayerId
         },
@@ -194,5 +195,40 @@ function addHoverListeners(
     ...layerListeners,
     mousemove: onMouseMove,
     mouseleave: onMouseLeave
+  });
+}
+
+/**
+ * Detach the hover listeners registered for a set of layers.
+ *
+ * @param map The top-level {@link maplibregl.Map} instance.
+ * @param layerIds The ids of the layers to detach hover listeners from.
+ */
+export function removeHoverListeners(
+  map: maplibregl.Map,
+  layerIds: string[]
+): void {
+  layerIds.forEach((layerId) => {
+    const layerListeners = listeners.value.get(layerId);
+
+    if (!layerListeners) {
+      return;
+    }
+
+    const { mousemove, mouseleave, click } = layerListeners;
+
+    if (mousemove) {
+      map.off('mousemove', layerId, mousemove);
+    }
+    if (mouseleave) {
+      map.off('mouseleave', layerId, mouseleave);
+    }
+    // Leave the listener registered by select in place; it is detached by
+    // removeSelectListeners.
+    if (click) {
+      listeners.value.set(layerId, { click });
+    } else {
+      listeners.value.delete(layerId);
+    }
   });
 }

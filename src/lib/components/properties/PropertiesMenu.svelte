@@ -32,7 +32,7 @@
     if (feature.value?.id) {
       map.removeFeatureState(
         {
-          source: feature.value.layerId,
+          source: feature.value.sourceId,
           sourceLayer: feature.value.sourceLayerId,
           id: feature.value.id
         },

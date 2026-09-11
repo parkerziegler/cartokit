@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { materializeColorScheme } from '$lib/utils/color/scheme';
   import type {
     CategoricalColorScheme,
     QuantitativeColorScheme,
     SchemeDirection
-  } from '$lib/types';
+  } from '$lib/types/color';
+  import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
     scheme: CategoricalColorScheme | QuantitativeColorScheme;

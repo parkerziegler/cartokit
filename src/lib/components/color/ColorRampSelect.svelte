@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { tooltip } from '$lib/attachments/tooltip';
-  import { onClickOutside } from '$lib/attachments/on-click-outside';
   import { focus } from '$lib/actions/focus.svelte';
+  import { onClickOutside } from '$lib/attachments/on-click-outside';
+  import { tooltip } from '$lib/attachments/tooltip';
   import ColorRamp from '$lib/components/channel/shared/ColorRamp.svelte';
   import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import Portal from '$lib/components/shared/Portal.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import type { QuantitativeColorRamp, RampDirection } from '$lib/types';
+  import type { QuantitativeColorRamp, RampDirection } from '$lib/types/color';
   import { QUANTITATIVE_COLOR_RAMPS } from '$lib/utils/color/ramp';
 
   interface Props {

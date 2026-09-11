@@ -1,8 +1,6 @@
 import * as d3 from 'd3';
 
-import type { QuantitativeColorRamp, RampDirection } from '$lib/types';
-
-export const QUANTITATIVE_COLOR_RAMPS: QuantitativeColorRamp[] = [
+export const QUANTITATIVE_COLOR_RAMPS = [
   // Sequential, single-hue ramps.
   'interpolateBlues',
   'interpolateGreens',
@@ -45,14 +43,24 @@ export const QUANTITATIVE_COLOR_RAMPS: QuantitativeColorRamp[] = [
   // Cyclical ramps.
   'interpolateRainbow',
   'interpolateSinebow'
-];
+] as const;
 
 /**
- * Materialize a color ramp into an array of colors.
+ * Represents a quantitative D3 color scheme.
+ */
+export type QuantitativeColorRamp = (typeof QUANTITATIVE_COLOR_RAMPS)[number];
+
+/**
+ * Represents the direction of a color ramp.
+ */
+export type RampDirection = 'Forward' | 'Reverse';
+
+/**
+ * Materialize a {@link QuantitativeColorRamp} into an array of colors.
  *
- * @param ramp – The color ramp to materialize.
- * @param rampDirection – The direction of the color ramp.
- * @param n – The number of colors to materialize.
+ * @param ramp The {@link QuantitativeColorRamp} to materialize.
+ * @param rampDirection The {@link RampDirection} of the color ramp.
+ * @param n The number of colors to materialize.
  * @returns An array of colors in hexadecimal format.
  */
 export function materializeColorRamp(

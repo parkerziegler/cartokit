@@ -26,7 +26,6 @@ export function reconChoropleth(
       redraw({
         map: map.value!,
         sourceLayerId,
-        sourceLayerType,
         targetLayer
       });
       break;

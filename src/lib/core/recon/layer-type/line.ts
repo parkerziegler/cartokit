@@ -26,7 +26,6 @@ export function reconLine(
       redraw({
         map: map.value!,
         sourceLayerId,
-        sourceLayerType,
         targetLayer
       });
       break;
