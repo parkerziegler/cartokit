@@ -1,4 +1,4 @@
-import { json, error } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import OpenAI from 'openai';
 import type {
   ChatCompletionMessageParam,
@@ -12,6 +12,11 @@ import type { RequestHandler } from './$types';
 import type { BasemapProvider, LayerType } from '$lib/types';
 import type { LLMRequest, LLMRequestState, Prompt } from '$lib/types/llm';
 import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
+import { QUANTITATIVE_COLOR_RAMPS } from '$lib/utils/color/ramp';
+import {
+  CATEGORICAL_COLOR_SCHEMES,
+  QUANTITATIVE_COLOR_SCHEMES
+} from '$lib/utils/color/scheme';
 
 // Initialize the OpenAI client.
 const openai = new OpenAI({
@@ -484,45 +489,9 @@ const FillColorSchemeDiff = z.object({
   type: z.literal('fill-color-scheme'),
   layerId: z.string(),
   payload: z.object({
-    scheme: z.union([
-      z.literal('schemeBlues'),
-      z.literal('schemeGreens'),
-      z.literal('schemeGreys'),
-      z.literal('schemeOranges'),
-      z.literal('schemePurples'),
-      z.literal('schemeReds'),
-      z.literal('schemeBuGn'),
-      z.literal('schemeBuPu'),
-      z.literal('schemeGnBu'),
-      z.literal('schemeOrRd'),
-      z.literal('schemePuBuGn'),
-      z.literal('schemePuBu'),
-      z.literal('schemePuRd'),
-      z.literal('schemeRdPu'),
-      z.literal('schemeYlGnBu'),
-      z.literal('schemeYlGn'),
-      z.literal('schemeYlOrBr'),
-      z.literal('schemeYlOrRd'),
-      z.literal('schemeBrBG'),
-      z.literal('schemePRGn'),
-      z.literal('schemePiYG'),
-      z.literal('schemePuOr'),
-      z.literal('schemeRdBu'),
-      z.literal('schemeRdGy'),
-      z.literal('schemeRdYlBu'),
-      z.literal('schemeRdYlGn'),
-      z.literal('schemeSpectral'),
-      z.literal('schemeCategory10'),
-      z.literal('schemeAccent'),
-      z.literal('schemeDark2'),
-      z.literal('schemeObservable10'),
-      z.literal('schemePaired'),
-      z.literal('schemePastel1'),
-      z.literal('schemePastel2'),
-      z.literal('schemeSet1'),
-      z.literal('schemeSet2'),
-      z.literal('schemeSet3'),
-      z.literal('schemeTableau10')
+    scheme: z.enum([
+      ...QUANTITATIVE_COLOR_SCHEMES,
+      ...CATEGORICAL_COLOR_SCHEMES
     ])
   })
 });
@@ -535,51 +504,10 @@ const FillColorSchemeDirectionDiff = z.object({
   })
 });
 
-const QuantitativeColorRamp = z.union([
-  z.literal('interpolateBlues'),
-  z.literal('interpolateGreens'),
-  z.literal('interpolateGreys'),
-  z.literal('interpolateOranges'),
-  z.literal('interpolatePurples'),
-  z.literal('interpolateReds'),
-  z.literal('interpolateBuGn'),
-  z.literal('interpolateBuPu'),
-  z.literal('interpolateGnBu'),
-  z.literal('interpolateOrRd'),
-  z.literal('interpolatePuBuGn'),
-  z.literal('interpolatePuBu'),
-  z.literal('interpolatePuRd'),
-  z.literal('interpolateRdPu'),
-  z.literal('interpolateYlGnBu'),
-  z.literal('interpolateYlGn'),
-  z.literal('interpolateYlOrBr'),
-  z.literal('interpolateYlOrRd'),
-  z.literal('interpolateCividis'),
-  z.literal('interpolateViridis'),
-  z.literal('interpolateInferno'),
-  z.literal('interpolateMagma'),
-  z.literal('interpolatePlasma'),
-  z.literal('interpolateWarm'),
-  z.literal('interpolateCool'),
-  z.literal('interpolateCubehelixDefault'),
-  z.literal('interpolateTurbo'),
-  z.literal('interpolateBrBG'),
-  z.literal('interpolatePRGn'),
-  z.literal('interpolatePiYG'),
-  z.literal('interpolatePuOr'),
-  z.literal('interpolateRdBu'),
-  z.literal('interpolateRdGy'),
-  z.literal('interpolateRdYlBu'),
-  z.literal('interpolateRdYlGn'),
-  z.literal('interpolateSpectral'),
-  z.literal('interpolateRainbow'),
-  z.literal('interpolateSinebow')
-]);
-
 const FillColorRampDiff = z.object({
   type: z.literal('fill-color-ramp'),
   layerId: z.string(),
-  payload: z.object({ ramp: QuantitativeColorRamp })
+  payload: z.object({ ramp: z.enum(QUANTITATIVE_COLOR_RAMPS) })
 });
 
 const FillColorRampDirectionDiff = z.object({
@@ -591,6 +519,7 @@ const FillColorRampDirectionDiff = z.object({
 });
 
 const ClassificationMethod = z.union([
+  z.literal('Continuous'),
   z.literal('Quantile'),
   z.literal('Equal Interval'),
   z.literal('Jenks'),
@@ -751,22 +680,7 @@ const HeatmapRadiusDiff = z.object({
 const HeatmapRampDiff = z.object({
   type: z.literal('heatmap-ramp'),
   layerId: z.string(),
-  payload: z.object({
-    ramp: z.union([
-      z.literal('Cividis'),
-      z.literal('Viridis'),
-      z.literal('Inferno'),
-      z.literal('Magma'),
-      z.literal('Plasma'),
-      z.literal('Warm'),
-      z.literal('Cool'),
-      z.literal('CubehelixDefault'),
-      z.literal('Turbo'),
-      z.literal('Spectral'),
-      z.literal('Rainbow'),
-      z.literal('Sinebow')
-    ])
-  })
+  payload: z.object({ ramp: z.enum(QUANTITATIVE_COLOR_RAMPS) })
 });
 
 const HeatmapRampDirectionDiff = z.object({

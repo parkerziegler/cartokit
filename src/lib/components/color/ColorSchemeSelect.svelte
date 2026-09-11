@@ -9,15 +9,17 @@
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type {
     CategoricalColorScale,
-    CategoricalColorScheme,
     ContinuousColorScale,
-    QuantitativeColorScale,
-    QuantitativeColorScheme,
-    SchemeDirection
+    QuantitativeColorScale
   } from '$lib/types';
   import {
-    QUANTITATIVE_COLOR_SCHEMES,
-    CATEGORICAL_COLOR_SCHEMES
+    type CategoricalColorScheme,
+    type QuantitativeColorScheme,
+    type SchemeDirection
+  } from '$lib/types/color';
+  import {
+    CATEGORICAL_COLOR_SCHEMES,
+    QUANTITATIVE_COLOR_SCHEMES
   } from '$lib/utils/color/scheme';
 
   interface Props {

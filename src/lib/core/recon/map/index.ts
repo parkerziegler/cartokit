@@ -1,6 +1,6 @@
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
 import { map } from '$lib/state/map.svelte';
-import { getInstrumentedLayerIds } from '$lib/utils/layer';
+import { isAffiliatedId, isAffiliatedLayer } from '$lib/utils/layer';
 
 /**
  * Reconcile map-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
@@ -22,24 +22,17 @@ export async function reconMapDiffs(
       // See: https://github.com/maplibre/maplibre-gl-js/issues/2587.
       map.value!.setStyle(diff.payload.url, {
         transformStyle: (previousStyle, nextStyle) => {
-          const ids = Object.values(targetIR.layers).reduce<string[]>(
-            (acc, layer) => [
-              ...acc,
-              layer.id,
-              ...getInstrumentedLayerIds(layer.id, layer.type)
-            ],
-            []
-          );
-
+          const layerIds = Object.keys(targetIR.layers);
           const customLayers =
-            previousStyle?.layers?.filter((layer) => ids.includes(layer.id)) ??
-            [];
+            previousStyle?.layers?.filter((layer) =>
+              layerIds.some((layerId) => isAffiliatedLayer(layerId, layer))
+            ) ?? [];
           const layers = nextStyle.layers.concat(customLayers);
 
           const sources = nextStyle.sources;
           if (previousStyle?.sources) {
             for (const [id, value] of Object.entries(previousStyle.sources)) {
-              if (ids.includes(id)) {
+              if (layerIds.some((layerId) => isAffiliatedId(layerId, id))) {
                 sources[id] = value;
               }
             }

@@ -1,9 +1,9 @@
-import type {
-  QuantitativeColorScheme,
-  QuantitativeColorRamp
-} from '$lib/types';
-import { QUANTITATIVE_COLOR_SCHEMES } from '$lib/utils/color/scheme';
+import {
+  type QuantitativeColorRamp,
+  type QuantitativeColorScheme
+} from '$lib/types/color';
 import { DEFAULT_QUANTITATIVE_SCHEME } from '$lib/utils/constants';
+import { isQuantitativeColorScheme } from '$lib/utils/color/scheme';
 
 /**
  * Convert a {@link QuantitativeColorScheme} to a {@link QuantitativeColorRamp}.
@@ -28,8 +28,8 @@ export function convertRampToScheme(
 ): QuantitativeColorScheme {
   const id = ramp.replace('interpolate', 'scheme');
 
-  if (QUANTITATIVE_COLOR_SCHEMES.includes(id as QuantitativeColorScheme)) {
-    return id as QuantitativeColorScheme;
+  if (isQuantitativeColorScheme(id)) {
+    return id;
   }
 
   return DEFAULT_QUANTITATIVE_SCHEME;

@@ -1,16 +1,16 @@
 import * as Comlink from 'comlink';
 
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
+import { removeLayerListeners } from '$lib/interaction/events';
 import { addLayer } from '$lib/interaction/layer';
 import { catalog } from '$lib/state/catalog.svelte';
 import { feature } from '$lib/state/feature.svelte';
-import { listeners, type LayerListeners } from '$lib/state/listeners.svelte';
+import { layerId } from '$lib/state/layerId.svelte';
 import { map } from '$lib/state/map.svelte';
 import type { CartoKitLayer, Catalog } from '$lib/types';
-import { getInstrumentedLayerIds } from '$lib/utils/layer';
-import { layerId } from '$lib/state/layerId.svelte';
+import { getAffiliatedLayerIds } from '$lib/utils/layer';
+import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
 import { redraw } from '$lib/utils/layer/redraw';
-import { getCanonicalLayerId } from '$lib/utils/layer/id';
 
 /**
  * Reconcile layer-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
@@ -100,30 +100,27 @@ export async function reconLayerDiffs(
       break;
     }
     case 'remove-layer': {
-      // Remove all event listeners for the layer.
-      if (listeners.value.has(diff.layerId)) {
-        Object.entries(listeners.value.get(diff.layerId)!).forEach(
-          ([event, listener]) => {
-            map.value!.off(
-              event as keyof LayerListeners,
-              diff.layerId,
-              listener
-            );
-          }
-        );
+      const affiliatedLayerIds = getAffiliatedLayerIds(
+        map.value!,
+        diff.layerId
+      );
+      const affiliatedSourceIds = new Set(
+        affiliatedLayerIds.map((id) => getSourceId(map.value!, id))
+      );
 
-        listeners.value.delete(diff.layerId);
-      }
+      // Remove all event listeners for the layer and its affiliated layers.
+      removeLayerListeners(map.value!, affiliatedLayerIds);
 
-      // Remove the layer.
-      map.value!.removeLayer(diff.layerId);
+      affiliatedLayerIds.forEach((id) => {
+        map.value!.removeLayer(id);
+      });
 
-      // If the removed layer was selected, set the layer to null.
+      // If the removed layer was selected, set layerId to null.
       if (layerId.value === diff.layerId) {
         layerId.value = null;
       }
 
-      // If the selected feature belongs to the removed layer, set the feature to null.
+      // If the selected feature belongs to the removed layer, set feature to null.
       if (
         feature.value &&
         getCanonicalLayerId(feature.value.layerId) === diff.layerId
@@ -131,23 +128,12 @@ export async function reconLayerDiffs(
         feature.value = null;
       }
 
-      // Remove all instrumented layers.
-      getInstrumentedLayerIds(
-        diff.layerId,
-        diff.payload.sourceLayerType
-      ).forEach((id) => {
-        if (map.value!.getLayer(id)) {
-          map.value!.removeLayer(id);
+      // Remove the sources backing the removed layers.
+      affiliatedSourceIds.forEach((id) => {
+        if (map.value!.getSource(id)) {
+          map.value!.removeSource(id);
         }
       });
-
-      // Remove the source.
-      map.value!.removeSource(diff.layerId);
-
-      // Remove the outlines source for dot density layers.
-      if (map.value!.getSource(`${diff.layerId}-outlines`)) {
-        map.value!.removeSource(`${diff.layerId}-outlines`);
-      }
 
       break;
     }
@@ -160,7 +146,6 @@ export async function reconLayerDiffs(
       redraw({
         map: map.value!,
         sourceLayerId: diff.layerId,
-        sourceLayerType: targetLayer.type,
         targetLayer
       });
 

@@ -24,7 +24,6 @@ export function reconPoint(
       redraw({
         map: map.value!,
         sourceLayerId,
-        sourceLayerType,
         targetLayer
       });
       break;

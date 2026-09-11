@@ -21,12 +21,13 @@ export function registerKeybinding(
     ) {
       event.stopPropagation();
       return;
-    } else if (event.metaKey) {
-      event.stopPropagation();
-      return;
     }
 
-    if (event.key === key && (!requireShift || event.shiftKey)) {
+    if (
+      event.key === key &&
+      !(event.metaKey || event.ctrlKey) &&
+      (!requireShift || event.shiftKey)
+    ) {
       event.preventDefault();
       callback();
     }

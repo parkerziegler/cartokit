@@ -1,7 +1,7 @@
-import type { MapLayerMouseEvent } from 'maplibre-gl';
+import type maplibregl from 'maplibre-gl';
 import { SvelteMap } from 'svelte/reactivity';
 
-type LayerListener = (event: MapLayerMouseEvent) => void;
+type LayerListener = (event: maplibregl.MapLayerMouseEvent) => void;
 
 export interface LayerListeners {
   click: LayerListener;

@@ -22,7 +22,6 @@ export function reconDotDensity(
       redraw({
         map: map.value!,
         sourceLayerId,
-        sourceLayerType,
         targetLayer
       });
       break;

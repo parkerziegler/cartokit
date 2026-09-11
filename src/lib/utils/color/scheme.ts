@@ -1,19 +1,17 @@
 import * as d3 from 'd3';
 
-import type {
-  CategoricalColorScheme,
-  QuantitativeColorScheme,
-  SchemeDirection
-} from '$lib/types';
-
-export const QUANTITATIVE_COLOR_SCHEMES: QuantitativeColorScheme[] = [
-  // Sequential schemes.
+/**
+ * The quantitative D3 color schemes available in cartokit, in display order.
+ */
+export const QUANTITATIVE_COLOR_SCHEMES = [
+  // Sequential, single-hue schemes.
   'schemeBlues',
   'schemeGreens',
   'schemeGreys',
   'schemeOranges',
   'schemePurples',
   'schemeReds',
+  // Sequential, multi-hue schemes.
   'schemeBuGn',
   'schemeBuPu',
   'schemeGnBu',
@@ -36,9 +34,18 @@ export const QUANTITATIVE_COLOR_SCHEMES: QuantitativeColorScheme[] = [
   'schemeRdYlBu',
   'schemeRdYlGn',
   'schemeSpectral'
-];
+] as const;
 
-export const CATEGORICAL_COLOR_SCHEMES: CategoricalColorScheme[] = [
+/**
+ * Represents a quantitative D3 color scheme.
+ */
+export type QuantitativeColorScheme =
+  (typeof QUANTITATIVE_COLOR_SCHEMES)[number];
+
+/**
+ * The categorical D3 color schemes available in cartokit, in display order.
+ */
+export const CATEGORICAL_COLOR_SCHEMES = [
   'schemeCategory10',
   'schemeAccent',
   'schemeDark2',
@@ -50,9 +57,26 @@ export const CATEGORICAL_COLOR_SCHEMES: CategoricalColorScheme[] = [
   'schemeSet2',
   'schemeSet3',
   'schemeTableau10'
-];
+] as const;
 
-function isQuantitativeColorScheme(
+/**
+ * Represents a categorical D3 color scheme.
+ */
+export type CategoricalColorScheme = (typeof CATEGORICAL_COLOR_SCHEMES)[number];
+
+/**
+ * Represents the direction of a color scheme.
+ */
+export type SchemeDirection = 'Forward' | 'Reverse';
+
+/**
+ * A type guard to narrow a scheme to a {@link QuantitativeColorScheme}.
+ *
+ * @param scheme The name of the scheme to test.
+ * @returns A Boolean flag indicating whether the scheme is a
+ * {@link QuantitativeColorScheme}.
+ */
+export function isQuantitativeColorScheme(
   scheme: string
 ): scheme is QuantitativeColorScheme {
   return QUANTITATIVE_COLOR_SCHEMES.includes(scheme as QuantitativeColorScheme);
@@ -61,8 +85,8 @@ function isQuantitativeColorScheme(
 /**
  * Materialize a quantitative color scheme into an array of colors.
  *
- * @param scheme A @link{QuantitativeColorScheme}.
- * @param direction The @link{SchemeDirection} of the scheme.
+ * @param scheme A {@link QuantitativeColorScheme}.
+ * @param direction The {@link SchemeDirection} of the scheme.
  * @param count The number of colors in the color scale.
  * @returns An array of colors in hexadecimal format.
  */

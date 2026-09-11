@@ -9,18 +9,20 @@ import { ir } from '$lib/stores/ir';
 import type {
   BasemapProvider,
   CartoKitLayer,
-  CategoricalColorScheme,
   LayerType,
   Projection,
-  QuantitativeColorRamp,
   QuantitativeColorScale,
-  QuantitativeColorScheme,
-  RampDirection,
-  SchemeDirection,
   ThemeMode,
   TransformationCall,
   VisualizationType
 } from '$lib/types';
+import type {
+  CategoricalColorScheme,
+  QuantitativeColorRamp,
+  QuantitativeColorScheme,
+  RampDirection,
+  SchemeDirection
+} from '$lib/types/color';
 
 interface LayerDiff {
   layerId: CartoKitLayer['id'];
