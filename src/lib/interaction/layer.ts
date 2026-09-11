@@ -1,17 +1,15 @@
 import type maplibregl from 'maplibre-gl';
 
 import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
-import { deriveSize } from '$lib/interaction/geometry';
 import {
-  instrumentPointHover,
   instrumentLineHover,
-  instrumentPolygonHover
-} from '$lib/interaction/hover';
-import {
-  instrumentPointSelect,
   instrumentLineSelect,
+  instrumentPointHover,
+  instrumentPointSelect,
+  instrumentPolygonHover,
   instrumentPolygonSelect
-} from '$lib/interaction/select';
+} from '$lib/interaction/events';
+import { deriveSize } from '$lib/interaction/geometry';
 import type { CartoKitLayer } from '$lib/types';
 
 /**

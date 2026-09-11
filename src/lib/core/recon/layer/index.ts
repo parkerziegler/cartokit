@@ -1,17 +1,16 @@
 import * as Comlink from 'comlink';
 
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
+import { removeLayerListeners } from '$lib/interaction/events';
 import { addLayer } from '$lib/interaction/layer';
 import { catalog } from '$lib/state/catalog.svelte';
 import { feature } from '$lib/state/feature.svelte';
+import { layerId } from '$lib/state/layerId.svelte';
 import { map } from '$lib/state/map.svelte';
 import type { CartoKitLayer, Catalog } from '$lib/types';
 import { getAffiliatedLayerIds } from '$lib/utils/layer';
-import { layerId } from '$lib/state/layerId.svelte';
-import { redraw } from '$lib/utils/layer/redraw';
 import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
-import { removeHoverListeners } from '$lib/interaction/hover';
-import { removeSelectListeners } from '$lib/interaction/select';
+import { redraw } from '$lib/utils/layer/redraw';
 
 /**
  * Reconcile layer-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.
@@ -110,12 +109,8 @@ export async function reconLayerDiffs(
       );
 
       // Remove all event listeners for the layer and its affiliated layers.
-      removeHoverListeners(map.value!, affiliatedLayerIds);
-      removeSelectListeners(map.value!, affiliatedLayerIds);
+      removeLayerListeners(map.value!, affiliatedLayerIds);
 
-      // Remove the layer and its affiliated layers. Every affiliated layer
-      // must go before its source does, as MapLibre refuses to remove a source
-      // still in use.
       affiliatedLayerIds.forEach((id) => {
         map.value!.removeLayer(id);
       });

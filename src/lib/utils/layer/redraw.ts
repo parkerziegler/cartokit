@@ -1,8 +1,7 @@
 import type * as maplibregl from 'maplibre-gl';
 
 import { addLayer } from '$lib/interaction/layer';
-import { removeHoverListeners } from '$lib/interaction/hover';
-import { removeSelectListeners } from '$lib/interaction/select';
+import { removeLayerListeners } from '$lib/interaction/events';
 import type { CartoKitLayer } from '$lib/types';
 import { getAffiliatedLayerIds } from '$lib/utils/layer';
 
@@ -24,15 +23,10 @@ export function redraw(params: RedrawParams): void {
 
   const affiliatedLayerIds = getAffiliatedLayerIds(map, sourceLayerId);
 
-  // Remove all event listeners for the existing layer and its affiliated
-  // layers.
-  removeHoverListeners(map, affiliatedLayerIds);
-  removeSelectListeners(map, affiliatedLayerIds);
+  // Remove all event listeners for the existing layer and affiliated layers.
+  removeLayerListeners(map, affiliatedLayerIds);
 
-  // Remove the existing layer and its affiliated layers.
-  affiliatedLayerIds.forEach((id) => {
-    map.removeLayer(id);
-  });
+  affiliatedLayerIds.forEach((id) => map.removeLayer(id));
 
   if (targetLayer.source.type === 'geojson') {
     // Update the source with the new data.

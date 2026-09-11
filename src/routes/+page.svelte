@@ -18,7 +18,7 @@
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
   import Popup from '$lib/components/shared/Popup.svelte';
   import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
-  import { onFeatureLeave } from '$lib/interaction/select';
+  import { onFeatureLeave } from '$lib/interaction/events';
   import { chat } from '$lib/state/chat.svelte';
   import { error } from '$lib/state/error.svelte';
   import { initHistory } from '$lib/state/history.svelte';
