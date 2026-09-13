@@ -353,30 +353,26 @@ export const POST = (async ({ request }) => {
 }) satisfies RequestHandler;
 
 /**
+ * The shape of a layer ID generated on the fly by the "add-layer" diff: the
+ * display name in kebab-case, a double underscore, then a random suffix.
+ */
+const FRESH_LAYER_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*__[a-z0-9]+$/;
+
+/**
  * Construct the schema for the layerId field for a diff.
  *
  * Responses from the OpenAI API are validated after the fact, and should only
- * target existing map layers. This schema also permits a fresh layer ID
- * subschema to support the "add-layer" diff, which must generate a layer ID on
- * the fly.
+ * target existing map layers. The schema also accepts a freshly generated layer
+ * ID to support the "add-layer" diff, which names a layer that does not exist
+ * on the map yet.
  *
  * @param layerIds An array of the IDs of the current layers on the map.
  * @returns A Zod schema for the layerId field of a generated diff.
  */
 function makeLayerIdSchema(layerIds: string[]) {
-  const freshLayerIdSchema = z
+  return z
     .string()
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*__[a-z0-9]+$/);
-
-  if (layerIds.length === 0) {
-    return freshLayerIdSchema;
-  }
-
-  return z.union([
-    z.literal(layerIds[0]),
-    freshLayerIdSchema,
-    ...layerIds.slice(1).map((id) => z.literal(id))
-  ]);
+    .refine((id) => new Set(layerIds).has(id) || FRESH_LAYER_ID.test(id));
 }
 
 /**
@@ -396,18 +392,7 @@ function makeLayerIdSchema(layerIds: string[]) {
 function makeAttrsSchema(attributes: string[]) {
   const attrs = [...new Set(attributes)];
 
-  switch (attrs.length) {
-    case 0:
-      return z.literal('None');
-    case 1:
-      return z.literal(attrs[0]);
-    default:
-      return z.union([
-        z.literal(attrs[0]),
-        z.literal(attrs[1]),
-        ...attrs.slice(2).map((attr) => z.literal(attr))
-      ]);
-  }
+  return z.enum(attrs.length > 0 ? attrs : ['None']);
 }
 
 /**
@@ -427,28 +412,17 @@ function makeAttrsSchema(attributes: string[]) {
 function makeSourceLayerIdsSchema(ids: string[]) {
   const sourceLayerIds = [...new Set(ids)];
 
-  switch (sourceLayerIds.length) {
-    case 0:
-      return z.literal('None');
-    case 1:
-      return z.literal(sourceLayerIds[0]);
-    default:
-      return z.union([
-        z.literal(sourceLayerIds[0]),
-        z.literal(sourceLayerIds[1]),
-        ...sourceLayerIds.slice(2).map((id) => z.literal(id))
-      ]);
-  }
+  return z.enum(sourceLayerIds.length > 0 ? sourceLayerIds : ['None']);
 }
 
-const LayerTypeSchema = z.union([
-  z.literal('Choropleth'),
-  z.literal('Dot Density'),
-  z.literal('Heatmap'),
-  z.literal('Line'),
-  z.literal('Point'),
-  z.literal('Polygon'),
-  z.literal('Proportional Symbol')
+const LayerTypeSchema = z.enum([
+  'Choropleth',
+  'Dot Density',
+  'Heatmap',
+  'Line',
+  'Point',
+  'Polygon',
+  'Proportional Symbol'
 ]);
 
 const LayerTypeDiff = z.object({
@@ -496,11 +470,13 @@ const FillColorSchemeDiff = z.object({
   })
 });
 
+const SchemeDirection = z.enum(['Forward', 'Reverse']);
+
 const FillColorSchemeDirectionDiff = z.object({
   type: z.literal('fill-color-scheme-direction'),
   layerId: z.string(),
   payload: z.object({
-    direction: z.union([z.literal('Forward'), z.literal('Reverse')])
+    direction: SchemeDirection
   })
 });
 
@@ -510,20 +486,22 @@ const FillColorRampDiff = z.object({
   payload: z.object({ ramp: z.enum(QUANTITATIVE_COLOR_RAMPS) })
 });
 
+const RampDirection = z.enum(['Forward', 'Reverse']);
+
 const FillColorRampDirectionDiff = z.object({
   type: z.literal('fill-color-ramp-direction'),
   layerId: z.string(),
   payload: z.object({
-    direction: z.union([z.literal('Forward'), z.literal('Reverse')])
+    direction: RampDirection
   })
 });
 
-const ClassificationMethod = z.union([
-  z.literal('Continuous'),
-  z.literal('Quantile'),
-  z.literal('Equal Interval'),
-  z.literal('Jenks'),
-  z.literal('Manual')
+const ClassificationMethod = z.enum([
+  'Continuous',
+  'Quantile',
+  'Equal Interval',
+  'Jenks',
+  'Manual'
 ]);
 
 const FillClassificationMethodDiff = z.object({
@@ -551,11 +529,7 @@ const FillStepValueDiff = z.object({
   })
 });
 
-const VisualizationType = z.union([
-  z.literal('Quantitative'),
-  z.literal('Categorical'),
-  z.literal('Constant')
-]);
+const VisualizationType = z.enum(['Quantitative', 'Categorical', 'Constant']);
 
 const FillVisualizationTypeDiff = z.object({
   type: z.literal('fill-visualization-type'),
@@ -687,7 +661,7 @@ const HeatmapRampDirectionDiff = z.object({
   type: z.literal('heatmap-ramp-direction'),
   layerId: z.string(),
   payload: z.object({
-    direction: z.union([z.literal('Forward'), z.literal('Reverse')])
+    direction: RampDirection
   })
 });
 
@@ -695,7 +669,7 @@ const HeatmapWeightTypeDiff = z.object({
   type: z.literal('heatmap-weight-type'),
   layerId: z.string(),
   payload: z.object({
-    weightType: z.union([z.literal('Constant'), z.literal('Quantitative')])
+    weightType: z.enum(['Constant', 'Quantitative'])
   })
 });
 
@@ -823,7 +797,7 @@ const BearingDiff = z.object({
 const ProjectionDiff = z.object({
   type: z.literal('projection'),
   payload: z.object({
-    projection: z.union([z.literal('mercator'), z.literal('globe')])
+    projection: z.enum(['mercator', 'globe'])
   })
 });
 
