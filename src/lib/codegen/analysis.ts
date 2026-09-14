@@ -1,5 +1,8 @@
 import type { CartoKitIR } from '$lib/types';
-import type { CartoKitBackend, CartoKitBackendAnalysis } from '$lib/types/codegen';
+import type {
+  CartoKitBackend,
+  CartoKitBackendAnalysis
+} from '$lib/types/codegen';
 
 /**
  * Determine whether @turf/turf is required for cross-geometry transformations.
@@ -38,15 +41,17 @@ function isFetchGeoJSONRequired(ir: CartoKitIR): boolean {
  * Determine whether we need to insert an import of the GeoJSON namespace.
  * This is only relevant for TypeScript codegen.
  *
- * @param ir – The CartoKit IR.
- * @param languageBackend – The @see{CartoKitLanguageBackend} for the analysis.
+ * @param ir The CartoKit IR.
+ * @param backend The code generation {@link CartoKitBackend} for the analysis.
+ * @returns A Boolean value indicating whether we need to include the
+ * @types/geojson devDependency.
  */
 export function isGeoJSONNamespaceRequired(
   ir: CartoKitIR,
-  languageBackend: CartoKitBackend['language']
+  backend: CartoKitBackend
 ): boolean {
   return (
-    languageBackend === 'typescript' &&
+    backend.language === 'typescript' &&
     Object.values(ir.layers).some(
       (layer) =>
         layer.source.type === 'geojson' &&
@@ -59,33 +64,37 @@ export function isGeoJSONNamespaceRequired(
  * Determine whether we need to include the PMTiles client library.
  *
  * @param ir The current {@link CartoKitIR}.
+ * @param backend The code generation {@link CartoKitBackend} for the analysis.
  * @returns A Boolean value indicating whether we need to include the PMTiles
  * client library.
  */
-export function isPMTilesRequired(ir: CartoKitIR): boolean {
-  return Object.values(ir.layers).some(
-    (layer) => layer.source.type === 'vector'
+export function isPMTilesRequired(
+  ir: CartoKitIR,
+  backend: CartoKitBackend
+): boolean {
+  return (
+    backend.library === 'maplibre' &&
+    Object.values(ir.layers).some((layer) => layer.source.type === 'vector')
   );
 }
 
 /**
  * Analyze the CartoKit IR to glean relevant information for code generation.
  *
- * @param ir – The CartoKit IR.
- * @param languageBackend – The @see{CartoKitLanguageBackend} for the analysis.
- * @returns – A CartoKit backend analysis.
+ * @param ir The CartoKit IR.
+ * @param backend The {@link CartoKitBackend} for the analysis.
+ * @returns A {@link CartoKitBackendAnalysis}.
  */
 export function analyzeIR(
   ir: CartoKitIR,
-  languageBackend: CartoKitBackend['language'],
-  libraryBackend: CartoKitBackend['library']
+  backend: CartoKitBackend
 ): CartoKitBackendAnalysis {
   return {
-    language: languageBackend,
-    library: libraryBackend,
+    language: backend.language,
+    library: backend.library,
     isTurfRequired: isTurfRequired(ir),
     isFetchGeoJSONRequired: isFetchGeoJSONRequired(ir),
-    isGeoJSONNamespaceRequired: isGeoJSONNamespaceRequired(ir, languageBackend),
-    isPMTilesRequired: isPMTilesRequired(ir)
+    isGeoJSONNamespaceRequired: isGeoJSONNamespaceRequired(ir, backend),
+    isPMTilesRequired: isPMTilesRequired(ir, backend)
   };
 }

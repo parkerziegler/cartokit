@@ -44,7 +44,7 @@ export interface CartoKitBackendAnalysis extends CartoKitBackend {
  */
 export interface CartokitCodegenFile {
   /** The name of the file. */
-  name: string;
+  path: string;
   /** The program text. */
   text: string;
   /** The language of the generated code. */

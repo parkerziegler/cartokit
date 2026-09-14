@@ -123,7 +123,7 @@
   {/snippet}
   <Tabs bodyClass="max-h-[24rem] overflow-y-auto">
     {#each providers as provider, i (provider)}
-      <TabItem title={provider} open={i === 0}>
+      <TabItem title={provider} defaultOpen={i === 0}>
         <BasemapGrid {provider} />
       </TabItem>
     {/each}

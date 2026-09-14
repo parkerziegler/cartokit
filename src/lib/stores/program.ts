@@ -13,5 +13,5 @@ export const program = derived<
   [Writable<CartoKitIR>, Writable<CartoKitBackend>],
   CartokitCodegenFile[]
 >([ir, backend], ([$ir, $backend], set) => {
-  codegen($ir, $backend.language, $backend.library).then(set);
+  codegen($ir, $backend).then(set);
 });

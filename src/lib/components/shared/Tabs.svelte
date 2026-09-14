@@ -19,8 +19,8 @@
 
   let {
     children,
-    containerClass = '',
     bodyClass = '',
+    containerClass = '',
     tablistClass = 'flex gap-6 border-b border-b-slate-400 px-4'
   }: Props = $props();
   const panelId = $props.id();
@@ -37,7 +37,13 @@
 </script>
 
 <div class={['flex flex-col', containerClass]}>
-  <ul role="tablist" class={tablistClass}>
+  <ul
+    role="tablist"
+    class={[
+      'overflow-auto mask-radial-[100%_100%] mask-radial-from-75% mask-radial-at-left',
+      tablistClass
+    ]}
+  >
     {@render children()}
   </ul>
   <div

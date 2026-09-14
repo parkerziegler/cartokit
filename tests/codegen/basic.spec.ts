@@ -30,11 +30,11 @@ test.describe('basic codegen', () => {
     await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
     // Select the From Gallery tab.
-    await page.getByRole('button', { name: 'From Gallery' }).click();
+    await page.getByRole('tab', { name: 'From Gallery' }).click();
 
     // Select the Climate Impact Regions dataset. The modal closes automatically
     // once the MapLibre source finishes loading.
-    await page.getByRole('button', { name: 'Climate Impact Regions' }).click();
+    await page.getByRole('tab', { name: 'Climate Impact Regions' }).click();
 
     // Ensure the Add Layer modal is no longer visible.
     await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();

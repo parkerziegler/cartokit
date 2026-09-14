@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext, type Snippet } from 'svelte';
+  import { getContext, onDestroy, onMount, type Snippet } from 'svelte';
   import type { ClassValue } from 'svelte/elements';
 
   import {
@@ -9,7 +9,7 @@
 
   interface Props {
     class?: (open: boolean) => ClassValue;
-    open: boolean;
+    defaultOpen?: boolean;
     title: string;
     children: Snippet;
   }
@@ -21,7 +21,7 @@
         ? 'border-b-slate-400 font-semibold text-white'
         : 'border-b-transparent font-light text-slate-400'
     ],
-    open = $bindable(false),
+    defaultOpen = false,
     title,
     children
   }: Props = $props();
@@ -32,16 +32,20 @@
     selectedTab?: SelectedTab;
   }>(TabContext);
 
-  $effect(() => {
-    if (ctx.selectedTab?.id !== undefined) {
-      open = ctx.selectedTab.id === tabId;
+  const open = $derived(ctx.selectedTab?.id === tabId);
+
+  function select() {
+    ctx.selectedTab = { id: tabId, snippet: children };
+  }
+
+  onMount(() => {
+    if (defaultOpen && !ctx.selectedTab) {
+      select();
     }
   });
 
-  $effect(() => {
+  onDestroy(() => {
     if (open) {
-      ctx.selectedTab = { id: tabId, snippet: children };
-    } else if (ctx.selectedTab?.id === tabId) {
       ctx.selectedTab = undefined;
     }
   });
@@ -51,7 +55,7 @@
   <button
     class={className(open)}
     type="button"
-    onclick={() => (open = true)}
+    onclick={select}
     role="tab"
     id={tabId}
     aria-controls={ctx.panelId}

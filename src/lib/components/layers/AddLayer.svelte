@@ -54,13 +54,13 @@
     <h2 class="text-xl font-semibold">Add Layer</h2>
   {/snippet}
   <Tabs bodyClass="max-h-[24rem] overflow-y-auto">
-    <TabItem title="From API" open>
+    <TabItem title="From API" defaultOpen>
       <FromAPI />
     </TabItem>
-    <TabItem title="From File" open={false}>
+    <TabItem title="From File">
       <FromFile />
     </TabItem>
-    <TabItem title="From Gallery" open={false}>
+    <TabItem title="From Gallery">
       <FromGallery />
     </TabItem>
   </Tabs>
