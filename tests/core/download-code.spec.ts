@@ -41,7 +41,7 @@ async function screenshotSettledCanvas(page: Page): Promise<Buffer> {
     }
 
     previous = current;
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
   }
 
   throw new Error('Map canvas did not settle within 30 seconds.');
