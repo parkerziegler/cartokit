@@ -6,7 +6,11 @@
   import { syntaxHighlighting } from '@codemirror/language';
   import { basicSetup, EditorView } from 'codemirror';
   import { onMount } from 'svelte';
-  import { syntaxTheme, cssSyntaxTheme, editorTheme } from '$lib/utils/codemirror';
+  import {
+    syntaxTheme,
+    cssSyntaxTheme,
+    editorTheme
+  } from '$lib/utils/codemirror';
 
   interface ReadonlyCodeEditorConfig {
     kind: 'readonly';
