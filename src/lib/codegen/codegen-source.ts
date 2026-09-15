@@ -1,6 +1,7 @@
 import { camelCase } from 'lodash-es';
 
-import type { CartoKitBackendAnalysis, CartoKitLayer } from '$lib/types';
+import type { CartoKitLayer } from '$lib/types';
+import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
 
 /**
  * Generate a program fragment for a {@link CartoKitSource}.

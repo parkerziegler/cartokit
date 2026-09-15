@@ -35,8 +35,7 @@ test.describe('undo', () => {
     await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
     // Select the From File tab.
-    await page.getByRole('button', { name: 'From File' }).waitFor();
-    await page.getByRole('button', { name: 'From File' }).click();
+    await page.getByRole('tab', { name: 'From File' }).click();
 
     // Upload the Climate Impact Regions GeoJSON file.
     await page

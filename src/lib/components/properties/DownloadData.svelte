@@ -5,7 +5,7 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import DownloadIcon from '$lib/components/icons/DownloadIcon.svelte';
   import type { CartoKitLayer } from '$lib/types';
-  import { downloadContentToFile } from '$lib/utils/files/download';
+  import { downloadJson } from '$lib/utils/files/download';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
@@ -16,10 +16,7 @@
 
   function onClick() {
     if (layer.source.type === 'geojson') {
-      downloadContentToFile(
-        layer.source.data,
-        `${kebabCase(layer.displayName)}.json`
-      );
+      downloadJson(layer.source.data, `${kebabCase(layer.displayName)}.json`);
     }
   }
 

@@ -12,7 +12,7 @@
   import { applyDiff } from '$lib/core/diff';
   import { diffs } from '$lib/state/diffs.svelte';
   import { ir } from '$lib/stores/ir';
-  import { downloadContentToFile } from '$lib/utils/files/download';
+  import { downloadJson } from '$lib/utils/files/download';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   let actionPickerActive = $state(false);
@@ -58,7 +58,7 @@
       bearing: $ir.bearing
     };
 
-    downloadContentToFile(
+    downloadJson(
       { cartokitVersion: __CARTOKIT_VERSION__, camera, diffs },
       'map.ck.json'
     );
