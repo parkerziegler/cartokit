@@ -117,7 +117,7 @@ test('workflow-5', async ({ page }) => {
 
   // Upload the American Crow Population Change GeoJSON file.
   await page
-    .getByLabel('File')
+    .locator('#from-file-input')
     .setInputFiles(
       path.join(
         __dirname,
