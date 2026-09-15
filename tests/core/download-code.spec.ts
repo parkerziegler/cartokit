@@ -237,7 +237,7 @@ test.describe('download-code', () => {
       await appPage.goto(appUrl);
 
       // Wait for data to tile.
-      await appPage.waitForTimeout(10_000);
+      await appPage.waitForTimeout(20_000);
       const appCanvas = appPage.locator(MAP_CANVAS_SELECTOR);
       const actual = await appCanvas.screenshot({ style: CANVAS_ONLY_STYLE });
 
