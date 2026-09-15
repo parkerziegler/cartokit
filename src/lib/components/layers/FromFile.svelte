@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { uniqueId, kebabCase } from 'lodash-es';
+  import { uniqueId, snakeCase } from 'lodash-es';
 
   import Alert from '$lib/components/shared/Alert.svelte';
   import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
@@ -57,7 +57,7 @@
           }
 
           const featureCollection = normalizeGeoJSONToFeatureCollection(parsed);
-          const layerId = uniqueId(`${kebabCase(displayName)}__`);
+          const layerId = uniqueId(`${snakeCase(displayName)}__`);
 
           await applyDiff({
             type: 'add-layer',

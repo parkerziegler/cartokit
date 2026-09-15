@@ -19,6 +19,7 @@
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/language": "^6.12.4",
     "@codemirror/view": "^6.43.10",
+    "@duckdb/duckdb-wasm": "1.33.1-dev57.0",
     "@floating-ui/dom": "^1.8.0",
     "@lezer/highlight": "^1.2.3",
     "@turf/turf": "^7.4.0",
