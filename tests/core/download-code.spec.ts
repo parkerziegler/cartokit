@@ -5,7 +5,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as url from 'node:url';
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type TestInfo } from '@playwright/test';
 import { unzipSync } from 'fflate';
 import type { Map } from 'maplibre-gl';
 
@@ -29,15 +29,49 @@ const CANVAS_ONLY_STYLE = `
 `;
 
 /**
- * Screenshot the MapLibre canvas once the map is idle, i.e., all tiles have
- * loaded and no camera or fade transitions are in progress.
+ * A MapLibre tile, as exposed by MapLibre's internal (untyped) API.
+ */
+interface InternalTile {
+  state: string;
+  tileID: {
+    key: string | number;
+    canonical: { z: number; x: number; y: number };
+  };
+  buckets?: Record<string, unknown>;
+}
+
+/**
+ * A MapLibre tile manager, as exposed by MapLibre's internal (untyped) API.
+ */
+interface InternalTileManager {
+  getSource(): { type: string };
+  reload(): void;
+  _inViewTiles: { getAllTiles(): InternalTile[] };
+}
+
+/**
+ * The in-view tiles of a single GeoJSON source, for diagnosing rendering
+ * mismatches.
+ */
+interface GeoJSONTileReport {
+  source: string;
+  tiles: {
+    key: string | number;
+    z: number;
+    x: number;
+    y: number;
+    state: string;
+    buckets: number;
+  }[];
+}
+
+/**
+ * Wait for the map to fire its idle event.
  *
  * @param page The Playwright {@link Page} instance, with window.__map set.
- * @returns A PNG {@link Buffer} of the idle map canvas.
  */
-async function screenshotIdleCanvas(page: Page): Promise<Buffer> {
-  await page.waitForFunction(() => window.__map !== undefined);
-  await page.evaluate(
+function waitForIdle(page: Page): Promise<void> {
+  return page.evaluate(
     () =>
       new Promise<void>((resolve) => {
         const map = window.__map!;
@@ -47,10 +81,117 @@ async function screenshotIdleCanvas(page: Page): Promise<Buffer> {
         map.triggerRepaint();
       })
   );
+}
 
-  return page
+/**
+ * Report the state of every in-view tile for each GeoJSON source on the map.
+ *
+ * @param page The Playwright {@link Page} instance, with window.__map set.
+ * @returns A {@link GeoJSONTileReport} per GeoJSON source.
+ */
+function inspectGeoJSONTiles(page: Page): Promise<GeoJSONTileReport[]> {
+  return page.evaluate(() => {
+    const { tileManagers } = (
+      window.__map as unknown as {
+        style: { tileManagers: Record<string, InternalTileManager> };
+      }
+    ).style;
+
+    return Object.entries(tileManagers)
+      .filter(([, manager]) => manager.getSource().type === 'geojson')
+      .map(([source, manager]) => ({
+        source,
+        tiles: manager._inViewTiles.getAllTiles().map((tile) => ({
+          key: tile.tileID.key,
+          ...tile.tileID.canonical,
+          state: tile.state,
+          buckets: Object.keys(tile.buckets ?? {}).length
+        }))
+      }));
+  });
+}
+
+/**
+ * Screenshot the MapLibre canvas once the map is idle and every in-view
+ * GeoJSON tile has loaded. MapLibre's idle event treats errored tiles as
+ * loaded, so tiles are verified directly; sources with incomplete tiles are
+ * reloaded once. A genuine codegen bug would render incorrectly again, so
+ * this recovers from transient tile failures without masking real mismatches.
+ *
+ * The tile report and screenshot are attached to the test for diagnosis.
+ *
+ * @param page The Playwright {@link Page} instance, with window.__map set.
+ * @param testInfo The {@link TestInfo} for the running test.
+ * @param name A name identifying the map in attachments and annotations.
+ * @returns A PNG {@link Buffer} of the map canvas.
+ */
+async function screenshotReadyCanvas(
+  page: Page,
+  testInfo: TestInfo,
+  name: string
+): Promise<Buffer> {
+  await page.waitForFunction(() => window.__map !== undefined);
+  await waitForIdle(page);
+
+  let report = await inspectGeoJSONTiles(page);
+  const incomplete = report
+    .filter(({ tiles }) => tiles.some((tile) => tile.state !== 'loaded'))
+    .map(({ source }) => source);
+
+  if (incomplete.length > 0) {
+    testInfo.annotations.push({
+      type: 'warning',
+      description: `${name}: reloaded GeoJSON sources with incomplete tiles (${incomplete.join(', ')}).`
+    });
+
+    await page.evaluate((sources) => {
+      const { tileManagers } = (
+        window.__map as unknown as {
+          style: { tileManagers: Record<string, InternalTileManager> };
+        }
+      ).style;
+
+      for (const source of sources) {
+        tileManagers[source].reload();
+      }
+    }, incomplete);
+    await waitForIdle(page);
+
+    report = await inspectGeoJSONTiles(page);
+  }
+
+  await testInfo.attach(`${name}-tiles`, {
+    body: JSON.stringify(report, null, 2),
+    contentType: 'application/json'
+  });
+
+  const screenshot = await page
     .locator(MAP_CANVAS_SELECTOR)
     .screenshot({ style: CANVAS_ONLY_STYLE });
+
+  await testInfo.attach(name, { body: screenshot, contentType: 'image/png' });
+
+  return screenshot;
+}
+
+/**
+ * Collect console errors and uncaught exceptions from a page. MapLibre logs
+ * unhandled map errors (e.g., tile failures) to the console.
+ *
+ * @param page The Playwright {@link Page} instance.
+ * @returns An array that fills with error messages as they occur.
+ */
+function collectConsoleErrors(page: Page): string[] {
+  const errors: string[] = [];
+
+  page.on('console', (message) => {
+    if (message.type() === 'error') {
+      errors.push(message.text());
+    }
+  });
+  page.on('pageerror', (error) => errors.push(error.stack ?? error.message));
+
+  return errors;
 }
 
 /**
@@ -136,6 +277,8 @@ test.describe('download-code', () => {
     // settle takes considerably longer than the default timeout.
     test.setTimeout(240_000);
 
+    const cartokitErrors = collectConsoleErrors(page);
+
     // Navigate to cartokit, running on a local development server. The
     // playwright parameter exposes cartokit's map instance on window.__map.
     await page.goto('/?playwright=1');
@@ -219,7 +362,7 @@ test.describe('download-code', () => {
     await expect(page.locator('#properties')).not.toBeVisible();
 
     // Screenshot the map as rendered by cartokit, absent UI controls.
-    const expected = await screenshotIdleCanvas(page);
+    const expected = await screenshotReadyCanvas(page, testInfo, 'cartokit');
 
     // Open the Editor Panel and export the Vite project.
     await page.getByTestId('editor-toggle').click();
@@ -264,6 +407,7 @@ test.describe('download-code', () => {
       viewport: page.viewportSize(),
       deviceScaleFactor: await page.evaluate(() => window.devicePixelRatio)
     });
+    const generatedErrors = collectConsoleErrors(appPage);
 
     // Expose the generated app's map instance by appending an assignment to its
     // entry module as it's served.
@@ -278,15 +422,19 @@ test.describe('download-code', () => {
 
     try {
       await appPage.goto(appUrl);
-      const actual = await screenshotIdleCanvas(appPage);
+      const actual = await screenshotReadyCanvas(
+        appPage,
+        testInfo,
+        'generated'
+      );
 
-      await testInfo.attach('cartokit', {
-        body: expected,
-        contentType: 'image/png'
-      });
-      await testInfo.attach('generated', {
-        body: actual,
-        contentType: 'image/png'
+      await testInfo.attach('console-errors', {
+        body: JSON.stringify(
+          { cartokit: cartokitErrors, generated: generatedErrors },
+          null,
+          2
+        ),
+        contentType: 'application/json'
       });
 
       expect(

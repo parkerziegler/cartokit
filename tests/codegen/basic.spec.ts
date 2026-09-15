@@ -34,7 +34,7 @@ test.describe('basic codegen', () => {
 
     // Select the Climate Impact Regions dataset. The modal closes automatically
     // once the MapLibre source finishes loading.
-    await page.getByRole('tab', { name: 'Climate Impact Regions' }).click();
+    await page.getByRole('button', { name: 'Climate Impact Regions' }).click();
 
     // Ensure the Add Layer modal is no longer visible.
     await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
