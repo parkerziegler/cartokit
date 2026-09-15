@@ -5,7 +5,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as url from 'node:url';
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { unzipSync } from 'fflate';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -20,32 +20,6 @@ const CANVAS_ONLY_STYLE = `
   body * { visibility: hidden !important; }
   ${MAP_CANVAS_SELECTOR} { visibility: visible !important; }
 `;
-
-/**
- * Screenshot the MapLibre canvas once it stops changing between consecutive
- * captures.
- *
- * @param page The Playwright {@link Page} instance.
- * @returns A PNG {@link Buffer} of the settled map canvas.
- */
-async function screenshotSettledCanvas(page: Page): Promise<Buffer> {
-  const canvas = page.locator(MAP_CANVAS_SELECTOR);
-  const deadline = performance.now() + 30_000;
-  let previous: Buffer | undefined;
-
-  while (performance.now() < deadline) {
-    const current = await canvas.screenshot({ style: CANVAS_ONLY_STYLE });
-
-    if (previous?.equals(current)) {
-      return current;
-    }
-
-    previous = current;
-    await page.waitForTimeout(2000);
-  }
-
-  throw new Error('Map canvas did not settle within 30 seconds.');
-}
 
 /**
  * Find an open port on localhost.
@@ -211,8 +185,9 @@ test.describe('download-code', () => {
     await page.getByTestId('close-properties-menu-button').click();
     await expect(page.locator('#properties')).not.toBeVisible();
 
-    // Screenshot the map as rendered by cartokit.
-    const expected = await screenshotSettledCanvas(page);
+    // Screenshot the map as rendered by cartokit, absent UI controls.
+    const canvas = page.locator(MAP_CANVAS_SELECTOR);
+    const expected = await canvas.screenshot({ style: CANVAS_ONLY_STYLE });
 
     // Open the Editor Panel and export the Vite project.
     await page.getByTestId('editor-toggle').click();
@@ -260,7 +235,11 @@ test.describe('download-code', () => {
 
     try {
       await appPage.goto(appUrl);
-      const actual = await screenshotSettledCanvas(appPage);
+
+      // Wait for data to tile.
+      await appPage.waitForTimeout(10_000);
+      const appCanvas = appPage.locator(MAP_CANVAS_SELECTOR);
+      const actual = await appCanvas.screenshot({ style: CANVAS_ONLY_STYLE });
 
       await testInfo.attach('cartokit', {
         body: expected,
