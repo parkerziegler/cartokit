@@ -1,9 +1,10 @@
 import * as Comlink from 'comlink';
-import type { FeatureCollection } from 'geojson';
+import type { Feature, FeatureCollection } from 'geojson';
 import { get } from 'svelte/store';
 
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
+import { db } from '$lib/state/db.svelte';
 import { ir } from '$lib/stores/ir';
 import type { CartoKitLayer, CartoKitSource } from '$lib/types';
 import { randomColor } from '$lib/utils/color';
@@ -190,16 +191,53 @@ export async function patchLayerDiffs(
         // If the GeoJSON data is hosted at a remote API endpoint, fetch it in a
         // WebWorker to store in memory.
         if (diff.payload.location.type === 'api') {
-          const sourceWorker = new Worker(
-            new URL('$lib/utils/source/worker.ts', import.meta.url),
-            { type: 'module' }
-          );
-          const fetchGeoJSON =
-            Comlink.wrap<(url: string) => Promise<FeatureCollection>>(
-              sourceWorker
+          // const sourceWorker = new Worker(
+          //   new URL('$lib/utils/source/worker.ts', import.meta.url),
+          //   { type: 'module' }
+          // );
+          // const fetchGeoJSON =
+          //   Comlink.wrap<(url: string) => Promise<FeatureCollection>>(
+          //     sourceWorker
+          //   );
+
+          // sourceData = await fetchGeoJSON(diff.payload.location.url);
+
+          // Fetch the data via DuckDB.
+          if (db.value) {
+            await db.value!.conn.query(
+              `CREATE TABLE ${diff.layerId} AS SELECT * FROM ST_Read("${diff.payload.location.url}");`
             );
 
-          sourceData = await fetchGeoJSON(diff.payload.location.url);
+            const results = await db.value!.conn.query(
+              `SELECT * EXCLUDE geom, ST_AsGeoJSON(geom) AS geom FROM ${diff.layerId};`
+            );
+
+            const features = results
+              .toArray()
+              .map(
+                (row: {
+                  toJSON: () => { geom: string; [key: string]: unknown };
+                }) => {
+                  const { geom, ...properties } = row.toJSON();
+
+                  return {
+                    type: 'Feature',
+                    properties,
+                    geometry: JSON.parse(geom)
+                  } as Feature;
+                }
+              );
+
+            sourceData = {
+              type: 'FeatureCollection',
+              features
+            };
+          } else {
+            sourceData = {
+              type: 'FeatureCollection',
+              features: []
+            };
+          }
         } else {
           sourceData = diff.payload.location.featureCollection;
         }

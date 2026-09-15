@@ -9,11 +9,11 @@
   import { page } from '$app/state';
   import Cursor from '$lib/components/cursor/Cursor.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
+  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import PropertiesMenu from '$lib/components/properties/PropertiesMenu.svelte';
   import Alert from '$lib/components/shared/Alert.svelte';
-  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
   import DataTable from '$lib/components/shared/DataTable.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
@@ -21,12 +21,13 @@
   import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
   import { onFeatureLeave } from '$lib/interaction/events';
   import { chat } from '$lib/state/chat.svelte';
+  import { db, initDB } from '$lib/state/db.svelte';
   import { error } from '$lib/state/error.svelte';
   import { initHistory } from '$lib/state/history.svelte';
   import { layerId } from '$lib/state/layerId.svelte';
   import { map as mapState } from '$lib/state/map.svelte';
   import { user } from '$lib/state/user.svelte';
-  import { ir } from '$lib/stores/ir';
+  import { initialIR, ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
@@ -182,10 +183,25 @@
       toggleEditorVisibility
     );
 
+    initDB().then(({ db: ddb, worker, conn }) => {
+      db.value = { db: ddb, worker, conn };
+    });
+
     return () => {
+      // Remove the map.
       map?.remove();
+
+      // Reset the IR to its initial state.
+      ir.set(initialIR);
+
+      // Destroy edit historty and the E keybinding.
       destroyHistory();
       deregisterKeybinding();
+
+      // Terminate the DuckDB database instance and the Worker thread running it.
+      db.value?.db.terminate();
+      db.value?.worker.terminate();
+      db.value = null;
     };
   });
 

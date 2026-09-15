@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 
 import type { CartoKitIR } from '$lib/types';
 
-export const ir = writable<CartoKitIR>({
+export const initialIR: CartoKitIR = {
   center: [-98.35, 39.5],
   zoom: 4,
   pitch: 0,
@@ -15,4 +15,6 @@ export const ir = writable<CartoKitIR>({
   },
   projection: 'mercator',
   layers: {}
-});
+};
+
+export const ir = writable<CartoKitIR>(initialIR);

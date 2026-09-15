@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { uniqueId, kebabCase } from 'lodash-es';
+  import { uniqueId, snakeCase } from 'lodash-es';
   import type { MapSourceDataEvent } from 'maplibre-gl';
 
   import Alert from '$lib/components/shared/Alert.svelte';
@@ -57,7 +57,7 @@
     error = '';
 
     try {
-      const layerId = uniqueId(`${kebabCase(displayName)}__`);
+      const layerId = uniqueId(`${snakeCase(displayName)}__`);
 
       const payload = endpoint.endsWith('.pmtiles')
         ? {
