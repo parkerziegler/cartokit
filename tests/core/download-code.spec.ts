@@ -21,6 +21,10 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 // capturing basemap thumbnails in this selector.
 const MAP_CANVAS_SELECTOR = '#map > .maplibregl-canvas-container > canvas';
 
+// The maximum number of synchronous redraws to perform while waiting for two
+// consecutive, identical captures of the map canvas.
+const MAX_REDRAWS = 4;
+
 // Hide everything but the map canvas during screenshots, so neither the
 // cartokit GUI nor map controls (e.g., attribution) are captured.
 const CANVAS_ONLY_STYLE = `
@@ -178,10 +182,13 @@ function redrawAndInspectWebGL(page: Page): Promise<WebGLReport> {
  * reloaded once. A genuine codegen bug would render incorrectly again, so
  * this recovers from transient tile failures without masking real mismatches.
  *
- * The canvas is then redrawn synchronously and captured a second time. The
- * tile report, both screenshots, and a WebGL report are attached to the test,
- * distinguishing a frame that was drawn incorrectly from one captured mid-
- * render. The first capture is returned, so assertions are unaffected.
+ * The canvas is captured after a synchronous redraw, repeating until two
+ * consecutive captures are identical. WebKit can otherwise composite a frame
+ * that is still being drawn, yielding a canvas missing whole tiles even though
+ * every tile has loaded.
+ *
+ * The tile report, the pre-redraw capture, and a WebGL report are attached to
+ * the test for diagnosis.
  *
  * @param page The Playwright {@link Page} instance, with window.__map set.
  * @param testInfo The {@link TestInfo} for the running test.
@@ -229,29 +236,46 @@ async function screenshotReadyCanvas(
   });
 
   const canvas = page.locator(MAP_CANVAS_SELECTOR);
-  const screenshot = await canvas.screenshot({ style: CANVAS_ONLY_STYLE });
+  const redrawAndCapture = async () => ({
+    webgl: await redrawAndInspectWebGL(page),
+    capture: await canvas.screenshot({ style: CANVAS_ONLY_STYLE })
+  });
 
-  const webgl = await redrawAndInspectWebGL(page);
-  const redrawn = await canvas.screenshot({ style: CANVAS_ONLY_STYLE });
+  const initial = await canvas.screenshot({ style: CANVAS_ONLY_STYLE });
+  let { webgl, capture: screenshot } = await redrawAndCapture();
+  let stable = screenshot.equals(initial);
+  let redraws = 1;
 
-  if (!redrawn.equals(screenshot)) {
+  while (!stable && redraws < MAX_REDRAWS) {
+    const previous = screenshot;
+
+    ({ webgl, capture: screenshot } = await redrawAndCapture());
+    stable = screenshot.equals(previous);
+    redraws++;
+  }
+
+  if (!stable) {
     testInfo.annotations.push({
       type: 'warning',
-      description: `${name}: canvas changed after a synchronous redraw.`
+      description: `${name}: canvas still changing after ${redraws} redraws.`
     });
   }
 
   await testInfo.attach(`${name}-webgl`, {
     body: JSON.stringify(
-      { ...webgl, redrawChangedCanvas: !redrawn.equals(screenshot) },
+      {
+        ...webgl,
+        redrawChangedCanvas: !screenshot.equals(initial),
+        redraws
+      },
       null,
       2
     ),
     contentType: 'application/json'
   });
   await testInfo.attach(name, { body: screenshot, contentType: 'image/png' });
-  await testInfo.attach(`${name}-redrawn`, {
-    body: redrawn,
+  await testInfo.attach(`${name}-initial`, {
+    body: initial,
     contentType: 'image/png'
   });
 
