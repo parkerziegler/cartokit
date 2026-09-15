@@ -112,13 +112,76 @@ function inspectGeoJSONTiles(page: Page): Promise<GeoJSONTileReport[]> {
 }
 
 /**
+ * The WebGL configuration and error state of the map's rendering context.
+ */
+interface WebGLReport {
+  vendor: unknown;
+  renderer: unknown;
+  unmaskedRenderer: unknown;
+  attributes: WebGLContextAttributes | null;
+  stencilBits: unknown;
+  depthBits: unknown;
+  samples: unknown;
+  contextLost: boolean;
+  errorAfterRedraw: number;
+}
+
+/**
+ * Force a synchronous render, then report the map's WebGL configuration and
+ * any error raised while drawing. MapLibre masks each tile against the stencil
+ * buffer, so a missing stencil buffer or a draw error would explain tiles that
+ * load with data but never appear on the canvas.
+ *
+ * @param page The Playwright {@link Page} instance, with window.__map set.
+ * @returns A {@link WebGLReport} for the map's rendering context.
+ */
+function redrawAndInspectWebGL(page: Page): Promise<WebGLReport> {
+  return page.evaluate(() => {
+    const map = window.__map!;
+    const { gl } = (
+      map as unknown as {
+        painter: { context: { gl: WebGL2RenderingContext } };
+      }
+    ).painter.context;
+    // WebGL2 drops some WebGL1 parameters, which throw rather than report.
+    const parameter = (name: number): unknown => {
+      try {
+        return gl.getParameter(name);
+      } catch {
+        return null;
+      }
+    };
+    const debug = gl.getExtension('WEBGL_debug_renderer_info');
+
+    // Clear any pending error, so the reported error comes from the redraw.
+    gl.getError();
+    map.redraw();
+
+    return {
+      vendor: parameter(gl.VENDOR),
+      renderer: parameter(gl.RENDERER),
+      unmaskedRenderer: debug ? parameter(debug.UNMASKED_RENDERER_WEBGL) : null,
+      attributes: gl.getContextAttributes(),
+      stencilBits: parameter(gl.STENCIL_BITS),
+      depthBits: parameter(gl.DEPTH_BITS),
+      samples: parameter(gl.SAMPLES),
+      contextLost: gl.isContextLost(),
+      errorAfterRedraw: gl.getError()
+    };
+  });
+}
+
+/**
  * Screenshot the MapLibre canvas once the map is idle and every in-view
  * GeoJSON tile has loaded. MapLibre's idle event treats errored tiles as
  * loaded, so tiles are verified directly; sources with incomplete tiles are
  * reloaded once. A genuine codegen bug would render incorrectly again, so
  * this recovers from transient tile failures without masking real mismatches.
  *
- * The tile report and screenshot are attached to the test for diagnosis.
+ * The canvas is then redrawn synchronously and captured a second time. The
+ * tile report, both screenshots, and a WebGL report are attached to the test,
+ * distinguishing a frame that was drawn incorrectly from one captured mid-
+ * render. The first capture is returned, so assertions are unaffected.
  *
  * @param page The Playwright {@link Page} instance, with window.__map set.
  * @param testInfo The {@link TestInfo} for the running test.
@@ -165,11 +228,32 @@ async function screenshotReadyCanvas(
     contentType: 'application/json'
   });
 
-  const screenshot = await page
-    .locator(MAP_CANVAS_SELECTOR)
-    .screenshot({ style: CANVAS_ONLY_STYLE });
+  const canvas = page.locator(MAP_CANVAS_SELECTOR);
+  const screenshot = await canvas.screenshot({ style: CANVAS_ONLY_STYLE });
 
+  const webgl = await redrawAndInspectWebGL(page);
+  const redrawn = await canvas.screenshot({ style: CANVAS_ONLY_STYLE });
+
+  if (!redrawn.equals(screenshot)) {
+    testInfo.annotations.push({
+      type: 'warning',
+      description: `${name}: canvas changed after a synchronous redraw.`
+    });
+  }
+
+  await testInfo.attach(`${name}-webgl`, {
+    body: JSON.stringify(
+      { ...webgl, redrawChangedCanvas: !redrawn.equals(screenshot) },
+      null,
+      2
+    ),
+    contentType: 'application/json'
+  });
   await testInfo.attach(name, { body: screenshot, contentType: 'image/png' });
+  await testInfo.attach(`${name}-redrawn`, {
+    body: redrawn,
+    contentType: 'image/png'
+  });
 
   return screenshot;
 }
