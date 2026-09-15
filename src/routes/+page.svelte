@@ -6,6 +6,7 @@
 
   import type { PageData } from './$types';
 
+  import { page } from '$app/state';
   import Cursor from '$lib/components/cursor/Cursor.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
@@ -94,6 +95,12 @@
       pitch: $ir.pitch,
       bearing: $ir.bearing
     });
+
+    // Expose the map instance to Playwright tests, so they can wait on MapLibre
+    // events (e.g., idle) rather than inferring map state from the DOM.
+    if (page.url.searchParams.has('playwright')) {
+      (window as Window & { __map?: maplibregl.Map }).__map = map;
+    }
 
     // Add an event listener to handle feature deselection.
     map.on('click', onFeatureLeave(map, $ir.layers));

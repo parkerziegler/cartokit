@@ -5,8 +5,15 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as url from 'node:url';
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { unzipSync } from 'fflate';
+import type { Map } from 'maplibre-gl';
+
+declare global {
+  interface Window {
+    __map?: Map;
+  }
+}
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -20,6 +27,31 @@ const CANVAS_ONLY_STYLE = `
   body * { visibility: hidden !important; }
   ${MAP_CANVAS_SELECTOR} { visibility: visible !important; }
 `;
+
+/**
+ * Screenshot the MapLibre canvas once the map is idle, i.e., all tiles have
+ * loaded and no camera or fade transitions are in progress.
+ *
+ * @param page The Playwright {@link Page} instance, with window.__map set.
+ * @returns A PNG {@link Buffer} of the idle map canvas.
+ */
+async function screenshotIdleCanvas(page: Page): Promise<Buffer> {
+  await page.waitForFunction(() => window.__map !== undefined);
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        const map = window.__map!;
+
+        map.once('idle', () => resolve());
+        // Force a render, so idle fires even if the map is already idle.
+        map.triggerRepaint();
+      })
+  );
+
+  return page
+    .locator(MAP_CANVAS_SELECTOR)
+    .screenshot({ style: CANVAS_ONLY_STYLE });
+}
 
 /**
  * Find an open port on localhost.
@@ -104,8 +136,9 @@ test.describe('download-code', () => {
     // settle takes considerably longer than the default timeout.
     test.setTimeout(240_000);
 
-    // Navigate to cartokit, running on a local development server.
-    await page.goto('/');
+    // Navigate to cartokit, running on a local development server. The
+    // playwright parameter exposes cartokit's map instance on window.__map.
+    await page.goto('/?playwright=1');
 
     if (page.url().includes('vercel.app')) {
       // In Preview Vercel environments, ensure <vercel-live-feedback> does not
@@ -186,8 +219,7 @@ test.describe('download-code', () => {
     await expect(page.locator('#properties')).not.toBeVisible();
 
     // Screenshot the map as rendered by cartokit, absent UI controls.
-    const canvas = page.locator(MAP_CANVAS_SELECTOR);
-    const expected = await canvas.screenshot({ style: CANVAS_ONLY_STYLE });
+    const expected = await screenshotIdleCanvas(page);
 
     // Open the Editor Panel and export the Vite project.
     await page.getByTestId('editor-toggle').click();
@@ -233,13 +265,20 @@ test.describe('download-code', () => {
       deviceScaleFactor: await page.evaluate(() => window.devicePixelRatio)
     });
 
+    // Expose the generated app's map instance by appending an assignment to its
+    // entry module as it's served.
+    await appPage.route('**/src/index.{js,ts}', async (route) => {
+      const response = await route.fetch();
+
+      await route.fulfill({
+        response,
+        body: `${await response.text()}\nwindow.__map = map;`
+      });
+    });
+
     try {
       await appPage.goto(appUrl);
-
-      // Wait for data to tile.
-      await appPage.waitForTimeout(20_000);
-      const appCanvas = appPage.locator(MAP_CANVAS_SELECTOR);
-      const actual = await appCanvas.screenshot({ style: CANVAS_ONLY_STYLE });
+      const actual = await screenshotIdleCanvas(appPage);
 
       await testInfo.attach('cartokit', {
         body: expected,
