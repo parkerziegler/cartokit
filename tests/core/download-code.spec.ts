@@ -5,7 +5,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as url from 'node:url';
 
-import { test, expect, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { unzipSync } from 'fflate';
 import type { Map } from 'maplibre-gl';
 
@@ -33,49 +33,18 @@ const CANVAS_ONLY_STYLE = `
 `;
 
 /**
- * A MapLibre tile, as exposed by MapLibre's internal (untyped) API.
- */
-interface InternalTile {
-  state: string;
-  tileID: {
-    key: string | number;
-    canonical: { z: number; x: number; y: number };
-  };
-  buckets?: Record<string, unknown>;
-}
-
-/**
- * A MapLibre tile manager, as exposed by MapLibre's internal (untyped) API.
- */
-interface InternalTileManager {
-  getSource(): { type: string };
-  reload(): void;
-  _inViewTiles: { getAllTiles(): InternalTile[] };
-}
-
-/**
- * The in-view tiles of a single GeoJSON source, for diagnosing rendering
- * mismatches.
- */
-interface GeoJSONTileReport {
-  source: string;
-  tiles: {
-    key: string | number;
-    z: number;
-    x: number;
-    y: number;
-    state: string;
-    buckets: number;
-  }[];
-}
-
-/**
- * Wait for the map to fire its idle event.
+ * Screenshot the MapLibre canvas once the map has fully rendered.
+ *
+ * We wait for MapLibre's idle event, then capture after synchronous redraws
+ * until two consecutive captures are identical. Without the redraws, WebKit
+ * can composite a frame that is still being drawn, missing whole tiles.
  *
  * @param page The Playwright {@link Page} instance, with window.__map set.
+ * @returns A PNG {@link Buffer} of the map canvas.
  */
-function waitForIdle(page: Page): Promise<void> {
-  return page.evaluate(
+async function screenshotMap(page: Page): Promise<Buffer> {
+  await page.waitForFunction(() => window.__map !== undefined);
+  await page.evaluate(
     () =>
       new Promise<void>((resolve) => {
         const map = window.__map!;
@@ -85,221 +54,25 @@ function waitForIdle(page: Page): Promise<void> {
         map.triggerRepaint();
       })
   );
-}
-
-/**
- * Report the state of every in-view tile for each GeoJSON source on the map.
- *
- * @param page The Playwright {@link Page} instance, with window.__map set.
- * @returns A {@link GeoJSONTileReport} per GeoJSON source.
- */
-function inspectGeoJSONTiles(page: Page): Promise<GeoJSONTileReport[]> {
-  return page.evaluate(() => {
-    const { tileManagers } = (
-      window.__map as unknown as {
-        style: { tileManagers: Record<string, InternalTileManager> };
-      }
-    ).style;
-
-    return Object.entries(tileManagers)
-      .filter(([, manager]) => manager.getSource().type === 'geojson')
-      .map(([source, manager]) => ({
-        source,
-        tiles: manager._inViewTiles.getAllTiles().map((tile) => ({
-          key: tile.tileID.key,
-          ...tile.tileID.canonical,
-          state: tile.state,
-          buckets: Object.keys(tile.buckets ?? {}).length
-        }))
-      }));
-  });
-}
-
-/**
- * The WebGL configuration and error state of the map's rendering context.
- */
-interface WebGLReport {
-  vendor: unknown;
-  renderer: unknown;
-  unmaskedRenderer: unknown;
-  attributes: WebGLContextAttributes | null;
-  stencilBits: unknown;
-  depthBits: unknown;
-  samples: unknown;
-  contextLost: boolean;
-  errorAfterRedraw: number;
-}
-
-/**
- * Force a synchronous render, then report the map's WebGL configuration and
- * any error raised while drawing. MapLibre masks each tile against the stencil
- * buffer, so a missing stencil buffer or a draw error would explain tiles that
- * load with data but never appear on the canvas.
- *
- * @param page The Playwright {@link Page} instance, with window.__map set.
- * @returns A {@link WebGLReport} for the map's rendering context.
- */
-function redrawAndInspectWebGL(page: Page): Promise<WebGLReport> {
-  return page.evaluate(() => {
-    const map = window.__map!;
-    const { gl } = (
-      map as unknown as {
-        painter: { context: { gl: WebGL2RenderingContext } };
-      }
-    ).painter.context;
-    // WebGL2 drops some WebGL1 parameters, which throw rather than report.
-    const parameter = (name: number): unknown => {
-      try {
-        return gl.getParameter(name);
-      } catch {
-        return null;
-      }
-    };
-    const debug = gl.getExtension('WEBGL_debug_renderer_info');
-
-    // Clear any pending error, so the reported error comes from the redraw.
-    gl.getError();
-    map.redraw();
-
-    return {
-      vendor: parameter(gl.VENDOR),
-      renderer: parameter(gl.RENDERER),
-      unmaskedRenderer: debug ? parameter(debug.UNMASKED_RENDERER_WEBGL) : null,
-      attributes: gl.getContextAttributes(),
-      stencilBits: parameter(gl.STENCIL_BITS),
-      depthBits: parameter(gl.DEPTH_BITS),
-      samples: parameter(gl.SAMPLES),
-      contextLost: gl.isContextLost(),
-      errorAfterRedraw: gl.getError()
-    };
-  });
-}
-
-/**
- * Screenshot the MapLibre canvas once the map is idle and every in-view
- * GeoJSON tile has loaded. MapLibre's idle event treats errored tiles as
- * loaded, so tiles are verified directly; sources with incomplete tiles are
- * reloaded once. A genuine codegen bug would render incorrectly again, so
- * this recovers from transient tile failures without masking real mismatches.
- *
- * The canvas is captured after a synchronous redraw, repeating until two
- * consecutive captures are identical. WebKit can otherwise composite a frame
- * that is still being drawn, yielding a canvas missing whole tiles even though
- * every tile has loaded.
- *
- * The tile report, the pre-redraw capture, and a WebGL report are attached to
- * the test for diagnosis.
- *
- * @param page The Playwright {@link Page} instance, with window.__map set.
- * @param testInfo The {@link TestInfo} for the running test.
- * @param name A name identifying the map in attachments and annotations.
- * @returns A PNG {@link Buffer} of the map canvas.
- */
-async function screenshotReadyCanvas(
-  page: Page,
-  testInfo: TestInfo,
-  name: string
-): Promise<Buffer> {
-  await page.waitForFunction(() => window.__map !== undefined);
-  await waitForIdle(page);
-
-  let report = await inspectGeoJSONTiles(page);
-  const incomplete = report
-    .filter(({ tiles }) => tiles.some((tile) => tile.state !== 'loaded'))
-    .map(({ source }) => source);
-
-  if (incomplete.length > 0) {
-    testInfo.annotations.push({
-      type: 'warning',
-      description: `${name}: reloaded GeoJSON sources with incomplete tiles (${incomplete.join(', ')}).`
-    });
-
-    await page.evaluate((sources) => {
-      const { tileManagers } = (
-        window.__map as unknown as {
-          style: { tileManagers: Record<string, InternalTileManager> };
-        }
-      ).style;
-
-      for (const source of sources) {
-        tileManagers[source].reload();
-      }
-    }, incomplete);
-    await waitForIdle(page);
-
-    report = await inspectGeoJSONTiles(page);
-  }
-
-  await testInfo.attach(`${name}-tiles`, {
-    body: JSON.stringify(report, null, 2),
-    contentType: 'application/json'
-  });
 
   const canvas = page.locator(MAP_CANVAS_SELECTOR);
-  const redrawAndCapture = async () => ({
-    webgl: await redrawAndInspectWebGL(page),
-    capture: await canvas.screenshot({ style: CANVAS_ONLY_STYLE })
-  });
+  let previous: Buffer | undefined;
 
-  const initial = await canvas.screenshot({ style: CANVAS_ONLY_STYLE });
-  let { webgl, capture: screenshot } = await redrawAndCapture();
-  let stable = screenshot.equals(initial);
-  let redraws = 1;
-
-  while (!stable && redraws < MAX_REDRAWS) {
-    const previous = screenshot;
-
-    ({ webgl, capture: screenshot } = await redrawAndCapture());
-    stable = screenshot.equals(previous);
-    redraws++;
-  }
-
-  if (!stable) {
-    testInfo.annotations.push({
-      type: 'warning',
-      description: `${name}: canvas still changing after ${redraws} redraws.`
+  for (let i = 0; i < MAX_REDRAWS; i++) {
+    await page.evaluate(() => {
+      window.__map!.redraw();
     });
+
+    const current = await canvas.screenshot({ style: CANVAS_ONLY_STYLE });
+
+    if (previous?.equals(current)) {
+      return current;
+    }
+
+    previous = current;
   }
 
-  await testInfo.attach(`${name}-webgl`, {
-    body: JSON.stringify(
-      {
-        ...webgl,
-        redrawChangedCanvas: !screenshot.equals(initial),
-        redraws
-      },
-      null,
-      2
-    ),
-    contentType: 'application/json'
-  });
-  await testInfo.attach(name, { body: screenshot, contentType: 'image/png' });
-  await testInfo.attach(`${name}-initial`, {
-    body: initial,
-    contentType: 'image/png'
-  });
-
-  return screenshot;
-}
-
-/**
- * Collect console errors and uncaught exceptions from a page. MapLibre logs
- * unhandled map errors (e.g., tile failures) to the console.
- *
- * @param page The Playwright {@link Page} instance.
- * @returns An array that fills with error messages as they occur.
- */
-function collectConsoleErrors(page: Page): string[] {
-  const errors: string[] = [];
-
-  page.on('console', (message) => {
-    if (message.type() === 'error') {
-      errors.push(message.text());
-    }
-  });
-  page.on('pageerror', (error) => errors.push(error.stack ?? error.message));
-
-  return errors;
+  throw new Error(`Map canvas did not settle after ${MAX_REDRAWS} redraws.`);
 }
 
 /**
@@ -380,12 +153,10 @@ test.describe('download-code', () => {
   test('should export a Vite project that renders the same map as cartokit', async ({
     browser,
     page
-  }, testInfo) => {
+  }) => {
     // Building the map, installing dependencies, and waiting for both maps to
     // settle takes considerably longer than the default timeout.
     test.setTimeout(240_000);
-
-    const cartokitErrors = collectConsoleErrors(page);
 
     // Navigate to cartokit, running on a local development server. The
     // playwright parameter exposes cartokit's map instance on window.__map.
@@ -470,7 +241,7 @@ test.describe('download-code', () => {
     await expect(page.locator('#properties')).not.toBeVisible();
 
     // Screenshot the map as rendered by cartokit, absent UI controls.
-    const expected = await screenshotReadyCanvas(page, testInfo, 'cartokit');
+    const expected = await screenshotMap(page);
 
     // Open the Editor Panel and export the Vite project.
     await page.getByTestId('editor-toggle').click();
@@ -515,7 +286,6 @@ test.describe('download-code', () => {
       viewport: page.viewportSize(),
       deviceScaleFactor: await page.evaluate(() => window.devicePixelRatio)
     });
-    const generatedErrors = collectConsoleErrors(appPage);
 
     // Expose the generated app's map instance by appending an assignment to its
     // entry module as it's served.
@@ -530,20 +300,7 @@ test.describe('download-code', () => {
 
     try {
       await appPage.goto(appUrl);
-      const actual = await screenshotReadyCanvas(
-        appPage,
-        testInfo,
-        'generated'
-      );
-
-      await testInfo.attach('console-errors', {
-        body: JSON.stringify(
-          { cartokit: cartokitErrors, generated: generatedErrors },
-          null,
-          2
-        ),
-        contentType: 'application/json'
-      });
+      const actual = await screenshotMap(appPage);
 
       expect(
         actual.equals(expected),
