@@ -5,7 +5,8 @@ import { codegenMapStyle } from '$lib/codegen/codegen-map-style';
 import { codegenProjection } from '$lib/codegen/codegen-projection';
 import { codegenSource } from '$lib/codegen/codegen-source';
 import { withDefault } from '$lib/codegen/utils';
-import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
+import type { CartoKitIR } from '$lib/types';
+import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
 
 /**
  * Generate a program fragment for layer sources, layer renders, and the

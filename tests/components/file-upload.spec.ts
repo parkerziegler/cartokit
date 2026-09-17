@@ -44,7 +44,7 @@ test.describe('file upload', () => {
     await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
     // Select the From File tab.
-    await page.getByRole('button', { name: 'From File' }).click();
+    await page.getByRole('tab', { name: 'From File' }).click();
 
     // Upload the Path of Totality GeoJSON file.
     await page.locator('#from-file-input').setInputFiles(GEOJSON_PATH);
@@ -79,7 +79,7 @@ test.describe('file upload', () => {
     // the form state has been reset.
     await page.getByTestId('add-layer-button').click();
     await expect(page.getByTestId('add-layer-modal')).toBeVisible();
-    await page.getByRole('button', { name: 'From File' }).click();
+    await page.getByRole('tab', { name: 'From File' }).click();
 
     // The Display Name input should be empty.
     await expect(page.getByLabel('Display Name')).toHaveValue('');
@@ -102,7 +102,7 @@ test.describe('file upload', () => {
       await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
       // Select the From File tab.
-      await page.getByRole('button', { name: 'From File' }).click();
+      await page.getByRole('tab', { name: 'From File' }).click();
 
       // Upload the Path of Totality GeoJSON file.
       await page.locator('#from-file-input').setInputFiles(GEOJSON_PATH);

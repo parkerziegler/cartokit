@@ -7,6 +7,7 @@
   import FromFile from '$lib/components/layers/FromFile.svelte';
   import FromGallery from '$lib/components/layers/FromGallery.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
+  import TabItem from '$lib/components/shared/TabItem.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
   import { map } from '$lib/state/map.svelte';
   import { registerKeybinding } from '$lib/utils/keybinding';
@@ -14,12 +15,6 @@
   setContext('close-modal', () => {
     showModal = false;
   });
-
-  const tabs = [
-    { name: 'From API', content: FromAPI, props: {} },
-    { name: 'From File', content: FromFile, props: {} },
-    { name: 'From Gallery', content: FromGallery, props: {} }
-  ];
 
   let showModal = $state(false);
 
@@ -58,5 +53,15 @@
   {#snippet header()}
     <h2 class="text-xl font-semibold">Add Layer</h2>
   {/snippet}
-  <Tabs {tabs} bodyClass="max-h-[24rem] overflow-y-auto" />
+  <Tabs bodyClass="max-h-[24rem] overflow-y-auto">
+    <TabItem title="From API" defaultOpen>
+      <FromAPI />
+    </TabItem>
+    <TabItem title="From File">
+      <FromFile />
+    </TabItem>
+    <TabItem title="From Gallery">
+      <FromGallery />
+    </TabItem>
+  </Tabs>
 </Modal>

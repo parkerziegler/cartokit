@@ -1,8 +1,10 @@
 import { camelCase } from 'lodash-es';
 
+import { codegenDataFileName } from '$lib/codegen/codegen-data';
 import { codegenFns } from '$lib/codegen/codegen-fns';
 import { codegenMap } from '$lib/codegen/codegen-map';
-import type { CartoKitBackendAnalysis, CartoKitIR } from '$lib/types';
+import type { CartoKitIR } from '$lib/types';
+import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
 
 /**
  * Generate a program fragment for all library and data source imports.
@@ -34,23 +36,28 @@ export function codegenImports(
     .filter(Boolean)
     .join('\n');
 
-  const fileImports = Object.values(ir.layers).reduce((acc, layer) => {
-    if (
-      layer.source.type === 'geojson' &&
-      layer.source.location.type === 'file'
-    ) {
+  const fileImports = Object.values(ir.layers)
+    .flatMap((layer) => {
+      if (
+        layer.source.type !== 'geojson' ||
+        layer.source.location.type !== 'file'
+      ) {
+        return [];
+      }
+
       const dataIdent = camelCase(layer.displayName);
       uploadTable.set(layer.id, dataIdent);
 
-      return acc.concat(
-        `import ${dataIdent} from './${layer.source.location.fileName}';`
-      );
-    }
+      return `import ${dataIdent} from './data/${codegenDataFileName(layer.source.location.fileName)}';`;
+    })
+    .join('\n');
 
-    return acc;
-  }, '');
+  const cssImports = `import '${analysis.library}-gl/dist/${analysis.library}-gl.css';
+import './style.css'`;
 
   const imports = `${libraryImports}
+
+  ${cssImports}
   
   ${fileImports}`;
 
