@@ -37,13 +37,7 @@
 </script>
 
 <div class={['flex flex-col', containerClass]}>
-  <ul
-    role="tablist"
-    class={[
-      'overflow-auto mask-radial-[100%_100%] mask-radial-from-75% mask-radial-at-left',
-      tablistClass
-    ]}
-  >
+  <ul role="tablist" class={['overflow-auto', tablistClass]}>
     {@render children()}
   </ul>
   <div

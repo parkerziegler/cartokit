@@ -7,10 +7,10 @@
   import FromFile from '$lib/components/layers/FromFile.svelte';
   import FromGallery from '$lib/components/layers/FromGallery.svelte';
   import Modal from '$lib/components/shared/Modal.svelte';
+  import TabItem from '$lib/components/shared/TabItem.svelte';
   import Tabs from '$lib/components/shared/Tabs.svelte';
   import { map } from '$lib/state/map.svelte';
   import { registerKeybinding } from '$lib/utils/keybinding';
-  import TabItem from '../shared/TabItem.svelte';
 
   setContext('close-modal', () => {
     showModal = false;

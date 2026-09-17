@@ -13,10 +13,13 @@ const versions = {
   'mapbox-gl': `^${MAPBOX_GL_VERSION}`
 };
 
+/** Represents the string union of all cartokit dependency names. */
 type PackageName = keyof typeof versions;
 
+/** Represents a value for a package.json entry. */
 type JSONValue = string | boolean | JSONEntry[];
 
+/** Represents a key-value pair for a package.json entry. */
 interface JSONEntry {
   key: string;
   value: JSONValue;
@@ -30,7 +33,7 @@ interface JSONEntry {
  */
 function writeJSONEntry(entry: JSONEntry): string {
   const serialized = Array.isArray(entry.value)
-    ? `{\n${entry.value.map(writeJSONEntry).join(',')}\n}`
+    ? `{\n${entry.value.map(writeJSONEntry).join(',\n')}\n}`
     : JSON.stringify(entry.value);
 
   return `${JSON.stringify(entry.key)}: ${serialized}`;
@@ -41,8 +44,8 @@ function writeJSONEntry(entry: JSONEntry): string {
  *
  * @param include A partial dictionary mapping package names to Boolean
  * conditions indicating whether or not they're included in the generated code.
- * @returns A list of {@link JSONEntry} values representing packages to include
- * in the generated package.json.
+ * @returns A list of {@link JSONEntry} key-value pairs representing packages to
+ * include in the generated package.json.
  */
 function packages(include: Partial<Record<PackageName, boolean>>): JSONEntry[] {
   return Object.entries(include)
@@ -91,5 +94,5 @@ export function codegenPackageJson(analysis: CartoKitBackendAnalysis) {
     }
   ];
 
-  return `{${json.map(writeJSONEntry).join(',')}}`;
+  return `{\n${json.map(writeJSONEntry).join(',\n')}\n}`;
 }

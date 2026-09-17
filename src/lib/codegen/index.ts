@@ -63,7 +63,7 @@ async function format(text: string, language: CartokitCodegenLanguage) {
  *
  * @param ir The {@link CartoKitIR}.
  * @param backend The {@link CartoKitBackend} to use for code generation.
- * @returns A Promise resolving to an array of {@link CartokitCodegenFile}.
+ * @returns A Promise resolving to an Array of {@link CartokitCodegenFile}.
  */
 export async function codegen(
   ir: CartoKitIR,

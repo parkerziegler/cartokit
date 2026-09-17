@@ -1,7 +1,7 @@
 /**
- * Downloads a Blob to a file.
+ * Downloads a {@link Blob} to a file.
  *
- * @param blob The Blob to download.
+ * @param blob The {@link Blob} to download.
  * @param fileName The name of the file to download.
  */
 export function downloadBlob(blob: Blob, fileName: string) {

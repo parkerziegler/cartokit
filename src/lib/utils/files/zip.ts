@@ -1,6 +1,6 @@
 import { strToU8, zipSync, type Zippable } from 'fflate';
 
-import favicon from '../../../../static/favicon.svg?raw';
+import favicon from '$lib/utils/files/favicon.svg?raw';
 
 import { codegenDataFiles } from '$lib/codegen/codegen-data';
 import type { CartoKitIR } from '$lib/types';

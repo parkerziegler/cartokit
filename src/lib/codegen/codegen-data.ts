@@ -20,7 +20,7 @@ export function codegenDataFileName(fileName: string): string {
  * expensive.
  *
  * @param ir The {@link CartoKitIR}.
- * @returns An array of {@link CartokitCodegenFile}, one per uploaded layer.
+ * @returns An Array of {@link CartokitCodegenFile}, one per uploaded layer.
  */
 export function codegenDataFiles(ir: CartoKitIR): CartokitCodegenFile[] {
   return Object.values(ir.layers).flatMap((layer) =>

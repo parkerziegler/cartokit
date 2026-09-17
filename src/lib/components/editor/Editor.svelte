@@ -32,7 +32,7 @@
   <Tabs
     bodyClass="flex flex-1 overflow-hidden p-0!"
     containerClass="flex-1 overflow-auto"
-    tablistClass="flex p-1 border-b border-slate-600 gap-1"
+    tablistClass="flex p-1 border-b border-slate-600 gap-1 mask-radial-[100%_100%] mask-radial-from-75% mask-radial-at-left"
   >
     {#each $program as file, i (i)}
       <TabItem
