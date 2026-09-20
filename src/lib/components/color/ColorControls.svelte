@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { FeatureCollection } from 'geojson';
-
   import ColorRampSelect from '$lib/components/color/ColorRampSelect.svelte';
   import ColorSchemeSelect from '$lib/components/color/ColorSchemeSelect.svelte';
   import FillPicker from '$lib/components/color/FillPicker.svelte';
@@ -18,11 +16,10 @@
   interface Props {
     layerId: string;
     layerType: 'Choropleth' | 'Proportional Symbol' | 'Point';
-    geojson?: FeatureCollection;
     fill: QuantitativeFill | CategoricalFill | ConstantFill;
   }
 
-  let { layerId, layerType, geojson, fill }: Props = $props();
+  let { layerId, layerType, fill }: Props = $props();
 </script>
 
 <div class="flex flex-col gap-1">
@@ -36,7 +33,6 @@
   {:else if fill.type === 'Categorical'}
     <AttributeSelect
       {layerId}
-      {geojson}
       visualizationType={fill.type}
       selected={fill.attribute}
       channel="fill"
@@ -45,7 +41,6 @@
   {:else if fill.type === 'Quantitative'}
     <AttributeSelect
       {layerId}
-      {geojson}
       visualizationType={fill.type}
       selected={fill.attribute}
       channel="fill"

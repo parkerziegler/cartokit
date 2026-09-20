@@ -27,7 +27,7 @@
 <div
   class="absolute top-0 right-0 bottom-0 flex w-1/3 flex-col bg-slate-900 shadow-lg"
   in:fly={{ x: '100%', opacity: 1 }}
-  out:fly={{ x: '100%', opacity: 1, delay: 150 }}
+  out:fly={{ x: '100%', opacity: 1 }}
 >
   <Tabs
     bodyClass="flex flex-1 overflow-hidden p-0!"

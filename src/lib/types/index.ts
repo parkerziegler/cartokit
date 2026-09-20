@@ -8,6 +8,7 @@ import type {
   RampDirection,
   SchemeDirection
 } from '$lib/types/color';
+import type { TransformationCall } from '$lib/types/transformation';
 
 /**
  * Represents a continuous color scale for continuous numerical data.
@@ -162,40 +163,6 @@ export type Channel = 'fill' | 'stroke' | 'size' | 'dot' | 'heatmap-weight';
  * Represents the visualization type for a given channel.
  */
 export type VisualizationType = 'Quantitative' | 'Categorical' | 'Constant';
-
-/**
- * Represents the kind of transformation.
- */
-export type TransformationKind = 'geometric' | 'tabular';
-
-/**
- * Represents a transformation—either internal or user-defined—applied to a
- * layer.
- *
- * @property name The function name of the transformation.
- * @property params The function parameters of the transformation.
- * @property paramTypes The types of the function parameters of the transforma-
- * tion.
- * @property returnType The type of the function return value of the transfor-
- * mation.
- * @property args The arguments passed to the transformation.
- * @property definitionTS The TypeScript function body of the transformation.
- * @property definitionJS The JavaScript function body of the transformation.
- * @property kind The {@link TransformationKind} of the transformation.
- */
-export interface Transformation {
-  name: string;
-  params: string[];
-  paramTypes: string[];
-  returnType: string;
-  definitionTS: string;
-  definitionJS: string;
-  kind: TransformationKind;
-}
-
-export interface TransformationCall extends Transformation {
-  args: (string | number)[];
-}
 
 /**
  * Represents the underlying data and metadata of a GeoJSON layer. This object

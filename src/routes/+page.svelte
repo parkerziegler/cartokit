@@ -236,8 +236,7 @@
         'ease-cubic-out absolute right-4 bottom-12 z-10 flex items-baseline gap-2 rounded bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 disabled:cursor-not-allowed',
         {
           '-translate-y-72': $layout.dataVisible,
-          'translate-x-[-33.333333vw]': $layout.editorVisible,
-          'delay-150': !$layout.editorVisible
+          'translate-x-[-33.333333vw]': $layout.editorVisible
         }
       ]}
       onclick={toggleEditorVisibility}

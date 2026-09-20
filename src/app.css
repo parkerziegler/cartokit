@@ -107,10 +107,6 @@
   #map.compact-x .maplibregl-ctrl-attrib.maplibregl-compact {
     @apply translate-x-[-33.333333vw];
   }
-
-  #map:not(.compact-x) .maplibregl-ctrl-attrib.maplibregl-compact {
-    @apply delay-150;
-  }
 }
 
 @layer utilities {

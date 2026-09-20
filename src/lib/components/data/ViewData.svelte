@@ -22,6 +22,7 @@
 </script>
 
 <button
+  class={['transition-colors', { 'text-ck-light': $layout.dataVisible }]}
   onclick={onViewDataClick}
   {@attach tooltip({
     content: 'View Data Table',

@@ -8,7 +8,6 @@
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import { map } from '$lib/state/map.svelte';
-  import { layout } from '$lib/stores/layout';
   import type { CartoKitSource } from '$lib/types';
   import { pluralize } from '$lib/utils/formatters/shared';
 
@@ -102,7 +101,6 @@
 <div
   class={[
     'ease-cubic-out z-10 flex flex-col overflow-hidden bg-slate-900 font-mono',
-    { 'delay-150': !$layout.editorVisible },
     className
   ]}
   in:slide={{ axis: 'y' }}

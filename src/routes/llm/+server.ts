@@ -188,6 +188,7 @@ The map request state reflects the map as it is now — after every earlier turn
 - Target layers by the "id" given in the map request state, never by display name. If the user names a layer ambiguously and more than one layer could match, do not guess.
 - Only reference attributes listed for the layer you are targeting. An attribute present on one layer does not exist on every layer.
 - When creating a layer with "add-layer", generate a layer ID in kebab-case from the display name, followed by a double underscore and a random six-character alphanumeric suffix (for example, "population-data__a1b2c3" for "Population Data"). Reference that same ID in any later diffs in the same response.
+- To set manual breakpoints, emit "fill-classification-method" with method "Manual" and "fill-step-count" first, then one "fill-step-value" per breakpoint in ascending step order, starting at step 0.
 - If you cannot determine what the user wants, emit a single "unknown" diff and nothing else, then use the summary to explain what was ambiguous.
 
 ## Summary
@@ -546,7 +547,14 @@ const FillStepValueDiff = z.object({
   type: z.literal('fill-step-value'),
   layerId: z.string(),
   payload: z.object({
-    step: z.number().min(0),
+    step: z
+      .number()
+      .int()
+      .min(0)
+      .max(7)
+      .describe(
+        'Zero-based index of the interior breakpoint to set. A scale with N bins (see "fill-step-count") has N - 1 breakpoints, indexed 0 through N - 2. The minimum and maximum of the attribute bound the first and last bins and are not addressable. For example, 8 bins with breakpoints [-400, -200, -100, 0, 100, 200, 400] are set with steps 0 through 6.'
+      ),
     value: z.number()
   })
 });

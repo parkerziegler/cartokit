@@ -72,7 +72,6 @@
 {#if layer.style.heatmap.weight.type === 'Quantitative'}
   <AttributeSelect
     layerId={layer.id}
-    geojson={layer.source.type === 'geojson' ? layer.source.data : undefined}
     visualizationType="Quantitative"
     selected={layer.style.heatmap.weight.attribute}
     channel="heatmap-weight"

@@ -1,7 +1,8 @@
 import { uniqBy } from 'lodash-es';
 
-import type { CartoKitIR, Transformation } from '$lib/types';
+import type { CartoKitIR } from '$lib/types';
 import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
+import type { Transformation } from '$lib/types/transformation';
 
 /**
  * Generate a program fragment for a single transformation function.

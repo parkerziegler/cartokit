@@ -98,7 +98,7 @@ export async function patchFillDiffs(
         if (layer.style.fill.scale.type !== 'Continuous') {
           layer.style.fill.scale.thresholds = recomputeBreaks(
             layer.id,
-            layer.style.fill.attribute,
+            diff.payload.attribute,
             layer.style.fill.scale
           );
         }
@@ -373,6 +373,18 @@ export async function patchFillDiffs(
         layer.style.fill.type === 'Quantitative' &&
         layer.style.fill.scale.type === 'Manual'
       ) {
+        // If the diff targets a step outside the current thresholds, return
+        // early. Writing past the end of the thresholds array would trigger a
+        // fallback to quantiles and discard every manual break. This cannot
+        // happen via the UI but may happen when using LLM-generated edits.
+        if (
+          !Number.isInteger(diff.payload.step) ||
+          diff.payload.step < 0 ||
+          diff.payload.step >= layer.style.fill.scale.thresholds.length
+        ) {
+          break;
+        }
+
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'fill-step-value',
@@ -398,6 +410,13 @@ export async function patchFillDiffs(
     case 'fill-visualization-type': {
       const layer = ir.layers[diff.layerId] as
         CartoKitChoroplethLayer | CartoKitProportionalSymbolLayer;
+
+      // If the diff attempts to transition the encoding to the already existing
+      // encoding, retun early. This cannot happen via the UI but may happen
+      // when using LLM-generated edits.
+      if (diff.payload.visualizationType === layer.style.fill.type) {
+        break;
+      }
 
       // Derive the inverse diff prior to applying the patch.
       inverse = {

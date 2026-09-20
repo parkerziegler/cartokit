@@ -17,7 +17,6 @@
   <ColorControls
     layerId={layer.id}
     layerType="Choropleth"
-    geojson={layer.source.type === 'geojson' ? layer.source.data : undefined}
     fill={layer.style.fill}
   />
 </MenuItem>
