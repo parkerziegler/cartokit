@@ -7,6 +7,27 @@ import type { CartoKitIR } from '$lib/types';
 import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
 
 /**
+ * Generate named imports for required classes and functions from maplibre-gl.
+ *
+ * @param analysis The {@link CartoKitBackendAnalysis} for the current
+ * {@link CartoKitIR}.
+ * @returns A program fragment containing all maplibre-gl imports.
+ */
+function codegenMapLibreNamedImports(analysis: CartoKitBackendAnalysis) {
+  const namedImports = Object.entries({
+    Map: true,
+    setWorkerUrl: true,
+    addProtocol: analysis.isPMTilesRequired && analysis.library === 'maplibre'
+  })
+    .filter(([, include]) => include)
+    .map(([namedImport]) => namedImport)
+    .join(', ');
+
+  return `import { ${namedImports} } from 'maplibre-gl';
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';`;
+}
+
+/**
  * Generate a program fragment for all library and data source imports.
  *
  * @param ir The {@link CartoKitIR}.
@@ -28,8 +49,7 @@ export function codegenImports(
       ? `import * as mapboxgl from 'mapbox-gl/esm';`
       : '',
     analysis.library === 'maplibre'
-      ? `import { Map, setWorkerUrl } from 'maplibre-gl';
-import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';`
+      ? codegenMapLibreNamedImports(analysis)
       : '',
     analysis.isTurfRequired ? "import * as turf from '@turf/turf';" : '',
     analysis.language === 'typescript' && analysis.isGeoJSONNamespaceRequired

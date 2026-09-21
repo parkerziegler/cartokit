@@ -44,7 +44,7 @@ export function codegenMap(
     analysis.isPMTilesRequired && analysis.library === 'maplibre'
       ? `
   const protocol = new pmtiles.Protocol();
-  maplibregl.addProtocol('pmtiles', protocol.tile);
+  addProtocol('pmtiles', protocol.tile);
   `
       : '';
 
@@ -64,7 +64,7 @@ export function codegenMap(
   return `
   ${protocol}
 
-  const map = new ${analysis.library}gl.Map({
+  const map = new ${analysis.library === 'mapbox' ? 'mapboxgl.' : ''}Map({
     ${mapOptions}
   });
 
