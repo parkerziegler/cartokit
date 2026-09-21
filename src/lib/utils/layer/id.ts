@@ -1,4 +1,4 @@
-import type maplibregl from 'maplibre-gl';
+import type { Map } from 'maplibre-gl';
 
 /**
  * Get the canonical layerId for a {@link CartoKitLayer}.
@@ -13,10 +13,10 @@ export function getCanonicalLayerId(layerId: string): string {
 /**
  * Get the id of the source backing a layer on the map.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to look up.
  * @returns The id of the source backing the layer.
  */
-export function getSourceId(map: maplibregl.Map, layerId: string): string {
+export function getSourceId(map: Map, layerId: string): string {
   return map.getLayer(layerId)?.source ?? layerId;
 }

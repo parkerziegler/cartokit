@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type maplibregl from 'maplibre-gl';
+  import type { Map } from 'maplibre-gl';
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import LayerTypeSelect from '$lib/components/layer-types/LayerTypeSelect.svelte';
@@ -22,7 +22,7 @@
   import type { CartoKitLayer } from '$lib/types';
 
   interface Props {
-    map: maplibregl.Map;
+    map: Map;
     layer: CartoKitLayer;
   }
 

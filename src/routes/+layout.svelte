@@ -1,5 +1,7 @@
 <script lang="ts">
   import { inject } from '@vercel/analytics';
+  import { setWorkerUrl } from 'maplibre-gl';
+  import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
   import type { Snippet } from 'svelte';
 
   import 'maplibre-gl/dist/maplibre-gl.css';
@@ -10,6 +12,8 @@
   }
 
   let { children }: Props = $props();
+
+  setWorkerUrl(workerUrl);
 
   inject({
     beforeSend: (event) => {

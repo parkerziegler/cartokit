@@ -24,7 +24,13 @@ export function codegenImports(
   const uploadTable = new Map<string, string>();
 
   const libraryImports = [
-    `import ${analysis.library}gl from '${analysis.library}-gl';`,
+    analysis.library === 'mapbox'
+      ? `import * as mapboxgl from 'mapbox-gl/esm';`
+      : '',
+    analysis.library === 'maplibre'
+      ? `import { Map, setWorkerUrl } from 'maplibre-gl';
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';`
+      : '',
     analysis.isTurfRequired ? "import * as turf from '@turf/turf';" : '',
     analysis.language === 'typescript' && analysis.isGeoJSONNamespaceRequired
       ? "import type * as GeoJSON from 'geojson';"

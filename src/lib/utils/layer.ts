@@ -1,5 +1,5 @@
 import type { Geometry } from 'geojson';
-import type maplibregl from 'maplibre-gl';
+import type { Map as MapLibreGLMap } from 'maplibre-gl';
 
 import type { LayerType, VectorGeometry } from '$lib/types';
 
@@ -41,12 +41,12 @@ export function isAffiliatedLayer(
  * Get the ids of all layers on the map belonging to a {@link CartoKitLayer},
  * including the layer's own id.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link MapLibreGLMap} instance.
  * @param layerId The id of the {@link CartoKitLayer}.
  * @returns An array of affiliated layer ids, in draw order.
  */
 export function getAffiliatedLayerIds(
-  map: maplibregl.Map,
+  map: MapLibreGLMap,
   layerId: string
 ): string[] {
   return map

@@ -5,10 +5,10 @@ import type { UserConfig } from 'vite';
 import { defineConfig } from 'vitest/config';
 
 const config: UserConfig = defineConfig({
-  plugins: [tailwindcss(), enhancedImages(), sveltekit()],
   define: {
     __CARTOKIT_VERSION__: JSON.stringify(process.env.npm_package_version)
   },
+  plugins: [tailwindcss(), enhancedImages(), sveltekit()],
   resolve: process.env.VITEST
     ? {
         conditions: ['browser']

@@ -49,6 +49,7 @@ export function codegenMap(
       : '';
 
   const mapOptions = [
+    `${analysis.library === 'mapbox' ? `accessToken: YOUR_MAPBOX_ACCESS_TOKEN` : ''}`,
     "container: 'map'",
     `style: ${codegenMapStyle(ir)}`,
     `center: [${ir.center.join(', ')}]`,

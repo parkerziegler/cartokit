@@ -1,5 +1,5 @@
 <script lang="ts">
-  import maplibregl from 'maplibre-gl';
+  import { Map } from 'maplibre-gl';
   import { onMount, setContext } from 'svelte';
 
   import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
@@ -15,13 +15,13 @@
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
-    map: maplibregl.Map;
+    map: Map;
   }
 
   let { map }: Props = $props();
 
   let picker: HTMLButtonElement;
-  let thumbnails = $state<maplibregl.Map[]>([]);
+  let thumbnails = $state<Map[]>([]);
   let showModal = $state(false);
   let timeoutId = $state<number | null>(null);
 
@@ -36,7 +36,7 @@
     const { top, left } = picker.getBoundingClientRect();
 
     thumbnails = mapStyles.map((style) => {
-      const thumbnail = new maplibregl.Map({
+      const thumbnail = new Map({
         container: `inset-${style}`,
         style: `https://api.maptiler.com/maps/${style}/style.json?key=${PUBLIC_MAPTILER_API_KEY}`,
         center: map.unproject([left + 20, top + 20]),
@@ -64,14 +64,14 @@
     };
   });
 
-  function updateMapThumbnailCenter(map: maplibregl.Map) {
+  function updateMapThumbnailCenter(map: Map) {
     const { top, left } = picker.getBoundingClientRect();
 
     const thumbnail = thumbnails[0];
     thumbnail.setCenter(map.unproject([left + 20, top + 20]));
   }
 
-  function updateMapThumbnailZoom(map: maplibregl.Map) {
+  function updateMapThumbnailZoom(map: Map) {
     const thumbnail = thumbnails[0];
     thumbnail.setZoom(map.getZoom());
   }
