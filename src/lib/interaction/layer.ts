@@ -1,4 +1,4 @@
-import type maplibregl from 'maplibre-gl';
+import type { Map } from 'maplibre-gl';
 
 import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
 import {
@@ -15,10 +15,10 @@ import type { CartoKitLayer } from '$lib/types';
 /**
  * Add a {@link CartoKitLayer} to the map.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param layer The {@link CartoKitLayer} to add to the map.
  */
-export function addLayer(map: maplibregl.Map, layer: CartoKitLayer): void {
+export function addLayer(map: Map, layer: CartoKitLayer): void {
   const sourceLayer =
     layer.source.type === 'vector' ? layer.source.sourceLayerId : undefined;
 

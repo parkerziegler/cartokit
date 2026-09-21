@@ -12,6 +12,6 @@ const allAfterEqualRegex = /=.+$/;
 export function codegenMapStyle(ir: CartoKitIR): string {
   return `'${ir.basemap.url.replace(
     allAfterEqualRegex,
-    '=<YOUR_MAPTILER_API_KEY>'
+    '=_MAPTILER_API_KEY'
   )}'`;
 }

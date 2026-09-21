@@ -44,11 +44,12 @@ export function codegenMap(
     analysis.isPMTilesRequired && analysis.library === 'maplibre'
       ? `
   const protocol = new pmtiles.Protocol();
-  maplibregl.addProtocol('pmtiles', protocol.tile);
+  addProtocol('pmtiles', protocol.tile);
   `
       : '';
 
   const mapOptions = [
+    `${analysis.library === 'mapbox' ? `accessToken: 'YOUR_MAPBOX_ACCESS_TOKEN'` : ''}`,
     "container: 'map'",
     `style: ${codegenMapStyle(ir)}`,
     `center: [${ir.center.join(', ')}]`,
@@ -63,7 +64,7 @@ export function codegenMap(
   return `
   ${protocol}
 
-  const map = new ${analysis.library}gl.Map({
+  const map = new ${analysis.library === 'mapbox' ? 'mapboxgl.' : ''}Map({
     ${mapOptions}
   });
 

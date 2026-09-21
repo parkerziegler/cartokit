@@ -53,7 +53,7 @@
 
 <li role="presentation" class="flex">
   <button
-    class={className(open)}
+    class={['text-nowrap', className(open)]}
     type="button"
     onclick={select}
     role="tab"

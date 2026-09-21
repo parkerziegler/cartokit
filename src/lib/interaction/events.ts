@@ -1,4 +1,4 @@
-import type maplibregl from 'maplibre-gl';
+import type { Map, MapLayerMouseEvent, MapMouseEvent } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { feature } from '$lib/state/feature.svelte';
@@ -13,13 +13,13 @@ import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
 /**
  * Add a hover effect to all features in a point layer.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
  * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentPointHover(
-  map: maplibregl.Map,
+  map: Map,
   layerId: string,
   sourceLayerId?: string
 ): void {
@@ -35,14 +35,14 @@ export function instrumentPointHover(
   map.setPaintProperty(layerId, 'circle-stroke-width', [
     'case',
     ['boolean', ['feature-state', 'hover'], false],
-    1,
-    currentStrokeWidth ?? 0
+    ['number', 1],
+    ['number', currentStrokeWidth ?? 0]
   ]);
   map.setPaintProperty(layerId, 'circle-stroke-color', [
     'case',
     ['boolean', ['feature-state', 'hover'], false],
-    '#FFFFFF',
-    currentStrokeColor ?? 'transparent'
+    ['string', '#FFFFFF'],
+    ['string', currentStrokeColor ?? 'transparent']
   ]);
 
   addHoverListeners(map, layerId, sourceLayerId);
@@ -51,13 +51,13 @@ export function instrumentPointHover(
 /**
  * Add a hover effect to all features in a line layer.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
  * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentLineHover(
-  map: maplibregl.Map,
+  map: Map,
   layerId: string,
   sourceLayerId?: string
 ): void {
@@ -67,14 +67,14 @@ export function instrumentLineHover(
   map.setPaintProperty(layerId, 'line-width', [
     'case',
     ['boolean', ['feature-state', 'hover'], false],
-    1,
-    currentStrokeWidth ?? 0
+    ['number', 1],
+    ['number', currentStrokeWidth ?? 0]
   ]);
   map.setPaintProperty(layerId, 'line-color', [
     'case',
     ['boolean', ['feature-state', 'hover'], false],
-    '#FFFFFF',
-    currentStrokeColor ?? 'transparent'
+    ['string', '#FFFFFF'],
+    ['string', currentStrokeColor ?? 'transparent']
   ]);
 
   addHoverListeners(map, layerId, sourceLayerId);
@@ -83,13 +83,13 @@ export function instrumentLineHover(
 /**
  * Add a hover effect to all features in a polygon layer.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
  * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentPolygonHover(
-  map: maplibregl.Map,
+  map: Map,
   layerId: string,
   sourceLayerId?: string
 ): void {
@@ -115,13 +115,13 @@ export function instrumentPolygonHover(
 /**
  * Wire up event listeners for hover effects.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to add event listeners to.
  * @param sourceLayerId The id of the source layer to instrument. This is only
  * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 function addHoverListeners(
-  map: maplibregl.Map,
+  map: Map,
   layerId: string,
   sourceLayerId?: string
 ): void {
@@ -129,7 +129,7 @@ function addHoverListeners(
   const canonicalLayerId = getCanonicalLayerId(layerId);
   const sourceId = getSourceId(map, layerId);
 
-  function onMouseMove(event: maplibregl.MapLayerMouseEvent): void {
+  function onMouseMove(event: MapLayerMouseEvent): void {
     if (event.features && event.features.length > 0) {
       if (hoveredFeatureId !== null) {
         map.setFeatureState(
@@ -205,13 +205,13 @@ function addHoverListeners(
 /**
  * Add a selection indicator to a feature in a point layer.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
  * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentPointSelect(
-  map: maplibregl.Map,
+  map: Map,
   layerId: string,
   sourceLayerId?: string
 ): void {
@@ -227,14 +227,14 @@ export function instrumentPointSelect(
   map.setPaintProperty(layerId, 'circle-stroke-width', [
     'case',
     ['boolean', ['feature-state', 'selected'], false],
-    1,
-    currentStrokeWidth ?? 0
+    ['number', 1],
+    ['number', currentStrokeWidth ?? 0]
   ]);
   map.setPaintProperty(layerId, 'circle-stroke-color', [
     'case',
     ['boolean', ['feature-state', 'selected'], false],
-    '#A534FF',
-    currentStrokeColor ?? 'transparent'
+    ['string', '#A534FF'],
+    ['string', currentStrokeColor ?? 'transparent']
   ]);
 
   addSelectListeners(map, layerId, sourceLayerId);
@@ -243,13 +243,13 @@ export function instrumentPointSelect(
 /**
  * Add a selection indicator to a feature in a line layer.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
  * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentLineSelect(
-  map: maplibregl.Map,
+  map: Map,
   layerId: string,
   sourceLayerId?: string
 ): void {
@@ -259,14 +259,14 @@ export function instrumentLineSelect(
   map.setPaintProperty(layerId, 'line-width', [
     'case',
     ['boolean', ['feature-state', 'selected'], false],
-    1,
-    currentStrokeWidth ?? 0
+    ['number', 1],
+    ['number', currentStrokeWidth ?? 0]
   ]);
   map.setPaintProperty(layerId, 'line-color', [
     'case',
     ['boolean', ['feature-state', 'selected'], false],
-    '#A534FF',
-    currentStrokeColor ?? 'transparent'
+    ['string', '#A534FF'],
+    ['string', currentStrokeColor ?? 'transparent']
   ]);
 
   addSelectListeners(map, layerId, sourceLayerId);
@@ -275,13 +275,13 @@ export function instrumentLineSelect(
 /**
  * Add a selection indicator to a feature in a polygon layer.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
  * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 export function instrumentPolygonSelect(
-  map: maplibregl.Map,
+  map: Map,
   layerId: string,
   sourceLayerId?: string
 ): void {
@@ -307,20 +307,20 @@ export function instrumentPolygonSelect(
 /**
  * Wire up event listeners for select effects.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param lyrId The id of the layer to add event listeners to.
  * @param sourceLayerId The id of the source layer to instrument. This is only
  * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
  */
 function addSelectListeners(
-  map: maplibregl.Map,
+  map: Map,
   lyrId: string,
   sourceLayerId?: string
 ): void {
   let featureId: string | number | undefined;
   const sourceId = getSourceId(map, lyrId);
 
-  function onClick(event: maplibregl.MapLayerMouseEvent): void {
+  function onClick(event: MapLayerMouseEvent): void {
     if (event.features && event.features.length > 0) {
       if (featureId !== undefined) {
         map.setFeatureState(
@@ -373,15 +373,15 @@ function addSelectListeners(
 /**
  * A global event listener for deselecting features.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param layers The current {@link CartoKitLayer}s on the map.
  * @returns A callback to run when a map mouse event intersects no features.
  */
 export function onFeatureLeave(
-  map: maplibregl.Map,
+  map: Map,
   layers: Record<string, CartoKitLayer>
-): (event: maplibregl.MapMouseEvent) => void {
-  return (event: maplibregl.MapMouseEvent): void => {
+): (event: MapMouseEvent) => void {
+  return (event: MapMouseEvent): void => {
     const layerIds = Object.values(layers).map((layer) => {
       // For dot density layers, we need to deselect the outlines layer.
       if (layer.type === 'Dot Density') {
@@ -447,13 +447,10 @@ export function onFeatureLeave(
 /**
  * Detach the event listeners registered for a set of layers.
  *
- * @param map The top-level {@link maplibregl.Map} instance.
+ * @param map The top-level {@link Map} instance.
  * @param layerIds The ids of the layers to detach listeners from.
  */
-export function removeLayerListeners(
-  map: maplibregl.Map,
-  layerIds: string[]
-): void {
+export function removeLayerListeners(map: Map, layerIds: string[]): void {
   layerIds.forEach((layerId) => {
     const layerListeners = listeners.value.get(layerId);
 

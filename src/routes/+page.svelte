@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Feature } from 'geojson';
-  import maplibregl from 'maplibre-gl';
+  import { addProtocol, Map } from 'maplibre-gl';
   import * as pmtiles from 'pmtiles';
   import { onMount } from 'svelte';
 
@@ -36,7 +36,7 @@
 
   let { data }: Props = $props();
 
-  let map = $state<maplibregl.Map>();
+  let map = $state<Map>();
   let features = $state<Feature[]>([]);
   let table = $derived.by<{ columns: string[]; rows: Feature[] }>(() => {
     if (layerId.value) {
@@ -85,9 +85,9 @@
 
   onMount(() => {
     const protocol = new pmtiles.Protocol();
-    maplibregl.addProtocol('pmtiles', protocol.tile);
+    addProtocol('pmtiles', protocol.tile);
 
-    map = new maplibregl.Map({
+    map = new Map({
       container: 'map',
       style: data.basemap.url,
       center: $ir.center,
@@ -99,7 +99,7 @@
     // Expose the map instance to Playwright tests, so they can wait on MapLibre
     // events (e.g., idle) rather than inferring map state from the DOM.
     if (page.url.searchParams.has('playwright')) {
-      (window as Window & { __map?: maplibregl.Map }).__map = map;
+      (window as Window & { __map?: Map }).__map = map;
     }
 
     // Add an event listener to handle feature deselection.
