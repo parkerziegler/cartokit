@@ -61,15 +61,14 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';`
   const cssImports = `import '${analysis.library}-gl/dist/${analysis.library}-gl.css';
 import './style.css'`;
 
-  const imports = `${libraryImports}
-
-  ${cssImports}
-  
-  ${fileImports}`;
-
-  return `${imports}
-
-  ${codegenFns(ir, analysis)}
-
-  ${codegenMap(ir, uploadTable, analysis)}`;
+  return [
+    libraryImports,
+    cssImports,
+    fileImports,
+    analysis.library === 'maplibre' ? `setWorkerUrl(workerUrl)` : '',
+    codegenFns(ir, analysis),
+    codegenMap(ir, uploadTable, analysis)
+  ]
+    .filter(Boolean)
+    .join('\n\n');
 }
