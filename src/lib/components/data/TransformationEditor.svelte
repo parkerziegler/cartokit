@@ -92,6 +92,7 @@
       };
 
       await applyDiff(diff);
+      transaction = 'applied';
     } catch (err) {
       error = err instanceof Error ? err.message : 'An error occurred.';
       transaction = 'ready';
