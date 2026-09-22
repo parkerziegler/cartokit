@@ -136,7 +136,9 @@ test('workflow-1', async ({ page }) => {
   await page.getByTestId('apply-transformation-button').click();
 
   // Wait for the transformation to complete.
-  await expect(page.getByTestId('success-indicator')).toBeVisible();
+  await expect(
+    page.getByTestId('transformation-success-indicator')
+  ).toBeVisible();
 
   // Return to the Style Editor.
   await transformDataButton.click();

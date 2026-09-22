@@ -5,8 +5,7 @@ import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
 import type { TransformationCall } from '$lib/types/transformation';
 
 /**
- * Execute a user-defined transformation program against a
- * {@link FeatureCollection}.
+ * Execute a user-defined transformation against a {@link FeatureCollection}.
  *
  * @param program The source code of the user-defined transformation function.
  * @param featureCollection The {@link FeatureCollection} to transform.
@@ -56,6 +55,25 @@ export function upsertUserTransformation(
   transformation: TransformationCall
 ): TransformationCall[] {
   const tIdx = transformations.findIndex(({ kind }) => kind === 'user');
+
+  return tIdx > -1
+    ? transformations.toSpliced(tIdx, 1, transformation)
+    : [...transformations, transformation];
+}
+
+/**
+ * Insert a geometric transformation, replacing any existing transformation of
+ * the same name.
+ *
+ * @param transformations The layer's current {@link TransformationCall}s.
+ * @param transformation The user-defined {@link TransformationCall} to place.
+ * @returns The layer's updated {@link TransformationCall}s.
+ */
+export function upsertGeometricTransformation(
+  transformations: TransformationCall[],
+  transformation: TransformationCall
+): TransformationCall[] {
+  const tIdx = transformations.findIndex((t) => t.name === transformation.name);
 
   return tIdx > -1
     ? transformations.toSpliced(tIdx, 1, transformation)

@@ -37,6 +37,9 @@ export interface UserTransformation extends BaseTransformation {
   kind: 'user';
 }
 
+/**
+ * Represents the definition of a transformation on GeoJSON data.
+ */
 export type Transformation = GeometricTransformation | UserTransformation;
 
 /**
@@ -59,5 +62,8 @@ export interface UserTransformationCall extends BaseTransformation {
   args: (string | number)[];
 }
 
+/**
+ * Represents a concrete call of a {@link Transformation}.
+ */
 export type TransformationCall =
   GeometricTransformationCall | UserTransformationCall;

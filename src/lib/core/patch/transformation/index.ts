@@ -4,11 +4,11 @@ import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { catalog } from '$lib/state/catalog.svelte';
 import type { CartoKitGeoJSONSource, CartoKitLayer, Catalog } from '$lib/types';
-import { upsertUserTransformation } from '$lib/utils/transformation';
-import type {
-  TransformationCall,
-  UserTransformationCall
-} from '$lib/types/transformation';
+import {
+  upsertGeometricTransformation,
+  upsertUserTransformation
+} from '$lib/utils/transformation';
+import type { TransformationCall } from '$lib/types/transformation';
 import type { FeatureCollection } from 'geojson';
 
 /**
@@ -20,14 +20,11 @@ import type { FeatureCollection } from 'geojson';
  * @param transformations The full, ordered list of {@link TransformationCall}s
  * to replay against the source data.
  */
-async function replayAndUpdate(
+async function replayTransformationsWithCatalogUpdates(
   layer: CartoKitLayer,
   source: CartoKitGeoJSONSource,
   transformations: TransformationCall[]
 ) {
-  // Replay the full chain from the source data in a worker thread; running
-  // against the current data would apply a previously applied version of a
-  // transformation twice.
   const transformationWorker = new Worker(
     new URL('$lib/utils/transformation/worker.ts', import.meta.url),
     { type: 'module' }
@@ -56,25 +53,15 @@ async function replayAndUpdate(
     new URL('$lib/utils/catalog/worker.ts', import.meta.url),
     { type: 'module' }
   );
-  const buildCatalog =
-    Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
-  const catalogPatch = await buildCatalog(layer);
-  catalog.value = { ...catalog.value, ...catalogPatch };
-}
 
-/**
- * Insert a geometric transformation, replacing any existing transformation of
- * the same name.
- */
-function upsertGeometricTransformation(
-  transformations: TransformationCall[],
-  transformation: TransformationCall
-): TransformationCall[] {
-  const tIdx = transformations.findIndex((t) => t.name === transformation.name);
-
-  return tIdx > -1
-    ? transformations.toSpliced(tIdx, 1, transformation)
-    : [...transformations, transformation];
+  try {
+    const buildCatalog =
+      Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
+    const catalogPatch = await buildCatalog(layer);
+    catalog.value = { ...catalog.value, ...catalogPatch };
+  } finally {
+    catalogWorker.terminate();
+  }
 }
 
 /**
@@ -106,7 +93,7 @@ export async function patchTransformationDiffs(
 
       const replaced = layer.source.transformations.find(
         ({ kind }) => kind === 'user'
-      ) as UserTransformationCall | undefined;
+      );
 
       // Derive the inverse diff prior to applying the patch. Replacing an
       // existing transformation inverts to restoring it, not removing it.
@@ -123,7 +110,7 @@ export async function patchTransformationDiffs(
           };
 
       // Apply the patch.
-      await replayAndUpdate(
+      await replayTransformationsWithCatalogUpdates(
         layer,
         layer.source,
         transformation.kind === 'user'
@@ -158,7 +145,7 @@ export async function patchTransformationDiffs(
           };
 
           // Apply the patch.
-          await replayAndUpdate(
+          await replayTransformationsWithCatalogUpdates(
             layer,
             layer.source,
             layer.source.transformations.toSpliced(tIdx, 1)

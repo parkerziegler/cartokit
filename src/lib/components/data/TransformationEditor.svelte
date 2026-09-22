@@ -3,32 +3,33 @@
   import { EditorView } from 'codemirror';
   import * as Comlink from 'comlink';
   import type { Feature, FeatureCollection, Geometry } from 'geojson';
-  import type maplibregl from 'maplibre-gl';
+  import type { Map } from 'maplibre-gl';
 
   import JavaScriptIcon from '$lib/components/icons/JavaScriptIcon.svelte';
   import TerminalIcon from '$lib/components/icons/TerminalIcon.svelte';
-  import TypeScriptIcon from '$lib/components/icons/TypeScriptIcon.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import CodeEditor from '$lib/components/shared/CodeEditor.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import { parseStringToTransformation } from '$lib/utils/parse';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import { pluralize } from '$lib/utils/formatters/shared';
-  import { backend } from '$lib/stores/backend';
   import type { TransformationCall } from '$lib/types/transformation';
+  import { onMount } from 'svelte';
+  import { debounce } from 'lodash-es';
+  import { tooltip } from '$lib/attachments/tooltip';
 
   interface Props {
     layerId: string;
     transformations: TransformationCall[];
-    map: maplibregl.Map;
+    map: Map;
   }
 
   let { layerId, transformations, map }: Props = $props();
 
   let view: EditorView | undefined = $state();
-  let processing = $state(false);
-  let applied = $state(false);
+  let transaction = $state<'processing' | 'applied' | 'ready'>('ready');
   let error = $state('');
+
   // Internal transformations (e.g., dot density generation) are 'geometric';
   // user-defined ones from this editor are 'user'.
   const appliedTransformation = $derived(
@@ -36,7 +37,7 @@
   );
   const doc = $derived(
     appliedTransformation
-      ? `function ${appliedTransformation.name}(${appliedTransformation.params.join(', ')}) ${appliedTransformation.definitionTS}\n\n\n`
+      ? `function ${appliedTransformation.name}(${appliedTransformation.params.join(', ')}) ${appliedTransformation.definitionJS}\n\n\n`
       : `function transformGeojson(geojson) {
   return geojson;
 }\n\n\n`
@@ -75,9 +76,9 @@
     const program = view?.state.doc.toString() ?? '';
 
     try {
-      processing = true;
-      // Reset so a subsequent apply re-triggers the button's success state.
-      applied = false;
+      // Reset the error state on successive applications.
+      error = '';
+      transaction = 'processing';
 
       const transformation = {
         ...parseStringToTransformation(program, 'user'),
@@ -92,12 +93,11 @@
 
       await applyDiff(diff);
 
-      applied = true;
-      error = '';
+      transaction = 'applied';
     } catch (err) {
       error = err instanceof Error ? err.message : 'An error occurred.';
     } finally {
-      processing = false;
+      transaction = 'ready';
     }
   }
 
@@ -109,6 +109,8 @@
       consoleOutput = [];
 
       try {
+        // Reset the error state on successive applications.
+        error = '';
         const output = await runTransformation(
           program,
           turf.featureCollection(viewportFeatures),
@@ -119,19 +121,31 @@
 
         featureCount = output.features.length;
         previewDoc = JSON.stringify(output, null, 2);
-        error = '';
       } catch (err) {
         error = err instanceof Error ? err.message : 'An error occurred.';
       } finally {
         worker.terminate();
+        transaction = 'ready';
       }
     }
   }
 
-  $effect(() => {
-    if (view) {
-      onEditorChange(view?.state.doc.toString());
-    }
+  onMount(() => {
+    // Produce the Output Preview once on mount.
+    onEditorChange(doc);
+
+    // Update the Output Preview on a debounced map move.
+    const cb = debounce(() => {
+      if (view) {
+        onEditorChange(view.state.doc.toString());
+      }
+    }, 200);
+
+    map.on('move', cb);
+
+    return () => {
+      map.off('move', cb);
+    };
   });
 </script>
 
@@ -141,11 +155,7 @@
   titleClass="items-center"
 >
   {#snippet action()}
-    {#if $backend.language === 'typescript'}
-      <TypeScriptIcon />
-    {:else}
-      <JavaScriptIcon />
-    {/if}
+    <JavaScriptIcon />
   {/snippet}
   <div class="flex flex-col">
     <CodeEditor
@@ -166,9 +176,14 @@
         class="px-2! py-1! font-sans! text-xs!"
         onclick={onClick}
         disabled={!!error}
-        loading={processing}
-        success={applied}
-        testId="apply-transformation-button">Apply</Button
+        loading={transaction === 'processing'}
+        success={transaction === 'applied'}
+        testId="apply-transformation-button"
+        {@attach error &&
+          tooltip({
+            content: error,
+            placement: 'left'
+          })}>Apply</Button
       >
     </div>
   </div>

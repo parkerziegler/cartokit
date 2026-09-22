@@ -23,10 +23,9 @@
     loading = false,
     success = false,
     testId = undefined,
-    children
+    children,
+    ...props
   }: Props = $props();
-
-  const SUCCESS_DURATION_MS = 2000;
 
   let succeeded = $state(false);
   const indicatorTransition = $derived({
@@ -42,7 +41,7 @@
     succeeded = true;
     const timeoutId = window.setTimeout(() => {
       succeeded = false;
-    }, SUCCESS_DURATION_MS);
+    }, 2000);
 
     return () => window.clearTimeout(timeoutId);
   });
@@ -59,22 +58,20 @@
     className
   ]}
   data-testid={testId}
+  {...props}
 >
   {@render children?.()}
   {#if loading || succeeded}
     <span class="relative size-4 shrink-0">
       {#if succeeded}
         <span
-          class="absolute inset-0 flex [&_svg]:size-4"
-          data-testid="success-indicator"
+          class="absolute inset-0 flex"
+          data-testid="transformation-success-indicator"
           transition:fly={indicatorTransition}
         >
           <CheckIcon />
         </span>
       {:else if loading}
-        <!-- The spinner lives on an inner element so that its rotation
-        animation and the transition's translation don't fight over
-        `transform`. -->
         <span
           class="absolute inset-0 flex"
           data-testid="loading-indicator"

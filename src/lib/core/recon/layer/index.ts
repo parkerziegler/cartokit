@@ -34,10 +34,14 @@ export async function reconLayerDiffs(
         new URL('$lib/utils/catalog/worker.ts', import.meta.url),
         { type: 'module' }
       );
-      const buildCatalog =
-        Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
-      const catalogPatch = await buildCatalog(layer);
-      catalog.value = { ...catalog.value, ...catalogPatch };
+      try {
+        const buildCatalog =
+          Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
+        const catalogPatch = await buildCatalog(layer);
+        catalog.value = { ...catalog.value, ...catalogPatch };
+      } finally {
+        catalogWorker.terminate();
+      }
 
       // Add the source to the map.
       if (diff.payload.type === 'geojson') {
