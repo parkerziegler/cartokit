@@ -92,11 +92,8 @@
       };
 
       await applyDiff(diff);
-
-      transaction = 'applied';
     } catch (err) {
       error = err instanceof Error ? err.message : 'An error occurred.';
-    } finally {
       transaction = 'ready';
     }
   }
@@ -125,7 +122,6 @@
         error = err instanceof Error ? err.message : 'An error occurred.';
       } finally {
         worker.terminate();
-        transaction = 'ready';
       }
     }
   }
@@ -163,7 +159,7 @@
         kind: 'editable',
         initialDoc: doc,
         language: 'javascript',
-        onchange: onEditorChange
+        onchange: debounce(onEditorChange, 200)
       }}
       class="-mx-4 max-h-38 overflow-auto border-b-transparent"
       bind:view
