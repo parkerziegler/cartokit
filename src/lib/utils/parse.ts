@@ -1,20 +1,23 @@
 import { Project, ScriptTarget } from 'ts-morph';
 
-import type { Transformation, TransformationKind } from '$lib/types';
+import type {
+  TransformationKind,
+  Transformation
+} from '$lib/types/transformation';
 
 /**
  * Parse a string of TypeScript code into a transformation.
  *
  * @param sourceCode The string of TypeScript code to parse.
- * @param kind The {@link TransformationKind}, either 'geometric' or 'tabular'.
+ * @param kind The {@link TransformationKind}, either 'geometric' or 'user'.
  * @param name The name of the {@link Transformation} to parse.
  * @returns A {@link Transformation}.
  */
-export function parseStringToTransformation(
+export function parseStringToTransformation<T extends TransformationKind>(
   sourceCode: string,
-  kind: TransformationKind,
+  kind: T,
   name?: string
-): Transformation {
+): Extract<Transformation, { kind: T }> {
   // Create a new project using ts-morph to parse the source code for TypeScript.
   const project = new Project({
     useInMemoryFileSystem: true,
@@ -73,5 +76,5 @@ export function parseStringToTransformation(
     definitionTS,
     definitionJS,
     kind
-  };
+  } as Extract<Transformation, { kind: T }>;
 }

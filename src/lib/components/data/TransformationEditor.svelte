@@ -1,235 +1,215 @@
 <script lang="ts">
   import * as turf from '@turf/turf';
   import { EditorView } from 'codemirror';
-  import type { FeatureCollection } from 'geojson';
-  import { onDestroy } from 'svelte';
+  import * as Comlink from 'comlink';
+  import type { Feature, FeatureCollection, Geometry } from 'geojson';
+  import type { Map } from 'maplibre-gl';
 
-  import Alert from '$lib/components/shared/Alert.svelte';
-  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
-  import CheckIcon from '$lib/components/icons/CheckIcon.svelte';
-  import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
-  import PlayCircle from '$lib/components/icons/PlayCircle.svelte';
+  import JavaScriptIcon from '$lib/components/icons/JavaScriptIcon.svelte';
   import TerminalIcon from '$lib/components/icons/TerminalIcon.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import CodeEditor from '$lib/components/shared/CodeEditor.svelte';
-  import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
-  import { feature } from '$lib/state/feature.svelte';
   import { parseStringToTransformation } from '$lib/utils/parse';
-  import { transformationWorker } from '$lib/utils/worker';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import { pluralize } from '$lib/utils/formatters/shared';
+  import type { TransformationCall } from '$lib/types/transformation';
+  import { onMount } from 'svelte';
+  import { debounce } from 'lodash-es';
+  import { tooltip } from '$lib/attachments/tooltip';
 
   interface Props {
-    oncloseeditor: () => void;
-    onclickoutsideeditor: (event: MouseEvent) => void;
     layerId: string;
-    geojson: FeatureCollection;
+    transformations: TransformationCall[];
+    map: Map;
   }
 
-  let { oncloseeditor, onclickoutsideeditor, layerId, geojson }: Props =
-    $props();
+  let { layerId, transformations, map }: Props = $props();
 
-  // Main editor state.
   let view: EditorView | undefined = $state();
+  let transaction = $state<'processing' | 'applied' | 'ready'>('ready');
   let error = $state('');
-  let success = $state(false);
-  let timeoutId: number | undefined;
-  const doc = `function transformGeojson(geojson) {
-  return geojson;
-}`;
 
-  // Preview editor state.
-  let previewError = $state('');
-  let previewDoc: string = $state(
-    feature.value
-      ? JSON.stringify(
-          {
-            type: feature.value.type,
-            properties: feature.value.properties,
-            geometry: feature.value.geometry
-          },
-          null,
-          2
-        )
-      : ''
+  // Internal transformations (e.g., dot density generation) are 'geometric';
+  // user-defined ones from this editor are 'user'.
+  const appliedTransformation = $derived(
+    transformations.findLast(({ kind }) => kind === 'user')
   );
-
-  // Console state.
+  const doc = $derived(
+    appliedTransformation
+      ? `function ${appliedTransformation.name}(${appliedTransformation.params.join(', ')}) ${appliedTransformation.definitionJS}\n\n\n`
+      : `function transformGeojson(geojson) {
+  return geojson;
+}\n\n\n`
+  );
+  let previewDoc: string = $state('');
   let consoleOutput: string[] = $state([]);
+  let featureCount = $state(0);
 
-  export function focus() {
-    view?.focus();
+  function getViewportFeatures(): Feature<Geometry>[] {
+    return map.queryRenderedFeatures({ layers: [layerId] }).map((feature) => ({
+      type: 'Feature',
+      id: feature.id,
+      properties: feature.properties,
+      geometry: feature.geometry
+    }));
   }
 
-  function onClick() {
+  function registerTransformationWorker() {
+    const worker = new Worker(
+      new URL('$lib/utils/transformation/worker.ts', import.meta.url),
+      { type: 'module' }
+    );
+
+    const { runTransformation } = Comlink.wrap<{
+      runTransformation: (
+        program: string,
+        featureCollection: FeatureCollection,
+        onconsole?: (args: unknown[]) => void
+      ) => FeatureCollection;
+    }>(worker);
+
+    return { worker, runTransformation };
+  }
+
+  async function onClick() {
     const program = view?.state.doc.toString() ?? '';
 
-    transformationWorker(program, geojson, async (message) => {
-      switch (message.type) {
-        case 'data': {
-          const diff: CartoKitDiff = {
-            type: 'add-transformation',
-            layerId,
-            payload: {
-              geojson: message.data,
-              transformation: {
-                ...parseStringToTransformation(program, 'tabular'),
-                args: []
-              }
-            }
-          };
+    try {
+      // Reset the error state on successive applications.
+      error = '';
+      transaction = 'processing';
 
-          await applyDiff(diff);
+      const transformation = {
+        ...parseStringToTransformation(program, 'user'),
+        args: []
+      };
 
-          success = true;
-          // Clear any errors on successful transformation.
-          error = '';
+      const diff: CartoKitDiff = {
+        type: 'add-transformation',
+        layerId,
+        payload: { transformation }
+      };
 
-          // Set a timeout to hide the success message.
-          timeoutId = window.setTimeout(() => {
-            success = false;
-          }, 3000);
-          break;
-        }
-        case 'console':
-          break;
-        case 'error':
-          success = false;
-          error = message.error.message;
-          break;
+      await applyDiff(diff);
+      transaction = 'applied';
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'An error occurred.';
+      transaction = 'ready';
+    }
+  }
+
+  async function onEditorChange(program: string) {
+    const viewportFeatures = getViewportFeatures();
+
+    if (viewportFeatures.length > 0) {
+      const { worker, runTransformation } = registerTransformationWorker();
+      consoleOutput = [];
+
+      try {
+        // Reset the error state on successive applications.
+        error = '';
+        const output = await runTransformation(
+          program,
+          turf.featureCollection(viewportFeatures),
+          Comlink.proxy((args: unknown[]) => {
+            consoleOutput = args.map((entry) => JSON.stringify(entry, null, 2));
+          })
+        );
+
+        featureCount = output.features.length;
+        previewDoc = JSON.stringify(output, null, 2);
+      } catch (err) {
+        error = err instanceof Error ? err.message : 'An error occurred.';
+      } finally {
+        worker.terminate();
       }
-    });
-  }
-
-  function onEditorChange(program: string) {
-    if (feature.value) {
-      transformationWorker(
-        program,
-        turf.featureCollection([feature.value]),
-        (message) => {
-          // TODO: Split out the additional edge cases here.
-          // - message.data?.[0] is strictly a GeoJSON feature.
-          // - message.data?.[0] is _not_ a GeoJSON feature (warning).
-          // - message.data is null (warning).
-          switch (message.type) {
-            case 'data':
-              previewError = '';
-
-              if (message.data.features?.[0]) {
-                previewDoc = JSON.stringify(
-                  {
-                    type: message.data.features[0].type,
-                    properties: message.data.features[0].properties,
-                    geometry: message.data.features[0].geometry
-                  },
-                  null,
-                  2
-                );
-              } else {
-                previewDoc = JSON.stringify(
-                  message.data.features?.[0],
-                  null,
-                  2
-                );
-              }
-              break;
-            case 'console':
-              previewError = '';
-
-              message.args.forEach((entry) => {
-                consoleOutput.push(JSON.stringify(entry, null, 2));
-              });
-              consoleOutput = consoleOutput;
-              break;
-            case 'error':
-              previewDoc = '';
-              previewError = message.error.message;
-              break;
-          }
-        }
-      );
     }
   }
 
-  onDestroy(() => {
-    if (timeoutId) {
-      window.clearTimeout(timeoutId);
-    }
+  onMount(() => {
+    // Produce the Output Preview once on mount.
+    onEditorChange(doc);
+
+    // Update the Output Preview on a debounced map move.
+    const cb = debounce(() => {
+      if (view) {
+        onEditorChange(view.state.doc.toString());
+      }
+    }, 200);
+
+    map.on('move', cb);
+
+    return () => {
+      map.off('move', cb);
+    };
   });
 </script>
 
-<Menu class="relative z-10 w-96" onclickoutsidemenu={onclickoutsideeditor}>
-  <MenuItem title="Transform Data">
-    {#snippet action()}
-      <button onclick={oncloseeditor}><CloseIcon /></button>
-    {/snippet}
-    <div class="flex flex-col gap-4">
-      <p class="font-sans">
-        Use the editor below to transform your dataset using JavaScript.
-      </p>
-      <CodeEditor
-        config={{
-          kind: 'editable',
-          initialDoc: doc,
-          language: 'javascript',
-          onchange: onEditorChange
-        }}
-        class="-mx-4 max-h-38 overflow-auto"
-        bind:view
-        testId="transformation-editor"
-      />
-      {#if error}
-        <Alert
-          kind="error"
-          message={`Failed to transform data. Error: ${error}`}
-        >
-          {#snippet icon()}
-            <AlertIcon />
-          {/snippet}
-        </Alert>
-      {:else if success}
-        <Alert kind="success" message="Successfully transformed data.">
-          {#snippet icon()}
-            <CheckIcon />
-          {/snippet}
-        </Alert>
-      {/if}
+<MenuItem
+  title="Transform Data"
+  containerClass="shrink-0 pb-0"
+  titleClass="items-center"
+>
+  {#snippet action()}
+    <JavaScriptIcon />
+  {/snippet}
+  <div class="flex flex-col">
+    <CodeEditor
+      config={{
+        kind: 'editable',
+        initialDoc: doc,
+        language: 'javascript',
+        onchange: debounce(onEditorChange, 200)
+      }}
+      class="-mx-4 max-h-38 overflow-auto border-b-transparent"
+      bind:view
+      testId="transformation-editor"
+    />
+    <div
+      class="relative flex w-full justify-end pb-2 after:absolute after:-top-px after:left-8 after:h-[calc(100%+1px)] after:w-px after:bg-slate-600 after:content-['']"
+    >
       <Button
-        class="flex items-center gap-2 self-end"
+        class="px-2! py-1! font-sans! text-xs!"
         onclick={onClick}
-        testId="run-transformation-button"
-        ><span>Run</span><PlayCircle /></Button
+        disabled={!!error}
+        loading={transaction === 'processing'}
+        success={transaction === 'applied'}
+        testId="apply-transformation-button"
+        {@attach error &&
+          tooltip({
+            content: error,
+            placement: 'left'
+          })}>Apply</Button
       >
     </div>
-  </MenuItem>
-  <MenuItem title="Preview (1 selected feature)" titleClass="items-baseline">
-    <CodeEditor
-      config={{ kind: 'readonly', doc: previewDoc, language: 'json' }}
-      class="-mx-4 max-h-38 overflow-auto"
-    />
-    {#snippet action()}
-      <p class="text-slate-400">OUTPUT</p>
-    {/snippet}
-    {#if previewError}
-      <Alert kind="error" message={previewError}>
-        {#snippet icon()}
-          <AlertIcon />
-        {/snippet}
-      </Alert>
-    {/if}
-  </MenuItem>
-  <MenuItem title="Console">
-    <ul class="-mx-4 max-h-38 overflow-auto">
-      {#each consoleOutput as entry, i (`${entry}-${i}`)}
-        <li
-          class="border-b border-slate-600 px-4 py-2 text-white first:border-t"
-        >
-          {entry}
-        </li>
-      {/each}
-      <li class="px-4 py-2 text-white">
-        <TerminalIcon />
+  </div>
+</MenuItem>
+<MenuItem
+  title="Output Preview"
+  containerClass="min-h-0 flex-1 pb-0"
+  titleClass="items-baseline!"
+>
+  <CodeEditor
+    config={{ kind: 'readonly', doc: previewDoc, language: 'json' }}
+    class={['-mx-4 overflow-auto', { 'opacity-60': error }]}
+  />
+  {#snippet action()}
+    <p class="text-3xs text-slate-400 uppercase">
+      {featureCount}
+      {pluralize('Feature', featureCount)} in Viewport
+    </p>
+  {/snippet}
+</MenuItem>
+<MenuItem title="Console" containerClass="shrink-0 border-t-transparent!">
+  <ul class="-mx-4 max-h-38 overflow-auto">
+    {#each consoleOutput as entry, i (`${entry}-${i}`)}
+      <li class="border-b border-slate-700 px-4 py-2 text-white first:border-t">
+        {entry}
       </li>
-    </ul>
-  </MenuItem>
-</Menu>
+    {/each}
+    <li class="px-4 py-2 text-white">
+      <TerminalIcon />
+    </li>
+  </ul>
+</MenuItem>

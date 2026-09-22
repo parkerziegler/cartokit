@@ -1,17 +1,19 @@
 <script lang="ts">
   import type { Map } from 'maplibre-gl';
 
+  import DownloadData from '$lib/components/data/DownloadData.svelte';
+  import TransformData from '$lib/components/data/TransformData.svelte';
+  import TransformationEditor from '$lib/components/data/TransformationEditor.svelte';
+  import ViewData from '$lib/components/data/ViewData.svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import LayerTypeSelect from '$lib/components/layer-types/LayerTypeSelect.svelte';
   import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
   import DotDensityPropertiesPanel from '$lib/components/properties/DotDensityPropertiesPanel.svelte';
-  import DownloadData from '$lib/components/properties/DownloadData.svelte';
   import HeatmapPropertiesPanel from '$lib/components/properties/HeatmapPropertiesPanel.svelte';
   import LinePropertiesPanel from '$lib/components/properties/LinePropertiesPanel.svelte';
   import PointPropertiesPanel from '$lib/components/properties/PointPropertiesPanel.svelte';
   import PolygonPropertiesPanel from '$lib/components/properties/PolygonPropertiesPanel.svelte';
   import ProportionalSymbolPropertiesPanel from '$lib/components/properties/ProportionalSymbolPropertiesPanel.svelte';
-  import ViewData from '$lib/components/properties/ViewData.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuItem from '$lib/components/shared/MenuItem.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
@@ -27,6 +29,8 @@
   }
 
   let { map, layer }: Props = $props();
+
+  let transformationEditorActive = $state(false);
 
   function onPropertiesMenuClose() {
     if (feature.value?.id) {
@@ -56,11 +60,12 @@
 <Menu
   id="properties"
   class={[
-    'ease-cubic-out absolute top-4 right-4 z-10 max-h-[calc(100%-2rem)] w-80 overflow-auto transition-[max-height,translate] duration-[200ms,400ms]',
+    'ease-cubic-out absolute top-4 right-4 z-10 max-h-[calc(100%-9rem)] w-80 transition-[max-height,translate,width] duration-[200ms,400ms,200ms]',
     {
       'max-h-[calc(100%-25.25rem)]': $layout.dataVisible,
       'translate-x-[-33.333333vw]': $layout.editorVisible,
-      'delay-150': !$layout.editorVisible
+      'flex w-100 flex-col overflow-hidden': transformationEditorActive,
+      'overflow-auto': !transformationEditorActive
     }
   ]}
 >
@@ -79,31 +84,40 @@
         <ViewData />
         {#if layer.source.type === 'geojson'}
           <DownloadData {layer} />
+          <TransformData bind:active={transformationEditorActive} />
         {/if}
       </div>
     {/snippet}
   </MenuTitle>
-  {#if layer.source.type === 'vector'}
-    <MenuItem title="Source Layer">
-      <SourceLayerSelect {layer} />
+  {#if transformationEditorActive && layer.source.type === 'geojson'}
+    <TransformationEditor
+      layerId={layer.id}
+      transformations={layer.source.transformations}
+      {map}
+    />
+  {:else}
+    {#if layer.source.type === 'vector'}
+      <MenuItem title="Source Layer">
+        <SourceLayerSelect {layer} />
+      </MenuItem>
+    {/if}
+    <MenuItem title="Layer Type">
+      <LayerTypeSelect {layer} />
     </MenuItem>
-  {/if}
-  <MenuItem title="Layer Type">
-    <LayerTypeSelect {layer} />
-  </MenuItem>
-  {#if layer.type === 'Choropleth'}
-    <ChoroplethPropertiesPanel {layer} />
-  {:else if layer.type === 'Dot Density'}
-    <DotDensityPropertiesPanel {layer} />
-  {:else if layer.type === 'Heatmap'}
-    <HeatmapPropertiesPanel {layer} />
-  {:else if layer.type === 'Line'}
-    <LinePropertiesPanel {layer} />
-  {:else if layer.type === 'Point'}
-    <PointPropertiesPanel {layer} />
-  {:else if layer.type === 'Polygon'}
-    <PolygonPropertiesPanel {layer} />
-  {:else if layer.type === 'Proportional Symbol'}
-    <ProportionalSymbolPropertiesPanel {layer} />
+    {#if layer.type === 'Choropleth'}
+      <ChoroplethPropertiesPanel {layer} />
+    {:else if layer.type === 'Dot Density'}
+      <DotDensityPropertiesPanel {layer} />
+    {:else if layer.type === 'Heatmap'}
+      <HeatmapPropertiesPanel {layer} />
+    {:else if layer.type === 'Line'}
+      <LinePropertiesPanel {layer} />
+    {:else if layer.type === 'Point'}
+      <PointPropertiesPanel {layer} />
+    {:else if layer.type === 'Polygon'}
+      <PolygonPropertiesPanel {layer} />
+    {:else if layer.type === 'Proportional Symbol'}
+      <ProportionalSymbolPropertiesPanel {layer} />
+    {/if}
   {/if}
 </Menu>

@@ -19,10 +19,14 @@ export async function reconTransformationDiffs(
   switch (diff.type) {
     case 'add-transformation':
     case 'remove-transformation': {
-      // Update the source with the new data.
-      (map.value!.getSource(diff.layerId) as GeoJSONSource).setData(
-        diff.payload.geojson
-      );
+      const { source } = targetIR.layers[diff.layerId];
+
+      // Update the source with the layer's newly patched data.
+      if (source.type === 'geojson') {
+        (map.value!.getSource(diff.layerId) as GeoJSONSource).setData(
+          source.data
+        );
+      }
       break;
     }
   }

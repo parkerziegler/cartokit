@@ -13,7 +13,6 @@ import type {
   Projection,
   QuantitativeColorScale,
   ThemeMode,
-  TransformationCall,
   VisualizationType
 } from '$lib/types';
 import type {
@@ -23,6 +22,7 @@ import type {
   RampDirection,
   SchemeDirection
 } from '$lib/types/color';
+import type { TransformationCall } from '$lib/types/transformation';
 
 interface LayerDiff {
   layerId: CartoKitLayer['id'];
@@ -271,7 +271,6 @@ interface HeatmapWeightValueDiff extends LayerDiff {
 interface AddTransformationDiff extends LayerDiff {
   type: 'add-transformation';
   payload: {
-    geojson: FeatureCollection;
     transformation: TransformationCall;
   };
 }
@@ -279,7 +278,6 @@ interface AddTransformationDiff extends LayerDiff {
 interface RemoveTransformationDiff extends LayerDiff {
   type: 'remove-transformation';
   payload: {
-    geojson: FeatureCollection;
     transformationName: string;
   };
 }

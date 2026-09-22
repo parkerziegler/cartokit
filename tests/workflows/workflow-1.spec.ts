@@ -117,24 +117,31 @@ test('workflow-1', async ({ page }) => {
   await page.locator('#stroke-width-input').press('Enter');
 
   // Open the Transformation Editor.
-  await page.getByTestId('open-transformation-editor-button').click();
-  await expect(page.getByTestId('transformation-editor')).toBeVisible();
+  const transformDataButton = page.getByTestId('transform-data-button');
+  await transformDataButton.click();
+  const transformationEditor = page.getByTestId('transformation-editor');
+  await expect(transformationEditor).toBeVisible();
 
   // Fill the Transformation Editor with JS code to reverse the order of feat-
   // ures in the Penumbra Paths layer.
-  await page.getByTestId('transformation-editor').press('ControlOrMeta+A');
-  await page.getByTestId('transformation-editor').press('Backspace');
-  await page.getByTestId('transformation-editor')
-    .pressSequentially(`function transformGeojson(geojson) {
+  const textbox = transformationEditor.getByRole('textbox');
+  await textbox.press('ControlOrMeta+A');
+  await textbox.press('Backspace');
+  await textbox.pressSequentially(`function transformGeojson(geojson) {
   geojson.features.reverse();
   
   return geojson;`);
 
   // Execute the transformation.
-  await page.getByTestId('run-transformation-button').click();
+  await page.getByTestId('apply-transformation-button').click();
 
   // Wait for the transformation to complete.
-  await expect(page.getByText('Successfully transformed data.')).toBeVisible();
+  await expect(
+    page.getByTestId('transformation-success-indicator')
+  ).toBeVisible();
+
+  // Return to the Style Editor.
+  await transformDataButton.click();
 
   // Switch the Layer Type to Fill.
   await page.locator('#layer-type-select').selectOption('Polygon');

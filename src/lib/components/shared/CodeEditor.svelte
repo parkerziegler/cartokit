@@ -6,10 +6,12 @@
   import { syntaxHighlighting } from '@codemirror/language';
   import { basicSetup, EditorView } from 'codemirror';
   import { onMount } from 'svelte';
+  import type { ClassValue } from 'svelte/elements';
+
   import {
-    syntaxTheme,
     cssSyntaxTheme,
-    editorTheme
+    editorTheme,
+    syntaxTheme
   } from '$lib/utils/codemirror';
 
   interface ReadonlyCodeEditorConfig {
@@ -30,7 +32,7 @@
   interface Props {
     config: CodeEditorConfig;
     view?: EditorView;
-    class?: string;
+    class?: ClassValue;
     testId?: string;
   }
 
@@ -117,10 +119,6 @@
   bind:this={editor}
   class={[
     'relative grow overflow-auto border border-slate-600 text-white',
-    {
-      'transition-colors focus-within:border-slate-400 hover:border-slate-400 focus:border-slate-400':
-        config.kind === 'editable'
-    },
     className
   ]}
   data-testid={testId}
@@ -135,5 +133,9 @@
 
   :global(.cm-editor .cm-scroller) {
     @apply font-mono text-xs;
+  }
+
+  :global(.ͼ1l .cm-gutters) {
+    @apply min-w-12 pr-0! pl-1.5!;
   }
 </style>

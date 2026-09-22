@@ -28,7 +28,6 @@
     <ColorControls
       layerId={layer.id}
       layerType="Point"
-      geojson={layer.source.type === 'geojson' ? layer.source.data : undefined}
       fill={layer.style.fill}
     />
   {/if}

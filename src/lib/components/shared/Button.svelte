@@ -1,12 +1,17 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { MouseEventHandler } from 'svelte/elements';
+  import { prefersReducedMotion } from 'svelte/motion';
+  import { fly } from 'svelte/transition';
+
+  import CheckIcon from '$lib/components/icons/CheckIcon.svelte';
 
   interface Props {
     onclick?: MouseEventHandler<HTMLButtonElement>;
     class?: string;
     disabled?: boolean;
     loading?: boolean;
+    success?: boolean;
     testId?: string | undefined;
     children: Snippet;
   }
@@ -16,23 +21,66 @@
     class: className = '',
     disabled = false,
     loading = false,
+    success = false,
     testId = undefined,
-    children
+    children,
+    ...props
   }: Props = $props();
+
+  let succeeded = $state(false);
+  const indicatorTransition = $derived({
+    x: prefersReducedMotion.current ? 0 : 8,
+    duration: prefersReducedMotion.current ? 0 : 150
+  });
+
+  $effect(() => {
+    if (!success) {
+      return;
+    }
+
+    succeeded = true;
+    const timeoutId = window.setTimeout(() => {
+      succeeded = false;
+    }, 2000);
+
+    return () => window.clearTimeout(timeoutId);
+  });
 </script>
 
 <button
   {onclick}
   disabled={disabled || loading}
   class={[
-    'rounded-sm border border-slate-600 px-3 py-2 text-sm text-white transition focus:border-slate-400 enabled:hover:border-slate-400 disabled:cursor-not-allowed disabled:text-slate-500',
+    'flex items-center gap-2 rounded-sm border px-3 py-2 text-sm transition focus:border-slate-400 disabled:cursor-not-allowed',
+    succeeded
+      ? 'bg-ck-light text-slate-900'
+      : 'border-slate-600 text-white enabled:hover:border-slate-400 disabled:text-slate-500',
     className
   ]}
   data-testid={testId}
-  >{#if loading}
-    <span class="loader align-text-top" data-testid="loading-indicator"></span>
-  {:else}
-    {@render children?.()}
+  {...props}
+>
+  {@render children?.()}
+  {#if loading || succeeded}
+    <span class="relative size-4 shrink-0">
+      {#if succeeded}
+        <span
+          class="absolute inset-0 flex"
+          data-testid="transformation-success-indicator"
+          transition:fly={indicatorTransition}
+        >
+          <CheckIcon />
+        </span>
+      {:else if loading}
+        <span
+          class="absolute inset-0 flex"
+          data-testid="loading-indicator"
+          transition:fly={indicatorTransition}
+        >
+          <span class="loader"></span>
+        </span>
+      {/if}
+    </span>
   {/if}
 </button>
 
@@ -40,24 +88,21 @@
   @reference 'tailwindcss';
 
   .loader {
-    @apply relative inline-block h-4 w-4;
-  }
-  .loader::after,
-  .loader::before {
-    @apply absolute top-0 left-0 h-4 w-4 rounded-full bg-white;
-    content: '';
-    animation: animloader 0.5s ease-in-out infinite;
+    @apply inline-block h-4 w-4 rounded-full;
+    border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-top-color: currentColor;
+    animation: animloader 0.6s linear infinite;
   }
 
   @keyframes animloader {
-    0% {
-      transform: scale(0);
-      opacity: 1;
+    to {
+      transform: rotate(1turn);
     }
+  }
 
-    100% {
-      transform: scale(1);
-      opacity: 0;
+  @media (prefers-reduced-motion: reduce) {
+    .loader {
+      animation-duration: 2s;
     }
   }
 </style>
