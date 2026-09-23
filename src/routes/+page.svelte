@@ -113,6 +113,7 @@
       ir.update((ir) => {
         ir.basemap.url = data.basemap.url;
         ir.basemap.provider = data.basemap.provider;
+        ir.basemap.beforeId = data.basemap.beforeId;
 
         return ir;
       });

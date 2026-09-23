@@ -10,7 +10,7 @@
   import Tabs from '$lib/components/shared/Tabs.svelte';
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
-  import type { BasemapProvider } from '$lib/types';
+  import type { BasemapProvider } from '$lib/types/basemap';
   import { BASEMAPS } from '$lib/utils/basemap';
   import { registerKeybinding } from '$lib/utils/keybinding';
 

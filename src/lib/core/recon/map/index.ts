@@ -27,7 +27,19 @@ export async function reconMapDiffs(
             previousStyle?.layers?.filter((layer) =>
               layerIds.some((layerId) => isAffiliatedLayer(layerId, layer))
             ) ?? [];
-          const layers = nextStyle.layers.concat(customLayers);
+
+          // Reinsert the preserved layers beneath the next basemap's labels,
+          // matching where addLayer places newly created layers.
+          const firstSymbolLayerIndex = nextStyle.layers.findIndex(
+            (layer) => layer.id === diff.payload.beforeId
+          );
+          const layers = nextStyle.layers.toSpliced(
+            firstSymbolLayerIndex === -1
+              ? nextStyle.layers.length
+              : firstSymbolLayerIndex,
+            0,
+            ...customLayers
+          );
 
           const sources = nextStyle.sources;
           if (previousStyle?.sources) {

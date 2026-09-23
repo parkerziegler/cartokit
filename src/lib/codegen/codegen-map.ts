@@ -37,7 +37,7 @@ export function codegenMap(
     'layout.z',
     'asc'
   ).reduce((p, layer) => {
-    return p.concat('\n\n' + codegenLayer(layer));
+    return p.concat('\n\n' + codegenLayer(layer, ir.basemap.beforeId));
   }, '');
 
   const protocol =
