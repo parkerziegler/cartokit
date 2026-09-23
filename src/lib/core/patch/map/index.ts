@@ -24,14 +24,13 @@ export async function patchMapDiffs(
         payload: {
           url: ir.basemap.url,
           provider: ir.basemap.provider,
-          mode: ir.basemap.mode
+          mode: ir.basemap.mode,
+          beforeId: ir.basemap.beforeId
         }
       };
 
       // Apply the patch.
-      ir.basemap.url = diff.payload.url;
-      ir.basemap.provider = diff.payload.provider;
-      ir.basemap.mode = diff.payload.mode;
+      ir.basemap = diff.payload;
       break;
     }
     case 'zoom': {

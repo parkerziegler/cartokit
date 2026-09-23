@@ -25,7 +25,8 @@
       payload: {
         url: tileUrl,
         provider: 'Custom',
-        mode: 'light'
+        mode: 'light',
+        beforeId: undefined
       }
     };
 

@@ -33,11 +33,13 @@ export async function load({ url }) {
       VERCEL_ENV === 'preview'
         ? {
             url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-            provider: 'CARTO' as const
+            provider: 'CARTO' as const,
+            beforeId: 'waterway_label'
           }
         : {
             url: 'https://tiles.stadiamaps.com/styles/stamen_toner_lite.json',
-            provider: 'Stamen' as const
+            provider: 'Stamen' as const,
+            beforeId: 'waterway-label'
           },
     userId,
     enableChat: userExists && llmEnabled

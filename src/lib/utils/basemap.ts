@@ -56,17 +56,30 @@ import StamenTonerLite from '$lib/assets/basemaps/stamen/stamen_toner_lite.webp?
 import StamenToner from '$lib/assets/basemaps/stamen/stamen_toner.webp?enhanced';
 import StamenWatercolor from '$lib/assets/basemaps/stamen/stamen_watercolor.webp?enhanced';
 
-import type { Basemap, BasemapProvider } from '$lib/types';
+import type { Basemap, BasemapProvider } from '$lib/types/basemap';
 
 const CARTO_BASEMAPS: Basemap[] = [
   {
     title: 'Dark Matter',
     tileId: 'dark-matter',
     src: DarkMatter,
-    mode: 'dark'
+    mode: 'dark',
+    beforeId: 'waterway_label'
   },
-  { title: 'Positron', tileId: 'positron', src: Positron, mode: 'light' },
-  { title: 'Voyager', tileId: 'voyager', src: Voyager, mode: 'light' }
+  {
+    title: 'Positron',
+    tileId: 'positron',
+    src: Positron,
+    mode: 'light',
+    beforeId: 'waterway_label'
+  },
+  {
+    title: 'Voyager',
+    tileId: 'voyager',
+    src: Voyager,
+    mode: 'light',
+    beforeId: 'waterway_label'
+  }
 ];
 
 const MAPTILER_BASEMAPS: Basemap[] = [
@@ -74,149 +87,261 @@ const MAPTILER_BASEMAPS: Basemap[] = [
     title: 'Aquarelle Dark',
     tileId: 'aquarelle-dark',
     src: AquarelleDark,
-    mode: 'dark'
+    mode: 'dark',
+    beforeId: undefined
   },
   {
     title: 'Aquarelle Vivid',
     tileId: 'aquarelle-vivid',
     src: AquarelleVivid,
-    mode: 'light'
+    mode: 'light',
+    beforeId: undefined
   },
-  { title: 'Aquarelle', tileId: 'aquarelle', src: Aquarelle, mode: 'light' },
+  {
+    title: 'Aquarelle',
+    tileId: 'aquarelle',
+    src: Aquarelle,
+    mode: 'light',
+    beforeId: undefined
+  },
   {
     title: 'Backdrop Dark',
     tileId: 'backdrop-dark',
     src: BackdropDark,
-    mode: 'dark'
+    mode: 'dark',
+    beforeId: 'Ocean labels'
   },
   {
     title: 'Backdrop Light',
     tileId: 'backdrop-light',
     src: BackdropLight,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'Ocean labels'
   },
-  { title: 'Backdrop', tileId: 'backdrop', src: Backdrop, mode: 'light' },
+  {
+    title: 'Backdrop',
+    tileId: 'backdrop',
+    src: Backdrop,
+    mode: 'light',
+    beforeId: 'Ocean labels'
+  },
   {
     title: 'Basic Dark',
     tileId: 'basic-v2-dark',
     src: BasicV2Dark,
-    mode: 'dark'
+    mode: 'dark',
+    beforeId: 'Airport labels'
   },
   {
     title: 'Basic Light',
     tileId: 'basic-v2-light',
     src: BasicV2Light,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'Airport labels'
   },
-  { title: 'Basic', tileId: 'basic-v2', src: BasicV2, mode: 'light' },
+  {
+    title: 'Basic',
+    tileId: 'basic-v2',
+    src: BasicV2,
+    mode: 'light',
+    beforeId: 'Airport labels'
+  },
   {
     title: 'Bright Dark',
     tileId: 'bright-v2-dark',
     src: BrightV2Dark,
-    mode: 'dark'
+    mode: 'dark',
+    beforeId: 'River labels'
   },
   {
     title: 'Bright Light',
     tileId: 'bright-v2-light',
     src: BrightV2Light,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'River labels'
   },
   {
     title: 'Bright Pastel',
     tileId: 'bright-v2-pastel',
     src: BrightV2Pastel,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'River labels'
   },
-  { title: 'Bright', tileId: 'bright-v2', src: BrightV2, mode: 'light' },
+  {
+    title: 'Bright',
+    tileId: 'bright-v2',
+    src: BrightV2,
+    mode: 'light',
+    beforeId: 'River labels'
+  },
   {
     title: 'Dataviz Dark',
     tileId: 'dataviz-dark',
     src: DatavizDark,
-    mode: 'dark'
+    mode: 'dark',
+    beforeId: 'Ocean labels'
   },
   {
     title: 'Dataviz Light',
     tileId: 'dataviz-light',
     src: DatavizLight,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'Ocean labels'
   },
-  { title: 'Dataviz', tileId: 'dataviz', src: Dataviz, mode: 'light' },
-  { title: 'Hybrid', tileId: 'hybrid', src: Hybrid, mode: 'dark' },
+  {
+    title: 'Dataviz',
+    tileId: 'dataviz',
+    src: Dataviz,
+    mode: 'light',
+    beforeId: 'Ocean labels'
+  },
+  {
+    title: 'Hybrid',
+    tileId: 'hybrid',
+    src: Hybrid,
+    mode: 'dark',
+    beforeId: 'Road labels'
+  },
   {
     title: 'Landscape Dark',
     tileId: 'landscape-dark',
     src: LandscapeDark,
-    mode: 'dark'
+    mode: 'dark',
+    beforeId: 'Ocean labels'
   },
   {
     title: 'Landscape Vivid',
     tileId: 'landscape-vivid',
     src: LandscapeVivid,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'Ocean labels'
   },
-  { title: 'Landscape', tileId: 'landscape', src: Landscape, mode: 'light' },
-  { title: 'Ocean', tileId: 'ocean', src: Ocean, mode: 'light' },
+  {
+    title: 'Landscape',
+    tileId: 'landscape',
+    src: Landscape,
+    mode: 'light',
+    beforeId: 'Ocean labels'
+  },
+  {
+    title: 'Ocean',
+    tileId: 'ocean',
+    src: Ocean,
+    mode: 'light',
+    beforeId: 'Landform labels'
+  },
   {
     title: 'Openstreetmap',
     tileId: 'openstreetmap',
     src: Openstreetmap,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'River labels'
   },
   {
     title: 'Outdoor Dark',
     tileId: 'outdoor-v2-dark',
     src: OutdoorV2Dark,
-    mode: 'dark'
+    mode: 'dark',
+    beforeId: 'Contour labels'
   },
-  { title: 'Outdoor', tileId: 'outdoor-v2', src: OutdoorV2, mode: 'light' },
-  { title: 'Satellite', tileId: 'satellite', src: Satellite, mode: 'dark' },
+  {
+    title: 'Outdoor',
+    tileId: 'outdoor-v2',
+    src: OutdoorV2,
+    mode: 'light',
+    beforeId: 'Contour labels'
+  },
+  {
+    title: 'Satellite',
+    tileId: 'satellite',
+    src: Satellite,
+    mode: 'dark',
+    beforeId: 'Road labels'
+  },
   {
     title: 'Streets Dark',
     tileId: 'streets-v2-dark',
     src: StreetsV2Dark,
-    mode: 'dark'
+    mode: 'dark',
+    beforeId: 'River labels'
   },
   {
     title: 'Streets Light',
     tileId: 'streets-v2-light',
     src: StreetsV2Light,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'River labels'
   },
   {
     title: 'Streets Pastel',
     tileId: 'streets-v2-pastel',
     src: StreetsV2Pastel,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'River labels'
   },
-  { title: 'Streets', tileId: 'streets-v2', src: StreetsV2, mode: 'light' },
+  {
+    title: 'Streets',
+    tileId: 'streets-v2',
+    src: StreetsV2,
+    mode: 'light',
+    beforeId: 'River labels'
+  },
   {
     title: 'Toner Lite',
     tileId: 'toner-v2-lite',
     src: TonerV2Lite,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'River labels'
   },
-  { title: 'Toner', tileId: 'toner-v2', src: TonerV2, mode: 'dark' },
-  { title: 'Topo Dark', tileId: 'topo-v2-dark', src: TopoV2Dark, mode: 'dark' },
+  {
+    title: 'Toner',
+    tileId: 'toner-v2',
+    src: TonerV2,
+    mode: 'dark',
+    beforeId: 'River labels'
+  },
+  {
+    title: 'Topo Dark',
+    tileId: 'topo-v2-dark',
+    src: TopoV2Dark,
+    mode: 'dark',
+    beforeId: 'Contour labels'
+  },
   {
     title: 'Topo Pastel',
     tileId: 'topo-v2-pastel',
     src: TopoV2Pastel,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'Contour labels'
   },
   {
     title: 'Topo Topographique',
     tileId: 'topo-v2-topographique',
     src: TopoV2Topographique,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'Contour labels'
   },
-  { title: 'Topo', tileId: 'topo-v2', src: TopoV2, mode: 'light' },
+  {
+    title: 'Topo',
+    tileId: 'topo-v2',
+    src: TopoV2,
+    mode: 'light',
+    beforeId: 'Contour labels'
+  },
   {
     title: 'Winter Dark',
     tileId: 'winter-v2-dark',
     src: WinterV2Dark,
-    mode: 'dark'
+    mode: 'dark',
+    beforeId: 'Contour labels'
   },
-  { title: 'Winter', tileId: 'winter-v2', src: WinterV2, mode: 'light' }
+  {
+    title: 'Winter',
+    tileId: 'winter-v2',
+    src: WinterV2,
+    mode: 'light',
+    beforeId: 'Contour labels'
+  }
 ];
 
 const STAMEN_BASEMAPS: Basemap[] = [
@@ -224,20 +349,29 @@ const STAMEN_BASEMAPS: Basemap[] = [
     title: 'Terrain',
     tileId: 'stamen_terrain',
     src: StamenTerrain,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'road-label-simple'
   },
   {
     title: 'Toner Lite',
     tileId: 'stamen_toner_lite',
     src: StamenTonerLite,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'waterway-label'
   },
-  { title: 'Toner', tileId: 'stamen_toner', src: StamenToner, mode: 'dark' },
+  {
+    title: 'Toner',
+    tileId: 'stamen_toner',
+    src: StamenToner,
+    mode: 'dark',
+    beforeId: 'waterway-label'
+  },
   {
     title: 'Watercolor',
     tileId: 'stamen_watercolor',
     src: StamenWatercolor,
-    mode: 'light'
+    mode: 'light',
+    beforeId: undefined
   }
 ];
 
@@ -246,16 +380,30 @@ const STADIA_MAPS_BASEMAPS: Basemap[] = [
     title: 'Alidade Smooth Dark',
     tileId: 'alidade_smooth_dark',
     src: AlidadeSmoothDark,
-    mode: 'dark'
+    mode: 'dark',
+    beforeId: 'highway_name_other'
   },
   {
     title: 'Alidade Smooth',
     tileId: 'alidade_smooth',
     src: AlidadeSmooth,
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'highway_name_other'
   },
-  { title: 'OSM Bright', tileId: 'osm_bright', src: OsmBright, mode: 'light' },
-  { title: 'Outdoors', tileId: 'outdoors', src: Outdoors, mode: 'light' }
+  {
+    title: 'OSM Bright',
+    tileId: 'osm_bright',
+    src: OsmBright,
+    mode: 'light',
+    beforeId: 'waterway-name'
+  },
+  {
+    title: 'Outdoors',
+    tileId: 'outdoors',
+    src: Outdoors,
+    mode: 'light',
+    beforeId: 'waterway-name'
+  }
 ];
 
 export const BASEMAPS: Record<BasemapProvider, Basemap[]> = {

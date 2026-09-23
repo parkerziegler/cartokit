@@ -1,4 +1,5 @@
 import type { Map } from 'maplibre-gl';
+import { get } from 'svelte/store';
 
 import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
 import {
@@ -10,10 +11,12 @@ import {
   instrumentPolygonSelect
 } from '$lib/interaction/events';
 import { deriveSize } from '$lib/interaction/geometry';
+import { ir } from '$lib/stores/ir';
 import type { CartoKitLayer } from '$lib/types';
 
 /**
- * Add a {@link CartoKitLayer} to the map.
+ * Add a {@link CartoKitLayer} to the map, beneath the labels of the active
+ * basemap.
  *
  * @param map The top-level {@link Map} instance.
  * @param layer The {@link CartoKitLayer} to add to the map.
@@ -21,19 +24,23 @@ import type { CartoKitLayer } from '$lib/types';
 export function addLayer(map: Map, layer: CartoKitLayer): void {
   const sourceLayer =
     layer.source.type === 'vector' ? layer.source.sourceLayerId : undefined;
+  const beforeId = get(ir).basemap.beforeId;
 
   switch (layer.type) {
     case 'Choropleth': {
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        'source-layer': sourceLayer,
-        type: 'fill',
-        paint: {
-          'fill-color': deriveColorScale(layer.style.fill, layer.id),
-          'fill-opacity': layer.style.fill.opacity
-        }
-      });
+      map.addLayer(
+        {
+          id: layer.id,
+          source: layer.id,
+          'source-layer': sourceLayer,
+          type: 'fill',
+          paint: {
+            'fill-color': deriveColorScale(layer.style.fill, layer.id),
+            'fill-opacity': layer.style.fill.opacity
+          }
+        },
+        beforeId
+      );
 
       const strokePaint = layer.style.stroke.visible
         ? {
@@ -47,13 +54,16 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
             'line-opacity': 0
           };
 
-      map.addLayer({
-        id: `${layer.id}-stroke`,
-        source: layer.id,
-        'source-layer': sourceLayer,
-        type: 'line',
-        paint: strokePaint
-      });
+      map.addLayer(
+        {
+          id: `${layer.id}-stroke`,
+          source: layer.id,
+          'source-layer': sourceLayer,
+          type: 'line',
+          paint: strokePaint
+        },
+        beforeId
+      );
 
       instrumentPolygonHover(map, layer.id, sourceLayer);
       instrumentPolygonSelect(map, layer.id, sourceLayer);
@@ -75,15 +85,18 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
 
       // Add a transparent layer to the map for the outlines.
       // This is the layer we'll instrument for hover and select effects.
-      map.addLayer({
-        id: `${layer.id}-outlines`,
-        type: 'fill',
-        source: `${layer.id}-outlines`,
-        paint: {
-          'fill-color': 'transparent',
-          'fill-opacity': 0
-        }
-      });
+      map.addLayer(
+        {
+          id: `${layer.id}-outlines`,
+          type: 'fill',
+          source: `${layer.id}-outlines`,
+          paint: {
+            'fill-color': 'transparent',
+            'fill-opacity': 0
+          }
+        },
+        beforeId
+      );
 
       const fillPaint = layer.style.fill.visible
         ? {
@@ -108,16 +121,19 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
           };
 
       // Add the dot density layer to the map.
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        type: 'circle',
-        paint: {
-          ...fillPaint,
-          ...strokePaint,
-          'circle-radius': layer.style.size
-        }
-      });
+      map.addLayer(
+        {
+          id: layer.id,
+          source: layer.id,
+          type: 'circle',
+          paint: {
+            ...fillPaint,
+            ...strokePaint,
+            'circle-radius': layer.style.size
+          }
+        },
+        beforeId
+      );
 
       // We cannot create Dot Density layers with vector tile sources.
       // Therefore, we do not pass the sourceLayerId argument to these calls.
@@ -128,46 +144,55 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
     case 'Heatmap': {
       // Add a transparent layer to the map for the points.
       // This is the layer we'll instrument for hover and select effects.
-      map.addLayer({
-        id: `${layer.id}-points`,
-        source: layer.id,
-        'source-layer': sourceLayer,
-        type: 'circle',
-        paint: {
-          'circle-color': 'transparent',
-          'circle-opacity': 0
-        }
-      });
+      map.addLayer(
+        {
+          id: `${layer.id}-points`,
+          source: layer.id,
+          'source-layer': sourceLayer,
+          type: 'circle',
+          paint: {
+            'circle-color': 'transparent',
+            'circle-opacity': 0
+          }
+        },
+        beforeId
+      );
 
       // Add the heatmap layer to the map.
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        'source-layer': sourceLayer,
-        type: 'heatmap',
-        paint: {
-          'heatmap-color': deriveColorRamp(layer.style.heatmap),
-          'heatmap-opacity': layer.style.heatmap.opacity,
-          'heatmap-radius': layer.style.heatmap.radius
-        }
-      });
+      map.addLayer(
+        {
+          id: layer.id,
+          source: layer.id,
+          'source-layer': sourceLayer,
+          type: 'heatmap',
+          paint: {
+            'heatmap-color': deriveColorRamp(layer.style.heatmap),
+            'heatmap-opacity': layer.style.heatmap.opacity,
+            'heatmap-radius': layer.style.heatmap.radius
+          }
+        },
+        beforeId
+      );
 
       instrumentPointHover(map, `${layer.id}-points`, sourceLayer);
       instrumentPointSelect(map, `${layer.id}-points`, sourceLayer);
       break;
     }
     case 'Line': {
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        'source-layer': sourceLayer,
-        type: 'line',
-        paint: {
-          'line-color': layer.style.stroke.color,
-          'line-width': layer.style.stroke.width,
-          'line-opacity': layer.style.stroke.opacity
-        }
-      });
+      map.addLayer(
+        {
+          id: layer.id,
+          source: layer.id,
+          'source-layer': sourceLayer,
+          type: 'line',
+          paint: {
+            'line-color': layer.style.stroke.color,
+            'line-width': layer.style.stroke.width,
+            'line-opacity': layer.style.stroke.opacity
+          }
+        },
+        beforeId
+      );
 
       instrumentLineHover(map, layer.id, sourceLayer);
       instrumentLineSelect(map, layer.id, sourceLayer);
@@ -196,17 +221,20 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
             'circle-stroke-opacity': 0
           };
 
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        'source-layer': sourceLayer,
-        type: 'circle',
-        paint: {
-          ...fillPaint,
-          ...strokePaint,
-          'circle-radius': layer.style.size
-        }
-      });
+      map.addLayer(
+        {
+          id: layer.id,
+          source: layer.id,
+          'source-layer': sourceLayer,
+          type: 'circle',
+          paint: {
+            ...fillPaint,
+            ...strokePaint,
+            'circle-radius': layer.style.size
+          }
+        },
+        beforeId
+      );
 
       instrumentPointHover(map, layer.id, sourceLayer);
       instrumentPointSelect(map, layer.id, sourceLayer);
@@ -223,13 +251,16 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
             'fill-opacity': 0
           };
 
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        'source-layer': sourceLayer,
-        type: 'fill',
-        paint: fillPaint
-      });
+      map.addLayer(
+        {
+          id: layer.id,
+          source: layer.id,
+          'source-layer': sourceLayer,
+          type: 'fill',
+          paint: fillPaint
+        },
+        beforeId
+      );
 
       const strokePaint = layer.style.stroke.visible
         ? {
@@ -244,13 +275,16 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
           };
 
       // Add a separate layer for the stroke.
-      map.addLayer({
-        id: `${layer.id}-stroke`,
-        source: layer.id,
-        'source-layer': sourceLayer,
-        type: 'line',
-        paint: strokePaint
-      });
+      map.addLayer(
+        {
+          id: `${layer.id}-stroke`,
+          source: layer.id,
+          'source-layer': sourceLayer,
+          type: 'line',
+          paint: strokePaint
+        },
+        beforeId
+      );
 
       instrumentPolygonHover(map, layer.id, sourceLayer);
       instrumentPolygonSelect(map, layer.id, sourceLayer);
@@ -279,17 +313,20 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
             'circle-stroke-opacity': 0
           };
 
-      map.addLayer({
-        id: layer.id,
-        source: layer.id,
-        'source-layer': sourceLayer,
-        type: 'circle',
-        paint: {
-          ...fillPaint,
-          ...strokePaint,
-          'circle-radius': deriveSize(layer.id, layer.style.size)
-        }
-      });
+      map.addLayer(
+        {
+          id: layer.id,
+          source: layer.id,
+          'source-layer': sourceLayer,
+          type: 'circle',
+          paint: {
+            ...fillPaint,
+            ...strokePaint,
+            'circle-radius': deriveSize(layer.id, layer.style.size)
+          }
+        },
+        beforeId
+      );
 
       instrumentPointHover(map, layer.id, sourceLayer);
       instrumentPointSelect(map, layer.id, sourceLayer);

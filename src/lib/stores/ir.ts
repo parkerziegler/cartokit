@@ -10,7 +10,8 @@ export const ir = writable<CartoKitIR>({
   basemap: {
     url: 'https://tiles.stadiamaps.com/styles/stamen_toner_lite.json',
     provider: 'Stamen',
-    mode: 'light'
+    mode: 'light',
+    beforeId: 'waterway-label'
   },
   projection: 'mercator',
   layers: {}

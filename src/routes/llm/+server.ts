@@ -9,7 +9,8 @@ import { z } from 'zod';
 import { OPENAI_API_KEY } from '$env/static/private';
 import type { RequestHandler } from './$types';
 
-import type { BasemapProvider, LayerType } from '$lib/types';
+import type { LayerType } from '$lib/types';
+import type { BasemapProvider } from '$lib/types/basemap';
 import type { LLMRequest, LLMRequestState, Prompt } from '$lib/types/llm';
 import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
 import { QUANTITATIVE_COLOR_RAMPS } from '$lib/utils/color/ramp';
@@ -792,7 +793,8 @@ const Basemap = z.union(
       z.object({
         provider: z.literal(provider),
         url: z.literal(TILE_URLS[provider as BasemapProvider](basemap.tileId)),
-        mode: z.literal(basemap.mode)
+        mode: z.literal(basemap.mode),
+        beforeId: z.literal(basemap.beforeId)
       })
     );
   })

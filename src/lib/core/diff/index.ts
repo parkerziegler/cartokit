@@ -7,12 +7,11 @@ import { diffs } from '$lib/state/diffs.svelte';
 import { history } from '$lib/state/history.svelte';
 import { ir } from '$lib/stores/ir';
 import type {
-  BasemapProvider,
+  CartoKitIR,
   CartoKitLayer,
   LayerType,
   Projection,
   QuantitativeColorScale,
-  ThemeMode,
   VisualizationType
 } from '$lib/types';
 import type {
@@ -333,11 +332,7 @@ interface RenameLayerDiff extends LayerDiff {
 
 interface BasemapDiff {
   type: 'basemap';
-  payload: {
-    url: string;
-    provider: BasemapProvider;
-    mode: ThemeMode;
-  };
+  payload: CartoKitIR['basemap'];
 }
 
 interface ZoomDiff {
