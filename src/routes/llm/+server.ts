@@ -794,7 +794,7 @@ const Basemap = z.union(
         provider: z.literal(provider),
         url: z.literal(TILE_URLS[provider as BasemapProvider](basemap.tileId)),
         mode: z.literal(basemap.mode),
-        beforeId: z.literal(basemap.beforeId)
+        beforeId: z.literal(basemap.beforeId ?? '')
       })
     );
   })
