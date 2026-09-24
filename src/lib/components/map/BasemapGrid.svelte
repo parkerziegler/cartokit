@@ -51,7 +51,7 @@
 </script>
 
 {#if provider === 'Custom'}
-  <form class="flex flex-col gap-4 min-w-xl">
+  <form class="flex min-w-xl flex-col gap-4">
     <div class="flex flex-col gap-2">
       <FieldLabel fieldId="tile-url">Tile URL</FieldLabel>
       <TextInput
@@ -68,7 +68,7 @@
     >
   </form>
 {:else}
-  <div class="grid grid-cols-3 gap-4 min-w-2xl">
+  <div class="grid min-w-2xl grid-cols-3 gap-4">
     {#each BASEMAPS[provider] as basemap (basemap.tileId)}
       <button
         class={[
