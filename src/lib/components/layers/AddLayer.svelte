@@ -46,14 +46,14 @@
 </button>
 <Modal
   bind:showModal
-  class="max-w-lg"
   testId="add-layer-modal"
   initialHeight={329}
+  initialWidth={512}
 >
   {#snippet header()}
     <h2 class="text-xl font-semibold">Add Layer</h2>
   {/snippet}
-  <Tabs bodyClass="max-h-[24rem] overflow-y-auto">
+  <Tabs bodyClass="max-h-[30rem] overflow-y-auto">
     <TabItem title="From API" defaultOpen>
       <FromAPI />
     </TabItem>
