@@ -64,21 +64,21 @@ const CARTO_BASEMAPS: Basemap[] = [
     tileId: 'dark-matter',
     src: DarkMatter,
     mode: 'dark',
-    beforeId: 'waterway_label'
+    beforeId: 'watername_ocean'
   },
   {
     title: 'Positron',
     tileId: 'positron',
     src: Positron,
     mode: 'light',
-    beforeId: 'waterway_label'
+    beforeId: 'watername_ocean'
   },
   {
     title: 'Voyager',
     tileId: 'voyager',
     src: Voyager,
     mode: 'light',
-    beforeId: 'waterway_label'
+    beforeId: 'watername_ocean'
   }
 ];
 
@@ -357,14 +357,14 @@ const STAMEN_BASEMAPS: Basemap[] = [
     tileId: 'stamen_toner_lite',
     src: StamenTonerLite,
     mode: 'light',
-    beforeId: 'waterway-label'
+    beforeId: 'road-label'
   },
   {
     title: 'Toner',
     tileId: 'stamen_toner',
     src: StamenToner,
     mode: 'dark',
-    beforeId: 'waterway-label'
+    beforeId: 'road-label'
   },
   {
     title: 'Watercolor',

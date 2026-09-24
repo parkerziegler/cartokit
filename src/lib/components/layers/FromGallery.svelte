@@ -60,7 +60,7 @@
   }
 </script>
 
-<div class="grid grid-cols-3 gap-x-2 gap-y-1 w-2xl h-106.5">
+<div class="grid h-110 w-5xl grid-cols-4 gap-x-2 gap-y-1">
   {#each GALLERY_ITEMS as item (item.id)}
     <button
       onclick={() => onSelectDataset(item.id, item.name, item.url)}
@@ -90,11 +90,11 @@
           {/if}
         </span>
       </div>
-      <div class="flex justify-between items-start gap-2 text-2xs font-light">
+      <div class="text-2xs flex items-start justify-between gap-2 font-light">
         <p class="text-slate-400">
           {item.attribution}
         </p>
-        <p class="font-mono bg-slate-700 px-1 py-0.5 rounded-xs">
+        <p class="rounded-xs bg-slate-700 px-1 py-0.5 font-mono">
           {item.format}
         </p>
       </div>

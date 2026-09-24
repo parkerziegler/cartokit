@@ -30,11 +30,11 @@
   let offsetWidth = $state(0);
 
   let offsetHeightTween = new Tween(initialHeight, {
-    duration: 150,
+    duration: 300,
     easing: cubicOut
   });
   let offsetWidthTween = new Tween(initialWidth, {
-    duration: 150,
+    duration: 300,
     easing: cubicOut
   });
 

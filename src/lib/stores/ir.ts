@@ -11,7 +11,7 @@ export const ir = writable<CartoKitIR>({
     url: 'https://tiles.stadiamaps.com/styles/stamen_toner_lite.json',
     provider: 'Stamen',
     mode: 'light',
-    beforeId: 'waterway-label'
+    beforeId: 'road-label'
   },
   projection: 'mercator',
   layers: {}

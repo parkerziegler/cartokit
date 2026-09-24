@@ -34,12 +34,12 @@ export async function load({ url }) {
         ? {
             url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
             provider: 'CARTO' as const,
-            beforeId: 'waterway_label'
+            beforeId: 'watername_ocean'
           }
         : {
             url: 'https://tiles.stadiamaps.com/styles/stamen_toner_lite.json',
             provider: 'Stamen' as const,
-            beforeId: 'waterway-label'
+            beforeId: 'road-label'
           },
     userId,
     enableChat: userExists && llmEnabled
