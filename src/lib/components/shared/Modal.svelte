@@ -1,6 +1,6 @@
 <!-- Core implementation adapted from: https://svelte.dev/playground/modal -->
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { untrack, type Snippet } from 'svelte';
   import { cubicOut } from 'svelte/easing';
   import { Tween } from 'svelte/motion';
 
@@ -29,14 +29,20 @@
   let offsetHeight = $state(0);
   let offsetWidth = $state(0);
 
-  let offsetHeightTween = new Tween(initialHeight, {
-    duration: 300,
-    easing: cubicOut
-  });
-  let offsetWidthTween = new Tween(initialWidth, {
-    duration: 300,
-    easing: cubicOut
-  });
+  let offsetHeightTween = new Tween(
+    untrack(() => initialHeight),
+    {
+      duration: 300,
+      easing: cubicOut
+    }
+  );
+  let offsetWidthTween = new Tween(
+    untrack(() => initialWidth),
+    {
+      duration: 300,
+      easing: cubicOut
+    }
+  );
 
   $effect(() => {
     if (dialog && showModal) {
@@ -74,8 +80,12 @@
   data-testid={testId}
   style="height: {offsetHeightTween.current}px; width: {offsetWidthTween.current}px;"
 >
-  <div class="w-fit" bind:offsetHeight bind:offsetWidth>
-    <div class="flex items-center justify-between p-4">
+  <div
+    class="flex max-h-[inherit] w-fit flex-col"
+    bind:offsetHeight
+    bind:offsetWidth
+  >
+    <div class="flex shrink-0 items-center justify-between p-4">
       {@render header?.()}
       <button onclick={() => dialog?.close()} aria-label="Close">
         <CloseIcon />

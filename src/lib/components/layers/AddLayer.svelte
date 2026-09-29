@@ -48,12 +48,15 @@
   bind:showModal
   testId="add-layer-modal"
   initialHeight={329}
-  initialWidth={512}
+  initialWidth={542}
 >
   {#snippet header()}
     <h2 class="text-xl font-semibold">Add Layer</h2>
   {/snippet}
-  <Tabs bodyClass="max-h-[30rem] overflow-y-auto">
+  <Tabs
+    containerClass="min-h-0"
+    bodyClass="min-h-0 overflow-y-auto [scrollbar-gutter:stable_both-edges]"
+  >
     <TabItem title="From API" defaultOpen>
       <FromAPI />
     </TabItem>
