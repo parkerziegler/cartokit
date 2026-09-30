@@ -37,14 +37,14 @@
 </script>
 
 <div class={['flex flex-col', containerClass]}>
-  <ul role="tablist" class={['overflow-auto', tablistClass]}>
+  <ul role="tablist" class={['shrink-0', tablistClass]}>
     {@render children()}
   </ul>
   <div
     id={ctx.panelId}
     role="tabpanel"
     aria-labelledby={ctx.selectedTab?.id}
-    class={['p-4', bodyClass]}
+    class={['py-4', bodyClass]}
   >
     {@render ctx.selectedTab?.snippet?.()}
   </div>

@@ -16,7 +16,7 @@
 
   let {
     class: className = (open) => [
-      'border-b-2 pb-2 text-base transition-all duration-200',
+      'border-b-2  pb-2 text-base transition-all duration-200',
       open
         ? 'border-b-slate-400 font-semibold text-white'
         : 'border-b-transparent font-light text-slate-400'

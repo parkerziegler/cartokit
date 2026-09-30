@@ -60,7 +60,9 @@
   }
 </script>
 
-<div class="grid h-110 w-5xl grid-cols-4 gap-x-2 gap-y-1">
+<div
+  class="grid h-full w-[min(80vw,64rem)] grid-cols-3 gap-x-2 gap-y-1 lg:grid-cols-4"
+>
   {#each GALLERY_ITEMS as item (item.id)}
     <button
       onclick={() => onSelectDataset(item.id, item.name, item.url)}
