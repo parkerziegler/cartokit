@@ -44,7 +44,7 @@
     id={ctx.panelId}
     role="tabpanel"
     aria-labelledby={ctx.selectedTab?.id}
-    class={['py-4', bodyClass]}
+    class={['p-4', bodyClass]}
   >
     {@render ctx.selectedTab?.snippet?.()}
   </div>

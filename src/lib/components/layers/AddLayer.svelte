@@ -53,10 +53,7 @@
   {#snippet header()}
     <h2 class="text-xl font-semibold">Add Layer</h2>
   {/snippet}
-  <Tabs
-    containerClass="min-h-0"
-    bodyClass="min-h-0 overflow-y-auto [scrollbar-gutter:stable_both-edges]"
-  >
+  <Tabs containerClass="min-h-0" bodyClass="min-h-0 overflow-y-auto">
     <TabItem title="From API" defaultOpen>
       <FromAPI />
     </TabItem>
