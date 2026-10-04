@@ -121,7 +121,10 @@
   {#snippet header()}
     <h2 class="text-xl font-semibold">Select Basemap</h2>
   {/snippet}
-  <Tabs containerClass="min-h-0" bodyClass="min-h-0 overflow-y-auto">
+  <Tabs
+    containerClass="min-h-0"
+    bodyClass="min-h-0 overflow-y-auto overflow-x-hidden"
+  >
     {#each providers as provider, i (provider)}
       <TabItem title={provider} defaultOpen={i === 0}>
         <BasemapGrid {provider} />

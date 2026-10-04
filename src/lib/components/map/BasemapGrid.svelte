@@ -68,7 +68,7 @@
     >
   </form>
 {:else}
-  <div class="grid min-w-2xl grid-cols-3 gap-4">
+  <div class="grid h-full w-[min(80vw,64rem)] grid-cols-3 gap-4">
     {#each BASEMAPS[provider] as basemap (basemap.tileId)}
       <button
         class={[
