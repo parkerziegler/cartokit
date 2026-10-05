@@ -5,7 +5,7 @@ import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
 // mapbox-gl is not a cartokit dependency, so Renovate keeps this version
 // current via the custom manager in renovate.json.
 // renovate: datasource=npm depName=mapbox-gl
-const MAPBOX_GL_VERSION = '3.30.0';
+const MAPBOX_GL_VERSION = '3.32.0';
 
 const versions = {
   ...dependencies,
