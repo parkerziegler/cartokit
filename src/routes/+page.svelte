@@ -29,6 +29,7 @@
   import { ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import { registerKeybinding } from '$lib/utils/keybinding';
+  import { applyBasemapLabels } from '$lib/utils/basemap-labels';
 
   interface Props {
     data: PageData;
@@ -153,6 +154,7 @@
     });
 
     map.on('style.load', (event) => {
+      applyBasemapLabels(event.target);
       event.target.setProjection({ type: $ir.projection });
     });
 
