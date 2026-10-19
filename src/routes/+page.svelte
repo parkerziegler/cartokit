@@ -32,7 +32,7 @@
   import { layout } from '$lib/stores/layout';
   import { initDB } from '$lib/utils/db';
   import { registerKeybinding } from '$lib/utils/keybinding';
-  import { applyBasemapLabels } from '$lib/utils/basemap-labels';
+  import { applyCustomBasemapLabels } from '$lib/utils/basemap-labels';
 
   interface Props {
     data: PageData;
@@ -166,7 +166,7 @@
     });
 
     map.on('style.load', (event) => {
-      applyBasemapLabels(event.target);
+      applyCustomBasemapLabels(event.target);
       event.target.setProjection({ type: $ir.projection });
     });
 
