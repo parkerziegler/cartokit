@@ -30,5 +30,5 @@
       stroke-opacity={layer.style.stroke.opacity}
     />
   </svg>
-  <span>{formatFeatureCount(layer.source)}</span>
+  <span>{formatFeatureCount(layer.id)}</span>
 </div>

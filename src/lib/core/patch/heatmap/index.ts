@@ -110,7 +110,7 @@ export async function patchHeatmapDiffs(
         case 'Quantitative':
           layer.style.heatmap.weight = {
             type: 'Quantitative',
-            attribute: selectQuantitativeAttribute(layer.source),
+            attribute: selectQuantitativeAttribute(layer.id),
             min: 0,
             max: 1
           };

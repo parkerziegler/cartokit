@@ -70,7 +70,9 @@ export function codegenMap(
 
   ${analysis.library === 'maplibre' ? projection : ''}
 
-  map.on('load', ${analysis.isFetchGeoJSONRequired ? 'async ' : ''}() => {
+  map.on('load', ${analysis.isFetchGeoJSONRequired || analysis.isDuckDBRequired ? 'async ' : ''}() => {
+    ${analysis.isDuckDBRequired ? `const { conn${analysis.isDuckDBDataProtocolRequired ? ', db' : ''} } = await initDB();` : ''}
+
     ${layerSources}
 
     ${layerRenders}

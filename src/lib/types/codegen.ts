@@ -49,6 +49,16 @@ export interface CartoKitBackendAnalysis extends CartoKitBackend {
    * library.
    */
   isPMTilesRequired: boolean;
+  /**
+   * A Boolean value indicating whether we need to include DuckDB to load
+   * GeoParquet sources.
+   */
+  isDuckDBRequired: boolean;
+  /**
+   * A Boolean value indicating whether we need to include DuckDBDataProtocol to
+   * support registering local GeoParquet files.
+   */
+  isDuckDBDataProtocolRequired: boolean;
 }
 
 /**

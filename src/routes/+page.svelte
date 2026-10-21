@@ -21,7 +21,7 @@
   import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
   import { onFeatureLeave } from '$lib/interaction/events';
   import { chat } from '$lib/state/chat.svelte';
-  import { db, initDB } from '$lib/state/db.svelte';
+  import { db } from '$lib/state/db.svelte';
   import { error } from '$lib/state/error.svelte';
   import { initHistory } from '$lib/state/history.svelte';
   import { layerId } from '$lib/state/layerId.svelte';
@@ -29,6 +29,7 @@
   import { user } from '$lib/state/user.svelte';
   import { initialIR, ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
+  import { initDB } from '$lib/utils/db';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
@@ -52,6 +53,7 @@
             )
           };
         }
+        case 'geoparquet':
         case 'vector': {
           if (features.length > 0) {
             return {
@@ -158,14 +160,14 @@
     });
 
     // Add an idle listener that will update features in the DataTable when a
-    // vector layer is active. GeoJSON layers already have their data available
-    // in memory, so we can populate the DataTable directly.
+    // vector or GeoParquet layer is active. GeoJSON layers already have their
+    // data available in memory, so we can populate the DataTable directly.
     map.on('idle', (e) => {
       const currentLayer = layerId.value
         ? $ir.layers[layerId.value]
         : undefined;
 
-      if (currentLayer?.source.type === 'vector') {
+      if (currentLayer && currentLayer.source.type !== 'geojson') {
         features = e.target.queryRenderedFeatures({
           layers: [currentLayer.id]
         });
@@ -183,9 +185,13 @@
       toggleEditorVisibility
     );
 
-    initDB().then(({ db: ddb, worker, conn }) => {
-      db.value = { db: ddb, worker, conn };
-    });
+    initDB()
+      .then(({ db: ddb, worker, conn }) => {
+        db.value = { db: ddb, worker, conn };
+      })
+      .catch((err) => {
+        console.error(err);
+      });
 
     return () => {
       // Remove the map.

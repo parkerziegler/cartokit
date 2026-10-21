@@ -10,7 +10,7 @@
   import { chat, MODELS } from '$lib/state/chat.svelte';
   import { ir } from '$lib/stores/ir';
   import type { LLM, LLMRequest, LLMRequestState } from '$lib/types/llm';
-  import { selectAttributes } from '$lib/utils/attributes';
+  import { catalog } from '$lib/state/catalog.svelte';
 
   interface Props {
     ref?: HTMLDivElement;
@@ -39,7 +39,7 @@
         displayName,
         type,
         layout,
-        attributes: selectAttributes(source),
+        attributes: Object.keys(catalog.value[id].attributes),
         sourceLayerIds:
           source.type === 'vector'
             ? source.vectorLayers.map(({ id }) => id)

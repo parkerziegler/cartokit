@@ -18,7 +18,7 @@
     const { zipProject } = await import('$lib/utils/files/zip');
 
     downloadBlob(
-      zipProject($ir, $program, PROJECT_NAME),
+      await zipProject($ir, $program, PROJECT_NAME),
       `${PROJECT_NAME}.zip`
     );
   }
