@@ -7,6 +7,7 @@ import typescript from 'prettier/plugins/typescript';
 
 import { analyzeIR } from '$lib/codegen/analysis';
 import { codegenCSS } from '$lib/codegen/codegen-css';
+import { codegenDB } from '$lib/codegen/codegen-db';
 import { codegenHTML } from '$lib/codegen/codegen-html';
 import { codegenImports } from '$lib/codegen/codegen-imports';
 import { codegenPackageJson } from '$lib/codegen/codegen-package-json';
@@ -76,7 +77,7 @@ export async function codegen(
   const css = codegenCSS(ir);
   const packageJson = codegenPackageJson(analysis);
 
-  const files = [
+  const files: CartokitCodegenFile[] = [
     {
       text: index,
       language: analysis.language,
@@ -86,6 +87,14 @@ export async function codegen(
     { text: css, language: 'css' as const, path: 'src/style.css' },
     { text: packageJson, language: 'json' as const, path: 'package.json' }
   ];
+
+  if (analysis.isDuckDBRequired) {
+    files.splice(1, 0, {
+      text: codegenDB(analysis.language),
+      language: analysis.language,
+      path: `src/db.${analysis.language === 'typescript' ? 'ts' : 'js'}`
+    });
+  }
 
   if (analysis.language === 'typescript') {
     files.push({

@@ -10,6 +10,7 @@
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
+  import { isGeoParquet } from '$lib/utils/db';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -69,7 +70,9 @@
             }
           }
         : {
-            type: 'geojson' as const,
+            type: isGeoParquet(endpoint)
+              ? ('geoparquet' as const)
+              : ('geojson' as const),
             displayName,
             location: {
               type: 'api' as const,

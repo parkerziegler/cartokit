@@ -32,5 +32,5 @@
         : 0}
     />
   </svg>
-  <span>{formatFeatureCount(layer.source)}</span>
+  <span>{formatFeatureCount(layer.id)}</span>
 </div>

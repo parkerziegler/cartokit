@@ -32,7 +32,7 @@
     bind:this={fileInput}
     bind:files
     class="sr-only"
-    accept=".geojson,.json"
+    accept=".geojson,.json,.parquet,.geoparquet"
   />
   <span
     class={['file-prompt', { 'file-prompt--uploaded': file?.name }]}

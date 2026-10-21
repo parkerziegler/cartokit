@@ -8,6 +8,7 @@
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
+  import { isGeoParquet } from '$lib/utils/db';
   import { GALLERY_ITEMS } from '$lib/utils/gallery';
 
   const closeModal = getContext<() => void>('close-modal');
@@ -42,7 +43,9 @@
           }
         }
       : {
-          type: 'geojson' as const,
+          type: isGeoParquet(url)
+            ? ('geoparquet' as const)
+            : ('geojson' as const),
           displayName,
           location: {
             type: 'api' as const,

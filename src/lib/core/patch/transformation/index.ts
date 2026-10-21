@@ -3,7 +3,8 @@ import * as Comlink from 'comlink';
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { catalog } from '$lib/state/catalog.svelte';
-import type { CartoKitGeoJSONSource, CartoKitLayer, Catalog } from '$lib/types';
+import type { CartoKitGeoJSONSource, CartoKitLayer } from '$lib/types';
+import { buildCatalog } from '$lib/utils/catalog';
 import {
   upsertGeometricTransformation,
   upsertUserTransformation
@@ -48,20 +49,9 @@ async function replayTransformationsWithCatalogUpdates(
 
   source.transformations = transformations;
 
-  // Rebuild the catalog for the layer in a worker thread.
-  const catalogWorker = new Worker(
-    new URL('$lib/utils/catalog/worker.ts', import.meta.url),
-    { type: 'module' }
-  );
-
-  try {
-    const buildCatalog =
-      Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
-    const catalogPatch = await buildCatalog(layer);
-    catalog.value = { ...catalog.value, ...catalogPatch };
-  } finally {
-    catalogWorker.terminate();
-  }
+  // Rebuild the catalog for the layer.
+  const catalogPatch = await buildCatalog(layer.id, source);
+  catalog.value = { ...catalog.value, ...catalogPatch };
 }
 
 /**
@@ -83,9 +73,11 @@ export async function patchTransformationDiffs(
     case 'add-transformation': {
       const layer = ir.layers[diff.layerId];
 
-      // Transformations can only be applied to in-memory data; vector sources
-      // are always pre-computed and cannot be modified on-the-fly.
-      if (layer.source.type === 'vector') {
+      // Transformations can only be applied to in-memory GeoJSON data currently.
+      if (
+        layer.source.type === 'vector' ||
+        layer.source.type === 'geoparquet'
+      ) {
         break;
       }
 

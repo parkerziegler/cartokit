@@ -115,7 +115,7 @@ export async function patchFillDiffs(
         // Apply the patch.
         layer.style.fill.attribute = diff.payload.attribute;
         layer.style.fill.scale.categories = findAttributeCategories(
-          layer.source,
+          layer.id,
           diff.payload.attribute
         );
       }
@@ -430,7 +430,7 @@ export async function patchFillDiffs(
       // Apply the patch.
       switch (diff.payload.visualizationType) {
         case 'Categorical': {
-          const attribute = selectCategoricalAttribute(layer.source);
+          const attribute = selectCategoricalAttribute(layer.id);
 
           layer.style.fill = {
             type: diff.payload.visualizationType,
@@ -441,7 +441,7 @@ export async function patchFillDiffs(
                 id: DEFAULT_CATEGORICAL_SCHEME,
                 direction: 'Forward'
               },
-              categories: findAttributeCategories(layer.source, attribute)
+              categories: findAttributeCategories(layer.id, attribute)
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
@@ -449,7 +449,7 @@ export async function patchFillDiffs(
           break;
         }
         case 'Quantitative': {
-          const attribute = selectQuantitativeAttribute(layer.source);
+          const attribute = selectQuantitativeAttribute(layer.id);
 
           layer.style.fill = {
             type: diff.payload.visualizationType,

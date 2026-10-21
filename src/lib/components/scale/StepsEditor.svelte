@@ -4,9 +4,9 @@
   import { catalog } from '$lib/state/catalog.svelte';
   import type {
     ContinuousColorScale,
-    NumericCatalogEntry,
     QuantitativeColorScale
   } from '$lib/types';
+  import type { NumericAttributeEntry } from '$lib/types/catalog';
   import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
@@ -17,7 +17,7 @@
 
   let { layerId, attribute, scale }: Props = $props();
   let { min, max } = $derived(
-    catalog.value[layerId][attribute] as NumericCatalogEntry
+    catalog.value[layerId].attributes[attribute] as NumericAttributeEntry
   );
   let colors = $derived(
     materializeColorScheme(scale.scheme.id, scale.scheme.direction, scale.steps)
