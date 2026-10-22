@@ -63,19 +63,6 @@ LOAD httpfs;`);
 }
 
 /**
- * Determine whether a data source is a GeoParquet file, based on the
- * extension of its URL or file name.
- *
- * @param source The URL or file name of the data source.
- * @returns Whether the source is a GeoParquet file.
- */
-export function isGeoParquet(source: string): boolean {
-  const path = source.split(/[?#]/)[0].toLowerCase();
-
-  return /\.(geo)?parquet$/.test(path);
-}
-
-/**
  * Generate a SQL CREATE TABLE statement for a given layerId and data source.
  *
  * @param layerId The layerId to use as the table name.
@@ -83,7 +70,7 @@ export function isGeoParquet(source: string): boolean {
  * @returns A SQL CREATE TABLE statement.
  */
 export function generateCreateTableStatement(layerId: string, source: string) {
-  const reader = isGeoParquet(source) ? `read_parquet` : `ST_Read`;
+  const reader = /\.(geo)?parquet$/.test(source) ? `read_parquet` : `ST_Read`;
 
   return `CREATE TABLE ${layerId} AS SELECT * FROM ${reader}('${source}');`;
 }

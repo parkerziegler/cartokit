@@ -622,7 +622,7 @@ export interface GalleryItem {
   url: string;
   src: SvelteHTMLElements['enhanced:img']['src'];
   type: CartoKitLayer['type'];
-  format: 'GeoJSON' | 'PMTiles';
+  format: CartoKitSource['type'];
 }
 
 /**
