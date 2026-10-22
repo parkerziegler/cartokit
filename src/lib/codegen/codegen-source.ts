@@ -19,6 +19,8 @@ export function codegenSource(
   layer: CartoKitLayer,
   analysis: CartoKitBackendAnalysis
 ): string {
+  const dataIdent = camelCase(layer.displayName);
+
   switch (layer.source.type) {
     case 'geojson': {
       const transformations = layer.source.transformations;
@@ -26,7 +28,6 @@ export function codegenSource(
         layer.source.location.type === 'api'
           ? layer.source.location.url
           : undefined;
-      const dataIdent = camelCase(layer.displayName);
       const fetchData = url
         ? `const ${dataIdent} = await fetchGeoJSON(${JSON.stringify(url)});\n`
         : '';
@@ -85,20 +86,21 @@ export function codegenSource(
       // over HTTP.
       const url =
         layer.source.location.type === 'api'
-          ? JSON.stringify(layer.source.location.url)
+          ? layer.source.location.url
           : layer.source.location.file.name;
-      const dataIdent = camelCase(layer.displayName);
 
-      // Query the file directly rather than creating a table, using the
-      // columns and geometry column cataloged when the layer was added.
+      // Query the file directly rather than creating a table, using the columns
+      // and geometry column cataloged when the layer was added. Replace `, \,
+      // and $ characters with their escaped equivalents to ensure these
+      // characters do not interfere with the template literal below.
       const selectList = generateSelectList(
         entry.columns,
         entry.geometryColumn
-      ).replace(/[`\\]|\$\{/g, (match) => `\\${match}`);
+      ).replace(/[`\\$]/g, '\\$&');
 
+      // If loading a local GeoParquet file from public/data, add a call to
+      // register it.
       let register = '';
-
-      // If loading a GeoParquet file from public/data, add a call to reigster it.
       if (layer.source.location.type === 'file') {
         register = `await db.registerFileURL("${url}", "/data/${url}", DuckDBDataProtocol.HTTP, false);`;
       }
@@ -107,8 +109,8 @@ export function codegenSource(
           \`SELECT ${selectList} FROM read_parquet('${url}');\`
         );
 
-        map.addSource('${layer.id}', {
-          type: 'geojson',
+        map.addSource("${layer.id}", {
+          type: "geojson",
           data: toFeatureCollection(${dataIdent})
         });
       `;
@@ -116,13 +118,15 @@ export function codegenSource(
       return [register, addSource].filter(Boolean).join('\n');
     }
     case 'vector': {
-      const protocolPrefix =
-        analysis.library === 'maplibre' ? 'pmtiles://' : '';
+      const url =
+        analysis.library === 'maplibre'
+          ? `pmtiles://${layer.source.location.url}`
+          : layer.source.location.url;
 
       return `
-        map.addSource('${layer.id}', {
-          type: 'vector',
-          url: ${JSON.stringify(protocolPrefix + layer.source.location.url)}
+        map.addSource("${layer.id}", {
+          type: "vector",
+          url: ${JSON.stringify(url)}
         });
     `;
     }
