@@ -21,8 +21,6 @@
   async function onSourceLayerChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    if (source.type !== 'pmtiles') return;
-
     const diff: CartoKitDiff = {
       type: 'source-layer',
       layerId,
