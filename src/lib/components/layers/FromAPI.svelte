@@ -10,7 +10,7 @@
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
-  import { isGeoParquet } from '$lib/utils/db';
+  import { extname } from '$lib/utils/file';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -59,26 +59,35 @@
 
     try {
       const layerId = uniqueId(`${snakeCase(displayName)}__`);
+      const ext = extname(endpoint);
+      let type: 'geojson' | 'geoparquet' | 'pmtiles';
 
-      const payload = endpoint.endsWith('.pmtiles')
-        ? {
-            type: 'pmtiles' as const,
-            displayName,
-            location: {
-              type: 'api' as const,
-              url: endpoint
-            }
-          }
-        : {
-            type: isGeoParquet(endpoint)
-              ? ('geoparquet' as const)
-              : ('geojson' as const),
-            displayName,
-            location: {
-              type: 'api' as const,
-              url: endpoint
-            }
-          };
+      switch (ext) {
+        case '.geojson':
+        case '.json':
+          type = 'geojson';
+          break;
+        case '.geoparquet':
+        case '.parquet':
+          type = 'geoparquet';
+          break;
+        case '.pmtiles':
+          type = 'pmtiles';
+          break;
+        default:
+          throw new Error(
+            "Invalid file extension, expected one of: 'geojson', 'geoparquet', 'pmtiles'"
+          );
+      }
+
+      const payload = {
+        type,
+        displayName,
+        location: {
+          type: 'api' as const,
+          url: endpoint
+        }
+      };
 
       await applyDiff({
         type: 'add-layer',
