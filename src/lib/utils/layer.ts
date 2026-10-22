@@ -76,7 +76,7 @@ export const GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   ['GeometryCollection', []]
 ]);
 
-export const VECTOR_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
+export const PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   VectorGeometry,
   LayerType[]
 >([

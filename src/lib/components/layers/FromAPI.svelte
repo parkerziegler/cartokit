@@ -62,7 +62,7 @@
 
       const payload = endpoint.endsWith('.pmtiles')
         ? {
-            type: 'vector' as const,
+            type: 'pmtiles' as const,
             displayName,
             location: {
               type: 'api' as const,

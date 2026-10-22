@@ -75,7 +75,7 @@ export async function patchTransformationDiffs(
 
       // Transformations can only be applied to in-memory GeoJSON data currently.
       if (
-        layer.source.type === 'vector' ||
+        layer.source.type === 'pmtiles' ||
         layer.source.type === 'geoparquet'
       ) {
         break;

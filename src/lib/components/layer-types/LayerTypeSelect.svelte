@@ -4,13 +4,11 @@
   import { catalog } from '$lib/state/catalog.svelte';
   import { error } from '$lib/state/error.svelte';
   import type { CartoKitLayer, LayerType } from '$lib/types';
-  import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
   import {
     GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES,
     GEOPARQUET_GEOMETRY_TYPES_TO_LAYER_TYPES,
-    VECTOR_GEOMETRY_TYPES_TO_LAYER_TYPES
+    PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES
   } from '$lib/utils/layer';
-  import { selectTileStats } from '$lib/utils/pmtiles';
 
   interface Props {
     layer: CartoKitLayer;
@@ -26,25 +24,17 @@
   );
 
   function getLayerTypes(layer: CartoKitLayer) {
-    switch (layer.source.type) {
-      case 'geojson': {
-        const geometryType = getFeatureCollectionGeometryType(
-          layer.source.sourceData
-        );
+    const entry = catalog.value[layer.id];
 
-        return GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES.get(geometryType);
+    switch (entry.type) {
+      case 'geojson': {
+        return GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES.get(entry.geometryType);
       }
       case 'geoparquet': {
-        const entry = catalog.value[layer.id];
-
-        return entry.type === 'geoparquet'
-          ? GEOPARQUET_GEOMETRY_TYPES_TO_LAYER_TYPES.get(entry.geometryType)
-          : undefined;
+        return GEOPARQUET_GEOMETRY_TYPES_TO_LAYER_TYPES.get(entry.geometryType);
       }
-      case 'vector': {
-        const { geometry } = selectTileStats(layer.source);
-
-        return VECTOR_GEOMETRY_TYPES_TO_LAYER_TYPES.get(geometry);
+      case 'pmtiles': {
+        return PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES.get(entry.geometryType);
       }
     }
   }

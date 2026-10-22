@@ -11,7 +11,7 @@ import type { CartoKitLayer } from '$lib/types';
  */
 export function codegenLayer(layer: CartoKitLayer, beforeId?: string): string {
   const sourceLayer =
-    layer.source.type === 'vector'
+    layer.source.type === 'pmtiles'
       ? `'source-layer': '${layer.source.sourceLayerId}',\n`
       : '';
   const beforeLayer = beforeId ? `, '${beforeId}'` : '';

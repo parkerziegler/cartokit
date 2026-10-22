@@ -11,7 +11,7 @@
   let { layer }: Props = $props();
 
   const options = $derived(
-    layer.source.type === 'vector'
+    layer.source.type === 'pmtiles'
       ? layer.source.vectorLayers.map(({ id }) => ({
           value: id,
           label: id
@@ -19,13 +19,13 @@
       : []
   );
   const selected = $derived(
-    layer.source.type === 'vector' ? layer.source.sourceLayerId : ''
+    layer.source.type === 'pmtiles' ? layer.source.sourceLayerId : ''
   );
 
   async function onSourceLayerChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    if (layer.source.type !== 'vector') return;
+    if (layer.source.type !== 'pmtiles') return;
 
     const diff: CartoKitDiff = {
       type: 'source-layer',

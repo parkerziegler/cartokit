@@ -41,7 +41,7 @@
         layout,
         attributes: Object.keys(catalog.value[id].attributes),
         sourceLayerIds:
-          source.type === 'vector'
+          source.type === 'pmtiles'
             ? source.vectorLayers.map(({ id }) => id)
             : []
       }))

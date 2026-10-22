@@ -142,7 +142,7 @@ export function generateCartoKitLayer(
  */
 export function addLayer(map: Map, layer: CartoKitLayer): void {
   const sourceLayer =
-    layer.source.type === 'vector' ? layer.source.sourceLayerId : undefined;
+    layer.source.type === 'pmtiles' ? layer.source.sourceLayerId : undefined;
   const beforeId = get(ir).basemap.beforeId;
 
   switch (layer.type) {

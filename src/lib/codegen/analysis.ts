@@ -74,7 +74,7 @@ export function isPMTilesRequired(
 ): boolean {
   return (
     backend.library === 'maplibre' &&
-    Object.values(ir.layers).some((layer) => layer.source.type === 'vector')
+    Object.values(ir.layers).some((layer) => layer.source.type === 'pmtiles')
   );
 }
 

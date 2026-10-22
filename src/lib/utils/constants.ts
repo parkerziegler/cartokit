@@ -13,7 +13,7 @@ export const DEFAULT_METHOD = (sourceType: CartoKitSource['type']) => {
     case 'geojson':
     case 'geoparquet':
       return 'Quantile';
-    case 'vector':
+    case 'pmtiles':
       return 'Equal Interval';
   }
 };

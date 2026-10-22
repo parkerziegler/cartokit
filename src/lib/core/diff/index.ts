@@ -306,7 +306,7 @@ interface AddLayerDiff extends LayerDiff {
         displayName: string;
       })
     | {
-        type: 'vector';
+        type: 'pmtiles';
         displayName: string;
         location: { type: 'api'; url: string };
       };

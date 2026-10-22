@@ -275,14 +275,14 @@ export interface VectorLayer {
 /**
  * Represents the underlying data and metadata of a vector tile layer.
  *
- * @property type The type of the source, 'vector'.
+ * @property type The type of the source, 'pmtiles'.
  * @property location The location of the source, a remote API endpoint.
  * @property sourceLayerId The id of the source layer in the vector tile archive.
  * @property tilestats The {@link TileStats} metadata of the vector tile source.
  * @property vectorLayers The {@link VectorLayer} metadata of the vector tile source.
  */
-interface CartoKitVectorSource {
-  type: 'vector';
+interface CartoKitPMTilesSource {
+  type: 'pmtiles';
   location: {
     type: 'api';
     url: string;
@@ -296,7 +296,7 @@ interface CartoKitVectorSource {
  * Represents the possible data sources for a layer.
  */
 export type CartoKitSource =
-  CartoKitGeoJSONSource | CartoKitGeoParquetSource | CartoKitVectorSource;
+  CartoKitGeoJSONSource | CartoKitGeoParquetSource | CartoKitPMTilesSource;
 
 /**
  * Represents the layout of a layer.
