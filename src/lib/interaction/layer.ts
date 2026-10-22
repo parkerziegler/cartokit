@@ -23,8 +23,7 @@ import {
 } from '$lib/utils/constants';
 
 /**
- * Generate a {@link CartoKitLayer} for a given {@link CartoKitSource}. The
- * layer's catalog entry must already be built.
+ * Generate a {@link CartoKitLayer} for a given {@link CartoKitSource}.
  *
  * @param source The {@link CartoKitSource} associated with the layer.
  * @param layerId The fresh ID of the {@link CartoKitLayer}.
@@ -37,7 +36,6 @@ export function generateCartoKitLayer(
   displayName: string
 ): CartoKitLayer {
   const { geometryType } = catalog.value[layerId];
-
   const color = randomColor();
   const z = Object.values(get(ir).layers).length;
 

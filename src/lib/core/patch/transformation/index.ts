@@ -73,11 +73,8 @@ export async function patchTransformationDiffs(
     case 'add-transformation': {
       const layer = ir.layers[diff.layerId];
 
-      // Transformations can only be applied to in-memory GeoJSON data currently.
-      if (
-        layer.source.type === 'pmtiles' ||
-        layer.source.type === 'geoparquet'
-      ) {
+      // Transformations can only be applied to in-memory GeoJSON data.
+      if (layer.source.type !== 'geojson') {
         break;
       }
 
