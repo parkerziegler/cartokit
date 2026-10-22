@@ -1,4 +1,3 @@
-import type { SvelteHTMLElements } from 'svelte/elements';
 import type { FeatureCollection } from 'geojson';
 
 import type { BasemapProvider } from '$lib/types/basemap';
@@ -610,19 +609,6 @@ export interface HeatmapStyle {
   radius: number;
   intensity: number;
   opacity: number;
-}
-
-/**
- * Represents a dataset gallery item in cartokit.
- */
-export interface GalleryItem {
-  id: string;
-  name: string;
-  attribution: string;
-  url: string;
-  src: SvelteHTMLElements['enhanced:img']['src'];
-  type: CartoKitLayer['type'];
-  format: CartoKitSource['type'];
 }
 
 /**
