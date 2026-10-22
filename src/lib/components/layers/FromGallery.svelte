@@ -8,7 +8,8 @@
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
-  import type { CartoKitSource, GalleryItem } from '$lib/types';
+  import type { CartoKitSource } from '$lib/types';
+  import type { GalleryItem } from '$lib/types/gallery';
   import { GALLERY_ITEMS } from '$lib/utils/gallery';
 
   const closeModal = getContext<() => void>('close-modal');

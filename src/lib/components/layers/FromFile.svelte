@@ -1,14 +1,15 @@
 <script lang="ts">
+  import { snakeCase, uniqueId } from 'lodash-es';
   import { getContext } from 'svelte';
-  import { uniqueId, snakeCase } from 'lodash-es';
 
-  import Alert from '$lib/components/shared/Alert.svelte';
   import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
+  import Alert from '$lib/components/shared/Alert.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
+  import type { CartoKitSource } from '$lib/types';
   import { extname } from '$lib/utils/file';
 
   const closeModal = getContext<() => void>('close-modal');
@@ -43,7 +44,7 @@
     try {
       const layerId = uniqueId(`${snakeCase(displayName)}__`);
       const ext = extname(file.name);
-      let type: 'geojson' | 'geoparquet';
+      let type: CartoKitSource['type'];
 
       switch (ext) {
         case '.geojson':
