@@ -2,12 +2,9 @@ import { strToU8, zipSync, type Zippable } from 'fflate';
 
 import favicon from '$lib/utils/files/favicon.svg?raw';
 
-import {
-  codegenDataFiles,
-  codegenGeoParquetDataFiles
-} from '$lib/codegen/codegen-data';
+import { codegenDataFiles } from '$lib/codegen/codegen-data';
 import type { CartoKitIR } from '$lib/types';
-import type { CartokitCodegenFile } from '$lib/types/codegen';
+import type { CartokitCodegenProgramFile } from '$lib/types/codegen';
 
 /**
  * Bundle a cartokit-generated Vite project into a .zip archive.
@@ -19,7 +16,7 @@ import type { CartokitCodegenFile } from '$lib/types/codegen';
  */
 export async function zipProject(
   ir: CartoKitIR,
-  files: CartokitCodegenFile[],
+  files: CartokitCodegenProgramFile[],
   rootDir: string
 ): Promise<Blob> {
   // Vite serves public/ at the root, matching the /favicon.svg link in the
@@ -28,11 +25,11 @@ export async function zipProject(
     [`${rootDir}/public/favicon.svg`]: strToU8(favicon)
   };
 
-  for (const file of [...files, ...codegenDataFiles(ir)]) {
+  for (const file of files) {
     entries[`${rootDir}/${file.path}`] = strToU8(file.text);
   }
 
-  for (const file of await codegenGeoParquetDataFiles(ir)) {
+  for (const file of await codegenDataFiles(ir)) {
     entries[`${rootDir}/${file.path}`] = file.bytes;
   }
 

@@ -1,6 +1,5 @@
 import { camelCase } from 'lodash-es';
 
-import { codegenDataFileName } from '$lib/codegen/codegen-data';
 import { codegenFns } from '$lib/codegen/codegen-fns';
 import { codegenMap } from '$lib/codegen/codegen-map';
 import type { CartoKitIR } from '$lib/types';
@@ -80,7 +79,7 @@ export function codegenImports(
       const dataIdent = camelCase(layer.displayName);
       uploadTable.set(layer.id, dataIdent);
 
-      return `import ${dataIdent} from './data/${codegenDataFileName(layer.source.location.file.name)}';`;
+      return `import ${dataIdent} from './data/${layer.source.location.file.name.replace(/\.geojson$/i, '.json')}';`;
     })
     .join('\n');
 
