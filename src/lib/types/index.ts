@@ -280,7 +280,7 @@ export interface VectorLayer {
  * @property tilestats The {@link TileStats} metadata of the vector tile source.
  * @property vectorLayers The {@link VectorLayer} metadata of the vector tile source.
  */
-interface CartoKitPMTilesSource {
+export interface CartoKitPMTilesSource {
   type: 'pmtiles';
   location: {
     type: 'api';

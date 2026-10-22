@@ -98,7 +98,7 @@
   {:else}
     {#if layer.source.type === 'pmtiles'}
       <MenuItem title="Source Layer">
-        <SourceLayerSelect {layer} />
+        <SourceLayerSelect layerId={layer.id} source={layer.source} />
       </MenuItem>
     {/if}
     <MenuItem title="Layer Type">
