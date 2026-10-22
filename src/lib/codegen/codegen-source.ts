@@ -10,7 +10,6 @@ import { generateSelectList } from '$lib/utils/db';
  * Generate a program fragment for a {@link CartoKitSource}.
  *
  * @param layer A {@link CartoKitLayer}.
- * @param uploadTable The symbol table tracking file uploads.
  * @param analysis The {@link CartoKitBackendAnalysis} for the current
  * {@link CartoKitIR}.
  * @returns A program fragment containing the definition of the data source
@@ -18,7 +17,6 @@ import { generateSelectList } from '$lib/utils/db';
  */
 export function codegenSource(
   layer: CartoKitLayer,
-  uploadTable: Map<string, string>,
   analysis: CartoKitBackendAnalysis
 ): string {
   switch (layer.source.type) {
@@ -28,12 +26,10 @@ export function codegenSource(
         layer.source.location.type === 'api'
           ? layer.source.location.url
           : undefined;
-      const dataIdent =
-        uploadTable.get(layer.id) ?? camelCase(layer.displayName);
-      const fetchData =
-        url && !uploadTable.has(layer.id)
-          ? `const ${dataIdent} = await fetchGeoJSON(${JSON.stringify(url)});\n`
-          : '';
+      const dataIdent = camelCase(layer.displayName);
+      const fetchData = url
+        ? `const ${dataIdent} = await fetchGeoJSON(${JSON.stringify(url)});\n`
+        : '';
 
       switch (transformations.length) {
         case 0:

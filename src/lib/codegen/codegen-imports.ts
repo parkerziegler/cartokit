@@ -39,10 +39,6 @@ export function codegenImports(
   ir: CartoKitIR,
   analysis: CartoKitBackendAnalysis
 ): string {
-  // Create a symbol table mapping layer ids to identifiers referencing imported
-  // source data.
-  const uploadTable = new Map<string, string>();
-
   const libraryImports = [
     analysis.isDuckDBDataProtocolRequired
       ? "import { DuckDBDataProtocol } from '@duckdb/duckdb-wasm';"
@@ -76,10 +72,7 @@ export function codegenImports(
         return [];
       }
 
-      const dataIdent = camelCase(layer.displayName);
-      uploadTable.set(layer.id, dataIdent);
-
-      return `import ${dataIdent} from './data/${layer.source.location.file.name.replace(/\.geojson$/i, '.json')}';`;
+      return `import ${camelCase(layer.displayName)} from './data/${layer.source.location.file.name.replace(/\.geojson$/i, '.json')}';`;
     })
     .join('\n');
 
@@ -92,7 +85,7 @@ import './style.css'`;
     fileImports,
     analysis.library === 'maplibre' ? `setWorkerUrl(workerUrl)` : '',
     codegenFns(ir, analysis),
-    codegenMap(ir, uploadTable, analysis)
+    codegenMap(ir, analysis)
   ]
     .filter(Boolean)
     .join('\n\n');

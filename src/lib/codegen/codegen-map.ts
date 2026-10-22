@@ -13,7 +13,6 @@ import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
  * top-level map instance.
  *
  * @param ir The {@link CartoKitIR}.
- * @param uploadTable The symbol table tracking file uploads.
  * @param analysis The {@link CartoKitBackendAnalysis} for the current
  * {@link CartoKitIR}.
  * @returns A program fragment containing the definition of the map instance,
@@ -21,7 +20,6 @@ import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
  */
 export function codegenMap(
   ir: CartoKitIR,
-  uploadTable: Map<string, string>,
   analysis: CartoKitBackendAnalysis
 ): string {
   const projection = codegenProjection(ir, analysis.library);
@@ -30,7 +28,7 @@ export function codegenMap(
     'layout.z',
     'asc'
   ).reduce((p, layer) => {
-    return p.concat('\n\n' + codegenSource(layer, uploadTable, analysis));
+    return p.concat('\n\n' + codegenSource(layer, analysis));
   }, '');
   const layerRenders = orderBy(
     Object.values(ir.layers),
