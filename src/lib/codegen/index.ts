@@ -15,7 +15,7 @@ import { codegenTsconfigJson } from '$lib/codegen/codegen-tsconfig-json';
 import type { CartoKitIR } from '$lib/types';
 import type {
   CartoKitBackend,
-  CartokitCodegenFile,
+  CartokitCodegenProgramFile,
   CartokitCodegenLanguage
 } from '$lib/types/codegen';
 
@@ -64,12 +64,12 @@ async function format(text: string, language: CartokitCodegenLanguage) {
  *
  * @param ir The {@link CartoKitIR}.
  * @param backend The {@link CartoKitBackend} to use for code generation.
- * @returns A Promise resolving to an Array of {@link CartokitCodegenFile}.
+ * @returns A Promise resolving to an Array of {@link CartokitCodegenProgramFile}.
  */
 export async function codegen(
   ir: CartoKitIR,
   backend: CartoKitBackend
-): Promise<CartokitCodegenFile[]> {
+): Promise<CartokitCodegenProgramFile[]> {
   const analysis = analyzeIR(ir, backend);
 
   const index = codegenImports(ir, analysis);
@@ -77,7 +77,7 @@ export async function codegen(
   const css = codegenCSS(ir);
   const packageJson = codegenPackageJson(analysis);
 
-  const files: CartokitCodegenFile[] = [
+  const files: CartokitCodegenProgramFile[] = [
     {
       text: index,
       language: analysis.language,
