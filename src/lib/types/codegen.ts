@@ -49,16 +49,37 @@ export interface CartoKitBackendAnalysis extends CartoKitBackend {
    * library.
    */
   isPMTilesRequired: boolean;
+  /**
+   * A Boolean value indicating whether we need to include DuckDB to load
+   * GeoParquet sources.
+   */
+  isDuckDBRequired: boolean;
+  /**
+   * A Boolean value indicating whether we need to include DuckDBDataProtocol to
+   * support registering local GeoParquet files.
+   */
+  isDuckDBDataProtocolRequired: boolean;
 }
 
 /**
- * Represents a file produced by cartokit's code generation.
+ * Represents a file containing program text produced by cartokit's code
+ * generation.
  */
-export interface CartokitCodegenFile {
-  /** The name of the file. */
+export interface CartokitCodegenProgramFile {
+  /** The relative path of the file on disk. */
   path: string;
   /** The program text. */
   text: string;
   /** The language of the generated code. */
   language: CartokitCodegenLanguage;
+}
+
+/**
+ * Represents a file containing data produced by cartokit's code generation.
+ */
+export interface CartokitCodegenDataFile {
+  /** The relative path of the file on disk. */
+  path: string;
+  /** The file contents. */
+  bytes: Uint8Array;
 }

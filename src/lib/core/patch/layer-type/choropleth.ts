@@ -83,7 +83,7 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
       const attribute =
         layer.type === 'Proportional Symbol'
           ? layer.style.size.attribute
-          : selectQuantitativeAttribute(layer.source);
+          : selectQuantitativeAttribute(layer.id);
 
       const targetLayer: CartoKitChoroplethLayer = {
         ...layer,
@@ -119,7 +119,7 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
       return targetLayer;
     }
     case 'Polygon': {
-      const attribute = selectQuantitativeAttribute(layer.source);
+      const attribute = selectQuantitativeAttribute(layer.id);
 
       const targetLayer: CartoKitChoroplethLayer = {
         ...layer,

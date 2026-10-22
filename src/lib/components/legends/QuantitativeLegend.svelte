@@ -1,12 +1,8 @@
 <script lang="ts">
   import ColorRamp from '$lib/components/channel/shared/ColorRamp.svelte';
   import { catalog } from '$lib/state/catalog.svelte';
-  import type {
-    ConstantStroke,
-    LayerType,
-    NumericCatalogEntry,
-    QuantitativeFill
-  } from '$lib/types';
+  import type { ConstantStroke, LayerType, QuantitativeFill } from '$lib/types';
+  import type { NumericAttributeEntry } from '$lib/types/catalog';
   import { materializeColorScheme } from '$lib/utils/color/scheme';
 
   interface Props {
@@ -19,7 +15,7 @@
 
   let { fill, stroke, layerId, layerType, visible }: Props = $props();
   let { min, max } = $derived(
-    catalog.value[layerId][fill.attribute] as NumericCatalogEntry
+    catalog.value[layerId].attributes[fill.attribute] as NumericAttributeEntry
   );
 
   let colors = $derived(

@@ -6,12 +6,12 @@ import { ir } from '$lib/stores/ir';
 import { type CartoKitIR } from '$lib/types';
 import {
   type CartoKitBackend,
-  type CartokitCodegenFile
+  type CartokitCodegenProgramFile
 } from '$lib/types/codegen';
 
 export const program = derived<
   [Writable<CartoKitIR>, Writable<CartoKitBackend>],
-  CartokitCodegenFile[]
+  CartokitCodegenProgramFile[]
 >([ir, backend], ([$ir, $backend], set) => {
   codegen($ir, $backend).then(set);
 });

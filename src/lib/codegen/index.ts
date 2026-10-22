@@ -7,6 +7,7 @@ import typescript from 'prettier/plugins/typescript';
 
 import { analyzeIR } from '$lib/codegen/analysis';
 import { codegenCSS } from '$lib/codegen/codegen-css';
+import { codegenDB } from '$lib/codegen/codegen-db';
 import { codegenHTML } from '$lib/codegen/codegen-html';
 import { codegenImports } from '$lib/codegen/codegen-imports';
 import { codegenPackageJson } from '$lib/codegen/codegen-package-json';
@@ -14,7 +15,7 @@ import { codegenTsconfigJson } from '$lib/codegen/codegen-tsconfig-json';
 import type { CartoKitIR } from '$lib/types';
 import type {
   CartoKitBackend,
-  CartokitCodegenFile,
+  CartokitCodegenProgramFile,
   CartokitCodegenLanguage
 } from '$lib/types/codegen';
 
@@ -63,12 +64,12 @@ async function format(text: string, language: CartokitCodegenLanguage) {
  *
  * @param ir The {@link CartoKitIR}.
  * @param backend The {@link CartoKitBackend} to use for code generation.
- * @returns A Promise resolving to an Array of {@link CartokitCodegenFile}.
+ * @returns A Promise resolving to an Array of {@link CartokitCodegenProgramFile}.
  */
 export async function codegen(
   ir: CartoKitIR,
   backend: CartoKitBackend
-): Promise<CartokitCodegenFile[]> {
+): Promise<CartokitCodegenProgramFile[]> {
   const analysis = analyzeIR(ir, backend);
 
   const index = codegenImports(ir, analysis);
@@ -76,7 +77,7 @@ export async function codegen(
   const css = codegenCSS(ir);
   const packageJson = codegenPackageJson(analysis);
 
-  const files = [
+  const files: CartokitCodegenProgramFile[] = [
     {
       text: index,
       language: analysis.language,
@@ -86,6 +87,14 @@ export async function codegen(
     { text: css, language: 'css' as const, path: 'src/style.css' },
     { text: packageJson, language: 'json' as const, path: 'package.json' }
   ];
+
+  if (analysis.isDuckDBRequired) {
+    files.splice(1, 0, {
+      text: codegenDB(analysis.language),
+      language: analysis.language,
+      path: `src/db.${analysis.language === 'typescript' ? 'ts' : 'js'}`
+    });
+  }
 
   if (analysis.language === 'typescript') {
     files.push({

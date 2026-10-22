@@ -2,6 +2,9 @@ import { camelCase } from 'lodash-es';
 
 import type { CartoKitLayer } from '$lib/types';
 import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
+import { catalog } from '$lib/state/catalog.svelte';
+import type { GeoParquetCatalogEntry } from '$lib/types/catalog';
+import { generateSelectList } from '$lib/utils/db';
 
 /**
  * Generate a program fragment for a {@link CartoKitSource}.
@@ -78,6 +81,43 @@ export function codegenSource(
             });
           `;
       }
+    }
+    case 'geoparquet': {
+      const entry = catalog.value[layer.id] as GeoParquetCatalogEntry;
+
+      // Uploaded files are served from public/data, so both locations are read
+      // over HTTP.
+      const url =
+        layer.source.location.type === 'api'
+          ? JSON.stringify(layer.source.location.url)
+          : layer.source.location.file.name;
+      const dataIdent = camelCase(layer.displayName);
+
+      // Query the file directly rather than creating a table, using the
+      // columns and geometry column cataloged when the layer was added.
+      const selectList = generateSelectList(
+        entry.columns,
+        entry.geometryColumn
+      ).replace(/[`\\]|\$\{/g, (match) => `\\${match}`);
+
+      let register = '';
+
+      // If loading a GeoParquet file from public/data, add a call to reigster it.
+      if (layer.source.location.type === 'file') {
+        register = `await db.registerFileURL("${url}", "/data/${url}", DuckDBDataProtocol.HTTP, false);`;
+      }
+
+      const addSource = `const ${dataIdent} = await conn.query(
+          \`SELECT ${selectList} FROM read_parquet('${url}');\`
+        );
+
+        map.addSource('${layer.id}', {
+          type: 'geojson',
+          data: toFeatureCollection(${dataIdent})
+        });
+      `;
+
+      return [register, addSource].filter(Boolean).join('\n');
     }
     case 'vector': {
       const protocolPrefix =

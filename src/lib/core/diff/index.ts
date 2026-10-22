@@ -1,4 +1,3 @@
-import type { FeatureCollection } from 'geojson';
 import { get } from 'svelte/store';
 
 import { patch } from '$lib/core/patch';
@@ -7,6 +6,8 @@ import { diffs } from '$lib/state/diffs.svelte';
 import { history } from '$lib/state/history.svelte';
 import { ir } from '$lib/stores/ir';
 import type {
+  CartoKitGeoJSONSource,
+  CartoKitGeoParquetSource,
   CartoKitIR,
   CartoKitLayer,
   LayerType,
@@ -298,17 +299,12 @@ interface LayerTooltipVisibilityDiff extends LayerDiff {
 interface AddLayerDiff extends LayerDiff {
   type: 'add-layer';
   payload:
-    | {
-        type: 'geojson';
+    | (Pick<CartoKitGeoJSONSource, 'type' | 'location'> & {
         displayName: string;
-        location:
-          | { type: 'api'; url: string }
-          | {
-              type: 'file';
-              fileName: string;
-              featureCollection: FeatureCollection;
-            };
-      }
+      })
+    | (Pick<CartoKitGeoParquetSource, 'type' | 'location'> & {
+        displayName: string;
+      })
     | {
         type: 'vector';
         displayName: string;

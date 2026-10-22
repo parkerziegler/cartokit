@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { uniqueId, kebabCase } from 'lodash-es';
+  import { uniqueId, snakeCase } from 'lodash-es';
   import type { MapSourceDataEvent } from 'maplibre-gl';
 
   import Alert from '$lib/components/shared/Alert.svelte';
@@ -10,6 +10,7 @@
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
+  import { isGeoParquet } from '$lib/utils/db';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -57,7 +58,7 @@
     error = '';
 
     try {
-      const layerId = uniqueId(`${kebabCase(displayName)}__`);
+      const layerId = uniqueId(`${snakeCase(displayName)}__`);
 
       const payload = endpoint.endsWith('.pmtiles')
         ? {
@@ -69,7 +70,9 @@
             }
           }
         : {
-            type: 'geojson' as const,
+            type: isGeoParquet(endpoint)
+              ? ('geoparquet' as const)
+              : ('geojson' as const),
             displayName,
             location: {
               type: 'api' as const,

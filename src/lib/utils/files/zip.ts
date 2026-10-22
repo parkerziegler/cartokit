@@ -4,7 +4,7 @@ import favicon from '$lib/utils/files/favicon.svg?raw';
 
 import { codegenDataFiles } from '$lib/codegen/codegen-data';
 import type { CartoKitIR } from '$lib/types';
-import type { CartokitCodegenFile } from '$lib/types/codegen';
+import type { CartokitCodegenProgramFile } from '$lib/types/codegen';
 
 /**
  * Bundle a cartokit-generated Vite project into a .zip archive.
@@ -12,21 +12,25 @@ import type { CartokitCodegenFile } from '$lib/types/codegen';
  * @param ir The {@link CartoKitIR}.
  * @param files The program files produced by code generation.
  * @param rootDir The name of the directory containing the project.
- * @returns A Blob containing the .zip archive.
+ * @returns A Promise resolving to a Blob containing the .zip archive.
  */
-export function zipProject(
+export async function zipProject(
   ir: CartoKitIR,
-  files: CartokitCodegenFile[],
+  files: CartokitCodegenProgramFile[],
   rootDir: string
-): Blob {
+): Promise<Blob> {
   // Vite serves public/ at the root, matching the /favicon.svg link in the
   // generated index.html.
   const entries: Zippable = {
     [`${rootDir}/public/favicon.svg`]: strToU8(favicon)
   };
 
-  for (const file of [...files, ...codegenDataFiles(ir)]) {
+  for (const file of files) {
     entries[`${rootDir}/${file.path}`] = strToU8(file.text);
+  }
+
+  for (const file of await codegenDataFiles(ir)) {
+    entries[`${rootDir}/${file.path}`] = file.bytes;
   }
 
   return new Blob([zipSync(entries)], { type: 'application/zip' });

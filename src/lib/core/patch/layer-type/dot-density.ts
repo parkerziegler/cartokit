@@ -79,7 +79,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
       );
     case 'Point': {
       let source = layer.source;
-      const attribute = selectQuantitativeAttribute(layer.source);
+      const attribute = selectQuantitativeAttribute(layer.id);
       const dotValue = deriveDotDensityStartingValue(layer.id, attribute);
 
       if (layer.source.type === 'geojson') {
@@ -140,7 +140,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
     }
     case 'Polygon': {
       let source = layer.source;
-      const attribute = selectQuantitativeAttribute(layer.source);
+      const attribute = selectQuantitativeAttribute(layer.id);
       const dotValue = deriveDotDensityStartingValue(layer.id, attribute);
 
       if (layer.source.type === 'geojson') {

@@ -14,7 +14,7 @@
   let { selected, layerId, visualizationType, channel }: Props = $props();
 
   let options = $derived(
-    Object.entries(catalog.value[layerId]).reduce<
+    Object.entries(catalog.value[layerId].attributes).reduce<
       { value: string; label: string }[]
     >((acc, [attribute, value]) => {
       const isQuantitative =

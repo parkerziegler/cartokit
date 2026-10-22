@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { uniqueId, kebabCase } from 'lodash-es';
+  import { uniqueId, snakeCase } from 'lodash-es';
   import type { MapSourceDataEvent } from 'maplibre-gl';
 
   import LineIcon from '$lib/components/icons/LineIcon.svelte';
@@ -8,6 +8,7 @@
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
+  import { isGeoParquet } from '$lib/utils/db';
   import { GALLERY_ITEMS } from '$lib/utils/gallery';
 
   const closeModal = getContext<() => void>('close-modal');
@@ -31,7 +32,7 @@
   ) {
     loadingId = itemId;
 
-    const layerId = uniqueId(`${kebabCase(displayName)}__`);
+    const layerId = uniqueId(`${snakeCase(displayName)}__`);
     const payload = url.endsWith('.pmtiles')
       ? {
           type: 'vector' as const,
@@ -42,7 +43,9 @@
           }
         }
       : {
-          type: 'geojson' as const,
+          type: isGeoParquet(url)
+            ? ('geoparquet' as const)
+            : ('geojson' as const),
           displayName,
           location: {
             type: 'api' as const,

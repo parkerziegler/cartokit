@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { uniqueId, kebabCase } from 'lodash-es';
+  import { uniqueId, snakeCase } from 'lodash-es';
 
   import Alert from '$lib/components/shared/Alert.svelte';
   import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
@@ -9,8 +9,7 @@
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
-  import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
-  import { VALID_GEOJSON_TYPES } from '$lib/utils/layer';
+  import { isGeoParquet } from '$lib/utils/db';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -29,7 +28,7 @@
     displayName = event.currentTarget.value;
   }
 
-  function onSubmit(
+  async function onSubmit(
     event: Event & { currentTarget: EventTarget & HTMLFormElement }
   ) {
     event.preventDefault();
@@ -39,55 +38,35 @@
     }
 
     dataLoading = true;
-    const reader = new FileReader();
+    error = '';
 
-    reader.onload = async function readGeoJSON(theFile) {
-      if (typeof theFile.target?.result === 'string' && file) {
-        try {
-          const parsed = JSON.parse(theFile.target.result);
+    try {
+      const layerId = uniqueId(`${snakeCase(displayName)}__`);
 
-          if (!parsed.type) {
-            throw new Error(
-              'Missing required member "type" in GeoJSON file. Fix the file and try again.'
-            );
-          } else if (!VALID_GEOJSON_TYPES.has(parsed.type)) {
-            throw new Error(
-              `Invalid value for "type" in GeoJSON file: ${parsed.type}. Valid values are: ${Array.from(VALID_GEOJSON_TYPES).join(', ')}. Fix the file and try again.`
-            );
-          }
-
-          const featureCollection = normalizeGeoJSONToFeatureCollection(parsed);
-          const layerId = uniqueId(`${kebabCase(displayName)}__`);
-
-          await applyDiff({
-            type: 'add-layer',
-            layerId,
-            payload: {
-              type: 'geojson',
-              location: {
-                type: 'file',
-                fileName: file.name,
-                featureCollection
-              },
-              displayName
-            }
-          });
-
-          displayName = '';
-          file = null;
-          closeModal();
-        } catch (e) {
-          error =
-            e instanceof Error
-              ? e.message
-              : 'Invalid GeoJSON file. Please check the file and try again.';
-        } finally {
-          dataLoading = false;
+      await applyDiff({
+        type: 'add-layer',
+        layerId,
+        payload: {
+          type: isGeoParquet(file.name) ? 'geoparquet' : 'geojson',
+          location: {
+            type: 'file',
+            file
+          },
+          displayName
         }
-      }
-    };
+      });
 
-    reader.readAsText(file, 'UTF-8');
+      displayName = '';
+      file = null;
+      closeModal();
+    } catch (e) {
+      error =
+        e instanceof Error
+          ? e.message
+          : 'Failed to read file. Please check the file and try again.';
+    } finally {
+      dataLoading = false;
+    }
   }
 </script>
 

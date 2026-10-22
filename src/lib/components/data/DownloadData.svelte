@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { kebabCase } from 'lodash-es';
+  import { snakeCase } from 'lodash-es';
   import { onMount } from 'svelte';
 
   import { tooltip } from '$lib/attachments/tooltip';
@@ -16,7 +16,7 @@
 
   function onClick() {
     if (layer.source.type === 'geojson') {
-      downloadJson(layer.source.data, `${kebabCase(layer.displayName)}.json`);
+      downloadJson(layer.source.data, `${snakeCase(layer.displayName)}.json`);
     }
   }
 

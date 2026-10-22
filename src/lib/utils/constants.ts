@@ -11,6 +11,7 @@ export const DEFAULT_STROKE_OPACITY = 1;
 export const DEFAULT_METHOD = (sourceType: CartoKitSource['type']) => {
   switch (sourceType) {
     case 'geojson':
+    case 'geoparquet':
       return 'Quantile';
     case 'vector':
       return 'Equal Interval';
