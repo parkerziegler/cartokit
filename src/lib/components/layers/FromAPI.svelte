@@ -76,7 +76,7 @@
           break;
         default:
           throw new Error(
-            "Invalid file extension, expected one of: 'geojson', 'geoparquet', 'pmtiles'"
+            "Invalid file extension, expected one of: '.geojson', 'geoparquet', '.json', '.parquet', '.pmtiles'"
           );
       }
 

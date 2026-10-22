@@ -9,7 +9,7 @@
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
-  import { isGeoParquet } from '$lib/utils/db';
+  import { extname } from '$lib/utils/file';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -42,12 +42,29 @@
 
     try {
       const layerId = uniqueId(`${snakeCase(displayName)}__`);
+      const ext = extname(file.name);
+      let type: 'geojson' | 'geoparquet';
+
+      switch (ext) {
+        case '.geojson':
+        case '.json':
+          type = 'geojson';
+          break;
+        case '.geoparquet':
+        case '.parquet':
+          type = 'geoparquet';
+          break;
+        default:
+          throw new Error(
+            "Invalid file extension, expected one of: '.geojson', 'geoparquet', '.json', '.parquet'"
+          );
+      }
 
       await applyDiff({
         type: 'add-layer',
         layerId,
         payload: {
-          type: isGeoParquet(file.name) ? 'geoparquet' : 'geojson',
+          type,
           location: {
             type: 'file',
             file

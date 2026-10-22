@@ -16,7 +16,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/urban-areas.json',
     src: UrbanAreas,
     type: 'Polygon',
-    format: 'GeoJSON'
+    format: 'geojson'
   },
   {
     id: 'earthquakes',
@@ -25,7 +25,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson',
     src: Earthquakes,
     type: 'Point',
-    format: 'GeoJSON'
+    format: 'geojson'
   },
   {
     id: 'climate-impacts',
@@ -34,7 +34,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-climate-impact-regions.json',
     src: ClimateImpacts,
     type: 'Polygon',
-    format: 'GeoJSON'
+    format: 'geojson'
   },
   {
     id: 'power-plants',
@@ -43,7 +43,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wapo-powerplants.json',
     src: PowerPlants,
     type: 'Point',
-    format: 'GeoJSON'
+    format: 'geojson'
   },
   {
     id: 'building-footprints',
@@ -52,7 +52,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     url: 'https://data.source.coop/vida/google-microsoft-osm-open-buildings/pmtiles/goog_msft_osm.pmtiles',
     src: BuildingFootprints,
     type: 'Polygon',
-    format: 'PMTiles'
+    format: 'pmtiles'
   },
   {
     id: 'election-2024',
@@ -61,7 +61,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/election-2024.pmtiles',
     src: Election2024,
     type: 'Polygon',
-    format: 'PMTiles'
+    format: 'pmtiles'
   },
   {
     id: 'japan-pop',
@@ -70,7 +70,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     url: 'https://data.source.coop/smartmaps/h3ys-worldpop/jpn.pmtiles',
     src: JapanPop,
     type: 'Polygon',
-    format: 'PMTiles'
+    format: 'pmtiles'
   },
   {
     id: 'wildfires',
@@ -79,6 +79,6 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     url: 'https://pub-7182966c1afe48d3949439f93d0d4223.r2.dev/wildfires-2025.pmtiles',
     src: Wildfires,
     type: 'Polygon',
-    format: 'PMTiles'
+    format: 'pmtiles'
   }
 ];
