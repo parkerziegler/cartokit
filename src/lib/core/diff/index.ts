@@ -10,6 +10,7 @@ import type {
   CartoKitGeoParquetSource,
   CartoKitIR,
   CartoKitLayer,
+  CartoKitPMTilesSource,
   LayerType,
   Projection,
   QuantitativeColorScale,
@@ -305,11 +306,9 @@ interface AddLayerDiff extends LayerDiff {
     | (Pick<CartoKitGeoParquetSource, 'type' | 'location'> & {
         displayName: string;
       })
-    | {
-        type: 'pmtiles';
+    | (Pick<CartoKitPMTilesSource, 'type' | 'location'> & {
         displayName: string;
-        location: { type: 'api'; url: string };
-      };
+      });
 }
 
 interface RemoveLayerDiff extends LayerDiff {

@@ -77,7 +77,6 @@ export async function patchLayerDiffs(
             diff.payload.location
           );
 
-          // GeoParquet data stays in DuckDB; recon reads it for the map.
           source = {
             type: 'geoparquet',
             location: diff.payload.location
@@ -86,8 +85,7 @@ export async function patchLayerDiffs(
         }
       }
 
-      // Build the catalog entry. Layer generation reads the geometry type from
-      // it, so this must happen first.
+      // Build the catalog entry.
       const catalogPatch = await buildCatalog(diff.layerId, source, table);
       catalog.value = { ...catalog.value, ...catalogPatch };
 
@@ -148,30 +146,32 @@ export async function patchLayerDiffs(
       const layer = ir.layers[diff.layerId];
 
       // Derive the inverse diff prior to applying the patch.
-      if (layer.source.type === 'pmtiles') {
-        inverse = {
-          type: 'add-layer',
-          layerId: diff.layerId,
-          payload: {
-            type: 'pmtiles',
-            displayName: layer.displayName,
-            location: layer.source.location
-          }
-        };
-      } else {
-        inverse = {
-          type: 'add-layer',
-          layerId: diff.layerId,
-          payload: {
-            type: layer.source.type,
-            displayName: layer.displayName,
-            location: layer.source.location
-          }
-        };
+      switch (layer.source.type) {
+        case 'pmtiles':
+          inverse = {
+            type: 'add-layer',
+            layerId: diff.layerId,
+            payload: {
+              type: 'pmtiles',
+              displayName: layer.displayName,
+              location: layer.source.location
+            }
+          };
+          break;
+        case 'geojson':
+        case 'geoparquet':
+          inverse = {
+            type: 'add-layer',
+            layerId: diff.layerId,
+            payload: {
+              type: layer.source.type,
+              displayName: layer.displayName,
+              location: layer.source.location
+            }
+          };
 
-        // Drop the layer's table. Undoing the removal re-creates it from the
-        // source location.
-        await db.value!.conn.query(`DROP TABLE IF EXISTS ${diff.layerId};`);
+          // Drop the layer's table.
+          await db.value!.conn.query(`DROP TABLE IF EXISTS ${diff.layerId};`);
       }
 
       // Apply the patch.
