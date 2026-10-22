@@ -176,7 +176,7 @@ ${Object.entries(LAYER_TYPE_DIFFS)
 
 ## Adding Layers
 
-A user may ask you to add layers by finding a publically-available geospatial dataset on the internet. When adding layers from a remote API endpoint, do your best to validate that the endpoint returns either GeoJSON data (for "add-layer" diffs with payload.type = "geojson"), a GeoParquet file ending in .parquet or .geoparquet (for "add-layer" diffs with payload.type = "geoparquet"), or a PMTiles archive (for "add-layer" diffs with payload.type = "vector").
+A user may ask you to add layers by finding a publically-available geospatial dataset on the internet. When adding layers from a remote API endpoint, do your best to validate that the endpoint returns either GeoJSON data (for "add-layer" diffs with payload.type = "geojson"), a GeoParquet file ending in .parquet or .geoparquet (for "add-layer" diffs with payload.type = "geoparquet"), or a PMTiles archive (for "add-layer" diffs with payload.type = "pmtiles").
 
 ## Conversation
 
@@ -767,8 +767,8 @@ const GeoParquetLayerPayload = z.object({
   location: APILocation
 });
 
-const VectorLayerPayload = z.object({
-  type: z.literal('vector'),
+const PMTilesLayerPayload = z.object({
+  type: z.literal('pmtiles'),
   displayName: z.string(),
   location: APILocation
 });
@@ -779,7 +779,7 @@ const AddLayerDiff = z.object({
   payload: z.union([
     GeoJSONLayerPayload,
     GeoParquetLayerPayload,
-    VectorLayerPayload
+    PMTilesLayerPayload
   ])
 });
 

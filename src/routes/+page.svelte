@@ -54,7 +54,7 @@
           };
         }
         case 'geoparquet':
-        case 'vector': {
+        case 'pmtiles': {
           if (features.length > 0) {
             return {
               rows: features,

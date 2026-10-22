@@ -13,5 +13,5 @@ export const SOURCE_TYPES_TO_CLASSIFICATION_METHODS: Map<
   QuantitativeColorScale['type'][]
 > = new Map([
   ['geojson', ['Continuous', 'Quantile', 'Equal Interval', 'Jenks', 'Manual']],
-  ['vector', ['Continuous', 'Equal Interval', 'Manual']]
+  ['pmtiles', ['Continuous', 'Equal Interval', 'Manual']]
 ]);

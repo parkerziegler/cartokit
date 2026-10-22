@@ -117,7 +117,7 @@ export function codegenSource(
 
       return [register, addSource].filter(Boolean).join('\n');
     }
-    case 'vector': {
+    case 'pmtiles': {
       const url =
         analysis.library === 'maplibre'
           ? `pmtiles://${layer.source.location.url}`

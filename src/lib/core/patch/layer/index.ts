@@ -30,7 +30,7 @@ export async function patchLayerDiffs(
       let table: DuckDBTable | undefined;
 
       switch (diff.payload.type) {
-        case 'vector': {
+        case 'pmtiles': {
           const pmtiles = new CartoKitPMTiles(diff.payload.location.url);
 
           const [metadata, vectorLayers] = await Promise.all([
@@ -39,7 +39,7 @@ export async function patchLayerDiffs(
           ]);
 
           source = {
-            type: 'vector',
+            type: 'pmtiles',
             location: diff.payload.location,
             sourceLayerId: vectorLayers[0].id,
             tilestats: metadata.tilestats,
@@ -148,12 +148,12 @@ export async function patchLayerDiffs(
       const layer = ir.layers[diff.layerId];
 
       // Derive the inverse diff prior to applying the patch.
-      if (layer.source.type === 'vector') {
+      if (layer.source.type === 'pmtiles') {
         inverse = {
           type: 'add-layer',
           layerId: diff.layerId,
           payload: {
-            type: 'vector',
+            type: 'pmtiles',
             displayName: layer.displayName,
             location: layer.source.location
           }
@@ -199,7 +199,7 @@ export async function patchLayerDiffs(
     case 'source-layer': {
       const layer = ir.layers[diff.layerId];
 
-      if (layer.source.type === 'vector') {
+      if (layer.source.type === 'pmtiles') {
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'source-layer',

@@ -51,7 +51,7 @@ export class CartoKitPMTiles {
  * @returns The selected {@link VectorLayer}.
  */
 export function selectVectorLayer(
-  source: Extract<CartoKitSource, { type: 'vector' }>
+  source: Extract<CartoKitSource, { type: 'pmtiles' }>
 ): VectorLayer {
   return source.vectorLayers.find(
     (layer) => layer.id === source.sourceLayerId
@@ -69,7 +69,7 @@ export function selectVectorLayer(
  * @returns The matching {@link TileStats} layer.
  */
 export function selectTileStats(
-  source: Extract<CartoKitSource, { type: 'vector' }>
+  source: Extract<CartoKitSource, { type: 'pmtiles' }>
 ) {
   return source.tilestats.layers.find(
     (layer) => layer.layer === source.sourceLayerId

@@ -223,7 +223,7 @@ export async function buildCatalog(
       };
       break;
     }
-    case 'vector': {
+    case 'pmtiles': {
       const { count, geometry, attributes } = selectTileStats(source);
 
       catalog[layerId] = {

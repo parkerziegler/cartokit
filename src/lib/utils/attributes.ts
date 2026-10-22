@@ -62,7 +62,7 @@ export function findAttributeCategories(
     case 'boolean':
       return entry.values;
     case 'number':
-      // Vector sources catalog unique values in place of a full domain.
+      // PMTiles sources catalog unique values in place of a full domain.
       return entry.values ?? Array.from(new Set(entry.quantiles?.domain ?? []));
     default:
       return [];

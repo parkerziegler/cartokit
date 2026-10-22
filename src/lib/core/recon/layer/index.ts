@@ -54,7 +54,7 @@ export async function reconLayerDiffs(
           });
           break;
         }
-        case 'vector': {
+        case 'pmtiles': {
           map.value!.addSource(layer.id, {
             type: 'vector',
             url: `pmtiles://${layer.source.location.url}`
