@@ -6,6 +6,7 @@ import { db } from '$lib/state/db.svelte';
 import { feature } from '$lib/state/feature.svelte';
 import { layerId } from '$lib/state/layerId.svelte';
 import { map } from '$lib/state/map.svelte';
+import type { GeoParquetCatalogEntry } from '$lib/types/catalog';
 import { readTableAsGeoJSON } from '$lib/utils/db';
 import { getAffiliatedLayerIds } from '$lib/utils/layer';
 import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
@@ -39,12 +40,11 @@ export async function reconLayerDiffs(
           break;
         }
         case 'geoparquet': {
-          // Reuse the columns described when the table was created.
-          const entry = catalog.value[layer.id];
+          const entry = catalog.value[layer.id] as GeoParquetCatalogEntry;
           const geojson = await readTableAsGeoJSON(
             db.value!.conn,
             layer.id,
-            entry.type === 'geoparquet' ? entry.columns : undefined
+            entry.columns
           );
 
           map.value!.addSource(layer.id, {
