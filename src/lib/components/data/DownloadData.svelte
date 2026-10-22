@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { snakeCase } from 'lodash-es';
+  import { kebabCase } from 'lodash-es';
   import { onMount } from 'svelte';
 
   import { tooltip } from '$lib/attachments/tooltip';
   import DownloadIcon from '$lib/components/icons/DownloadIcon.svelte';
   import type { CartoKitLayer } from '$lib/types';
-  import { downloadJson } from '$lib/utils/files/download';
+  import { downloadJson } from '$lib/utils/download';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
@@ -16,7 +16,7 @@
 
   function onClick() {
     if (layer.source.type === 'geojson') {
-      downloadJson(layer.source.data, `${snakeCase(layer.displayName)}.json`);
+      downloadJson(layer.source.data, `${kebabCase(layer.displayName)}.json`);
     }
   }
 

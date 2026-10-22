@@ -9,13 +9,13 @@
   import Tabs from '$lib/components/shared/Tabs.svelte';
   import { ir } from '$lib/stores/ir';
   import { program } from '$lib/stores/program';
-  import { downloadBlob } from '$lib/utils/files/download';
+  import { downloadBlob } from '$lib/utils/download';
 
   const PROJECT_NAME = 'cartokit-project';
 
   async function onExportClick() {
     // Lazy-load the zip module so fflate stays out of the main bundle.
-    const { zipProject } = await import('$lib/utils/files/zip');
+    const { zipProject } = await import('$lib/utils/zip');
 
     downloadBlob(
       await zipProject($ir, $program, PROJECT_NAME),

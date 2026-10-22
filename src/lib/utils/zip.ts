@@ -1,6 +1,6 @@
 import { strToU8, zipSync, type Zippable } from 'fflate';
 
-import favicon from '$lib/utils/files/favicon.svg?raw';
+import favicon from '$lib/utils/favicon.svg?raw';
 
 import { codegenDataFiles } from '$lib/codegen/codegen-data';
 import type { CartoKitIR } from '$lib/types';
@@ -19,8 +19,6 @@ export async function zipProject(
   files: CartokitCodegenProgramFile[],
   rootDir: string
 ): Promise<Blob> {
-  // Vite serves public/ at the root, matching the /favicon.svg link in the
-  // generated index.html.
   const entries: Zippable = {
     [`${rootDir}/public/favicon.svg`]: strToU8(favicon)
   };
