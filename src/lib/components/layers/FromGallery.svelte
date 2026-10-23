@@ -29,10 +29,10 @@
   async function onSelectDataset(item: GalleryItem) {
     loadingId = item.id;
 
-    const layerId = uniqueId(`${snakeCase(item.name)}__`);
+    const layerId = uniqueId(`${snakeCase(item.displayName)}__`);
     const payload = {
       type: item.format,
-      displayName: item.name,
+      displayName: item.displayName,
       location: {
         type: 'api' as const,
         url: item.url
