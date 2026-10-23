@@ -80,6 +80,9 @@ export interface CartokitCodegenProgramFile {
 export interface CartokitCodegenDataFile {
   /** The relative path of the file on disk. */
   path: string;
-  /** The file contents. */
-  bytes: Uint8Array;
+  /**
+   * The file contents as bytes.
+   * The Uint8Array is a view on the underlying bytes of the ArrayBuffer.
+   */
+  bytes: Uint8Array<ArrayBuffer>;
 }
