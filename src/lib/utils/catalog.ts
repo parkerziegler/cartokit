@@ -1,72 +1,114 @@
 import * as d3 from 'd3';
-import { set, isFinite } from 'lodash-es';
-import { ckmeans } from 'simple-statistics';
 
-import { db } from '$lib/state/db.svelte';
-import type { CartoKitSource } from '$lib/types';
 import type {
-  AttributeEntry,
-  BooleanAttributeEntry,
-  Catalog,
-  NumericAttributeEntry
+  CartoKitGeoJSONSource,
+  CartoKitGeoParquetSource,
+  CartoKitSource,
+  QuantitativeStepCount
+} from '$lib/types';
+import {
+  type Catalog,
+  type AttributeEntry,
+  type CategoricalAttributeEntry,
+  type QuantitativeAttributeEntry
 } from '$lib/types/catalog';
 import { type DuckDBTable } from '$lib/types/db';
 import { quoteIdentifier } from '$lib/utils/db';
 import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
 import { getGeoParquetGeometryType } from '$lib/utils/geoparquet';
 import { selectTileStats } from '$lib/utils/pmtiles';
-
-/** Matches the DuckDB column types cataloged as numeric attributes. */
-const NUMERIC_COLUMN_TYPE =
-  /^(U?(TINYINT|SMALLINT|INTEGER|BIGINT|HUGEINT)|FLOAT|DOUBLE|DECIMAL\(\d+,\d+\))$/;
+import {
+  deriveEqualIntervals,
+  deriveJenksBreaks,
+  deriveQuantiles
+} from '$lib/utils/scales';
+import type { AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 
 /**
- * Derive Jenks breaks for a domain using ckmeans clustering.
+ * Get the geometry type of data sources stored in DuckDB.
  *
- * @param domain The values of a numeric attribute.
- * @param k The number of classes.
- * @returns The k - 1 breaks between classes.
+ * @param conn active {@link AsyncDuckDBConnection} to the database.
+ * @param source A {@link CartoKitGeoJSONSource} or a {@link CartoKitGeoParquetSource}.
+ * @param layerId The layer id.
+ * @returns The {@link Geometry['type']} of the source.
  */
-function deriveJenksBreaks(domain: number[], k: number): number[] {
-  const breaks = ckmeans(domain, k).map(
-    (cluster) => cluster[cluster.length - 1]
+async function deriveGeometryType(
+  conn: AsyncDuckDBConnection,
+  source: CartoKitGeoJSONSource | CartoKitGeoParquetSource,
+  layerId: string
+) {
+  switch (source.type) {
+    case 'geojson':
+      return getFeatureCollectionGeometryType(source.sourceData);
+    case 'geoparquet':
+      return await getGeoParquetGeometryType(
+        conn,
+        source.location.type === 'api'
+          ? source.location.url
+          : source.location.file.name,
+        layerId
+      );
+  }
+}
+
+const QUANTITATIVE_COLUMN_TYPE =
+  /^(U?(TINYINT|SMALLINT|INTEGER|BIGINT|HUGEINT)|FLOAT|DOUBLE|DECIMAL\(\d+,\d+\))$/;
+const CATEGORICAL_COLUMN_TYPE = /^(VARCHAR|BOOLEAN)$/;
+
+/**
+ * Derive the catalog entry for a quantitative attribute.
+ *
+ * @param domain The finite values of the attribute.
+ * @param min The minimum value of the attribute.
+ * @param max The maximum value of the attribute.
+ * @returns The {@link QuantitativeAttributeEntry} for the attribute.
+ */
+function deriveQuantitativeAttributeEntry(
+  domain: number[],
+  min: number,
+  max: number
+): QuantitativeAttributeEntry {
+  const breaks = d3.range(3, 10).reduce(
+    (acc, key) => {
+      const k = key as QuantitativeStepCount;
+      acc.Quantile[k] = { breaks: deriveQuantiles(domain, key) };
+      acc['Equal Interval'][k] = {
+        breaks: deriveEqualIntervals(min, max, key)
+      };
+      acc.Jenks[k] = { breaks: deriveJenksBreaks(domain, key) };
+
+      return acc;
+    },
+    {
+      Quantile: {} as QuantitativeAttributeEntry['Quantile'],
+      'Equal Interval': {} as QuantitativeAttributeEntry['Equal Interval'],
+      Jenks: {} as QuantitativeAttributeEntry['Jenks']
+    }
   );
 
-  // Remove the last break—this corresponds to the max.
-  breaks.pop();
-
-  return breaks;
+  return {
+    type: 'quantitative',
+    min,
+    max,
+    domain,
+    unique: new Set(domain).size,
+    ...breaks
+  };
 }
 
 /**
- * Derive the catalog entry for a numeric attribute from its domain.
+ * Derive the catalog entry for a categorical attribute.
  *
- * @param domain The finite values of the attribute. Must be non-empty.
- * @returns The {@link NumericAttributeEntry} for the attribute.
+ * @param values The distinct, non-null values of the attribute.
+ * @returns The {@link CategoricalAttributeEntry} for the attribute.
  */
-function deriveNumericAttributeEntry(domain: number[]): NumericAttributeEntry {
-  const [min, max] = d3.extent(domain) as [number, number];
-  const jenks = {} as NumericAttributeEntry['jenks'];
-
-  d3.range(3, 10).forEach((k) => {
-    // If we have too few features for the number of classes, do not add an
-    // entry to the catalog.
-    if (domain.length < k) {
-      return;
-    }
-
-    jenks[k as keyof NumericAttributeEntry['jenks']] = {
-      breaks: deriveJenksBreaks(domain, k)
-    };
-  });
-
+function deriveCategoricalAttributeEntry(
+  values: string[]
+): CategoricalAttributeEntry {
   return {
-    type: 'number',
-    min,
-    max,
-    unique: new Set(domain).size,
-    quantiles: { domain },
-    jenks
+    type: 'categorical',
+    values: values,
+    unique: values.length
   };
 }
 
@@ -81,141 +123,82 @@ function deriveNumericAttributeEntry(domain: number[]): NumericAttributeEntry {
 export async function buildCatalog(
   layerId: string,
   source: CartoKitSource,
-  table?: DuckDBTable
+  db?: {
+    conn: AsyncDuckDBConnection;
+    table: DuckDBTable;
+  }
 ): Promise<Catalog> {
   const catalog: Catalog = {};
 
   switch (source.type) {
-    case 'geojson': {
-      const features = source.data.features;
-      const attributes: Record<string, AttributeEntry> = {};
-
-      Object.entries(features[0].properties || {}).forEach(
-        ([attribute, value]) => {
-          if (isFinite(value)) {
-            attributes[attribute] = deriveNumericAttributeEntry(
-              features
-                .map((feature) => feature.properties?.[attribute])
-                .filter(Number.isFinite)
-            );
-          } else if (typeof value === 'string') {
-            const values = features
-              .map((feature) => feature.properties?.[attribute])
-              .filter((v) => typeof v === 'string');
-            const distinct = Array.from(new Set(values));
-
-            attributes[attribute] = {
-              type: 'string',
-              values: distinct,
-              unique: distinct.length
-            };
-          } else if (typeof value === 'boolean') {
-            const values = features
-              .map((feature) => feature.properties?.[attribute])
-              .filter((v) => typeof v === 'boolean');
-            const distinct = Array.from(new Set(values));
-
-            attributes[attribute] = {
-              type: 'boolean',
-              values: distinct,
-              unique: distinct.length as BooleanAttributeEntry['unique']
-            };
-          }
-        }
-      );
-
-      catalog[layerId] = {
-        type: 'geojson',
-        geometryType: getFeatureCollectionGeometryType(source.data),
-        count: features.length,
-        attributes
-      };
-      break;
-    }
+    case 'geojson':
     case 'geoparquet': {
-      if (!table) {
-        throw new Error('GeoParquet catalogs require the layer table.');
+      if (!db?.conn || !db?.table) {
+        throw new Error(
+          `Catalog construction requires an active database connection and table for layer '${layerId}'.`
+        );
       }
 
-      const { conn } = db.value!;
-      const { columns, geometryColumn } = table;
+      const { columns, geometryColumn } = db.table;
       const tableName = quoteIdentifier(layerId);
 
       const numericColumns = columns
-        .filter(({ column_type }) => NUMERIC_COLUMN_TYPE.test(column_type))
+        .filter(({ column_type }) => QUANTITATIVE_COLUMN_TYPE.test(column_type))
         .map(({ column_name }) => quoteIdentifier(column_name));
       const categoricalColumns = columns
-        .filter(
-          ({ column_type }) =>
-            column_type === 'VARCHAR' || column_type === 'BOOLEAN'
-        )
+        .filter(({ column_type }) => CATEGORICAL_COLUMN_TYPE.test(column_type))
         .map(({ column_name }) => quoteIdentifier(column_name));
 
-      // Query the feature count and the distinct values of all categorical
-      // columns in a single pass.
+      // Query the feature count, the domains and extents of all numeric
+      // columns, and the distinct values of all categorical columns.
       const summary = (
-        await conn.query(
+        await db.conn.query(
           `SELECT ${[
             'count(*) AS count',
+            ...numericColumns.map(
+              (column) =>
+                `struct_pack(
+                  dom := list(${column}::DOUBLE) FILTER (WHERE isfinite(${column}::DOUBLE)),
+                  min := min(${column}::DOUBLE) FILTER (WHERE isfinite(${column}::DOUBLE)),
+                  max := max(${column}::DOUBLE) FILTER (WHERE isfinite(${column}::DOUBLE))
+                ) AS ${column}`
+            ),
             ...categoricalColumns.map(
               (column) =>
-                `list(DISTINCT ${column}) FILTER (WHERE ${column} IS NOT NULL) AS ${column}`
+                `list(DISTINCT ${column}) FILTER (WHERE ${column} IS NOT NULL AND ${column}::VARCHAR != '') AS ${column}`
             )
           ].join(', ')} FROM ${tableName};`
         )
       ).toArray()[0];
 
-      // Query the domains of all numeric columns in a single pass.
-      const domains =
-        numericColumns.length > 0
-          ? await conn.query(
-              `SELECT ${numericColumns
-                .map((column) => `${column}::DOUBLE AS ${column}`)
-                .join(', ')} FROM ${tableName};`
-            )
-          : null;
-
       const attributes: Record<string, AttributeEntry> = {};
 
       for (const { column_name, column_type } of columns) {
-        if (NUMERIC_COLUMN_TYPE.test(column_type)) {
-          const domain = Array.from(
-            domains?.getChild(column_name) ?? []
-          ).filter(Number.isFinite) as number[];
+        if (QUANTITATIVE_COLUMN_TYPE.test(column_type)) {
+          const { dom, min, max } = summary[column_name];
+          const domain = Array.from<number>(dom ?? []);
 
-          if (domain.length > 0) {
-            attributes[column_name] = deriveNumericAttributeEntry(domain);
+          if (new Set(domain).size >= 9) {
+            attributes[column_name] = deriveQuantitativeAttributeEntry(
+              domain,
+              min as number,
+              max as number
+            );
+          } else {
+            attributes[column_name] = deriveCategoricalAttributeEntry(
+              Array.from<string>(dom ?? [])
+            );
           }
-        } else if (column_type === 'VARCHAR') {
-          const values = Array.from<string>(summary[column_name] ?? []);
-
-          attributes[column_name] = {
-            type: 'string',
-            values,
-            unique: values.length
-          };
-        } else if (column_type === 'BOOLEAN') {
-          const values = Array.from<boolean>(summary[column_name] ?? []);
-
-          if (values.length > 0) {
-            attributes[column_name] = {
-              type: 'boolean',
-              values,
-              unique: values.length as BooleanAttributeEntry['unique']
-            };
-          }
+        } else if (CATEGORICAL_COLUMN_TYPE.test(column_type)) {
+          attributes[column_name] = deriveCategoricalAttributeEntry(
+            Array.from<string>(summary[column_name] ?? [])
+          );
         }
       }
 
       catalog[layerId] = {
-        type: 'geoparquet',
-        geometryType: await getGeoParquetGeometryType(
-          conn,
-          source.location.type === 'api'
-            ? source.location.url
-            : source.location.file.name,
-          layerId
-        ),
+        type: source.type,
+        geometryType: await deriveGeometryType(db.conn, source, layerId),
         count: summary.count as number,
         attributes,
         columns,
@@ -224,66 +207,28 @@ export async function buildCatalog(
       break;
     }
     case 'pmtiles': {
-      const { count, geometry, attributes } = selectTileStats(source);
+      const { count, geometry, attributes: attrs } = selectTileStats(source);
+
+      const attributes: Record<string, AttributeEntry> = {};
+
+      for (const attr of attrs) {
+        if (attr.type === 'number' && new Set(attr.values).size >= 9) {
+          attributes[attr.attribute] = deriveQuantitativeAttributeEntry(
+            [],
+            attr.min,
+            attr.max
+          );
+        } else {
+          attributes[attr.attribute] = deriveCategoricalAttributeEntry([]);
+        }
+      }
 
       catalog[layerId] = {
         type: 'pmtiles',
         geometryType: geometry,
         count,
-        attributes: {}
+        attributes
       };
-
-      attributes.forEach((attribute) => {
-        switch (attribute.type) {
-          case 'number': {
-            set(
-              catalog,
-              `${layerId}.attributes.${attribute.attribute}.type`,
-              'number'
-            );
-            set(
-              catalog,
-              `${layerId}.attributes.${attribute.attribute}.min`,
-              attribute.min
-            );
-            set(
-              catalog,
-              `${layerId}.attributes.${attribute.attribute}.max`,
-              attribute.max
-            );
-            set(
-              catalog,
-              `${layerId}.attributes.${attribute.attribute}.unique`,
-              attribute.count
-            );
-            set(
-              catalog,
-              `${layerId}.attributes.${attribute.attribute}.values`,
-              attribute.values
-            );
-            break;
-          }
-          case 'string':
-          case 'boolean': {
-            set(
-              catalog,
-              `${layerId}.attributes.${attribute.attribute}.type`,
-              attribute.type
-            );
-            set(
-              catalog,
-              `${layerId}.attributes.${attribute.attribute}.values`,
-              attribute.values
-            );
-            set(
-              catalog,
-              `${layerId}.attributes.${attribute.attribute}.unique`,
-              attribute.count
-            );
-            break;
-          }
-        }
-      });
       break;
     }
   }

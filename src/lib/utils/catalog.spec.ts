@@ -1,36 +1,96 @@
 import * as fs from 'node:fs';
+import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import * as url from 'node:url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+const require = createRequire(import.meta.url);
 
+import type { AsyncDuckDB, AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
+import {
+  createDuckDB,
+  NODE_RUNTIME,
+  VoidLogger
+} from '@duckdb/duckdb-wasm/blocking';
 import type { FeatureCollection } from 'geojson';
-import { expect, test, describe } from 'vitest';
+import { beforeAll, describe, expect, test } from 'vitest';
 
-import type { CartoKitLayer } from '$lib/types';
-import type { Catalog, NumericAttributeEntry } from '$lib/types/catalog';
+import type { CartoKitLayer, QuantitativeStepCount } from '$lib/types';
+import type { Catalog, QuantitativeAttributeEntry } from '$lib/types/catalog';
+import type { DuckDBTable } from '$lib/types/db';
 import { buildCatalog } from '$lib/utils/catalog';
+import { createTable } from '$lib/utils/db';
 
-const usCountiesUnemployment1 = JSON.parse(
+// Fixture file information.
+const fileName = 'us-counties-unemployment.json';
+const fixture = JSON.parse(
   fs.readFileSync(
-    path.join(
-      __dirname,
-      '../../../tests/data/all/us-counties-unemployment.json'
-    ),
+    path.join(__dirname, `../../../tests/data/all/${fileName}`),
     'utf8'
   )
 );
 
-const americanCrowRange = JSON.parse(
-  fs.readFileSync(
-    path.join(__dirname, '../../../tests/data/all/american-crow-range.json'),
-    'utf8'
-  )
-);
+/**
+ * Initialize an in-memory DuckDB database using the blocking Node.js build of
+ * DuckDB-wasm, which runs on the main thread and requires no Worker.
+ *
+ * @returns The initialized database and its active connection.
+ */
+async function initTestDB() {
+  const db = await createDuckDB(
+    {
+      mvp: {
+        mainModule: require.resolve('@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm'),
+        mainWorker: ''
+      },
+      eh: {
+        mainModule: require.resolve('@duckdb/duckdb-wasm/dist/duckdb-eh.wasm'),
+        mainWorker: ''
+      }
+    },
+    new VoidLogger(),
+    NODE_RUNTIME
+  );
+  await db.instantiate();
+  db.open({
+    query: {
+      castBigIntToDouble: true,
+      castDecimalToDouble: true,
+      castTimestampToDate: true
+    }
+  });
+
+  const conn = db.connect();
+  conn.query('INSTALL spatial; LOAD spatial;');
+
+  // conn is typed as a synchronous DuckDBConnection from the Node.js build.
+  // Casting it to an AsyncDuckDBConnection is fine, since awaiting a
+  // synchronous value just returns the value itself.
+  return { db, conn: conn as unknown as AsyncDuckDBConnection };
+}
 
 describe('buildCatalog', () => {
+  let conn: AsyncDuckDBConnection;
+  const tables: Record<string, DuckDBTable> = {};
+
+  beforeAll(async () => {
+    const testDB = await initTestDB();
+    conn = testDB.conn;
+
+    // Register the layer's data as a file in DuckDB's virtual file system,
+    // then create its table by reading from the registered file name.
+    testDB.db.registerFileText(fileName, JSON.stringify(fixture));
+
+    tables[layer.id] = await createTable(
+      testDB.db as unknown as AsyncDuckDB,
+      conn,
+      layer.id,
+      { type: 'api', url: fileName }
+    );
+  });
+
   const layer: CartoKitLayer = {
-    id: 'us-counties-unemployment__1',
+    id: 'us_counties_unemployment__1',
     type: 'Polygon',
     displayName: 'US Counties Unemployment',
     layout: {
@@ -44,54 +104,12 @@ describe('buildCatalog', () => {
       type: 'geojson',
       location: {
         type: 'file',
-        file: new File(
-          [usCountiesUnemployment1],
-          'us-counties-unemployment.json',
-          { type: 'application/json' }
-        )
-      },
-      data: usCountiesUnemployment1 as FeatureCollection,
-      sourceData: usCountiesUnemployment1 as FeatureCollection,
-      transformations: []
-    },
-    style: {
-      fill: {
-        type: 'Constant',
-        color: '#000000',
-        opacity: 0.5,
-        visible: true
-      },
-      stroke: {
-        type: 'Constant',
-        color: '#000000',
-        width: 1,
-        opacity: 0.5,
-        visible: true
-      }
-    }
-  };
-
-  const singleFeatureLayer: CartoKitLayer = {
-    id: 'american-crow-range.json',
-    type: 'Polygon',
-    displayName: 'American Crow Range',
-    layout: {
-      visible: true,
-      z: 0,
-      tooltip: {
-        visible: true
-      }
-    },
-    source: {
-      type: 'geojson',
-      location: {
-        type: 'file',
-        file: new File([americanCrowRange], 'american-crow-range.json', {
+        file: new File([fixture], fileName, {
           type: 'application/json'
         })
       },
-      data: americanCrowRange as FeatureCollection,
-      sourceData: americanCrowRange as FeatureCollection,
+      data: fixture as FeatureCollection,
+      sourceData: fixture as FeatureCollection,
       transformations: []
     },
     style: {
@@ -112,16 +130,25 @@ describe('buildCatalog', () => {
   };
 
   /**
-   * Select the numeric attribute entries for a layer from a built catalog.
+   * Select the {@link QuantitativeAttributeEntry} for a layer from a built
+   * catalog.
+   *
+   * @param catalog The built {@link Catalog}.
+   * @param layerId The layer id to query.
+   * @returns An Array of {@link QuantitativeAttributeEntry} from the catalog.
    */
   function selectNumericEntries(catalog: Catalog, layerId: string) {
     return Object.values(catalog[layerId].attributes).filter(
-      (entry): entry is NumericAttributeEntry => entry.type === 'number'
+      (entry): entry is QuantitativeAttributeEntry =>
+        entry.type === 'quantitative'
     );
   }
 
   test('should build a catalog with minimum and maximum values', async () => {
-    const catalog = await buildCatalog(layer.id, layer.source);
+    const catalog = await buildCatalog(layer.id, layer.source, {
+      conn,
+      table: tables[layer.id]
+    });
     const entries = selectNumericEntries(catalog, layer.id);
 
     expect(entries.length).toBeGreaterThan(0);
@@ -131,46 +158,34 @@ describe('buildCatalog', () => {
     });
   });
 
-  test('should produce a defined domain for quantiles on all attributes', async () => {
-    const catalog = await buildCatalog(layer.id, layer.source);
+  test('should produce a defined domain on all attributes', async () => {
+    const catalog = await buildCatalog(layer.id, layer.source, {
+      conn,
+      table: tables[layer.id]
+    });
     const entries = selectNumericEntries(catalog, layer.id);
 
     expect(entries.length).toBeGreaterThan(0);
     entries.forEach((entry) => {
-      expect(Array.isArray(entry.quantiles.domain)).toBe(true);
-      expect(entry.quantiles.domain.length).toBeGreaterThan(0);
+      expect(Array.isArray(entry.domain)).toBe(true);
+      expect(entry.domain.length).toBeGreaterThan(0);
     });
   });
 
-  test('should produce defined breaks for Jenks natural breaks on all attributes', async () => {
-    const catalog = await buildCatalog(layer.id, layer.source);
+  test('should produce defined breaks on all attributes', async () => {
+    const catalog = await buildCatalog(layer.id, layer.source, {
+      conn,
+      table: tables[layer.id]
+    });
     const entries = selectNumericEntries(catalog, layer.id);
 
     expect(entries.length).toBeGreaterThan(0);
     entries.forEach((entry) => {
-      // Test each possible k value that buildCatalog tries (3 through 9)
       for (let k = 3; k <= 9; k++) {
-        const breaks =
-          entry.jenks[k as keyof NumericAttributeEntry['jenks']].breaks;
-        expect(breaks).toHaveLength(k - 1);
-      }
-    });
-  });
-
-  test('should not produce Jenks natural breaks if the number of data values in the domain is less than the number of breaks', async () => {
-    const catalog = await buildCatalog(
-      singleFeatureLayer.id,
-      singleFeatureLayer.source
-    );
-    const entries = selectNumericEntries(catalog, singleFeatureLayer.id);
-
-    expect(entries.length).toBeGreaterThan(0);
-    entries.forEach((entry) => {
-      // Test each possible k value that buildCatalog tries (3 through 9)
-      for (let k = 3; k <= 9; k++) {
-        expect(
-          entry.jenks?.[k as keyof NumericAttributeEntry['jenks']]
-        ).toBeUndefined();
+        for (const method of ['Quantile', 'Equal Interval', 'Jenks'] as const) {
+          const breaks = entry[method][k as QuantitativeStepCount].breaks;
+          expect(breaks).toHaveLength(k - 1);
+        }
       }
     });
   });

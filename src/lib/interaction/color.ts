@@ -8,7 +8,7 @@ import type {
   QuantitativeStyle,
   HeatmapStyle
 } from '$lib/types';
-import type { NumericAttributeEntry } from '$lib/types/catalog';
+import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
 import { DEFAULT_FILL } from '$lib/utils/constants';
 import { materializeColorRamp } from '$lib/utils/color/ramp';
 import { materializeColorScheme } from '$lib/utils/color/scheme';
@@ -33,7 +33,7 @@ export function deriveColorScale(
       if (scale.type === 'Continuous') {
         const { min, max } = catalog.value[layerId].attributes[
           attribute
-        ] as NumericAttributeEntry;
+        ] as QuantitativeAttributeEntry;
         const colors = materializeColorRamp(
           scale.interpolator.id,
           scale.interpolator.direction,

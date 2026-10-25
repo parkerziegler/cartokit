@@ -86,7 +86,11 @@ export async function patchLayerDiffs(
       }
 
       // Build the catalog entry.
-      const catalogPatch = await buildCatalog(diff.layerId, source, table);
+      const catalogPatch = await buildCatalog(
+        diff.layerId,
+        source,
+        db.value && table ? { conn: db.value.conn, table } : undefined
+      );
       catalog.value = { ...catalog.value, ...catalogPatch };
 
       const layer = generateCartoKitLayer(

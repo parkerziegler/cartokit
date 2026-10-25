@@ -5,7 +5,8 @@
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import type {
     QuantitativeColorScale,
-    ContinuousColorScale
+    ContinuousColorScale,
+    QuantitativeStepCount
   } from '$lib/types';
 
   interface Props {
@@ -27,7 +28,7 @@
       type: 'fill-step-count',
       layerId,
       payload: {
-        count: +event.currentTarget.value
+        count: +event.currentTarget.value as QuantitativeStepCount
       }
     };
 

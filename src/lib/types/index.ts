@@ -10,6 +10,8 @@ import type {
 } from '$lib/types/color';
 import type { TransformationCall } from '$lib/types/transformation';
 
+export type QuantitativeStepCount = 3 | 4 | 5 | 6 | 7 | 8 | 9;
+
 /**
  * Represents a continuous color scale for continuous numerical data.
  *
@@ -34,7 +36,7 @@ export interface ContinuousColorScale {
  * @property scheme.id The {@link QuantitativeColorScheme} identifier for the
  * color scale.
  * @property scheme.direction The {@link SchemeDirection} of the color scale.
- * @property steps The number of discrete steps (classes) in the color scale.
+ * @property steps The {@link QuantitativeStepCount} of the color scale.
  * @property thresholds The thresholds of the color scale.
  */
 export interface QuantileColorScale {
@@ -43,7 +45,7 @@ export interface QuantileColorScale {
     id: QuantitativeColorScheme;
     direction: SchemeDirection;
   };
-  steps: number;
+  steps: QuantitativeStepCount;
   thresholds: number[];
 }
 
@@ -55,7 +57,7 @@ export interface QuantileColorScale {
  * @property scheme.id The {@link QuantitativeColorScheme} identifier for the
  * color scale.
  * @property scheme.direction The {@link SchemeDirection} of the color scale.
- * @property steps The number of discrete steps (classes) in the color scale.
+ * @property steps The {@link QuantitativeStepCount} of the color scale.
  * @property thresholds The thresholds of the color scale.
  */
 export interface EqualIntervalColorScale {
@@ -64,7 +66,7 @@ export interface EqualIntervalColorScale {
     id: QuantitativeColorScheme;
     direction: SchemeDirection;
   };
-  steps: number;
+  steps: QuantitativeStepCount;
   thresholds: number[];
 }
 
@@ -76,7 +78,7 @@ export interface EqualIntervalColorScale {
  * @property scheme.id The {@link QuantitativeColorScheme} identifier for the
  * color scale.
  * @property scheme.direction The {@link SchemeDirection} of the color scale.
- * @property steps The number of discrete steps (classes) in the color scale.
+ * @property steps The {@link QuantitativeStepCount} of the color scale.
  * @property thresholds The thresholds of the color scale.
  */
 export interface JenksColorScale {
@@ -85,7 +87,7 @@ export interface JenksColorScale {
     id: QuantitativeColorScheme;
     direction: SchemeDirection;
   };
-  steps: number;
+  steps: QuantitativeStepCount;
   thresholds: number[];
 }
 
@@ -97,7 +99,7 @@ export interface JenksColorScale {
  * @property scheme.id The {@link QuantitativeColorScheme} identifier for the
  * color scale.
  * @property scheme.direction The {@link SchemeDirection} of the color scale.
- * @property steps The number of discrete steps (classes) in the color scale.
+ * @property steps The {@link QuantitativeStepCount} of the color scale.
  * @property thresholds The thresholds of the color scale.
  */
 export interface ManualColorScale {
@@ -106,7 +108,7 @@ export interface ManualColorScale {
     id: QuantitativeColorScheme;
     direction: SchemeDirection;
   };
-  steps: number;
+  steps: QuantitativeStepCount;
   thresholds: number[];
 }
 

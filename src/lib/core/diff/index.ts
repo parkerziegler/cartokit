@@ -14,6 +14,7 @@ import type {
   LayerType,
   Projection,
   QuantitativeColorScale,
+  QuantitativeStepCount,
   VisualizationType
 } from '$lib/types';
 import type {
@@ -83,7 +84,7 @@ interface FillClassificationMethodDiff extends LayerDiff {
 interface FillStepCountDiff extends LayerDiff {
   type: 'fill-step-count';
   payload: {
-    count: number;
+    count: QuantitativeStepCount;
   };
 }
 

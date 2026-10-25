@@ -2,7 +2,7 @@ import type { ExpressionSpecification } from 'maplibre-gl';
 
 import { catalog } from '$lib/state/catalog.svelte';
 import type { ProportionalSymbolStyle } from '$lib/types';
-import type { NumericAttributeEntry } from '$lib/types/catalog';
+import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
 import { signedSqrt } from '$lib/utils/number';
 
 /**
@@ -18,7 +18,7 @@ export function deriveSize(
 ): ExpressionSpecification {
   const { min, max } = catalog.value[layerId].attributes[
     style.attribute
-  ] as NumericAttributeEntry;
+  ] as QuantitativeAttributeEntry;
   const [rMin, rMax] = [style.min, style.max];
   const attribute = style.attribute;
 
@@ -60,7 +60,7 @@ export function deriveDotDensityStartingValue(
 ): number {
   const { min, max } = catalog.value[layerId].attributes[
     attribute
-  ] as NumericAttributeEntry;
+  ] as QuantitativeAttributeEntry;
 
   // Aim for a ratio where the number of dots is 10% of the range.
   return (max - min) * 0.1 || 1;

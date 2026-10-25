@@ -19,13 +19,12 @@
     >((acc, [attribute, value]) => {
       const isQuantitative =
         visualizationType === 'Quantitative' &&
-        value.type === 'number' &&
+        value.type === 'quantitative' &&
         value.unique >= 9;
       const isCategorical =
         visualizationType === 'Categorical' &&
-        (value.type === 'string' ||
-          value.type === 'boolean' ||
-          (value.type === 'number' && value.unique < 9));
+        (value.type === 'categorical' ||
+          (value.type === 'quantitative' && value.unique < 9));
 
       if (isQuantitative || isCategorical) {
         acc.push({

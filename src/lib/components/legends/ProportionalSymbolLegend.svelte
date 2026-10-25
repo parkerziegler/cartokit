@@ -5,7 +5,7 @@
   import QuantitativeLegend from '$lib/components/legends/QuantitativeLegend.svelte';
   import { catalog } from '$lib/state/catalog.svelte';
   import type { CartoKitProportionalSymbolLayer } from '$lib/types';
-  import type { NumericAttributeEntry } from '$lib/types/catalog';
+  import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
   import { hexWithOpacity } from '$lib/utils/color';
   import { signedSqrt, signedSquare } from '$lib/utils/number';
 
@@ -18,7 +18,7 @@
   let { min, max } = $derived(
     catalog.value[layer.id].attributes[
       layer.style.size.attribute
-    ] as NumericAttributeEntry
+    ] as QuantitativeAttributeEntry
   );
   let domain = $derived([signedSqrt(min), signedSqrt(max)]);
   let range = $derived([layer.style.size.min, layer.style.size.max]);

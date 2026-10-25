@@ -1,8 +1,5 @@
-import * as d3 from 'd3';
-
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
-import { deriveThresholds } from '$lib/interaction/scales';
 import type {
   CartoKitChoroplethLayer,
   CartoKitDotDensityLayer,
@@ -13,8 +10,11 @@ import type {
   ContinuousColorScale,
   QuantitativeColorScale
 } from '$lib/types';
+import type {
+  CategoricalAttributeEntry,
+  QuantitativeAttributeEntry
+} from '$lib/types/catalog';
 import {
-  findAttributeCategories,
   selectCategoricalAttribute,
   selectQuantitativeAttribute
 } from '$lib/utils/attributes';
@@ -23,42 +23,14 @@ import {
   convertRampToScheme,
   convertSchemeToRamp
 } from '$lib/utils/color/converter';
-import { materializeColorScheme } from '$lib/utils/color/scheme';
 import {
   DEFAULT_CATEGORICAL_SCHEME,
   DEFAULT_COUNT,
   DEFAULT_METHOD,
   DEFAULT_QUANTITATIVE_SCHEME,
-  DEFAULT_SCHEME_DIRECTION,
-  DEFAULT_THRESHOLDS
+  DEFAULT_SCHEME_DIRECTION
 } from '$lib/utils/constants';
-
-/**
- * Recompute the quantitative breaks for a given layer and fill style.
- *
- * @param layerId The ID of the {@link CartoKitLayer}.
- * @param attribute The attribute to use for computing breaks.
- * @param scale The current {@link QuantitativeColorScale} style.
- * @returns The new breaks for the given layer, attribute, and color scale.
- */
-function recomputeBreaks(
-  layerId: string,
-  attribute: string,
-  scale: Exclude<QuantitativeColorScale, ContinuousColorScale>
-) {
-  const colors = d3[scale.scheme.id][scale.steps];
-
-  return deriveThresholds({
-    method: scale.type,
-    layerId,
-    attribute,
-    range:
-      scale.scheme.direction === 'Reverse'
-        ? [...colors].reverse()
-        : [...colors],
-    thresholds: scale.thresholds
-  });
-}
+import { catalog } from '$lib/state/catalog.svelte';
 
 /**
  * Patch fill-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
@@ -96,11 +68,16 @@ export async function patchFillDiffs(
         layer.style.fill.attribute = diff.payload.attribute;
 
         if (layer.style.fill.scale.type !== 'Continuous') {
-          layer.style.fill.scale.thresholds = recomputeBreaks(
-            layer.id,
-            diff.payload.attribute,
-            layer.style.fill.scale
-          );
+          const scaleType =
+            layer.style.fill.scale.type === 'Manual'
+              ? DEFAULT_METHOD(layer.source.type)
+              : layer.style.fill.scale.type;
+
+          layer.style.fill.scale.thresholds = (
+            catalog.value[layer.id].attributes[
+              diff.payload.attribute
+            ] as QuantitativeAttributeEntry
+          )[scaleType][layer.style.fill.scale.steps].breaks;
         }
       } else if (layer.style.fill.type === 'Categorical') {
         // Derive the inverse diff prior to applying the patch.
@@ -114,10 +91,11 @@ export async function patchFillDiffs(
 
         // Apply the patch.
         layer.style.fill.attribute = diff.payload.attribute;
-        layer.style.fill.scale.categories = findAttributeCategories(
-          layer.id,
-          diff.payload.attribute
-        );
+        layer.style.fill.scale.categories = (
+          catalog.value[diff.layerId].attributes[
+            diff.payload.attribute
+          ] as CategoricalAttributeEntry
+        ).values;
       }
       break;
     }
@@ -295,39 +273,34 @@ export async function patchFillDiffs(
             direction: layer.style.fill.scale.interpolator.direction
           };
 
-          const range = materializeColorScheme(
-            scheme.id,
-            scheme.direction,
-            DEFAULT_COUNT
-          );
-
           layer.style.fill.scale = {
             type: diff.payload.method,
             scheme,
             steps: DEFAULT_COUNT,
-            thresholds: deriveThresholds({
-              method: diff.payload.method,
-              layerId: layer.id,
-              attribute: layer.style.fill.attribute,
-              range,
-              thresholds: DEFAULT_THRESHOLDS(
-                layer.id,
-                layer.style.fill.attribute,
-                layer.source.type
-              )
-            })
+            thresholds: (
+              catalog.value[layer.id].attributes[
+                layer.style.fill.attribute
+              ] as QuantitativeAttributeEntry
+            ).Quantile[DEFAULT_COUNT].breaks
           };
         } else if (
           diff.payload.method !== 'Continuous' &&
           layer.style.fill.scale.type !== 'Continuous'
         ) {
-          // Just recompute the thresholds.
           layer.style.fill.scale.type = diff.payload.method;
-          layer.style.fill.scale.thresholds = recomputeBreaks(
-            layer.id,
-            layer.style.fill.attribute,
-            layer.style.fill.scale
-          );
+
+          // If using a Manual classifier, rederive breaks for the default
+          // classification method.
+          const scaleType =
+            layer.style.fill.scale.type === 'Manual'
+              ? DEFAULT_METHOD(layer.source.type)
+              : layer.style.fill.scale.type;
+
+          layer.style.fill.scale.thresholds = (
+            catalog.value[layer.id].attributes[
+              layer.style.fill.attribute
+            ] as QuantitativeAttributeEntry
+          )[scaleType][layer.style.fill.scale.steps].breaks;
         }
       }
 
@@ -354,11 +327,19 @@ export async function patchFillDiffs(
 
         // Apply the patch.
         layer.style.fill.scale.steps = diff.payload.count;
-        layer.style.fill.scale.thresholds = recomputeBreaks(
-          layer.id,
-          layer.style.fill.attribute,
-          layer.style.fill.scale
-        );
+
+        // If using a Manual classifier, rederive breaks for the default
+        // classification method.
+        const scaleType =
+          layer.style.fill.scale.type === 'Manual'
+            ? DEFAULT_METHOD(layer.source.type)
+            : layer.style.fill.scale.type;
+
+        layer.style.fill.scale.thresholds = (
+          catalog.value[layer.id].attributes[
+            layer.style.fill.attribute
+          ] as QuantitativeAttributeEntry
+        )[scaleType][layer.style.fill.scale.steps].breaks;
       }
 
       break;
@@ -373,18 +354,6 @@ export async function patchFillDiffs(
         layer.style.fill.type === 'Quantitative' &&
         layer.style.fill.scale.type === 'Manual'
       ) {
-        // If the diff targets a step outside the current thresholds, return
-        // early. Writing past the end of the thresholds array would trigger a
-        // fallback to quantiles and discard every manual break. This cannot
-        // happen via the UI but may happen when using LLM-generated edits.
-        if (
-          !Number.isInteger(diff.payload.step) ||
-          diff.payload.step < 0 ||
-          diff.payload.step >= layer.style.fill.scale.thresholds.length
-        ) {
-          break;
-        }
-
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'fill-step-value',
@@ -398,11 +367,6 @@ export async function patchFillDiffs(
         // Apply the patch.
         layer.style.fill.scale.thresholds[diff.payload.step] =
           diff.payload.value;
-        layer.style.fill.scale.thresholds = recomputeBreaks(
-          layer.id,
-          layer.style.fill.attribute,
-          layer.style.fill.scale
-        );
       }
 
       break;
@@ -441,7 +405,11 @@ export async function patchFillDiffs(
                 id: DEFAULT_CATEGORICAL_SCHEME,
                 direction: 'Forward'
               },
-              categories: findAttributeCategories(layer.id, attribute)
+              categories: (
+                catalog.value[diff.layerId].attributes[
+                  attribute
+                ] as CategoricalAttributeEntry
+              ).values
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
@@ -450,22 +418,23 @@ export async function patchFillDiffs(
         }
         case 'Quantitative': {
           const attribute = selectQuantitativeAttribute(layer.id);
+          const scaleType = DEFAULT_METHOD(layer.source.type);
 
           layer.style.fill = {
             type: diff.payload.visualizationType,
             attribute,
             scale: {
-              type: DEFAULT_METHOD(layer.source.type),
+              type: scaleType,
               scheme: {
                 id: DEFAULT_QUANTITATIVE_SCHEME,
                 direction: DEFAULT_SCHEME_DIRECTION
               },
               steps: DEFAULT_COUNT,
-              thresholds: DEFAULT_THRESHOLDS(
-                layer.id,
-                attribute,
-                layer.source.type
-              )
+              thresholds: (
+                catalog.value[layer.id].attributes[
+                  attribute
+                ] as QuantitativeAttributeEntry
+              )[scaleType][DEFAULT_COUNT].breaks
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible

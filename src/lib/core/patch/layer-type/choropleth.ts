@@ -1,10 +1,11 @@
-import type { CartoKitLayer, CartoKitChoroplethLayer } from '$lib/types';
+import { catalog } from '$lib/state/catalog.svelte';
+import type { CartoKitChoroplethLayer, CartoKitLayer } from '$lib/types';
+import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
 import { selectQuantitativeAttribute } from '$lib/utils/attributes';
 import {
+  DEFAULT_COUNT,
   DEFAULT_METHOD,
   DEFAULT_QUANTITATIVE_SCHEME,
-  DEFAULT_COUNT,
-  DEFAULT_THRESHOLDS,
   DEFAULT_SCHEME_DIRECTION
 } from '$lib/utils/constants';
 
@@ -31,6 +32,7 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
               )
             }
           : layer.source;
+      const scaleType = DEFAULT_METHOD(layer.source.type);
 
       const targetLayer: CartoKitChoroplethLayer = {
         ...layer,
@@ -41,17 +43,17 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
             type: 'Quantitative',
             attribute: layer.style.dot.attribute,
             scale: {
-              type: DEFAULT_METHOD(layer.source.type),
+              type: scaleType,
               scheme: {
                 id: DEFAULT_QUANTITATIVE_SCHEME,
                 direction: DEFAULT_SCHEME_DIRECTION
               },
               steps: DEFAULT_COUNT,
-              thresholds: DEFAULT_THRESHOLDS(
-                layer.id,
-                layer.style.dot.attribute,
-                layer.source.type
-              )
+              thresholds: (
+                catalog.value[layer.id].attributes[
+                  layer.style.dot.attribute
+                ] as QuantitativeAttributeEntry
+              )[scaleType][DEFAULT_COUNT].breaks
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible
@@ -84,6 +86,7 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
         layer.type === 'Proportional Symbol'
           ? layer.style.size.attribute
           : selectQuantitativeAttribute(layer.id);
+      const scaleType = DEFAULT_METHOD(layer.source.type);
 
       const targetLayer: CartoKitChoroplethLayer = {
         ...layer,
@@ -97,17 +100,17 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
                   type: 'Quantitative',
                   attribute,
                   scale: {
-                    type: DEFAULT_METHOD(layer.source.type),
+                    type: scaleType,
                     scheme: {
                       id: DEFAULT_QUANTITATIVE_SCHEME,
                       direction: DEFAULT_SCHEME_DIRECTION
                     },
                     steps: DEFAULT_COUNT,
-                    thresholds: DEFAULT_THRESHOLDS(
-                      layer.id,
-                      attribute,
-                      layer.source.type
-                    )
+                    thresholds: (
+                      catalog.value[layer.id].attributes[
+                        attribute
+                      ] as QuantitativeAttributeEntry
+                    )[scaleType][DEFAULT_COUNT].breaks
                   },
                   opacity: layer.style.fill.opacity,
                   visible: layer.style.fill.visible
@@ -120,6 +123,7 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
     }
     case 'Polygon': {
       const attribute = selectQuantitativeAttribute(layer.id);
+      const scaleType = DEFAULT_METHOD(layer.source.type);
 
       const targetLayer: CartoKitChoroplethLayer = {
         ...layer,
@@ -130,17 +134,17 @@ export function patchChoropleth(layer: CartoKitLayer): CartoKitChoroplethLayer {
             type: 'Quantitative',
             attribute,
             scale: {
-              type: DEFAULT_METHOD(layer.source.type),
+              type: scaleType,
               scheme: {
                 id: DEFAULT_QUANTITATIVE_SCHEME,
                 direction: DEFAULT_SCHEME_DIRECTION
               },
               steps: DEFAULT_COUNT,
-              thresholds: DEFAULT_THRESHOLDS(
-                layer.id,
-                attribute,
-                layer.source.type
-              )
+              thresholds: (
+                catalog.value[layer.id].attributes[
+                  attribute
+                ] as QuantitativeAttributeEntry
+              )[scaleType][DEFAULT_COUNT].breaks
             },
             opacity: layer.style.fill.opacity,
             visible: layer.style.fill.visible

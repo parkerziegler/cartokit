@@ -4,19 +4,22 @@ import type { CartoKitLayer, VectorGeometry } from '$lib/types';
 import type { DuckDBColumn } from '$lib/types/db';
 
 /**
- * Represents a per-attribute catalog entry for a numeric attribute, including
- * pre-computed classification statistics.
+ * Represents a per-attribute catalog entry for a quantitative attribute,
+ * including pre-computed classification statistics.
  */
-export interface NumericAttributeEntry {
-  /** The type of the attribute ('number'). */
-  type: 'number';
-  /** The domain of the attribute, used for quantile classification. */
-  quantiles: { domain: number[] };
-  /**
-   * The pre-computed Jenks breaks for the attribute, used for natural breaks
-   * classification.
-   */
-  jenks: {
+export interface QuantitativeAttributeEntry {
+  /** The type of the attribute, 'quantitative'. */
+  type: 'quantitative';
+  /** The minimum value of the attribute. */
+  min: number;
+  /** The maximum value of the attribute. */
+  max: number;
+  /** The domain of the attribute. */
+  domain: number[];
+  /** The number of unique values for the attribute. */
+  unique: number;
+  /** The pre-computed quantile breaks for the attribute. */
+  Quantile: {
     3: { breaks: number[] };
     4: { breaks: number[] };
     5: { breaks: number[] };
@@ -25,42 +28,41 @@ export interface NumericAttributeEntry {
     8: { breaks: number[] };
     9: { breaks: number[] };
   };
-  /** The minimum value of the attribute. */
-  min: number;
-  /** The maximum value of the attribute. */
-  max: number;
-  /** The number of unique values for the attribute. */
-  unique: number;
-  /**
-   * The unique values of the attribute, for sources that report them in place
-   * of a full domain (e.g., PMTiles tilestats).
-   */
-  values?: number[];
+  /** The pre-computed equal interval breaks for the attribute. */
+  'Equal Interval': {
+    3: { breaks: number[] };
+    4: { breaks: number[] };
+    5: { breaks: number[] };
+    6: { breaks: number[] };
+    7: { breaks: number[] };
+    8: { breaks: number[] };
+    9: { breaks: number[] };
+  };
+  /** The pre-computed Jenks breaks for the attribute. */
+  Jenks: {
+    3: { breaks: number[] };
+    4: { breaks: number[] };
+    5: { breaks: number[] };
+    6: { breaks: number[] };
+    7: { breaks: number[] };
+    8: { breaks: number[] };
+    9: { breaks: number[] };
+  };
 }
 
-/** Represents a per-attribute catalog entry for a string attribute. */
-export interface StringAttributeEntry {
-  /** The type of the attribute ('string'). */
-  type: 'string';
+/** Represents a per-attribute catalog entry for a categorical attribute. */
+export interface CategoricalAttributeEntry {
+  /** The type of the attribute, 'categorical'. */
+  type: 'categorical';
   /** The unique values of the attribute. */
-  values: string[];
+  values: string[] | number[] | boolean[];
   /** The number of unique values for the attribute. */
   unique: number;
-}
-
-/** Represents a per-attribute catalog entry for a Boolean attribute. */
-export interface BooleanAttributeEntry {
-  /** The type of the attribute ('boolean'). */
-  type: 'boolean';
-  /** The unique values of the attribute. */
-  values: boolean[];
-  /** The number of unique values for the attribute. */
-  unique: 1 | 2;
 }
 
 /** Represents a per-attribute entry in the {@link Catalog}. */
 export type AttributeEntry =
-  NumericAttributeEntry | StringAttributeEntry | BooleanAttributeEntry;
+  QuantitativeAttributeEntry | CategoricalAttributeEntry;
 
 /** Represents a catalog entry for a {@link CartoKitLayer} backed by GeoJSON. */
 interface GeoJSONCatalogEntry {

@@ -79,9 +79,9 @@
           ></span>
         </div>
       {/if}
-      <enhanced:img src={item.src} alt={item.name} class="rounded-xs" />
+      <enhanced:img src={item.src} alt={item.displayName} class="rounded-xs" />
       <div class="mt-2 flex items-center justify-between gap-1">
-        <p class="text-xs font-semibold">{item.name}</p>
+        <p class="text-xs font-semibold">{item.displayName}</p>
         <span class="shrink-0">
           {#if item.type === 'Line'}
             <LineIcon />
