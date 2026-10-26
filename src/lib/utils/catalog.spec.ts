@@ -69,6 +69,21 @@ async function initTestDB() {
   return { db, conn: conn as unknown as AsyncDuckDBConnection };
 }
 
+/**
+ * Select the {@link QuantitativeAttributeEntry} for a layer from a built
+ * catalog.
+ *
+ * @param catalog The built {@link Catalog}.
+ * @param layerId The layer id to query.
+ * @returns An Array of {@link QuantitativeAttributeEntry} from the catalog.
+ */
+function selectQuantitativeEntries(catalog: Catalog, layerId: string) {
+  return Object.values(catalog[layerId].attributes).filter(
+    (entry): entry is QuantitativeAttributeEntry =>
+      entry.kind === 'Quantitative'
+  );
+}
+
 describe('buildCatalog', () => {
   let conn: AsyncDuckDBConnection;
   const tables: Record<string, DuckDBTable> = {};
@@ -129,27 +144,12 @@ describe('buildCatalog', () => {
     }
   };
 
-  /**
-   * Select the {@link QuantitativeAttributeEntry} for a layer from a built
-   * catalog.
-   *
-   * @param catalog The built {@link Catalog}.
-   * @param layerId The layer id to query.
-   * @returns An Array of {@link QuantitativeAttributeEntry} from the catalog.
-   */
-  function selectNumericEntries(catalog: Catalog, layerId: string) {
-    return Object.values(catalog[layerId].attributes).filter(
-      (entry): entry is QuantitativeAttributeEntry =>
-        entry.kind === 'Quantitative'
-    );
-  }
-
   test('should build a catalog with minimum and maximum values', async () => {
     const catalog = await buildCatalog(layer.id, layer.source, {
       conn,
       table: tables[layer.id]
     });
-    const entries = selectNumericEntries(catalog, layer.id);
+    const entries = selectQuantitativeEntries(catalog, layer.id);
 
     expect(entries.length).toBeGreaterThan(0);
     entries.forEach((entry) => {
@@ -163,7 +163,7 @@ describe('buildCatalog', () => {
       conn,
       table: tables[layer.id]
     });
-    const entries = selectNumericEntries(catalog, layer.id);
+    const entries = selectQuantitativeEntries(catalog, layer.id);
 
     expect(entries.length).toBeGreaterThan(0);
     entries.forEach((entry) => {
@@ -177,7 +177,7 @@ describe('buildCatalog', () => {
       conn,
       table: tables[layer.id]
     });
-    const entries = selectNumericEntries(catalog, layer.id);
+    const entries = selectQuantitativeEntries(catalog, layer.id);
 
     expect(entries.length).toBeGreaterThan(0);
     entries.forEach((entry) => {

@@ -10,6 +10,7 @@ import type {
 } from '$lib/types/color';
 import type { TransformationCall } from '$lib/types/transformation';
 
+/** The valid number of steps in a {@link QuantitativeColorScale}. */
 export type QuantitativeStepCount = 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 /**

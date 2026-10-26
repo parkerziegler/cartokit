@@ -1,3 +1,4 @@
+import type { AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 import * as d3 from 'd3';
 
 import type {
@@ -7,8 +8,8 @@ import type {
   QuantitativeStepCount
 } from '$lib/types';
 import {
-  type Catalog,
   type AttributeEntry,
+  type Catalog,
   type CategoricalAttributeEntry,
   type QuantitativeAttributeEntry
 } from '$lib/types/catalog';
@@ -22,7 +23,6 @@ import {
   deriveJenksBreaks,
   deriveQuantiles
 } from '$lib/utils/scales';
-import type { AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 
 /**
  * Get the geometry type of data sources stored in DuckDB.
@@ -117,13 +117,14 @@ function deriveCategoricalAttributeEntry(
  *
  * @param layerId The id of the {@link CartoKitLayer} to add to the catalog.
  * @param source The {@link CartoKitSource} of the layer.
- * @param table The layer's {@link DuckDBTable}. Required for GeoParquet sources.
+ * @param table The layer's {@link DuckDBTable}. Required for GeoJSON and
+ * GeoParquet sources.
  * @returns The built {@link Catalog}.
  */
 export async function buildCatalog(
   layerId: string,
   source: CartoKitSource,
-  db?: {
+  db: {
     conn: AsyncDuckDBConnection;
     table: DuckDBTable;
   }
@@ -133,12 +134,6 @@ export async function buildCatalog(
   switch (source.type) {
     case 'geojson':
     case 'geoparquet': {
-      if (!db?.conn || !db?.table) {
-        throw new Error(
-          `Catalog construction requires an active database connection and table for layer '${layerId}'.`
-        );
-      }
-
       const { columns, geometryColumn } = db.table;
       const tableName = quoteIdentifier(layerId);
 
