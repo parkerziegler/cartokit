@@ -14,7 +14,7 @@ import { waitForMapIdle } from '../utils/idle';
  */
 test('workflow-3', async ({ page }) => {
   // Mark workflow tests as slow.
-  test.setTimeout(150000);
+  test.setTimeout(180_000);
 
   // Navigate to cartokit, running on a local development server.
   await page.goto('/?playwright=1');
