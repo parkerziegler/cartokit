@@ -44,7 +44,7 @@ export async function reconLayerDiffs(
           const geojson = await readTableAsGeoJSON(
             db.value!.conn,
             layer.id,
-            entry.columns
+            entry
           );
 
           map.value!.addSource(layer.id, {

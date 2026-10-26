@@ -27,13 +27,17 @@ const DUCKDB_GEOMETRY_TYPES_TO_GEOJSON_GEOMETRY_TYPES: Record<
  * @param conn The active DuckDB database connection.
  * @param source The URL or registered file name of the GeoParquet file.
  * @param layerId The id of the layer whose table holds the file's data.
+ * @param geometryColumn The name of the geometry column in the layer's table.
  * @returns The {@link Geometry['type']} of the GeoParquet file.
  */
 export async function getGeoParquetGeometryType(
   conn: AsyncDuckDBConnection,
   source: string,
-  layerId: string
+  layerId: string,
+  geometryColumn: string
 ): Promise<Geometry['type']> {
+  const geometry = quoteIdentifier(geometryColumn);
+
   const [metadata] = (
     await conn.query(
       `WITH metadata AS (
@@ -60,7 +64,7 @@ FROM metadata;`
 
   const [row] = (
     await conn.query(
-      `SELECT ST_GeometryType(geom)::VARCHAR AS geometry_type FROM ${quoteIdentifier(layerId)} WHERE geom IS NOT NULL LIMIT 1;`
+      `SELECT ST_GeometryType(${geometry})::VARCHAR AS geometry_type FROM ${quoteIdentifier(layerId)} WHERE ${geometry} IS NOT NULL LIMIT 1;`
     )
   )
     .toArray()

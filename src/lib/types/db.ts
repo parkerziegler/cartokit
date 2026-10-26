@@ -10,6 +10,6 @@ export interface DuckDBColumn {
 export interface DuckDBTable {
   /** The {@link DuckDBColumn}s of the normalized table. */
   columns: DuckDBColumn[];
-  /** The name of the geometry column in the source, prior to normalization. */
+  /** The name of the geometry column. */
   geometryColumn: string;
 }

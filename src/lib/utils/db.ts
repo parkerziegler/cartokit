@@ -64,14 +64,10 @@ export function generateCreateTableStatement(layerId: string, source: string) {
  * columns: nested properties serialized to JSON, and the geometry serialized
  * to GeoJSON in a column named geom.
  *
- * @param columns The {@link DuckDBColumn}s to select from.
- * @param geometryColumn The name of the geometry column to select from.
+ * @param table The {@link DuckDBTable} to select from.
  * @returns A SQL select list.
  */
-export function generateSelectList(
-  columns: DuckDBColumn[],
-  geometryColumn = 'geom'
-) {
+export function generateSelectList({ columns, geometryColumn }: DuckDBTable) {
   const nestedProperties = columns
     .filter(({ column_type }) => isNestedType(column_type))
     .map(({ column_name }) => column_name);
@@ -92,14 +88,11 @@ export function generateSelectList(
  * Generate a SQL SELECT query to query all data from a table.
  *
  * @param layerId The id of the table to query.
- * @param columns The {@link DuckDBColumn}s of the table, as reported by DESCRIBE.
+ * @param table The {@link DuckDBTable} to query.
  * @returns A SQL SELECT statement.
  */
-export function generateSelectStatement(
-  layerId: string,
-  columns: DuckDBColumn[]
-) {
-  return `SELECT ${generateSelectList(columns)} FROM ${layerId}`;
+export function generateSelectStatement(layerId: string, table: DuckDBTable) {
+  return `SELECT ${generateSelectList(table)} FROM ${layerId}`;
 }
 
 /**
@@ -141,20 +134,17 @@ function isNestedType(columnType: string): boolean {
 }
 
 /**
- * Normalize a newly-created table so that, regardless of the reader used to
- * create it, its geometry lives in a single column named geom and no
- * reader-specific columns remain.
+ * Inspect a newly-created table for the column storing geometry.
  *
  * @param conn The active DuckDB database connection.
  * @param layerId The id of the layer whose table should be normalized.
- * @returns The normalized {@link DuckDBTable}.
+ * @returns A {@link DuckDBTable}.
  */
-async function normalizeTable(
+async function inspectTableForGeometry(
   conn: AsyncDuckDBConnection,
   layerId: string
 ): Promise<DuckDBTable> {
   const columns = await describeTable(conn, layerId);
-
   const geometry = columns.find(({ column_type }) =>
     column_type.startsWith('GEOMETRY')
   );
@@ -163,23 +153,8 @@ async function normalizeTable(
     throw new Error('No geometry column found.');
   }
 
-  if (geometry.column_name !== 'geom') {
-    await conn.query(
-      `ALTER TABLE ${layerId} RENAME COLUMN ${quoteIdentifier(geometry.column_name)} TO geom;`
-    );
-  }
-
-  if (columns.some(({ column_name }) => column_name === 'OGC_FID')) {
-    await conn.query(`ALTER TABLE ${layerId} DROP COLUMN OGC_FID;`);
-  }
-
   return {
-    // Derive the normalized columns rather than describing the table again.
-    columns: columns
-      .filter(({ column_name }) => column_name !== 'OGC_FID')
-      .map((column) =>
-        column === geometry ? { ...column, column_name: 'geom' } : column
-      ),
+    columns,
     geometryColumn: geometry.column_name
   };
 }
@@ -215,7 +190,7 @@ export async function createTable(
 
   await conn.query(generateCreateTableStatement(layerId, source));
 
-  return await normalizeTable(conn, layerId);
+  return await inspectTableForGeometry(conn, layerId);
 }
 
 /**
@@ -225,19 +200,15 @@ export async function createTable(
  *
  * @param conn The active DuckDB database connection.
  * @param layerId The id of the layer to create.
- * @param columns The {@link DuckDBColumn}s of the layer's table, if already known. If
- * omitted, the table is described to obtain them.
+ * @param table The layer's {@link DuckDBTable}.
  * @returns A GeoJSON {@link FeatureCollection}.
  */
 export async function readTableAsGeoJSON(
   conn: AsyncDuckDBConnection,
   layerId: string,
-  columns?: DuckDBColumn[]
+  table: DuckDBTable
 ): Promise<FeatureCollection> {
-  const query = generateSelectStatement(
-    layerId,
-    columns ?? (await describeTable(conn, layerId))
-  );
+  const query = generateSelectStatement(layerId, table);
 
   return toFeatureCollection(await conn.query(query));
 }

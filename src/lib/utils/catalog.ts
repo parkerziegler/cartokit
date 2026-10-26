@@ -30,12 +30,14 @@ import {
  * @param conn active {@link AsyncDuckDBConnection} to the database.
  * @param source A {@link CartoKitGeoJSONSource} or a {@link CartoKitGeoParquetSource}.
  * @param layerId The layer id.
+ * @param geometryColumn The name of the geometry column in the layer's table.
  * @returns The {@link Geometry['type']} of the source.
  */
 async function deriveGeometryType(
   conn: AsyncDuckDBConnection,
   source: CartoKitGeoJSONSource | CartoKitGeoParquetSource,
-  layerId: string
+  layerId: string,
+  geometryColumn: string
 ) {
   switch (source.type) {
     case 'geojson':
@@ -46,7 +48,8 @@ async function deriveGeometryType(
         source.location.type === 'api'
           ? source.location.url
           : source.location.file.name,
-        layerId
+        layerId,
+        geometryColumn
       );
   }
 }
@@ -124,7 +127,7 @@ function deriveCategoricalAttributeEntry(
 export async function buildCatalog(
   layerId: string,
   source: CartoKitSource,
-  db: {
+  db?: {
     conn: AsyncDuckDBConnection;
     table: DuckDBTable;
   }
@@ -134,6 +137,11 @@ export async function buildCatalog(
   switch (source.type) {
     case 'geojson':
     case 'geoparquet': {
+      if (!db) {
+        throw new Error(
+          'A DuckDB database must be provided for catalog construction.'
+        );
+      }
       const { columns, geometryColumn } = db.table;
       const tableName = quoteIdentifier(layerId);
 
@@ -193,7 +201,12 @@ export async function buildCatalog(
 
       catalog[layerId] = {
         type: source.type,
-        geometryType: await deriveGeometryType(db.conn, source, layerId),
+        geometryType: await deriveGeometryType(
+          db.conn,
+          source,
+          layerId,
+          geometryColumn
+        ),
         count: summary.ck_count as number,
         attributes,
         columns,

@@ -93,10 +93,7 @@ export function codegenSource(
       // and geometry column cataloged when the layer was added. Replace `, \,
       // and $ characters with their escaped equivalents to ensure these
       // characters do not interfere with the template literal below.
-      const selectList = generateSelectList(
-        entry.columns,
-        entry.geometryColumn
-      ).replace(/[`\\$]/g, '\\$&');
+      const selectList = generateSelectList(entry).replace(/[`\\$]/g, '\\$&');
 
       // If loading a local GeoParquet file from public/data, add a call to
       // register it.

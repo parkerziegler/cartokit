@@ -57,7 +57,7 @@ export async function patchLayerDiffs(
           const geojson = await readTableAsGeoJSON(
             db.value!.conn,
             diff.layerId,
-            table.columns
+            table
           );
 
           source = {
