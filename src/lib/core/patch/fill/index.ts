@@ -251,8 +251,8 @@ export async function patchFillDiffs(
           }
         };
 
-        // If transitioning from a discrete to a continuous color scale or vice
-        // versa, build the color scale wholesale.
+        // If transitioning from a discrete to a continuous color scale, build
+        // the color scale wholesale.
         if (
           diff.payload.method === 'Continuous' &&
           layer.style.fill.scale.type !== 'Continuous'
@@ -264,6 +264,8 @@ export async function patchFillDiffs(
               direction: layer.style.fill.scale.scheme.direction
             }
           };
+          // If transitioning from a continuous to a discrete color scale, build
+          // the color scale wholesale.
         } else if (
           diff.payload.method !== 'Continuous' &&
           layer.style.fill.scale.type === 'Continuous'
@@ -272,6 +274,12 @@ export async function patchFillDiffs(
             id: convertRampToScheme(layer.style.fill.scale.interpolator.id),
             direction: layer.style.fill.scale.interpolator.direction
           };
+          // If targeting a Manual classifier, rederive breaks for the default
+          // classification method.
+          const scaleType =
+            diff.payload.method === 'Manual'
+              ? DEFAULT_METHOD(layer.source.type)
+              : diff.payload.method;
 
           layer.style.fill.scale = {
             type: diff.payload.method,
@@ -281,8 +289,10 @@ export async function patchFillDiffs(
               catalog.value[layer.id].attributes[
                 layer.style.fill.attribute
               ] as QuantitativeAttributeEntry
-            ).Quantile[DEFAULT_COUNT].breaks
+            )[scaleType][DEFAULT_COUNT].breaks
           };
+          // If transitioning between discrete scales, just update the scale
+          // type and thresholds directly.
         } else if (
           diff.payload.method !== 'Continuous' &&
           layer.style.fill.scale.type !== 'Continuous'
