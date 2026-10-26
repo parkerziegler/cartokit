@@ -4,7 +4,7 @@ import type {
 } from '$lib/types';
 import { deriveCentroids } from '$lib/stdlib/centroid';
 import deriveCentroidsSrc from '$lib/stdlib/centroid?raw';
-import { selectQuantitativeAttribute } from '$lib/utils/attributes';
+import { selectQuantitativeAttribute } from '$lib/utils/attribute';
 import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_FILL,

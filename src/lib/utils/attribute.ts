@@ -11,7 +11,7 @@ export function selectQuantitativeAttribute(layerId: string) {
   const quantitativeAttributes = Object.entries(
     catalog.value[layerId].attributes
   )
-    .filter(([_, value]) => value.type === 'Quantitative')
+    .filter(([_, value]) => value.kind === 'Quantitative')
     .map(([key]) => key);
 
   if (quantitativeAttributes.length === 0) {
@@ -32,7 +32,7 @@ export function selectCategoricalAttribute(layerId: string) {
   const categoricalAttributes = Object.entries(
     catalog.value[layerId].attributes
   )
-    .filter(([_, value]) => value.type === 'Categorical')
+    .filter(([_, value]) => value.kind === 'Categorical')
     .map(([key]) => key);
 
   if (categoricalAttributes.length === 0) {

@@ -18,7 +18,7 @@ import type {
 import {
   selectCategoricalAttribute,
   selectQuantitativeAttribute
-} from '$lib/utils/attributes';
+} from '$lib/utils/attribute';
 import { randomColor } from '$lib/utils/color';
 import {
   convertRampToScheme,

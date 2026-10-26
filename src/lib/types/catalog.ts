@@ -1,6 +1,7 @@
 import type { Geometry } from 'geojson';
 
 import type { CartoKitLayer, VectorGeometry } from '$lib/types';
+import type { AttributeKind } from '$lib/types/attribute';
 import type { DuckDBColumn } from '$lib/types/db';
 
 /**
@@ -8,8 +9,8 @@ import type { DuckDBColumn } from '$lib/types/db';
  * including pre-computed classification statistics.
  */
 export interface QuantitativeAttributeEntry {
-  /** The type of the attribute, 'quantitative'. */
-  type: 'Quantitative';
+  /** The logical kind of the attribute, 'quantitative'. */
+  kind: Extract<AttributeKind, 'Quantitative'>;
   /** The minimum value of the attribute. */
   min: number;
   /** The maximum value of the attribute. */
@@ -52,8 +53,8 @@ export interface QuantitativeAttributeEntry {
 
 /** Represents a per-attribute catalog entry for a categorical attribute. */
 export interface CategoricalAttributeEntry {
-  /** The type of the attribute, 'categorical'. */
-  type: 'Categorical';
+  /** The logical kind of the attribute, 'Categorical'. */
+  kind: Extract<AttributeKind, 'Categorical'>;
   /** The unique values of the attribute. */
   values: string[] | number[] | boolean[];
   /** The number of unique values for the attribute. */

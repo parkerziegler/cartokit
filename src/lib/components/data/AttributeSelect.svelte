@@ -17,8 +17,8 @@
   let options = $derived(
     Object.entries(catalog.value[layerId].attributes).reduce<
       { value: string; label: string }[]
-    >((acc, [attribute, value]) => {
-      if (attributeKind === value.type) {
+    >((acc, [attribute, entry]) => {
+      if (attributeKind === entry.kind) {
         acc.push({
           value: attribute,
           label: attribute

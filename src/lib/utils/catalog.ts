@@ -87,7 +87,7 @@ function deriveQuantitativeAttributeEntry(
   );
 
   return {
-    type: 'Quantitative',
+    kind: 'Quantitative',
     min,
     max,
     domain,
@@ -106,7 +106,7 @@ function deriveCategoricalAttributeEntry(
   values: string[]
 ): CategoricalAttributeEntry {
   return {
-    type: 'Categorical',
+    kind: 'Categorical',
     values: values,
     unique: values.length
   };

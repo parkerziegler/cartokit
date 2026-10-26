@@ -1,7 +1,7 @@
 import { catalog } from '$lib/state/catalog.svelte';
 import type { CartoKitChoroplethLayer, CartoKitLayer } from '$lib/types';
 import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
-import { selectQuantitativeAttribute } from '$lib/utils/attributes';
+import { selectQuantitativeAttribute } from '$lib/utils/attribute';
 import {
   DEFAULT_COUNT,
   DEFAULT_METHOD,

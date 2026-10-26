@@ -23,7 +23,7 @@ function setCatalogEntry(
   max: number
 ): void {
   const entry: QuantitativeAttributeEntry = {
-    type: 'Quantitative',
+    kind: 'Quantitative',
     min,
     max,
     domain: [],
