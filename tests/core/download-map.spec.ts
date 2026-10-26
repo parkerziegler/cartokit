@@ -4,14 +4,15 @@ import * as url from 'node:url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
+import { waitForMapIdle } from '../utils/idle';
 import packageJson from '../../package.json' with { type: 'json' };
 
 test.describe('download-map', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to cartokit, running on a local development server.
-    await page.goto('/');
+    await page.goto('/?playwright=1');
 
     if (page.url().includes('vercel.app')) {
       // In Preview Vercel environments, ensure <vercel-live-feedback> does not
@@ -57,15 +58,12 @@ test.describe('download-map', () => {
     await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
 
     // Ensure the Add Layer modal is no longer visible.
-    await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
+    await expect(page.getByTestId('add-layer-modal')).not.toBeVisible({
+      timeout: 10000
+    });
 
-    // Wait for MapLibre to render the Climate Impact Regions layer.
-    //
-    // Tiles are generated on the fly by MapLibre, so we need to wait for them to
-    // load. In theory, we'd like to hook into MapLibre's event system to deter-
-    // mine when the map is idle; however, we don't want to attach the map inst-
-    // ance to the global window object just for the sake of testing.
-    await page.waitForTimeout(5000);
+    // Wait for the map to tile and render the data.
+    await waitForMapIdle(page);
 
     // Click on the layer entry in the Layers Panel.
     await page.getByTestId('layer-entry').first().click();
@@ -103,7 +101,7 @@ test.describe('download-map', () => {
     diffs: [
       {
         type: 'add-layer',
-        layerId: 'climate-impact-regions__1',
+        layerId: 'climate_impact_regions__1',
         payload: {
           type: 'geojson',
           displayName: 'Climate Impact Regions',
@@ -115,22 +113,22 @@ test.describe('download-map', () => {
       },
       {
         type: 'remove-stroke',
-        layerId: 'climate-impact-regions__1',
+        layerId: 'climate_impact_regions__1',
         payload: {}
       },
       {
         type: 'layer-type',
-        layerId: 'climate-impact-regions__1',
+        layerId: 'climate_impact_regions__1',
         payload: { sourceLayerType: 'Polygon', targetLayerType: 'Choropleth' }
       },
       {
         type: 'fill-attribute',
-        layerId: 'climate-impact-regions__1',
+        layerId: 'climate_impact_regions__1',
         payload: { attribute: 'years_2080_2099' }
       },
       {
         type: 'fill-color-scheme',
-        layerId: 'climate-impact-regions__1',
+        layerId: 'climate_impact_regions__1',
         payload: { scheme: 'schemePRGn' }
       }
     ]

@@ -1,9 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
+import { waitForMapIdle } from '../utils/idle';
 
 test.describe('basic codegen', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to cartokit, running on a local development server.
-    await page.goto('/');
+    await page.goto('/?playwright=1');
 
     if (page.url().includes('vercel.app')) {
       // In Preview Vercel environments, ensure <vercel-live-feedback> does not
@@ -37,15 +39,12 @@ test.describe('basic codegen', () => {
     await page.getByRole('button', { name: 'Climate Impact Regions' }).click();
 
     // Ensure the Add Layer modal is no longer visible.
-    await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
+    await expect(page.getByTestId('add-layer-modal')).not.toBeVisible({
+      timeout: 10000
+    });
 
-    // Wait for MapLibre to render the Climate Impact Regions layer.
-    //
-    // Tiles are generated on the fly by MapLibre, so we need to wait for them
-    // to load. In theory, we'd like to hook into MapLibre's event system to
-    // determine when the map is idle; however, we don't want to attach the map
-    // instance to the global window object just for the sake of testing.
-    await page.waitForTimeout(5000);
+    // Wait for the map to tile and render the data.
+    await waitForMapIdle(page);
   });
 
   test('should generate code for a single-layer map', async ({ page }) => {

@@ -2,28 +2,13 @@ import {
   AsyncDuckDB,
   type AsyncDuckDBConnection,
   ConsoleLogger,
-  type DuckDBBundles,
-  DuckDBDataProtocol,
-  selectBundle
+  DuckDBDataProtocol
 } from '@duckdb/duckdb-wasm';
 import eh_worker from '@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url';
-import mvp_worker from '@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url';
 import duckdb_wasm_eh from '@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url';
-import duckdb_wasm from '@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url';
 import type { Feature, FeatureCollection } from 'geojson';
 
 import type { DuckDBColumn, DuckDBTable } from '$lib/types/db';
-
-const MANUAL_BUNDLES: DuckDBBundles = {
-  mvp: {
-    mainModule: duckdb_wasm,
-    mainWorker: mvp_worker
-  },
-  eh: {
-    mainModule: duckdb_wasm_eh,
-    mainWorker: eh_worker
-  }
-};
 
 /**
  * Initialize a DuckDB in-memory database.
@@ -34,13 +19,11 @@ const MANUAL_BUNDLES: DuckDBBundles = {
  *  3. The active {@link AsyncDuckDBConnection}.
  */
 export async function initDB() {
-  const bundle = await selectBundle(MANUAL_BUNDLES);
-
   // Instantiate the asynchronous version of DuckDB-wasm
-  const worker = new Worker(bundle.mainWorker!);
+  const worker = new Worker(eh_worker);
   const logger = new ConsoleLogger();
   const db = new AsyncDuckDB(logger, worker);
-  await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+  await db.instantiate(duckdb_wasm_eh);
 
   // Cast types that Arrow would otherwise surface as BigInt or Decimal objects
   // to plain numbers. MapLibre cannot serialize these when tiling GeoJSON.
@@ -53,11 +36,12 @@ export async function initDB() {
   });
 
   // Install and load the Spatial extension at startup.
+  // See https://github.com/duckdb/duckdb-wasm/issues/2199 for why the call to
+  // duckdb_coordinate_systems is necessary to support GeoParquet loading.
   const conn = await db.connect();
   await conn.query(`SELECT * FROM duckdb_coordinate_systems();
 INSTALL spatial;
-LOAD spatial;
-LOAD httpfs;`);
+LOAD spatial;`);
 
   return { db, worker, conn };
 }

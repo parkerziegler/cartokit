@@ -3,12 +3,14 @@ import * as url from 'node:url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
+import { waitForMapIdle } from '../utils/idle';
 
 test.describe('upload-map', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to cartokit, running on a local development server.
-    await page.goto('/');
+    await page.goto('/?playwright=1');
 
     if (page.url().includes('vercel.app')) {
       // In Preview Vercel environments, ensure <vercel-live-feedback> does not
@@ -46,13 +48,8 @@ test.describe('upload-map', () => {
     // Wait for the info indicator to disappear.
     await expect(page.getByTestId('upload-map-alert')).toBeHidden();
 
-    // Wait for MapLibre to render the Climate Impact Regions layer.
-    //
-    // Tiles are generated on the fly by MapLibre, so we need to wait for them to
-    // load. In theory, we'd like to hook into MapLibre's event system to deter-
-    // mine when the map is idle; however, we don't want to attach the map inst-
-    // ance to the global window object just for the sake of testing.
-    await page.waitForTimeout(5000);
+    // Wait for the map to tile and render the data.
+    await waitForMapIdle(page);
 
     // Click on the layer entry in the Layers Panel.
     await page.getByTestId('layer-entry').first().click();

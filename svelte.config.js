@@ -8,11 +8,6 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     adapter: adapter()
-  },
-  compilerOptions: {
-    experimental: {
-      async: true
-    }
   }
 };
 

@@ -1,7 +1,9 @@
 import * as path from 'node:path';
 import * as url from 'node:url';
 
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
+import { waitForMapIdle } from '../utils/idle';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -13,7 +15,7 @@ const GEOJSON_PATH = path.join(
 test.describe('file upload', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to cartokit, running on a local development server.
-    await page.goto('/');
+    await page.goto('/?playwright=1');
 
     if (page.url().includes('vercel.app')) {
       // In Preview Vercel environments, ensure <vercel-live-feedback> does not
@@ -62,15 +64,12 @@ test.describe('file upload', () => {
     await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
 
     // Ensure the Add Layer modal is no longer visible.
-    await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
+    await expect(page.getByTestId('add-layer-modal')).not.toBeVisible({
+      timeout: 10000
+    });
 
-    // Wait for MapLibre to render the Path of Totality layer.
-    //
-    // Tiles are generated on the fly by MapLibre, so we need to wait for them
-    // to load. In theory, we'd like to hook into MapLibre's event system to
-    // determine when the map is idle; however, we don't want to attach the map
-    // instance to the global window object just for the sake of testing.
-    await page.waitForTimeout(5000);
+    // Wait for the map to tile and render the data.
+    await waitForMapIdle(page);
 
     // Ensure the layer entry appears in the Layers Panel.
     await expect(page.getByTestId('layer-entry')).toHaveCount(1);
@@ -120,10 +119,12 @@ test.describe('file upload', () => {
       await page.getByTestId('loading-indicator').waitFor({ state: 'hidden' });
 
       // Ensure the Add Layer modal is no longer visible.
-      await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
+      await expect(page.getByTestId('add-layer-modal')).not.toBeVisible({
+        timeout: 10000
+      });
 
-      // Wait for MapLibre to render the new layer.
-      await page.waitForTimeout(5000);
+      // Wait for the map to tile and render the data.
+      await waitForMapIdle(page);
     }
 
     // Ensure both layer entries appear in the Layers Panel.

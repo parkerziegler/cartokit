@@ -154,7 +154,7 @@ export async function buildCatalog(
       const summary = (
         await db.conn.query(
           `SELECT ${[
-            'count(*) AS count',
+            'count(*) AS ck_count',
             ...numericColumns.map(
               (column) =>
                 `struct_pack(
@@ -199,7 +199,7 @@ export async function buildCatalog(
       catalog[layerId] = {
         type: source.type,
         geometryType: await deriveGeometryType(db.conn, source, layerId),
-        count: summary.count as number,
+        count: summary.ck_count as number,
         attributes,
         columns,
         geometryColumn
