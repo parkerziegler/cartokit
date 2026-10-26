@@ -1,31 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 import { waitForMapIdle } from '../utils/idle';
+import { openCartokit } from '../utils/navigate';
 
 test.describe('upload-api-pmtiles', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to cartokit, running on a local development server.
-    await page.goto('/?playwright=1');
-
-    if (page.url().includes('vercel.app')) {
-      // In Preview Vercel environments, ensure <vercel-live-feedback> does not
-      // intercept pointer events.
-      await page.locator('vercel-live-feedback').waitFor({ state: 'attached' });
-      await page.locator('vercel-live-feedback').evaluate((element) => {
-        element.style.pointerEvents = 'none';
-        element.style.zIndex = '-1';
-        element.style.display = 'none';
-      });
-    }
-
-    // Wait for the Open Editor button and Add Layer button to become enabled. These
-    // are proxies for the map reaching an idle state.
-    await expect(page.getByTestId('editor-toggle')).toBeEnabled({
-      timeout: 10000
-    });
-    await expect(page.getByTestId('add-layer-button')).toBeEnabled({
-      timeout: 10000
-    });
+    await openCartokit(page);
   });
 
   test('should support loading PMTiles archives from remote API endpoints', async ({

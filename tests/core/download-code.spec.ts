@@ -9,6 +9,8 @@ import { test, expect, type Browser, type Page } from '@playwright/test';
 import { unzipSync } from 'fflate';
 import type { Map } from 'maplibre-gl';
 
+import { openCartokit } from '../utils/navigate';
+
 declare global {
   interface Window {
     __map?: Map;
@@ -149,37 +151,6 @@ test.describe('download-code', () => {
       projectDir = undefined;
     }
   });
-
-  /**
-   * Navigate to cartokit and wait for the map to reach an idle state.
-   *
-   * @param page The Playwright {@link Page} instance.
-   */
-  async function openCartokit(page: Page): Promise<void> {
-    // Navigate to cartokit, running on a local development server. The
-    // playwright parameter exposes cartokit's map instance on window.__map.
-    await page.goto('/?playwright=1');
-
-    if (page.url().includes('vercel.app')) {
-      // In Preview Vercel environments, ensure <vercel-live-feedback> does not
-      // intercept pointer events.
-      await page.locator('vercel-live-feedback').waitFor({ state: 'attached' });
-      await page.locator('vercel-live-feedback').evaluate((element) => {
-        element.style.pointerEvents = 'none';
-        element.style.zIndex = '-1';
-        element.style.display = 'none';
-      });
-    }
-
-    // Wait for the Open Editor button and Add Layer button to become enabled.
-    // These are proxies for the map reaching an idle state.
-    await expect(page.getByTestId('editor-toggle')).toBeEnabled({
-      timeout: 10000
-    });
-    await expect(page.getByTestId('add-layer-button')).toBeEnabled({
-      timeout: 10000
-    });
-  }
 
   /**
    * Add a layer from a local file and open its Properties Panel.
