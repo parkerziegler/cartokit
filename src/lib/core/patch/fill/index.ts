@@ -1,5 +1,6 @@
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
+import { catalog } from '$lib/state/catalog.svelte';
 import type {
   CartoKitChoroplethLayer,
   CartoKitDotDensityLayer,
@@ -30,7 +31,6 @@ import {
   DEFAULT_QUANTITATIVE_SCHEME,
   DEFAULT_SCHEME_DIRECTION
 } from '$lib/utils/constants';
-import { catalog } from '$lib/state/catalog.svelte';
 
 /**
  * Patch fill-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
