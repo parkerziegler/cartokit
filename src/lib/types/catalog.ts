@@ -9,7 +9,7 @@ import type { DuckDBColumn } from '$lib/types/db';
  * including pre-computed classification statistics.
  */
 export interface QuantitativeAttributeEntry {
-  /** The logical kind of the attribute, 'quantitative'. */
+  /** The logical kind of the attribute, 'Quantitative'. */
   kind: Extract<AttributeKind, 'Quantitative'>;
   /** The minimum value of the attribute. */
   min: number;
