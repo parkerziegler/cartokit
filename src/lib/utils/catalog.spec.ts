@@ -140,7 +140,7 @@ describe('buildCatalog', () => {
   function selectNumericEntries(catalog: Catalog, layerId: string) {
     return Object.values(catalog[layerId].attributes).filter(
       (entry): entry is QuantitativeAttributeEntry =>
-        entry.type === 'quantitative'
+        entry.type === 'Quantitative'
     );
   }
 

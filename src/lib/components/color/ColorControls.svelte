@@ -33,7 +33,7 @@
   {:else if fill.type === 'Categorical'}
     <AttributeSelect
       {layerId}
-      visualizationType={fill.type}
+      attributeKind={fill.type}
       selected={fill.attribute}
       channel="fill"
     />
@@ -41,7 +41,7 @@
   {:else if fill.type === 'Quantitative'}
     <AttributeSelect
       {layerId}
-      visualizationType={fill.type}
+      attributeKind={fill.type}
       selected={fill.attribute}
       channel="fill"
     />

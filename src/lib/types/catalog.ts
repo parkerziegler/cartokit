@@ -9,7 +9,7 @@ import type { DuckDBColumn } from '$lib/types/db';
  */
 export interface QuantitativeAttributeEntry {
   /** The type of the attribute, 'quantitative'. */
-  type: 'quantitative';
+  type: 'Quantitative';
   /** The minimum value of the attribute. */
   min: number;
   /** The maximum value of the attribute. */
@@ -53,7 +53,7 @@ export interface QuantitativeAttributeEntry {
 /** Represents a per-attribute catalog entry for a categorical attribute. */
 export interface CategoricalAttributeEntry {
   /** The type of the attribute, 'categorical'. */
-  type: 'categorical';
+  type: 'Categorical';
   /** The unique values of the attribute. */
   values: string[] | number[] | boolean[];
   /** The number of unique values for the attribute. */

@@ -72,7 +72,7 @@
 {#if layer.style.heatmap.weight.type === 'Quantitative'}
   <AttributeSelect
     layerId={layer.id}
-    visualizationType="Quantitative"
+    attributeKind="Quantitative"
     selected={layer.style.heatmap.weight.attribute}
     channel="heatmap-weight"
   />
