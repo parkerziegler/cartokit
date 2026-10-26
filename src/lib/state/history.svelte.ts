@@ -52,5 +52,11 @@ export function initHistory() {
     }
   });
 
-  return off;
+  return () => {
+    off();
+
+    // Clear the stacks so stale diffs don't target a reset IR.
+    history.undo = [];
+    history.redo = [];
+  };
 }

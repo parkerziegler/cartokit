@@ -443,15 +443,15 @@ export async function applyDiff(
   execute: CartoKitDiff,
   triggeredByUndo = false
 ): Promise<void> {
-  const draftIR = get(ir);
+  const currentIR = get(ir);
 
-  // Patch the draft IR. We use in-place mutation to avoid deep copying the IR,
-  // which would involve copying all GeoJSON data on every update. In addition,
-  // we derive the inverse diff as part of the patch operation.
-  const invert = await patch(execute, draftIR);
+  // Patch the current IR. We use in-place mutation to avoid deep copying the
+  // IR, which would involve copying all GeoJSON data on every update. In
+  // addition, we derive the inverse diff as part of the patch operation.
+  const invert = await patch(execute, currentIR);
 
   // Reconcile the map based on the patched IR.
-  await recon(execute, draftIR);
+  await recon(execute, currentIR);
 
   // If the diff was triggered by undo, push the diff to the redo stack.
   // All normally applied diffs are pushed to the undo stack.
@@ -467,7 +467,7 @@ export async function applyDiff(
     });
   }
 
-  ir.set(draftIR);
+  ir.set(currentIR);
 
   // Track diffs as they are applied, excluding center, zoom, pitch, and
   // bearing diffs.

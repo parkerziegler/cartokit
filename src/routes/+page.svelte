@@ -28,7 +28,7 @@
   import { layerId } from '$lib/state/layerId.svelte';
   import { map as mapState } from '$lib/state/map.svelte';
   import { user } from '$lib/state/user.svelte';
-  import { initialIR, ir } from '$lib/stores/ir';
+  import { createInitialIR, ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
   import { initDB } from '$lib/utils/db';
   import { registerKeybinding } from '$lib/utils/keybinding';
@@ -169,7 +169,7 @@
     });
 
     // Add an idle listener that will update features in the DataTable when a
-    // vector or GeoParquet layer is active. GeoJSON layers already have their
+    // PMTiles or GeoParquet layer is active. GeoJSON layers already have their
     // data available in memory, so we can populate the DataTable directly.
     map.on('idle', (e) => {
       const currentLayer = layerId.value
@@ -199,7 +199,8 @@
       map?.remove();
 
       // Reset the IR to its initial state.
-      ir.set(initialIR);
+      ir.set(createInitialIR());
+      layerId.value = null;
 
       // Destroy edit historty and the E keybinding.
       destroyHistory();
