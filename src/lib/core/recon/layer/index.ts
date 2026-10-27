@@ -1,13 +1,13 @@
-import * as Comlink from 'comlink';
-
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
 import { removeLayerListeners } from '$lib/interaction/events';
 import { addLayer } from '$lib/interaction/layer';
 import { catalog } from '$lib/state/catalog.svelte';
+import { db } from '$lib/state/db.svelte';
 import { feature } from '$lib/state/feature.svelte';
 import { layerId } from '$lib/state/layerId.svelte';
 import { map } from '$lib/state/map.svelte';
-import type { CartoKitLayer, Catalog } from '$lib/types';
+import type { GeoParquetCatalogEntry } from '$lib/types/catalog';
+import { readTableAsGeoJSON } from '$lib/utils/db';
 import { getAffiliatedLayerIds } from '$lib/utils/layer';
 import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
 import { redraw } from '$lib/utils/layer/redraw';
@@ -29,35 +29,38 @@ export async function reconLayerDiffs(
     case 'add-layer': {
       const layer = targetIR.layers[diff.layerId];
 
-      // Build the catalog for the layer in a worker thread.
-      const catalogWorker = new Worker(
-        new URL('$lib/utils/catalog/worker.ts', import.meta.url),
-        { type: 'module' }
-      );
-      try {
-        const buildCatalog =
-          Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
-        const catalogPatch = await buildCatalog(layer);
-        catalog.value = { ...catalog.value, ...catalogPatch };
-      } finally {
-        catalogWorker.terminate();
-      }
-
       // Add the source to the map.
-      if (diff.payload.type === 'geojson') {
-        map.value!.addSource(layer.id, {
-          type: 'geojson',
-          data:
-            diff.payload.location.type === 'api'
-              ? diff.payload.location.url // Use the API endpoint when available to speed up vector tile generation.
-              : diff.payload.location.featureCollection,
-          generateId: true
-        });
-      } else if (diff.payload.type === 'vector') {
-        map.value!.addSource(layer.id, {
-          type: 'vector',
-          url: `pmtiles://${diff.payload.location.url}`
-        });
+      switch (layer.source.type) {
+        case 'geojson': {
+          map.value!.addSource(layer.id, {
+            type: 'geojson',
+            data: layer.source.data,
+            generateId: true
+          });
+          break;
+        }
+        case 'geoparquet': {
+          const entry = catalog.value[layer.id] as GeoParquetCatalogEntry;
+          const geojson = await readTableAsGeoJSON(
+            db.value!.conn,
+            layer.id,
+            entry
+          );
+
+          map.value!.addSource(layer.id, {
+            type: 'geojson',
+            data: geojson,
+            generateId: true
+          });
+          break;
+        }
+        case 'pmtiles': {
+          map.value!.addSource(layer.id, {
+            type: 'vector',
+            url: `pmtiles://${layer.source.location.url}`
+          });
+          break;
+        }
       }
 
       addLayer(map.value!, layer);

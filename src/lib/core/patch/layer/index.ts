@@ -1,136 +1,13 @@
-import * as Comlink from 'comlink';
-import type { FeatureCollection } from 'geojson';
-import { get } from 'svelte/store';
-
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
-import { ir } from '$lib/stores/ir';
-import type { CartoKitLayer, CartoKitSource } from '$lib/types';
-import { randomColor } from '$lib/utils/color';
-import {
-  DEFAULT_OPACITY,
-  DEFAULT_SIZE,
-  DEFAULT_STROKE_OPACITY,
-  DEFAULT_STROKE_WIDTH
-} from '$lib/utils/constants';
-import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
-import { CartoKitPMTiles, selectTileStats } from '$lib/utils/pmtiles';
-
-interface GenerateCartoKitLayerOptions {
-  layerId: string;
-  displayName: string;
-}
-
-/**
- * Generate a {@link CartoKitLayer} for a given {@link CartoKitSource}.
- *
- * @param source The {@link CartoKitSource} associated with the layer.
- * @param options.layerId The fresh ID of the {@link CartoKitLayer}.
- * @param options.displayName The display name of the {@link CartoKitLayer}.
- * @returns A default {@link CartoKitLayer} appropriate for the input source.
- */
-function generateCartoKitLayer(
-  source: CartoKitSource,
-  options: GenerateCartoKitLayerOptions
-): CartoKitLayer {
-  const geometryType =
-    source.type === 'geojson'
-      ? getFeatureCollectionGeometryType(source.data)
-      : selectTileStats(source).geometry;
-  const color = randomColor();
-  const z = Object.values(get(ir).layers).length;
-
-  switch (geometryType) {
-    case 'Point':
-    case 'MultiPoint':
-      return {
-        id: options.layerId,
-        displayName: options.displayName,
-        type: 'Point',
-        source,
-        style: {
-          size: DEFAULT_SIZE,
-          fill: {
-            type: 'Constant',
-            color,
-            opacity: DEFAULT_OPACITY,
-            visible: true
-          },
-          stroke: {
-            type: 'Constant',
-            color,
-            width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY,
-            visible: true
-          }
-        },
-        layout: {
-          visible: true,
-          z,
-          tooltip: {
-            visible: true
-          }
-        }
-      };
-    case 'Line':
-    case 'LineString':
-    case 'MultiLineString':
-      return {
-        id: options.layerId,
-        displayName: options.displayName,
-        type: 'Line',
-        source,
-        style: {
-          stroke: {
-            type: 'Constant',
-            color,
-            width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY,
-            visible: true
-          }
-        },
-        layout: {
-          visible: true,
-          z,
-          tooltip: {
-            visible: true
-          }
-        }
-      };
-    case 'Polygon':
-    case 'MultiPolygon':
-      return {
-        id: options.layerId,
-        displayName: options.displayName,
-        type: 'Polygon',
-        source,
-        style: {
-          fill: {
-            type: 'Constant',
-            color,
-            opacity: DEFAULT_OPACITY,
-            visible: true
-          },
-          stroke: {
-            type: 'Constant',
-            color,
-            width: DEFAULT_STROKE_WIDTH,
-            opacity: DEFAULT_STROKE_OPACITY,
-            visible: true
-          }
-        },
-        layout: {
-          visible: true,
-          z,
-          tooltip: {
-            visible: true
-          }
-        }
-      };
-    case 'GeometryCollection':
-      throw new Error('GeometryCollection not supported.');
-  }
-}
+import { generateCartoKitLayer } from '$lib/interaction/layer';
+import { catalog } from '$lib/state/catalog.svelte';
+import { db } from '$lib/state/db.svelte';
+import type { CartoKitSource } from '$lib/types';
+import type { DuckDBTable } from '$lib/types/db';
+import { buildCatalog } from '$lib/utils/catalog';
+import { createTable, readTableAsGeoJSON } from '$lib/utils/db';
+import { CartoKitPMTiles } from '$lib/utils/pmtiles';
 
 /**
  * Patch layer-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
@@ -149,88 +26,90 @@ export async function patchLayerDiffs(
 
   switch (diff.type) {
     case 'add-layer': {
-      let layer: CartoKitLayer;
+      let source: CartoKitSource;
+      let table: DuckDBTable | undefined;
 
-      if (diff.payload.type === 'vector') {
-        const pmtiles = new CartoKitPMTiles(diff.payload.location.url);
+      switch (diff.payload.type) {
+        case 'pmtiles': {
+          const pmtiles = new CartoKitPMTiles(diff.payload.location.url);
 
-        const [metadata, vectorLayers] = await Promise.all([
-          pmtiles.getMetadata(),
-          pmtiles.getVectorLayers()
-        ]);
+          const [metadata, vectorLayers] = await Promise.all([
+            pmtiles.getMetadata(),
+            pmtiles.getVectorLayers()
+          ]);
 
-        layer = generateCartoKitLayer(
-          {
-            type: 'vector',
+          source = {
+            type: 'pmtiles',
             location: diff.payload.location,
             sourceLayerId: vectorLayers[0].id,
             tilestats: metadata.tilestats,
             vectorLayers
-          },
-          {
-            layerId: diff.layerId,
-            displayName: diff.payload.displayName
-          }
-        );
-
-        // Derive the inverse diff after creating the layer.
-        inverse = {
-          type: 'remove-layer',
-          layerId: diff.layerId,
-          payload: {
-            sourceLayerType: layer.type
-          }
-        };
-
-        // Apply the patch.
-        ir.layers[diff.layerId] = layer;
-      } else if (diff.payload.type === 'geojson') {
-        let sourceData: FeatureCollection;
-
-        // If the GeoJSON data is hosted at a remote API endpoint, fetch it in a
-        // WebWorker to store in memory.
-        if (diff.payload.location.type === 'api') {
-          const sourceWorker = new Worker(
-            new URL('$lib/utils/source/worker.ts', import.meta.url),
-            { type: 'module' }
-          );
-          const fetchGeoJSON =
-            Comlink.wrap<(url: string) => Promise<FeatureCollection>>(
-              sourceWorker
-            );
-
-          sourceData = await fetchGeoJSON(diff.payload.location.url);
-        } else {
-          sourceData = diff.payload.location.featureCollection;
+          };
+          break;
         }
+        case 'geojson': {
+          table = await createTable(
+            db.value!.db,
+            db.value!.conn,
+            diff.layerId,
+            diff.payload.location
+          );
+          const geojson = await readTableAsGeoJSON(
+            db.value!.conn,
+            diff.layerId,
+            table
+          );
 
-        layer = generateCartoKitLayer(
-          {
+          source = {
             type: 'geojson',
             location: diff.payload.location,
-            data: sourceData,
-            sourceData,
+            data: geojson,
+            sourceData: geojson,
             transformations: []
-          },
-          {
-            layerId: diff.layerId,
-            displayName: diff.payload.displayName
-          }
-        );
+          };
+          break;
+        }
+        case 'geoparquet': {
+          table = await createTable(
+            db.value!.db,
+            db.value!.conn,
+            diff.layerId,
+            diff.payload.location
+          );
 
-        // Derive the inverse diff after creating the layer.
-        inverse = {
-          type: 'remove-layer',
-          layerId: diff.layerId,
-          payload: {
-            sourceLayerType: layer.type
-          }
-        };
-
-        // Apply the patch.
-        ir.layers[diff.layerId] = layer;
+          source = {
+            type: 'geoparquet',
+            location: diff.payload.location
+          };
+          break;
+        }
       }
 
+      // Build the catalog entry.
+      const catalogPatch = await buildCatalog(
+        diff.layerId,
+        source,
+        db.value && table ? { conn: db.value.conn, table } : undefined
+      );
+      catalog.value = { ...catalog.value, ...catalogPatch };
+
+      const layer = generateCartoKitLayer(
+        source,
+        diff.layerId,
+        diff.payload.displayName
+      );
+
+      // Derive the inverse diff after creating the layer.
+      inverse = {
+        type: 'remove-layer',
+        layerId: diff.layerId,
+        payload: {
+          sourceLayerType: layer.type
+        }
+      };
+
+      // Apply the patch.
+      ir.layers[diff.layerId] = layer;
       break;
     }
     case 'layer-visibility': {
@@ -271,36 +150,32 @@ export async function patchLayerDiffs(
       const layer = ir.layers[diff.layerId];
 
       // Derive the inverse diff prior to applying the patch.
-      if (layer.source.type === 'vector') {
-        inverse = {
-          type: 'add-layer',
-          layerId: diff.layerId,
-          payload: {
-            type: 'vector',
-            displayName: layer.displayName,
-            location: layer.source.location
-          }
-        };
-      } else if (layer.source.type === 'geojson') {
-        inverse = {
-          type: 'add-layer',
-          layerId: diff.layerId,
-          payload: {
-            type: 'geojson',
-            displayName: layer.displayName,
-            location:
-              layer.source.location.type === 'api'
-                ? {
-                    type: 'api',
-                    url: layer.source.location.url
-                  }
-                : {
-                    type: 'file',
-                    fileName: layer.source.location.fileName,
-                    featureCollection: layer.source.sourceData
-                  }
-          }
-        };
+      switch (layer.source.type) {
+        case 'pmtiles':
+          inverse = {
+            type: 'add-layer',
+            layerId: diff.layerId,
+            payload: {
+              type: 'pmtiles',
+              displayName: layer.displayName,
+              location: layer.source.location
+            }
+          };
+          break;
+        case 'geojson':
+        case 'geoparquet':
+          inverse = {
+            type: 'add-layer',
+            layerId: diff.layerId,
+            payload: {
+              type: layer.source.type,
+              displayName: layer.displayName,
+              location: layer.source.location
+            }
+          };
+
+          // Drop the layer's table.
+          await db.value!.conn.query(`DROP TABLE IF EXISTS ${diff.layerId};`);
       }
 
       // Apply the patch.
@@ -328,7 +203,7 @@ export async function patchLayerDiffs(
     case 'source-layer': {
       const layer = ir.layers[diff.layerId];
 
-      if (layer.source.type === 'vector') {
+      if (layer.source.type === 'pmtiles') {
         // Derive the inverse diff prior to applying the patch.
         inverse = {
           type: 'source-layer',

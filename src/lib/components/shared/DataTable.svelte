@@ -113,7 +113,7 @@
     <div class="flex gap-4">
       <span
         >{d3.format(',')(data.length)}
-        {pluralize('Feature', data.length)}{sourceType === 'vector'
+        {pluralize('Feature', data.length)}{sourceType !== 'geojson'
           ? ' in Viewport'
           : ''}</span
       >

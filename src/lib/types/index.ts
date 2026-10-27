@@ -1,4 +1,3 @@
-import type { SvelteHTMLElements } from 'svelte/elements';
 import type { FeatureCollection } from 'geojson';
 
 import type { BasemapProvider } from '$lib/types/basemap';
@@ -10,6 +9,9 @@ import type {
   SchemeDirection
 } from '$lib/types/color';
 import type { TransformationCall } from '$lib/types/transformation';
+
+/** The valid number of steps in a {@link QuantitativeColorScale}. */
+export type QuantitativeStepCount = 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 /**
  * Represents a continuous color scale for continuous numerical data.
@@ -35,7 +37,7 @@ export interface ContinuousColorScale {
  * @property scheme.id The {@link QuantitativeColorScheme} identifier for the
  * color scale.
  * @property scheme.direction The {@link SchemeDirection} of the color scale.
- * @property steps The number of discrete steps (classes) in the color scale.
+ * @property steps The {@link QuantitativeStepCount} of the color scale.
  * @property thresholds The thresholds of the color scale.
  */
 export interface QuantileColorScale {
@@ -44,7 +46,7 @@ export interface QuantileColorScale {
     id: QuantitativeColorScheme;
     direction: SchemeDirection;
   };
-  steps: number;
+  steps: QuantitativeStepCount;
   thresholds: number[];
 }
 
@@ -56,7 +58,7 @@ export interface QuantileColorScale {
  * @property scheme.id The {@link QuantitativeColorScheme} identifier for the
  * color scale.
  * @property scheme.direction The {@link SchemeDirection} of the color scale.
- * @property steps The number of discrete steps (classes) in the color scale.
+ * @property steps The {@link QuantitativeStepCount} of the color scale.
  * @property thresholds The thresholds of the color scale.
  */
 export interface EqualIntervalColorScale {
@@ -65,7 +67,7 @@ export interface EqualIntervalColorScale {
     id: QuantitativeColorScheme;
     direction: SchemeDirection;
   };
-  steps: number;
+  steps: QuantitativeStepCount;
   thresholds: number[];
 }
 
@@ -77,7 +79,7 @@ export interface EqualIntervalColorScale {
  * @property scheme.id The {@link QuantitativeColorScheme} identifier for the
  * color scale.
  * @property scheme.direction The {@link SchemeDirection} of the color scale.
- * @property steps The number of discrete steps (classes) in the color scale.
+ * @property steps The {@link QuantitativeStepCount} of the color scale.
  * @property thresholds The thresholds of the color scale.
  */
 export interface JenksColorScale {
@@ -86,7 +88,7 @@ export interface JenksColorScale {
     id: QuantitativeColorScheme;
     direction: SchemeDirection;
   };
-  steps: number;
+  steps: QuantitativeStepCount;
   thresholds: number[];
 }
 
@@ -98,7 +100,7 @@ export interface JenksColorScale {
  * @property scheme.id The {@link QuantitativeColorScheme} identifier for the
  * color scale.
  * @property scheme.direction The {@link SchemeDirection} of the color scale.
- * @property steps The number of discrete steps (classes) in the color scale.
+ * @property steps The {@link QuantitativeStepCount} of the color scale.
  * @property thresholds The thresholds of the color scale.
  */
 export interface ManualColorScale {
@@ -107,7 +109,7 @@ export interface ManualColorScale {
     id: QuantitativeColorScheme;
     direction: SchemeDirection;
   };
-  steps: number;
+  steps: QuantitativeStepCount;
   thresholds: number[];
 }
 
@@ -190,11 +192,30 @@ export interface CartoKitGeoJSONSource {
       }
     | {
         type: 'file';
-        fileName: string;
+        file: File;
       };
   data: FeatureCollection;
   sourceData: FeatureCollection;
   transformations: TransformationCall[];
+}
+
+/** Represents a GeoParquet data source. */
+export interface CartoKitGeoParquetSource {
+  /** The type of the data source, 'geoparquet'. */
+  type: 'geoparquet';
+  /**
+   * The location of the source, either a remote API endpoint or a local file on
+   * disk.
+   */
+  location:
+    | {
+        type: 'api';
+        url: string;
+      }
+    | {
+        type: 'file';
+        file: File;
+      };
 }
 
 /**
@@ -256,14 +277,14 @@ export interface VectorLayer {
 /**
  * Represents the underlying data and metadata of a vector tile layer.
  *
- * @property type The type of the source, 'vector'.
+ * @property type The type of the source, 'pmtiles'.
  * @property location The location of the source, a remote API endpoint.
  * @property sourceLayerId The id of the source layer in the vector tile archive.
  * @property tilestats The {@link TileStats} metadata of the vector tile source.
  * @property vectorLayers The {@link VectorLayer} metadata of the vector tile source.
  */
-interface CartoKitVectorSource {
-  type: 'vector';
+export interface CartoKitPMTilesSource {
+  type: 'pmtiles';
   location: {
     type: 'api';
     url: string;
@@ -276,7 +297,8 @@ interface CartoKitVectorSource {
 /**
  * Represents the possible data sources for a layer.
  */
-export type CartoKitSource = CartoKitGeoJSONSource | CartoKitVectorSource;
+export type CartoKitSource =
+  CartoKitGeoJSONSource | CartoKitGeoParquetSource | CartoKitPMTilesSource;
 
 /**
  * Represents the layout of a layer.
@@ -593,19 +615,6 @@ export interface HeatmapStyle {
 }
 
 /**
- * Represents a dataset gallery item in cartokit.
- */
-export interface GalleryItem {
-  id: string;
-  name: string;
-  attribution: string;
-  url: string;
-  src: SvelteHTMLElements['enhanced:img']['src'];
-  type: CartoKitLayer['type'];
-  format: 'GeoJSON' | 'PMTiles';
-}
-
-/**
  * Represents the set of possible projections in cartokit.
  */
 export type Projection = 'mercator' | 'globe';
@@ -634,68 +643,6 @@ export interface CartoKitIR {
   projection: Projection;
   layers: Record<string, CartoKitLayer>;
 }
-
-/**
- * Represents a per-attribute catalog entry for a numeric attribute, including
- * pre-computed classification statistics.
- *
- * @property type - The type of the attribute ('number').
- * @property quantiles - The domain of the attribute, used for quantile classification.
- * @property jenks - The pre-computed Jenks breaks for the attribute, used for
- * natural breaks classification.
- * @property min - The minimum value of the attribute.
- * @property max - The maximum value of the attribute.
- * @property unique - The number of unique values for the attribute.
- */
-export interface NumericCatalogEntry {
-  type: 'number';
-  quantiles: { domain: number[] };
-  jenks: {
-    3: { breaks: number[] };
-    4: { breaks: number[] };
-    5: { breaks: number[] };
-    6: { breaks: number[] };
-    7: { breaks: number[] };
-    8: { breaks: number[] };
-    9: { breaks: number[] };
-  };
-  min: number;
-  max: number;
-  unique: number;
-}
-
-/**
- * Represents a per-attribute catalog entry for a string attribute.
- *
- * @property type The type of the attribute ('string').
- * @property values The unique values of the attribute.
- * @property unique The number of unique values for the attribute.
- */
-export interface StringCatalogEntry {
-  type: 'string';
-  values: string[];
-  unique: number;
-}
-
-/**
- * Represents a per-attribute catalog entry for a Boolean attribute.
- *
- * @property type The type of the attribute ('boolean').
- * @property values The unique values of the attribute.
- * @property unique The number of unique values for the attribute.
- */
-export interface BooleanCatalogEntry {
-  type: 'boolean';
-  values: boolean[];
-  unique: 1 | 2;
-}
-
-/** Represents a per-attribute entry in the {@link Catalog}. */
-export type CatalogEntry =
-  NumericCatalogEntry | StringCatalogEntry | BooleanCatalogEntry;
-
-/** Represents a catalog mapping layers to pre-computed classification statistics. */
-export type Catalog = Record<CartoKitLayer['id'], Record<string, CatalogEntry>>;
 
 /**
  * Represents the color theme mode.

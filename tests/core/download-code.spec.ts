@@ -5,9 +5,11 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as url from 'node:url';
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from '@playwright/test';
 import { unzipSync } from 'fflate';
 import type { Map } from 'maplibre-gl';
+
+import { openCartokit } from '../utils/navigate';
 
 declare global {
   interface Window {
@@ -150,39 +152,18 @@ test.describe('download-code', () => {
     }
   });
 
-  test('should export a Vite project that renders the same map as cartokit', async ({
-    browser,
-    page
-  }) => {
-    // Building the map, installing dependencies, and waiting for both maps to
-    // settle takes considerably longer than the default timeout.
-    test.setTimeout(240_000);
-
-    // Navigate to cartokit, running on a local development server. The
-    // playwright parameter exposes cartokit's map instance on window.__map.
-    await page.goto('/?playwright=1');
-
-    if (page.url().includes('vercel.app')) {
-      // In Preview Vercel environments, ensure <vercel-live-feedback> does not
-      // intercept pointer events.
-      await page.locator('vercel-live-feedback').waitFor({ state: 'attached' });
-      await page.locator('vercel-live-feedback').evaluate((element) => {
-        element.style.pointerEvents = 'none';
-        element.style.zIndex = '-1';
-        element.style.display = 'none';
-      });
-    }
-
-    // Wait for the Open Editor button and Add Layer button to become enabled.
-    // These are proxies for the map reaching an idle state.
-    await expect(page.getByTestId('editor-toggle')).toBeEnabled({
-      timeout: 10000
-    });
-    await expect(page.getByTestId('add-layer-button')).toBeEnabled({
-      timeout: 10000
-    });
-
-    // Build the map from Workflow 6.
+  /**
+   * Add a layer from a local file and open its Properties Panel.
+   *
+   * @param page The Playwright {@link Page} instance.
+   * @param filePath The path to the file, relative to tests/data.
+   * @param displayName The layer's Display Name.
+   */
+  async function addLayerFromFile(
+    page: Page,
+    filePath: string,
+    displayName: string
+  ): Promise<void> {
     await page.getByTestId('add-layer-button').click();
     await expect(page.getByTestId('add-layer-modal')).toBeVisible();
 
@@ -190,14 +171,9 @@ test.describe('download-code', () => {
 
     await page
       .locator('#from-file-input')
-      .setInputFiles(
-        path.join(
-          __dirname,
-          '../data/workflow-6/wapo-climate-impact-regions.json'
-        )
-      );
+      .setInputFiles(path.join(__dirname, '../data', filePath));
 
-    await page.getByLabel('Display Name').fill('Climate Impact Regions');
+    await page.getByLabel('Display Name').fill(displayName);
 
     await page
       .getByTestId('add-layer-modal')
@@ -209,40 +185,19 @@ test.describe('download-code', () => {
 
     await page.getByTestId('layer-entry').first().click();
     await expect(page.locator('#properties')).toBeVisible();
+  }
 
-    await page.getByTestId('remove-stroke-button').click();
-    await page.locator('#layer-type-select').selectOption('Choropleth');
-    await page
-      .locator('#fill-attribute-select')
-      .selectOption('years_2080_2099');
-
-    await page.locator('#color-scheme').getByRole('button').click();
-    await page.locator('li:nth-child(20)').getByRole('button').click();
-    await page.getByTestId('color-scheme-reverse-button').click();
-
-    await page.locator('#fill-step-count-select').selectOption('8');
-    await page
-      .locator('#fill-classification-method-select')
-      .selectOption('Manual');
-
-    const stops = [-200, -100, -50, 0, 50, 100, 200];
-
-    for (const [i, stop] of stops.entries()) {
-      const input = page
-        .getByTestId('breaks-editor')
-        .locator('input:last-child')
-        .nth(i);
-
-      await input.fill(stop.toString());
-      await input.press('Enter');
-    }
-
-    await page.getByTestId('close-properties-menu-button').click();
-    await expect(page.locator('#properties')).not.toBeVisible();
-
-    // Screenshot the map as rendered by cartokit, absent UI controls.
-    const expected = await screenshotMap(page);
-
+  /**
+   * Export cartokit's map as a Vite project, run it, and screenshot its map.
+   *
+   * @param browser The Playwright {@link Browser} instance.
+   * @param page The Playwright {@link Page} instance running cartokit.
+   * @returns A PNG {@link Buffer} of the generated app's map canvas.
+   */
+  async function screenshotExportedMap(
+    browser: Browser,
+    page: Page
+  ): Promise<Buffer> {
     // Open the Editor Panel and export the Vite project.
     await page.getByTestId('editor-toggle').click();
     await expect(page.getByTestId('program-editor')).toBeVisible();
@@ -298,16 +253,126 @@ test.describe('download-code', () => {
       });
     });
 
+    // Collect the IDs of all sources on cartokit's map, removing the suffix
+    // from cartokit-only Dot Density outline sources.
+    const sourceIds = await page.evaluate(() =>
+      Object.keys(window.__map!.getStyle().sources).map((id) =>
+        id.replace(/-outlines$/, '')
+      )
+    );
+
     try {
       await appPage.goto(appUrl);
-      const actual = await screenshotMap(appPage);
 
-      expect(
-        actual.equals(expected),
-        'Generated map should match cartokit pixel-for-pixel'
-      ).toBe(true);
+      // Wait for the generated app to add every source. Sources loaded
+      // asynchronously (e.g., GeoParquet queried with DuckDB) may be added
+      // after the map first reaches an idle state.
+      await appPage.waitForFunction(
+        (ids) => ids.every((id) => window.__map?.getSource(id)),
+        sourceIds
+      );
+
+      return await screenshotMap(appPage);
     } finally {
       await appPage.close();
     }
+  }
+
+  test('should export a Vite project that renders the same map as cartokit', async ({
+    browser,
+    page
+  }) => {
+    // Building the map, installing dependencies, and waiting for both maps to
+    // settle takes considerably longer than the default timeout.
+    test.setTimeout(240_000);
+
+    await openCartokit(page);
+
+    // Build the map from Workflow 6.
+    await addLayerFromFile(
+      page,
+      'workflow-6/wapo-climate-impact-regions.json',
+      'Climate Impact Regions'
+    );
+
+    await page.getByTestId('remove-stroke-button').click();
+    await page.locator('#layer-type-select').selectOption('Choropleth');
+    await page
+      .locator('#fill-attribute-select')
+      .selectOption('years_2080_2099');
+
+    await page.locator('#color-scheme').getByRole('button').click();
+    await page.locator('li:nth-child(20)').getByRole('button').click();
+    await page.getByTestId('color-scheme-reverse-button').click();
+
+    await page.locator('#fill-step-count-select').selectOption('8');
+    await page
+      .locator('#fill-classification-method-select')
+      .selectOption('Manual');
+
+    const stops = [-200, -100, -50, 0, 50, 100, 200];
+
+    for (const [i, stop] of stops.entries()) {
+      const input = page
+        .getByTestId('breaks-editor')
+        .locator('input:last-child')
+        .nth(i);
+
+      await input.fill(stop.toString());
+      await input.press('Enter');
+    }
+
+    await page.getByTestId('close-properties-menu-button').click();
+    await expect(page.locator('#properties')).not.toBeVisible();
+
+    // Screenshot the map as rendered by cartokit, absent UI controls.
+    const expected = await screenshotMap(page);
+    const actual = await screenshotExportedMap(browser, page);
+
+    expect(
+      actual.equals(expected),
+      'Generated map should match cartokit pixel-for-pixel'
+    ).toBe(true);
+  });
+
+  test('should export a Vite project that renders the same GeoParquet map as cartokit', async ({
+    browser,
+    page
+  }) => {
+    // Building the map, installing dependencies, and waiting for both maps to
+    // settle takes considerably longer than the default timeout.
+    test.setTimeout(240_000);
+
+    await openCartokit(page);
+
+    // Build a proportional symbol map of earthquakes, sized by magnitude.
+    await addLayerFromFile(page, 'all/earthquakes.parquet', 'Earthquakes');
+
+    await page
+      .locator('#layer-type-select')
+      .selectOption('Proportional Symbol');
+    await page.locator('#size-attribute-select').selectOption('mag');
+
+    for (const [id, size] of [
+      ['min', 2],
+      ['max', 16]
+    ] as const) {
+      const input = page.locator(`#${id}`);
+
+      await input.fill(size.toString());
+      await input.press('Enter');
+    }
+
+    await page.getByTestId('close-properties-menu-button').click();
+    await expect(page.locator('#properties')).not.toBeVisible();
+
+    // Screenshot the map as rendered by cartokit, absent UI controls.
+    const expected = await screenshotMap(page);
+    const actual = await screenshotExportedMap(browser, page);
+
+    expect(
+      actual.equals(expected),
+      'Generated map should match cartokit pixel-for-pixel'
+    ).toBe(true);
   });
 });

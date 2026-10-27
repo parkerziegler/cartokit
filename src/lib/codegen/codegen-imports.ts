@@ -1,6 +1,5 @@
 import { camelCase } from 'lodash-es';
 
-import { codegenDataFileName } from '$lib/codegen/codegen-data';
 import { codegenFns } from '$lib/codegen/codegen-fns';
 import { codegenMap } from '$lib/codegen/codegen-map';
 import type { CartoKitIR } from '$lib/types';
@@ -40,13 +39,12 @@ export function codegenImports(
   ir: CartoKitIR,
   analysis: CartoKitBackendAnalysis
 ): string {
-  // Create a symbol table mapping layer ids to identifiers referencing imported
-  // source data.
-  const uploadTable = new Map<string, string>();
-
   const libraryImports = [
+    analysis.isDuckDBDataProtocolRequired
+      ? "import { DuckDBDataProtocol } from '@duckdb/duckdb-wasm';"
+      : '',
     analysis.library === 'mapbox'
-      ? `import * as mapboxgl from 'mapbox-gl/esm';`
+      ? "import * as mapboxgl from 'mapbox-gl/esm';"
       : '',
     analysis.library === 'maplibre'
       ? codegenMapLibreNamedImports(analysis)
@@ -57,6 +55,9 @@ export function codegenImports(
       : '',
     analysis.isPMTilesRequired && analysis.library === 'maplibre'
       ? "import * as pmtiles from 'pmtiles';"
+      : '',
+    analysis.isDuckDBRequired
+      ? "import { initDB, toFeatureCollection } from './db';"
       : ''
   ]
     .filter(Boolean)
@@ -71,10 +72,7 @@ export function codegenImports(
         return [];
       }
 
-      const dataIdent = camelCase(layer.displayName);
-      uploadTable.set(layer.id, dataIdent);
-
-      return `import ${dataIdent} from './data/${codegenDataFileName(layer.source.location.fileName)}';`;
+      return `import ${camelCase(layer.displayName)} from './data/${layer.source.location.file.name.replace(/\.geojson$/i, '.json')}';`;
     })
     .join('\n');
 
@@ -87,7 +85,7 @@ import './style.css'`;
     fileImports,
     analysis.library === 'maplibre' ? `setWorkerUrl(workerUrl)` : '',
     codegenFns(ir, analysis),
-    codegenMap(ir, uploadTable, analysis)
+    codegenMap(ir, analysis)
   ]
     .filter(Boolean)
     .join('\n\n');

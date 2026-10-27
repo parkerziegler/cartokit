@@ -4,7 +4,7 @@ import type {
 } from '$lib/types';
 import { deriveCentroids } from '$lib/stdlib/centroid';
 import deriveCentroidsSrc from '$lib/stdlib/centroid?raw';
-import { selectQuantitativeAttribute } from '$lib/utils/attributes';
+import { selectQuantitativeAttribute } from '$lib/utils/attribute';
 import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_FILL,
@@ -54,7 +54,7 @@ export function patchProportionalSymbol(
         style: {
           ...layer.style,
           size: {
-            attribute: selectQuantitativeAttribute(layer.source),
+            attribute: selectQuantitativeAttribute(layer.id),
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           }
@@ -114,7 +114,7 @@ export function patchProportionalSymbol(
       const attribute =
         layer.style.heatmap.weight.type === 'Quantitative'
           ? layer.style.heatmap.weight.attribute
-          : selectQuantitativeAttribute(layer.source);
+          : selectQuantitativeAttribute(layer.id);
 
       const targetLayer: CartoKitProportionalSymbolLayer = {
         ...layer,
@@ -170,7 +170,7 @@ export function patchProportionalSymbol(
         style: {
           ...layer.style,
           size: {
-            attribute: selectQuantitativeAttribute(layer.source),
+            attribute: selectQuantitativeAttribute(layer.id),
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           },
@@ -192,7 +192,7 @@ export function patchProportionalSymbol(
         style: {
           ...layer.style,
           size: {
-            attribute: selectQuantitativeAttribute(layer.source),
+            attribute: selectQuantitativeAttribute(layer.id),
             min: DEFAULT_MIN_SIZE,
             max: DEFAULT_MAX_SIZE
           }

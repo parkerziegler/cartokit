@@ -1,7 +1,7 @@
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import type { CartoKitHeatmapLayer } from '$lib/types';
-import { selectQuantitativeAttribute } from '$lib/utils/attributes';
+import { selectQuantitativeAttribute } from '$lib/utils/attribute';
 
 /**
  * Patch heatmap-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
@@ -110,7 +110,7 @@ export async function patchHeatmapDiffs(
         case 'Quantitative':
           layer.style.heatmap.weight = {
             type: 'Quantitative',
-            attribute: selectQuantitativeAttribute(layer.source),
+            attribute: selectQuantitativeAttribute(layer.id),
             min: 0,
             max: 1
           };

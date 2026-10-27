@@ -22,15 +22,16 @@ export interface PatchFnParams {
 export type PatchFnResult = PatchFnParams;
 
 /**
- * Patch a {@link CartoKitDiff} onto a source {@link CartoKitIR}.
+ * Patch a {@link CartoKitDiff} onto the current {@link CartoKitIR}, mutating
+ * it in place.
  *
  * @param diff The {@link CartoKitDiff} to apply.
- * @param draftIR The draft {@link CartoKitIR} to patch.
- * @returns A promise that resolves to the patched {@link CartoKitIR}.
+ * @param currentIR The current {@link CartoKitIR} to patch.
+ * @returns A promise that resolves to the inverse {@link CartoKitDiff}.
  */
 export async function patch(
   diff: CartoKitDiff,
-  draftIR: CartoKitIR
+  currentIR: CartoKitIR
 ): Promise<CartoKitDiff> {
   const patcher = flow(
     patchDotDiffs,
@@ -45,7 +46,7 @@ export async function patch(
   );
 
   const { inverseDiff } = await patcher(
-    Promise.resolve({ diff, ir: draftIR, inverseDiff: diff })
+    Promise.resolve({ diff, ir: currentIR, inverseDiff: diff })
   );
 
   return inverseDiff;

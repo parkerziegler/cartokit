@@ -76,7 +76,7 @@ export const GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   ['GeometryCollection', []]
 ]);
 
-export const VECTOR_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
+export const PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   VectorGeometry,
   LayerType[]
 >([
@@ -85,9 +85,18 @@ export const VECTOR_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   ['Polygon', ['Polygon', 'Choropleth']]
 ]);
 
-// A set of valid GeoJSON Geometry types for cartokit layers.
-export const VALID_GEOJSON_TYPES = new Set([
-  ...GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES.keys(),
-  'Feature',
-  'FeatureCollection'
+// A map of GeoParquet Geometry types to the supported cartokit layer types.
+// GeoParquet geometry cannot be transformed, so only layer types that render
+// the source geometry directly are supported.
+export const GEOPARQUET_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
+  Geometry['type'],
+  LayerType[]
+>([
+  ['Point', ['Point', 'Proportional Symbol', 'Heatmap']],
+  ['MultiPoint', ['Point', 'Proportional Symbol', 'Heatmap']],
+  ['LineString', ['Line']],
+  ['MultiLineString', ['Line']],
+  ['Polygon', ['Polygon', 'Choropleth']],
+  ['MultiPolygon', ['Polygon', 'Choropleth']],
+  ['GeometryCollection', []]
 ]);

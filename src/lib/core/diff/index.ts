@@ -1,4 +1,3 @@
-import type { FeatureCollection } from 'geojson';
 import { get } from 'svelte/store';
 
 import { patch } from '$lib/core/patch';
@@ -7,11 +6,15 @@ import { diffs } from '$lib/state/diffs.svelte';
 import { history } from '$lib/state/history.svelte';
 import { ir } from '$lib/stores/ir';
 import type {
+  CartoKitGeoJSONSource,
+  CartoKitGeoParquetSource,
   CartoKitIR,
   CartoKitLayer,
+  CartoKitPMTilesSource,
   LayerType,
   Projection,
   QuantitativeColorScale,
+  QuantitativeStepCount,
   VisualizationType
 } from '$lib/types';
 import type {
@@ -81,7 +84,7 @@ interface FillClassificationMethodDiff extends LayerDiff {
 interface FillStepCountDiff extends LayerDiff {
   type: 'fill-step-count';
   payload: {
-    count: number;
+    count: QuantitativeStepCount;
   };
 }
 
@@ -298,22 +301,15 @@ interface LayerTooltipVisibilityDiff extends LayerDiff {
 interface AddLayerDiff extends LayerDiff {
   type: 'add-layer';
   payload:
-    | {
-        type: 'geojson';
+    | (Pick<CartoKitGeoJSONSource, 'type' | 'location'> & {
         displayName: string;
-        location:
-          | { type: 'api'; url: string }
-          | {
-              type: 'file';
-              fileName: string;
-              featureCollection: FeatureCollection;
-            };
-      }
-    | {
-        type: 'vector';
+      })
+    | (Pick<CartoKitGeoParquetSource, 'type' | 'location'> & {
         displayName: string;
-        location: { type: 'api'; url: string };
-      };
+      })
+    | (Pick<CartoKitPMTilesSource, 'type' | 'location'> & {
+        displayName: string;
+      });
 }
 
 interface RemoveLayerDiff extends LayerDiff {
@@ -447,15 +443,15 @@ export async function applyDiff(
   execute: CartoKitDiff,
   triggeredByUndo = false
 ): Promise<void> {
-  const draftIR = get(ir);
+  const currentIR = get(ir);
 
-  // Patch the draft IR. We use in-place mutation to avoid deep copying the IR,
-  // which would involve copying all GeoJSON data on every update. In addition,
-  // we derive the inverse diff as part of the patch operation.
-  const invert = await patch(execute, draftIR);
+  // Patch the current IR. We use in-place mutation to avoid deep copying the
+  // IR, which would involve copying all GeoJSON data on every update. In
+  // addition, we derive the inverse diff as part of the patch operation.
+  const invert = await patch(execute, currentIR);
 
   // Reconcile the map based on the patched IR.
-  await recon(execute, draftIR);
+  await recon(execute, currentIR);
 
   // If the diff was triggered by undo, push the diff to the redo stack.
   // All normally applied diffs are pushed to the undo stack.
@@ -471,7 +467,7 @@ export async function applyDiff(
     });
   }
 
-  ir.set(draftIR);
+  ir.set(currentIR);
 
   // Track diffs as they are applied, excluding center, zoom, pitch, and
   // bearing diffs.

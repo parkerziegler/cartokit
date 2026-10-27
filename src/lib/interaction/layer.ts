@@ -11,8 +11,125 @@ import {
   instrumentPolygonSelect
 } from '$lib/interaction/events';
 import { deriveSize } from '$lib/interaction/geometry';
+import { catalog } from '$lib/state/catalog.svelte';
 import { ir } from '$lib/stores/ir';
-import type { CartoKitLayer } from '$lib/types';
+import type { CartoKitLayer, CartoKitSource } from '$lib/types';
+import { randomColor } from '$lib/utils/color';
+import {
+  DEFAULT_OPACITY,
+  DEFAULT_SIZE,
+  DEFAULT_STROKE_OPACITY,
+  DEFAULT_STROKE_WIDTH
+} from '$lib/utils/constants';
+
+/**
+ * Generate a {@link CartoKitLayer} for a given {@link CartoKitSource}.
+ *
+ * @param source The {@link CartoKitSource} associated with the layer.
+ * @param layerId The fresh ID of the {@link CartoKitLayer}.
+ * @param displayName The display name of the {@link CartoKitLayer}.
+ * @returns A default {@link CartoKitLayer} for the input source.
+ */
+export function generateCartoKitLayer(
+  source: CartoKitSource,
+  layerId: string,
+  displayName: string
+): CartoKitLayer {
+  const { geometryType } = catalog.value[layerId];
+  const color = randomColor();
+  const z = Object.values(get(ir).layers).length;
+
+  switch (geometryType) {
+    case 'Point':
+    case 'MultiPoint':
+      return {
+        id: layerId,
+        displayName: displayName,
+        type: 'Point',
+        source,
+        style: {
+          size: DEFAULT_SIZE,
+          fill: {
+            type: 'Constant',
+            color,
+            opacity: DEFAULT_OPACITY,
+            visible: true
+          },
+          stroke: {
+            type: 'Constant',
+            color,
+            width: DEFAULT_STROKE_WIDTH,
+            opacity: DEFAULT_STROKE_OPACITY,
+            visible: true
+          }
+        },
+        layout: {
+          visible: true,
+          z,
+          tooltip: {
+            visible: true
+          }
+        }
+      };
+    case 'Line':
+    case 'LineString':
+    case 'MultiLineString':
+      return {
+        id: layerId,
+        displayName: displayName,
+        type: 'Line',
+        source,
+        style: {
+          stroke: {
+            type: 'Constant',
+            color,
+            width: DEFAULT_STROKE_WIDTH,
+            opacity: DEFAULT_STROKE_OPACITY,
+            visible: true
+          }
+        },
+        layout: {
+          visible: true,
+          z,
+          tooltip: {
+            visible: true
+          }
+        }
+      };
+    case 'Polygon':
+    case 'MultiPolygon':
+      return {
+        id: layerId,
+        displayName: displayName,
+        type: 'Polygon',
+        source,
+        style: {
+          fill: {
+            type: 'Constant',
+            color,
+            opacity: DEFAULT_OPACITY,
+            visible: true
+          },
+          stroke: {
+            type: 'Constant',
+            color,
+            width: DEFAULT_STROKE_WIDTH,
+            opacity: DEFAULT_STROKE_OPACITY,
+            visible: true
+          }
+        },
+        layout: {
+          visible: true,
+          z,
+          tooltip: {
+            visible: true
+          }
+        }
+      };
+    case 'GeometryCollection':
+      throw new Error('GeometryCollection not supported.');
+  }
+}
 
 /**
  * Add a {@link CartoKitLayer} to the map, beneath the labels of the active
@@ -23,7 +140,7 @@ import type { CartoKitLayer } from '$lib/types';
  */
 export function addLayer(map: Map, layer: CartoKitLayer): void {
   const sourceLayer =
-    layer.source.type === 'vector' ? layer.source.sourceLayerId : undefined;
+    layer.source.type === 'pmtiles' ? layer.source.sourceLayerId : undefined;
   const beforeId = get(ir).basemap.beforeId;
 
   switch (layer.type) {

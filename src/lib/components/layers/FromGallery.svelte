@@ -1,13 +1,15 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
-  import { uniqueId, kebabCase } from 'lodash-es';
+  import { snakeCase, uniqueId } from 'lodash-es';
   import type { MapSourceDataEvent } from 'maplibre-gl';
+  import { getContext } from 'svelte';
 
   import LineIcon from '$lib/components/icons/LineIcon.svelte';
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
+  import type { CartoKitSource } from '$lib/types';
+  import type { GalleryItem } from '$lib/types/gallery';
   import { GALLERY_ITEMS } from '$lib/utils/gallery';
 
   const closeModal = getContext<() => void>('close-modal');
@@ -24,31 +26,18 @@
     };
   }
 
-  async function onSelectDataset(
-    itemId: string,
-    displayName: string,
-    url: string
-  ) {
-    loadingId = itemId;
+  async function onSelectDataset(item: GalleryItem) {
+    loadingId = item.id;
 
-    const layerId = uniqueId(`${kebabCase(displayName)}__`);
-    const payload = url.endsWith('.pmtiles')
-      ? {
-          type: 'vector' as const,
-          displayName,
-          location: {
-            type: 'api' as const,
-            url
-          }
-        }
-      : {
-          type: 'geojson' as const,
-          displayName,
-          location: {
-            type: 'api' as const,
-            url
-          }
-        };
+    const layerId = uniqueId(`${snakeCase(item.displayName)}__`);
+    const payload = {
+      type: item.format,
+      displayName: item.displayName,
+      location: {
+        type: 'api' as const,
+        url: item.url
+      }
+    };
 
     await applyDiff({
       type: 'add-layer',
@@ -58,6 +47,17 @@
 
     map.value!.on('sourcedata', handleSourceLoaded(layerId));
   }
+
+  function formatToDisplay(format: CartoKitSource['type']) {
+    switch (format) {
+      case 'geojson':
+        return 'GeoJSON';
+      case 'geoparquet':
+        return 'GeoParquet';
+      case 'pmtiles':
+        return 'PMTiles';
+    }
+  }
 </script>
 
 <div
@@ -65,7 +65,7 @@
 >
   {#each GALLERY_ITEMS as item (item.id)}
     <button
-      onclick={() => onSelectDataset(item.id, item.name, item.url)}
+      onclick={() => onSelectDataset(item)}
       disabled={loadingId !== null}
       class={[
         'relative flex flex-col gap-1 rounded-sm border p-2 text-left transition-colors hover:border-slate-400',
@@ -79,9 +79,9 @@
           ></span>
         </div>
       {/if}
-      <enhanced:img src={item.src} alt={item.name} class="rounded-xs" />
+      <enhanced:img src={item.src} alt={item.displayName} class="rounded-xs" />
       <div class="mt-2 flex items-center justify-between gap-1">
-        <p class="text-xs font-semibold">{item.name}</p>
+        <p class="text-xs font-semibold">{item.displayName}</p>
         <span class="shrink-0">
           {#if item.type === 'Line'}
             <LineIcon />
@@ -97,7 +97,7 @@
           {item.attribution}
         </p>
         <p class="rounded-xs bg-slate-700 px-1 py-0.5 font-mono">
-          {item.format}
+          {formatToDisplay(item.format)}
         </p>
       </div>
     </button>

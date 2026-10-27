@@ -12,7 +12,7 @@
   "diffs": [
     {
       "type": "add-layer",
-      "layerId": "climate-impact-regions__1",
+      "layerId": "climate_impact_regions__1",
       "payload": {
         "type": "geojson",
         "displayName": "Climate Impact Regions",
@@ -24,12 +24,12 @@
     },
     {
       "type": "remove-stroke",
-      "layerId": "climate-impact-regions__1",
+      "layerId": "climate_impact_regions__1",
       "payload": {}
     },
     {
       "type": "layer-type",
-      "layerId": "climate-impact-regions__1",
+      "layerId": "climate_impact_regions__1",
       "payload": {
         "sourceLayerType": "Polygon",
         "targetLayerType": "Choropleth"
@@ -37,14 +37,14 @@
     },
     {
       "type": "fill-attribute",
-      "layerId": "climate-impact-regions__1",
+      "layerId": "climate_impact_regions__1",
       "payload": {
         "attribute": "years_2080_2099"
       }
     },
     {
       "type": "fill-color-scheme",
-      "layerId": "climate-impact-regions__1",
+      "layerId": "climate_impact_regions__1",
       "payload": {
         "scheme": "schemePRGn"
       }

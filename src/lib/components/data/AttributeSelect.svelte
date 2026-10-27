@@ -2,32 +2,23 @@
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import { catalog } from '$lib/state/catalog.svelte';
-  import type { Channel, VisualizationType } from '$lib/types';
+  import type { Channel } from '$lib/types';
+  import type { AttributeKind } from '$lib/types/attribute';
 
   interface Props {
     selected: string;
     layerId: string;
-    visualizationType: VisualizationType;
+    attributeKind: AttributeKind;
     channel: Exclude<Channel, 'stroke'>;
   }
 
-  let { selected, layerId, visualizationType, channel }: Props = $props();
+  let { selected, layerId, attributeKind, channel }: Props = $props();
 
   let options = $derived(
-    Object.entries(catalog.value[layerId]).reduce<
+    Object.entries(catalog.value[layerId].attributes).reduce<
       { value: string; label: string }[]
-    >((acc, [attribute, value]) => {
-      const isQuantitative =
-        visualizationType === 'Quantitative' &&
-        value.type === 'number' &&
-        value.unique >= 9;
-      const isCategorical =
-        visualizationType === 'Categorical' &&
-        (value.type === 'string' ||
-          value.type === 'boolean' ||
-          (value.type === 'number' && value.unique < 9));
-
-      if (isQuantitative || isCategorical) {
+    >((acc, [attribute, entry]) => {
+      if (attributeKind === entry.kind) {
         acc.push({
           value: attribute,
           label: attribute

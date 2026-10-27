@@ -4,7 +4,7 @@ import { deriveDotDensityStartingValue } from '$lib/interaction/geometry';
 import { generateDotDensityPoints } from '$lib/stdlib/dot-density';
 import generateDotDensityPointsSrc from '$lib/stdlib/dot-density?raw';
 import type { CartoKitDotDensityLayer, CartoKitLayer } from '$lib/types';
-import { selectQuantitativeAttribute } from '$lib/utils/attributes';
+import { selectQuantitativeAttribute } from '$lib/utils/attribute';
 import { randomColor } from '$lib/utils/color';
 import { DEFAULT_SIZE } from '$lib/utils/constants';
 import { parseStringToTransformation } from '$lib/utils/parse';
@@ -79,7 +79,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
       );
     case 'Point': {
       let source = layer.source;
-      const attribute = selectQuantitativeAttribute(layer.source);
+      const attribute = selectQuantitativeAttribute(layer.id);
       const dotValue = deriveDotDensityStartingValue(layer.id, attribute);
 
       if (layer.source.type === 'geojson') {
@@ -140,7 +140,7 @@ export function patchDotDensity(layer: CartoKitLayer): CartoKitDotDensityLayer {
     }
     case 'Polygon': {
       let source = layer.source;
-      const attribute = selectQuantitativeAttribute(layer.source);
+      const attribute = selectQuantitativeAttribute(layer.id);
       const dotValue = deriveDotDensityStartingValue(layer.id, attribute);
 
       if (layer.source.type === 'geojson') {

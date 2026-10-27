@@ -74,7 +74,34 @@ export function isPMTilesRequired(
 ): boolean {
   return (
     backend.library === 'maplibre' &&
-    Object.values(ir.layers).some((layer) => layer.source.type === 'vector')
+    Object.values(ir.layers).some((layer) => layer.source.type === 'pmtiles')
+  );
+}
+
+/**
+ * Determine whether we need to include DuckDB to load GeoParquet sources.
+ *
+ * @param ir The current {@link CartoKitIR}.
+ * @returns A Boolean value indicating whether DuckDB is required.
+ */
+function isDuckDBRequired(ir: CartoKitIR): boolean {
+  return Object.values(ir.layers).some(
+    (layer) => layer.source.type === 'geoparquet'
+  );
+}
+
+/**
+ * Determine whether we need to include DuckDBDataProtocol to support register-
+ * ing local GeoParquet files.
+ *
+ * @param ir The current {@link CartoKitIR}.
+ * @returns A Boolean value indicating whether DuckDBDataProtocol is required.
+ */
+function isDuckDBDataProtocolRequired(ir: CartoKitIR): boolean {
+  return Object.values(ir.layers).some(
+    (layer) =>
+      layer.source.type === 'geoparquet' &&
+      layer.source.location.type === 'file'
   );
 }
 
@@ -95,6 +122,8 @@ export function analyzeIR(
     isTurfRequired: isTurfRequired(ir),
     isFetchGeoJSONRequired: isFetchGeoJSONRequired(ir),
     isGeoJSONNamespaceRequired: isGeoJSONNamespaceRequired(ir, backend),
-    isPMTilesRequired: isPMTilesRequired(ir, backend)
+    isPMTilesRequired: isPMTilesRequired(ir, backend),
+    isDuckDBRequired: isDuckDBRequired(ir),
+    isDuckDBDataProtocolRequired: isDuckDBDataProtocolRequired(ir)
   };
 }

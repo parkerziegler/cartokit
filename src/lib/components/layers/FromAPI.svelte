@@ -1,15 +1,17 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
-  import { uniqueId, kebabCase } from 'lodash-es';
+  import { snakeCase, uniqueId } from 'lodash-es';
   import type { MapSourceDataEvent } from 'maplibre-gl';
+  import { getContext } from 'svelte';
 
-  import Alert from '$lib/components/shared/Alert.svelte';
   import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
+  import Alert from '$lib/components/shared/Alert.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
+  import type { CartoKitSource } from '$lib/types';
+  import { extname } from '$lib/utils/file';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -57,25 +59,36 @@
     error = '';
 
     try {
-      const layerId = uniqueId(`${kebabCase(displayName)}__`);
+      const layerId = uniqueId(`${snakeCase(displayName)}__`);
+      const ext = extname(endpoint);
+      let type: CartoKitSource['type'];
 
-      const payload = endpoint.endsWith('.pmtiles')
-        ? {
-            type: 'vector' as const,
-            displayName,
-            location: {
-              type: 'api' as const,
-              url: endpoint
-            }
-          }
-        : {
-            type: 'geojson' as const,
-            displayName,
-            location: {
-              type: 'api' as const,
-              url: endpoint
-            }
-          };
+      switch (ext) {
+        case '.geojson':
+        case '.json':
+          type = 'geojson';
+          break;
+        case '.geoparquet':
+        case '.parquet':
+          type = 'geoparquet';
+          break;
+        case '.pmtiles':
+          type = 'pmtiles';
+          break;
+        default:
+          throw new Error(
+            "Invalid file extension, expected one of: '.geojson', 'geoparquet', '.json', '.parquet', '.pmtiles'"
+          );
+      }
+
+      const payload = {
+        type,
+        displayName,
+        location: {
+          type: 'api' as const,
+          url: endpoint
+        }
+      };
 
       await applyDiff({
         type: 'add-layer',

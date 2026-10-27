@@ -2,36 +2,30 @@
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import { error } from '$lib/state/error.svelte';
-  import type { CartoKitLayer } from '$lib/types';
+  import type { CartoKitPMTilesSource } from '$lib/types';
 
   interface Props {
-    layer: CartoKitLayer;
+    layerId: string;
+    source: CartoKitPMTilesSource;
   }
 
-  let { layer }: Props = $props();
+  let { layerId, source }: Props = $props();
 
   const options = $derived(
-    layer.source.type === 'vector'
-      ? layer.source.vectorLayers.map(({ id }) => ({
-          value: id,
-          label: id
-        }))
-      : []
-  );
-  const selected = $derived(
-    layer.source.type === 'vector' ? layer.source.sourceLayerId : ''
+    source.vectorLayers.map(({ id }) => ({
+      value: id,
+      label: id
+    }))
   );
 
   async function onSourceLayerChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    if (layer.source.type !== 'vector') return;
-
     const diff: CartoKitDiff = {
       type: 'source-layer',
-      layerId: layer.id,
+      layerId,
       payload: {
-        sourceSourceLayerId: layer.source.sourceLayerId,
+        sourceSourceLayerId: source.sourceLayerId,
         targetSourceLayerId: event.currentTarget.value
       }
     };
@@ -48,7 +42,7 @@
 
 <Select
   {options}
-  {selected}
+  selected={source.sourceLayerId}
   id="source-layer-select"
   onchange={onSourceLayerChange}
 />

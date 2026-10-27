@@ -16,7 +16,7 @@ import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
  * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
  */
 export function instrumentPointHover(
   map: Map,
@@ -54,7 +54,7 @@ export function instrumentPointHover(
  * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
  */
 export function instrumentLineHover(
   map: Map,
@@ -86,7 +86,7 @@ export function instrumentLineHover(
  * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
  */
 export function instrumentPolygonHover(
   map: Map,
@@ -118,7 +118,7 @@ export function instrumentPolygonHover(
  * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to add event listeners to.
  * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
  */
 function addHoverListeners(
   map: Map,
@@ -208,7 +208,7 @@ function addHoverListeners(
  * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
  */
 export function instrumentPointSelect(
   map: Map,
@@ -246,7 +246,7 @@ export function instrumentPointSelect(
  * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
  */
 export function instrumentLineSelect(
   map: Map,
@@ -278,7 +278,7 @@ export function instrumentLineSelect(
  * @param map The top-level {@link Map} instance.
  * @param layerId The id of the layer to instrument.
  * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
  */
 export function instrumentPolygonSelect(
   map: Map,
@@ -310,7 +310,7 @@ export function instrumentPolygonSelect(
  * @param map The top-level {@link Map} instance.
  * @param lyrId The id of the layer to add event listeners to.
  * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitVectorSource}s.
+ * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
  */
 function addSelectListeners(
   map: Map,

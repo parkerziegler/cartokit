@@ -1,26 +1,24 @@
 import * as Comlink from 'comlink';
+import type { FeatureCollection } from 'geojson';
 
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
-import { catalog } from '$lib/state/catalog.svelte';
-import type { CartoKitGeoJSONSource, CartoKitLayer, Catalog } from '$lib/types';
+import type { CartoKitGeoJSONSource, CartoKitLayer } from '$lib/types';
 import {
   upsertGeometricTransformation,
   upsertUserTransformation
 } from '$lib/utils/transformation';
 import type { TransformationCall } from '$lib/types/transformation';
-import type { FeatureCollection } from 'geojson';
 
 /**
- * Replay a set of transformations against a source's original data, then update
- * the source's data and transformations and rebuild the layer's catalog.
+ * Replay a set of transformations against a source's original data.
  *
  * @param layer The {@link CartoKitLayer} to update, backed by a GeoJSON source.
  * @param source The layer's {@link CartoKitGeoJSONSource}.
  * @param transformations The full, ordered list of {@link TransformationCall}s
  * to replay against the source data.
  */
-async function replayTransformationsWithCatalogUpdates(
+async function replayTransformations(
   layer: CartoKitLayer,
   source: CartoKitGeoJSONSource,
   transformations: TransformationCall[]
@@ -47,21 +45,6 @@ async function replayTransformationsWithCatalogUpdates(
   }
 
   source.transformations = transformations;
-
-  // Rebuild the catalog for the layer in a worker thread.
-  const catalogWorker = new Worker(
-    new URL('$lib/utils/catalog/worker.ts', import.meta.url),
-    { type: 'module' }
-  );
-
-  try {
-    const buildCatalog =
-      Comlink.wrap<(layer: CartoKitLayer) => Catalog>(catalogWorker);
-    const catalogPatch = await buildCatalog(layer);
-    catalog.value = { ...catalog.value, ...catalogPatch };
-  } finally {
-    catalogWorker.terminate();
-  }
 }
 
 /**
@@ -83,9 +66,8 @@ export async function patchTransformationDiffs(
     case 'add-transformation': {
       const layer = ir.layers[diff.layerId];
 
-      // Transformations can only be applied to in-memory data; vector sources
-      // are always pre-computed and cannot be modified on-the-fly.
-      if (layer.source.type === 'vector') {
+      // Transformations can only be applied to in-memory GeoJSON data.
+      if (layer.source.type !== 'geojson') {
         break;
       }
 
@@ -110,7 +92,7 @@ export async function patchTransformationDiffs(
           };
 
       // Apply the patch.
-      await replayTransformationsWithCatalogUpdates(
+      await replayTransformations(
         layer,
         layer.source,
         transformation.kind === 'user'
@@ -145,7 +127,7 @@ export async function patchTransformationDiffs(
           };
 
           // Apply the patch.
-          await replayTransformationsWithCatalogUpdates(
+          await replayTransformations(
             layer,
             layer.source,
             layer.source.transformations.toSpliced(tIdx, 1)

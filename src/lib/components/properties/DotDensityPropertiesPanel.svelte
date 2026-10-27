@@ -20,7 +20,7 @@
 <MenuItem title="Dots">
   <AttributeSelect
     layerId={layer.id}
-    visualizationType="Quantitative"
+    attributeKind="Quantitative"
     selected={layer.style.dot.attribute}
     channel="dot"
   />

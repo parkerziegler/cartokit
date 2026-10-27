@@ -12,7 +12,7 @@
   import { applyDiff } from '$lib/core/diff';
   import { diffs } from '$lib/state/diffs.svelte';
   import { ir } from '$lib/stores/ir';
-  import { downloadJson } from '$lib/utils/files/download';
+  import { downloadJson } from '$lib/utils/download';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   let actionPickerActive = $state(false);

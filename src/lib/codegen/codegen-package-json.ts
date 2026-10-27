@@ -78,6 +78,7 @@ export function codegenPackageJson(analysis: CartoKitBackendAnalysis) {
     {
       key: 'dependencies',
       value: packages({
+        '@duckdb/duckdb-wasm': analysis.isDuckDBRequired,
         '@turf/turf': analysis.isTurfRequired,
         'mapbox-gl': analysis.library === 'mapbox',
         'maplibre-gl': analysis.library === 'maplibre',
@@ -87,7 +88,9 @@ export function codegenPackageJson(analysis: CartoKitBackendAnalysis) {
     {
       key: 'devDependencies',
       value: packages({
-        '@types/geojson': analysis.isFetchGeoJSONRequired && isTypeScript,
+        '@types/geojson':
+          (analysis.isFetchGeoJSONRequired || analysis.isDuckDBRequired) &&
+          isTypeScript,
         typescript: isTypeScript,
         vite: true
       })

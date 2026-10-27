@@ -30,35 +30,31 @@
   />
   {#if fill.type === 'Constant'}
     <FillPicker {layerId} {fill} />
-  {:else if fill.type === 'Categorical'}
+  {:else}
     <AttributeSelect
       {layerId}
-      visualizationType={fill.type}
+      attributeKind={fill.type}
       selected={fill.attribute}
       channel="fill"
     />
-    <ColorSchemeSelect {layerId} scale={fill.scale} />
-  {:else if fill.type === 'Quantitative'}
-    <AttributeSelect
-      {layerId}
-      visualizationType={fill.type}
-      selected={fill.attribute}
-      channel="fill"
-    />
-    <ClassificationMethodSelect
-      {layerId}
-      attribute={fill.attribute}
-      scale={fill.scale}
-    />
-    {#if fill.scale.type === 'Continuous'}
-      <ColorRampSelect
-        {layerId}
-        channel="fill-color"
-        ramp={fill.scale.interpolator}
-      />
-    {:else}
-      <StepsSelect {layerId} scale={fill.scale} />
+    {#if fill.type === 'Categorical'}
       <ColorSchemeSelect {layerId} scale={fill.scale} />
+    {:else if fill.type === 'Quantitative'}
+      <ClassificationMethodSelect
+        {layerId}
+        attribute={fill.attribute}
+        scale={fill.scale}
+      />
+      {#if fill.scale.type === 'Continuous'}
+        <ColorRampSelect
+          {layerId}
+          channel="fill-color"
+          ramp={fill.scale.interpolator}
+        />
+      {:else}
+        <StepsSelect {layerId} scale={fill.scale} />
+        <ColorSchemeSelect {layerId} scale={fill.scale} />
+      {/if}
     {/if}
   {/if}
   <OpacityInput {layerId} channel="fill" style={fill} />

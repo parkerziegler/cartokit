@@ -1,4 +1,5 @@
 <script lang="ts">
+  import duckdb_wasm_eh from '@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url';
   import type { Feature } from 'geojson';
   import { addProtocol, Map } from 'maplibre-gl';
   import * as pmtiles from 'pmtiles';
@@ -9,11 +10,11 @@
   import { page } from '$app/state';
   import Cursor from '$lib/components/cursor/Cursor.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
+  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
   import PropertiesMenu from '$lib/components/properties/PropertiesMenu.svelte';
   import Alert from '$lib/components/shared/Alert.svelte';
-  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
   import DataTable from '$lib/components/shared/DataTable.svelte';
   import Menu from '$lib/components/shared/Menu.svelte';
   import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
@@ -21,13 +22,15 @@
   import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
   import { onFeatureLeave } from '$lib/interaction/events';
   import { chat } from '$lib/state/chat.svelte';
+  import { db } from '$lib/state/db.svelte';
   import { error } from '$lib/state/error.svelte';
   import { initHistory } from '$lib/state/history.svelte';
   import { layerId } from '$lib/state/layerId.svelte';
   import { map as mapState } from '$lib/state/map.svelte';
   import { user } from '$lib/state/user.svelte';
-  import { ir } from '$lib/stores/ir';
+  import { createInitialIR, ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
+  import { initDB } from '$lib/utils/db';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
@@ -51,7 +54,8 @@
             )
           };
         }
-        case 'vector': {
+        case 'geoparquet':
+        case 'pmtiles': {
           if (features.length > 0) {
             return {
               rows: features,
@@ -84,6 +88,14 @@
   chat.enable = data.enableChat;
 
   onMount(() => {
+    initDB()
+      .then(({ db: ddb, worker, conn }) => {
+        db.value = { db: ddb, worker, conn };
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
     const protocol = new pmtiles.Protocol();
     addProtocol('pmtiles', protocol.tile);
 
@@ -157,14 +169,14 @@
     });
 
     // Add an idle listener that will update features in the DataTable when a
-    // vector layer is active. GeoJSON layers already have their data available
-    // in memory, so we can populate the DataTable directly.
+    // PMTiles or GeoParquet layer is active. GeoJSON layers already have their
+    // data available in memory, so we can populate the DataTable directly.
     map.on('idle', (e) => {
       const currentLayer = layerId.value
         ? $ir.layers[layerId.value]
         : undefined;
 
-      if (currentLayer?.source.type === 'vector') {
+      if (currentLayer && currentLayer.source.type !== 'geojson') {
         features = e.target.queryRenderedFeatures({
           layers: [currentLayer.id]
         });
@@ -183,9 +195,21 @@
     );
 
     return () => {
+      // Remove the map.
       map?.remove();
+
+      // Reset the IR to its initial state.
+      ir.set(createInitialIR());
+      layerId.value = null;
+
+      // Destroy edit historty and the E keybinding.
       destroyHistory();
       deregisterKeybinding();
+
+      // Terminate the DuckDB database instance and the Worker thread running it.
+      db.value?.db.terminate();
+      db.value?.worker.terminate();
+      db.value = null;
     };
   });
 
@@ -205,6 +229,14 @@
     });
   }
 </script>
+
+<svelte:head>
+  <!--
+    Start downloading the DuckDB-wasm module during page load, rather than
+    waiting for initDB to request it in onMount.
+  -->
+  <link rel="preload" href={duckdb_wasm_eh} as="fetch" crossorigin="" />
+</svelte:head>
 
 <main class="absolute inset-0 overflow-hidden dark:bg-black">
   <div

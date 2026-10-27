@@ -2,7 +2,8 @@ import { expect, test, describe } from 'vitest';
 
 import { deriveSize } from '$lib/interaction/geometry';
 import { catalog } from '$lib/state/catalog.svelte';
-import type { NumericCatalogEntry, ProportionalSymbolStyle } from '$lib/types';
+import type { ProportionalSymbolStyle } from '$lib/types';
+import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
 import { signedSqrt } from '$lib/utils/number';
 
 const LAYER_ID = 'test-layer';
@@ -21,24 +22,23 @@ function setCatalogEntry(
   min: number,
   max: number
 ): void {
-  const entry: NumericCatalogEntry = {
-    type: 'number',
-    quantiles: { domain: [] },
-    jenks: {
-      3: { breaks: [] },
-      4: { breaks: [] },
-      5: { breaks: [] },
-      6: { breaks: [] },
-      7: { breaks: [] },
-      8: { breaks: [] },
-      9: { breaks: [] }
-    },
+  const entry: QuantitativeAttributeEntry = {
+    kind: 'Quantitative',
     min,
     max,
-    unique: 2
+    domain: [],
+    unique: 2,
+    Quantile: {} as QuantitativeAttributeEntry['Quantile'],
+    'Equal Interval': {} as QuantitativeAttributeEntry['Equal Interval'],
+    Jenks: {} as QuantitativeAttributeEntry['Jenks']
   };
 
-  catalog.value[layerId] = { [attribute]: entry };
+  catalog.value[layerId] = {
+    type: 'geojson',
+    geometryType: 'Point',
+    count: 2,
+    attributes: { [attribute]: entry }
+  };
 }
 
 describe('deriveSize', () => {

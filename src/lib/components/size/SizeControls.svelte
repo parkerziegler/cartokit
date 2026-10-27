@@ -39,7 +39,7 @@
 <div class="flex flex-col gap-1">
   <AttributeSelect
     layerId={layer.id}
-    visualizationType="Quantitative"
+    attributeKind="Quantitative"
     selected={layer.style.size.attribute}
     channel="size"
   />

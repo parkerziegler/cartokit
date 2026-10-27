@@ -1,16 +1,16 @@
 <script lang="ts">
+  import { snakeCase, uniqueId } from 'lodash-es';
   import { getContext } from 'svelte';
-  import { uniqueId, kebabCase } from 'lodash-es';
 
-  import Alert from '$lib/components/shared/Alert.svelte';
   import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
+  import Alert from '$lib/components/shared/Alert.svelte';
   import Button from '$lib/components/shared/Button.svelte';
   import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
   import FileInput from '$lib/components/shared/FileInput.svelte';
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
-  import { normalizeGeoJSONToFeatureCollection } from '$lib/utils/geojson';
-  import { VALID_GEOJSON_TYPES } from '$lib/utils/layer';
+  import type { CartoKitSource } from '$lib/types';
+  import { extname } from '$lib/utils/file';
 
   const closeModal = getContext<() => void>('close-modal');
 
@@ -29,7 +29,7 @@
     displayName = event.currentTarget.value;
   }
 
-  function onSubmit(
+  async function onSubmit(
     event: Event & { currentTarget: EventTarget & HTMLFormElement }
   ) {
     event.preventDefault();
@@ -39,55 +39,52 @@
     }
 
     dataLoading = true;
-    const reader = new FileReader();
+    error = '';
 
-    reader.onload = async function readGeoJSON(theFile) {
-      if (typeof theFile.target?.result === 'string' && file) {
-        try {
-          const parsed = JSON.parse(theFile.target.result);
+    try {
+      const layerId = uniqueId(`${snakeCase(displayName)}__`);
+      const ext = extname(file.name);
+      let type: CartoKitSource['type'];
 
-          if (!parsed.type) {
-            throw new Error(
-              'Missing required member "type" in GeoJSON file. Fix the file and try again.'
-            );
-          } else if (!VALID_GEOJSON_TYPES.has(parsed.type)) {
-            throw new Error(
-              `Invalid value for "type" in GeoJSON file: ${parsed.type}. Valid values are: ${Array.from(VALID_GEOJSON_TYPES).join(', ')}. Fix the file and try again.`
-            );
-          }
-
-          const featureCollection = normalizeGeoJSONToFeatureCollection(parsed);
-          const layerId = uniqueId(`${kebabCase(displayName)}__`);
-
-          await applyDiff({
-            type: 'add-layer',
-            layerId,
-            payload: {
-              type: 'geojson',
-              location: {
-                type: 'file',
-                fileName: file.name,
-                featureCollection
-              },
-              displayName
-            }
-          });
-
-          displayName = '';
-          file = null;
-          closeModal();
-        } catch (e) {
-          error =
-            e instanceof Error
-              ? e.message
-              : 'Invalid GeoJSON file. Please check the file and try again.';
-        } finally {
-          dataLoading = false;
-        }
+      switch (ext) {
+        case '.geojson':
+        case '.json':
+          type = 'geojson';
+          break;
+        case '.geoparquet':
+        case '.parquet':
+          type = 'geoparquet';
+          break;
+        default:
+          throw new Error(
+            "Invalid file extension, expected one of: '.geojson', 'geoparquet', '.json', '.parquet'"
+          );
       }
-    };
 
-    reader.readAsText(file, 'UTF-8');
+      await applyDiff({
+        type: 'add-layer',
+        layerId,
+        payload: {
+          type,
+          location: {
+            type: 'file',
+            file
+          },
+          displayName
+        }
+      });
+
+      displayName = '';
+      file = null;
+      closeModal();
+    } catch (e) {
+      error =
+        e instanceof Error
+          ? e.message
+          : 'Failed to read file. Please check the file and try again.';
+    } finally {
+      dataLoading = false;
+    }
   }
 </script>
 

@@ -5,7 +5,7 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import DownloadIcon from '$lib/components/icons/DownloadIcon.svelte';
   import type { CartoKitLayer } from '$lib/types';
-  import { downloadJson } from '$lib/utils/files/download';
+  import { downloadJson } from '$lib/utils/download';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {

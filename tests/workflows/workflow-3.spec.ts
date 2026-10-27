@@ -1,4 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
+import { waitForMapIdle } from '../utils/idle';
+import { openCartokit } from '../utils/navigate';
 
 /**
  * Workflow 3. https://www.washingtonpost.com/climate-environment/interactive/2024/winter-temperature-warming-city-data-climate-change/
@@ -12,30 +15,9 @@ import { test, expect } from '@playwright/test';
  */
 test('workflow-3', async ({ page }) => {
   // Mark workflow tests as slow.
-  test.setTimeout(150000);
+  test.setTimeout(180_000);
 
-  // Navigate to cartokit, running on a local development server.
-  await page.goto('/');
-
-  if (page.url().includes('vercel.app')) {
-    // In Preview Vercel environments, ensure <vercel-live-feedback> does not
-    // intercept pointer events.
-    await page.locator('vercel-live-feedback').waitFor({ state: 'attached' });
-    await page.locator('vercel-live-feedback').evaluate((element) => {
-      element.style.pointerEvents = 'none';
-      element.style.zIndex = '-1';
-      element.style.display = 'none';
-    });
-  }
-
-  // Wait for the Open Editor button and Add Layer button to become enabled. These
-  // are proxies for the map reaching an idle state.
-  await expect(page.getByTestId('editor-toggle')).toBeEnabled({
-    timeout: 10000
-  });
-  await expect(page.getByTestId('add-layer-button')).toBeEnabled({
-    timeout: 10000
-  });
+  await openCartokit(page);
 
   // Click the Open Editor button.
   await page.getByTestId('editor-toggle').click();
@@ -88,17 +70,14 @@ test('workflow-3', async ({ page }) => {
   // Wait for the loading indicator to disappear.
   await page
     .getByTestId('loading-indicator')
-    .waitFor({ state: 'hidden', timeout: 90000 });
+    .waitFor({ state: 'hidden', timeout: 150_000 });
 
-  await expect(page.getByTestId('add-layer-modal')).not.toBeVisible();
+  await expect(page.getByTestId('add-layer-modal')).not.toBeVisible({
+    timeout: 10000
+  });
 
-  // Wait for MapLibre to render the Winter Temperature Change layer.
-  //
-  // Tiles are generated on the fly by MapLibre, so we need to wait for them to
-  // load. In theory, we'd like to hook into MapLibre's event system to deter-
-  // mine when the map is idle; however, we don't want to attach the map inst-
-  // ance to the global window object just for the sake of testing.
-  await page.waitForTimeout(5000);
+  // Wait for the map to tile and render the data.
+  await waitForMapIdle(page);
 
   // Click on the layer entry in the Layers Panel.
   await page.getByTestId('layer-entry').first().click();

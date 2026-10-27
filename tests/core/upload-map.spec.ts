@@ -3,32 +3,14 @@ import * as url from 'node:url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
+import { waitForMapIdle } from '../utils/idle';
+import { openCartokit } from '../utils/navigate';
 
 test.describe('upload-map', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to cartokit, running on a local development server.
-    await page.goto('/');
-
-    if (page.url().includes('vercel.app')) {
-      // In Preview Vercel environments, ensure <vercel-live-feedback> does not
-      // intercept pointer events.
-      await page.locator('vercel-live-feedback').waitFor({ state: 'attached' });
-      await page.locator('vercel-live-feedback').evaluate((element) => {
-        element.style.pointerEvents = 'none';
-        element.style.zIndex = '-1';
-        element.style.display = 'none';
-      });
-    }
-
-    // Wait for the Open Editor button and Add Layer button to become enabled. These
-    // are proxies for the map reaching an idle state.
-    await expect(page.getByTestId('editor-toggle')).toBeEnabled({
-      timeout: 10000
-    });
-    await expect(page.getByTestId('add-layer-button')).toBeEnabled({
-      timeout: 10000
-    });
+    await openCartokit(page);
   });
 
   test('should upload a map from a .ck.json file', async ({ page }) => {
@@ -46,13 +28,8 @@ test.describe('upload-map', () => {
     // Wait for the info indicator to disappear.
     await expect(page.getByTestId('upload-map-alert')).toBeHidden();
 
-    // Wait for MapLibre to render the Climate Impact Regions layer.
-    //
-    // Tiles are generated on the fly by MapLibre, so we need to wait for them to
-    // load. In theory, we'd like to hook into MapLibre's event system to deter-
-    // mine when the map is idle; however, we don't want to attach the map inst-
-    // ance to the global window object just for the sake of testing.
-    await page.waitForTimeout(5000);
+    // Wait for the map to tile and render the data.
+    await waitForMapIdle(page);
 
     // Click on the layer entry in the Layers Panel.
     await page.getByTestId('layer-entry').first().click();
