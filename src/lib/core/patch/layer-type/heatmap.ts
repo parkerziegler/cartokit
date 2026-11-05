@@ -1,4 +1,8 @@
-import type { CartoKitHeatmapLayer, CartoKitLayer } from '$lib/types';
+import type {
+  CartoKitHeatmapLayer,
+  CartoKitPointLayer,
+  CartoKitProportionalSymbolLayer
+} from '$lib/types';
 import {
   DEFAULT_HEATMAP_INTENSITY,
   DEFAULT_HEATMAP_RADIUS,
@@ -7,20 +11,17 @@ import {
 } from '$lib/utils/constants';
 
 /**
- * Patch a {@link CartoKitLayer} to a {@link CartoKitHeatmapLayer}.
+ * Patch a {@link CartoKitPointLayer} or a
+ * {@link CartoKitProportionalSymbolLayer} to a {@link CartoKitHeatmapLayer}.
  *
- * @param layer The {@link CartoKitLayer} to patch.
+ * @param layer The {@link CartoKitPointLayer} or
+ * {@link CartoKitProportionalSymbolLayer}  to patch.
  * @returns The patched {@link CartoKitHeatmapLayer}.
  */
-export function patchHeatmap(layer: CartoKitLayer): CartoKitHeatmapLayer {
+export function patchHeatmap(
+  layer: CartoKitPointLayer | CartoKitProportionalSymbolLayer
+): CartoKitHeatmapLayer {
   switch (layer.type) {
-    case 'Choropleth':
-    case 'Dot Density':
-    case 'Line':
-    case 'Polygon':
-      throw new Error(
-        `Unsupported geometry transition. Transition initiated from ${layer.type} to Heatmap.`
-      );
     case 'Point': {
       const targetLayer: CartoKitHeatmapLayer = {
         ...layer,
@@ -68,9 +69,6 @@ export function patchHeatmap(layer: CartoKitLayer): CartoKitHeatmapLayer {
       };
 
       return targetLayer;
-    }
-    case 'Heatmap': {
-      return layer;
     }
   }
 }

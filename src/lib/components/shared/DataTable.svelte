@@ -8,7 +8,7 @@
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import { map } from '$lib/state/map.svelte';
-  import type { CartoKitSource } from '$lib/types';
+  import type { CartoKitSource } from '$lib/types/source';
   import { pluralize } from '$lib/utils/formatters/shared';
 
   interface Props {

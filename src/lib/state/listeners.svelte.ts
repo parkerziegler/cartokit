@@ -7,6 +7,7 @@ export interface LayerListeners {
   click: LayerListener;
   mousemove: LayerListener;
   mouseleave: LayerListener;
+  contextmenu: LayerListener;
 }
 
 export const listeners = $state<{ value: SvelteMap<string, LayerListeners> }>({

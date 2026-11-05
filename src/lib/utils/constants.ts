@@ -1,4 +1,4 @@
-import type { CartoKitSource } from '$lib/types';
+import type { CartoKitSource } from '$lib/types/source';
 
 // CartoKit default values.
 export const DEFAULT_FILL = '#000000';
@@ -10,6 +10,7 @@ export const DEFAULT_METHOD = (sourceType: CartoKitSource['type']) => {
   switch (sourceType) {
     case 'geojson':
     case 'geoparquet':
+    case 'table':
       return 'Quantile';
     case 'pmtiles':
       return 'Equal Interval';
