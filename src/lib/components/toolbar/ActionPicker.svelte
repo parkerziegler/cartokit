@@ -12,7 +12,7 @@
   import { applyDiff } from '$lib/core/diff';
   import { diffs } from '$lib/state/diffs.svelte';
   import { ir } from '$lib/stores/ir';
-  import { downloadJson } from '$lib/utils/download';
+  import { downloadBlob } from '$lib/utils/download';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   let actionPickerActive = $state(false);
@@ -58,10 +58,20 @@
       bearing: $ir.bearing
     };
 
-    downloadJson(
-      { cartokitVersion: __CARTOKIT_VERSION__, camera, diffs },
-      'map.ck.json'
+    const blob = new Blob(
+      [
+        JSON.stringify(
+          { cartokitVersion: __CARTOKIT_VERSION__, camera, diffs },
+          null,
+          2
+        )
+      ],
+      {
+        type: 'application/json'
+      }
     );
+
+    downloadBlob(blob, 'map.ck.json');
   }
 
   function onUploadMap(file: File) {

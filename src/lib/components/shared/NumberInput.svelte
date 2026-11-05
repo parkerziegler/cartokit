@@ -23,7 +23,7 @@
     class: className = ''
   }: Props = $props();
 
-  function onChange(
+  function onInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
     const input = parseFloat(event.currentTarget.value);
@@ -57,7 +57,7 @@
   {id}
   {disabled}
   onkeydown={onKeyDown}
-  onchange={onChange}
+  onchange={onInput}
   class={[
     'border border-transparent bg-inherit p-2 hover:border-slate-600 focus:border-slate-600',
     className

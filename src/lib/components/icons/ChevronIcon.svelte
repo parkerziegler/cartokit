@@ -1,16 +1,18 @@
 <script lang="ts">
   interface Props {
+    height?: number;
     rotate?: number;
+    width?: number;
   }
 
-  let { rotate = 0 }: Props = $props();
+  let { height = 16, rotate = 0, width = 16 }: Props = $props();
 </script>
 
 <svg
-  height="16"
+  {height}
   stroke-linejoin="round"
   viewBox="0 0 16 16"
-  width="16"
+  {width}
   style="color: currentcolor;"
   transform="rotate({rotate})"
   class="transition-transform"

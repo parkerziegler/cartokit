@@ -9,3 +9,7 @@
 export function pluralize(noun: string, n: number, suffix = 's'): string {
   return n === 1 ? noun : `${noun}${suffix}`;
 }
+
+export function conjugate(verb: string, n: number) {
+  return n === 1 ? `${verb}s` : verb;
+}

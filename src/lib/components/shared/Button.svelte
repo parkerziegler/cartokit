@@ -5,10 +5,12 @@
   import { fly } from 'svelte/transition';
 
   import CheckIcon from '$lib/components/icons/CheckIcon.svelte';
+  import LoadingIndicator from '$lib/components/shared/LoadingIndicator.svelte';
 
   interface Props {
     onclick?: MouseEventHandler<HTMLButtonElement>;
     class?: string;
+    variant?: 'tiny' | 'normal';
     disabled?: boolean;
     loading?: boolean;
     success?: boolean;
@@ -19,6 +21,7 @@
   let {
     onclick = () => {},
     class: className = '',
+    variant = 'normal',
     disabled = false,
     loading = false,
     success = false,
@@ -51,7 +54,8 @@
   {onclick}
   disabled={disabled || loading}
   class={[
-    'flex items-center gap-2 rounded-sm border px-3 py-2 text-sm transition focus:border-slate-400 disabled:cursor-not-allowed',
+    'flex items-center gap-2 rounded-sm border transition focus:border-slate-400 disabled:cursor-not-allowed',
+    variant === 'tiny' ? 'px-2 py-1 text-xs' : 'px-3 py-2 text-sm',
     succeeded
       ? 'bg-ck-light text-slate-900'
       : 'border-slate-600 text-white enabled:hover:border-slate-400 disabled:text-slate-500',
@@ -72,37 +76,8 @@
           <CheckIcon />
         </span>
       {:else if loading}
-        <span
-          class="absolute inset-0 flex"
-          data-testid="loading-indicator"
-          transition:fly={indicatorTransition}
-        >
-          <span class="loader"></span>
-        </span>
+        <LoadingIndicator class="inset-0" />
       {/if}
     </span>
   {/if}
 </button>
-
-<style lang="postcss">
-  @reference 'tailwindcss';
-
-  .loader {
-    @apply inline-block h-4 w-4 rounded-full;
-    border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
-    border-top-color: currentColor;
-    animation: animloader 0.6s linear infinite;
-  }
-
-  @keyframes animloader {
-    to {
-      transform: rotate(1turn);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .loader {
-      animation-duration: 2s;
-    }
-  }
-</style>

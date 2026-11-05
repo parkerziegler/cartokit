@@ -1,4 +1,5 @@
-import type { CartoKitSource, QuantitativeColorScale } from '$lib/types';
+import type { QuantitativeColorScale } from '$lib/types';
+import type { CartoKitSource } from '$lib/types/source';
 
 export const CLASSIFICATION_METHODS: QuantitativeColorScale['type'][] = [
   'Continuous',
@@ -13,5 +14,10 @@ export const SOURCE_TYPES_TO_CLASSIFICATION_METHODS: Map<
   QuantitativeColorScale['type'][]
 > = new Map([
   ['geojson', ['Continuous', 'Quantile', 'Equal Interval', 'Jenks', 'Manual']],
-  ['pmtiles', ['Continuous', 'Equal Interval', 'Manual']]
+  [
+    'geoparquet',
+    ['Continuous', 'Quantile', 'Equal Interval', 'Jenks', 'Manual']
+  ],
+  ['pmtiles', ['Continuous', 'Equal Interval', 'Manual']],
+  ['table', ['Continuous', 'Quantile', 'Equal Interval', 'Jenks', 'Manual']]
 ]);

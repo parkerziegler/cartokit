@@ -6,11 +6,8 @@ import { diffs } from '$lib/state/diffs.svelte';
 import { history } from '$lib/state/history.svelte';
 import { ir } from '$lib/stores/ir';
 import type {
-  CartoKitGeoJSONSource,
-  CartoKitGeoParquetSource,
   CartoKitIR,
   CartoKitLayer,
-  CartoKitPMTilesSource,
   LayerType,
   Projection,
   QuantitativeColorScale,
@@ -24,7 +21,12 @@ import type {
   RampDirection,
   SchemeDirection
 } from '$lib/types/color';
-import type { TransformationCall } from '$lib/types/transformation';
+import type {
+  CartoKitGeoJSONSource,
+  CartoKitGeoParquetSource,
+  CartoKitPMTilesSource,
+  CartoKitTableSource
+} from '$lib/types/source';
 
 interface LayerDiff {
   layerId: CartoKitLayer['id'];
@@ -270,20 +272,6 @@ interface HeatmapWeightValueDiff extends LayerDiff {
   };
 }
 
-interface AddTransformationDiff extends LayerDiff {
-  type: 'add-transformation';
-  payload: {
-    transformation: TransformationCall;
-  };
-}
-
-interface RemoveTransformationDiff extends LayerDiff {
-  type: 'remove-transformation';
-  payload: {
-    transformationName: string;
-  };
-}
-
 interface LayerVisibilityDiff extends LayerDiff {
   type: 'layer-visibility';
   payload: {
@@ -309,13 +297,20 @@ interface AddLayerDiff extends LayerDiff {
       })
     | (Pick<CartoKitPMTilesSource, 'type' | 'location'> & {
         displayName: string;
+      })
+    | (Pick<CartoKitTableSource, 'type' | 'location'> & {
+        displayName: string;
       });
 }
+
+export type RemoveLayerStrategy =
+  'default' | 'keep-data-as-needed' | 'remove-all-dependent-layers';
 
 interface RemoveLayerDiff extends LayerDiff {
   type: 'remove-layer';
   payload: {
     sourceLayerType: LayerType;
+    strategy: RemoveLayerStrategy;
   };
 }
 
@@ -415,8 +410,6 @@ export type CartoKitDiff =
   | HeatmapWeightMinDiff
   | HeatmapWeightMaxDiff
   | HeatmapWeightValueDiff
-  | AddTransformationDiff
-  | RemoveTransformationDiff
   | LayerVisibilityDiff
   | LayerTooltipVisibilityDiff
   | AddLayerDiff

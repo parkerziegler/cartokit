@@ -27,7 +27,8 @@
     const entry = catalog.value[layer.id];
 
     switch (entry.type) {
-      case 'geojson': {
+      case 'geojson':
+      case 'table': {
         return GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES.get(entry.geometryType);
       }
       case 'geoparquet': {

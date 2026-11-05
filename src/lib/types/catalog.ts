@@ -1,8 +1,8 @@
 import type { Geometry } from 'geojson';
 
-import type { CartoKitLayer, VectorGeometry } from '$lib/types';
+import type { CartoKitLayer } from '$lib/types';
 import type { AttributeKind } from '$lib/types/attribute';
-import type { DuckDBColumn } from '$lib/types/db';
+import type { VectorGeometry } from '$lib/types/source';
 
 /**
  * Represents a per-attribute catalog entry for a quantitative attribute,
@@ -65,41 +65,39 @@ export interface CategoricalAttributeEntry {
 export type AttributeEntry =
   QuantitativeAttributeEntry | CategoricalAttributeEntry;
 
-/** Represents a catalog entry for a {@link CartoKitLayer} backed by GeoJSON. */
-interface GeoJSONCatalogEntry {
-  /** The type of the catalog entry ('geojson'). */
-  type: 'geojson';
-  /** The geometry type of GeoJSON features. */
-  geometryType: Geometry['type'];
-  /** The number of features in the layer. */
-  count: number;
-  /** A dictionary mapping attribute names to entries. */
-  attributes: Record<string, AttributeEntry>;
-}
-
-/** Represents a catalog entry for a {@link CartoKitLayer} backed by GeoParquet. */
-export interface GeoParquetCatalogEntry {
-  /** The type of the catalog entry ('geoparquet'). */
-  type: 'geoparquet';
+/** Represents the base fields for a {@link CartoKitLayer} stored in DuckDB. */
+interface DuckDBCatalogEntry {
   /** The geometry type of the GeoParquet file's primary geometry column. */
   geometryType: Geometry['type'];
   /** The number of features in the layer. */
   count: number;
   /** A dictionary mapping attribute names to entries. */
   attributes: Record<string, AttributeEntry>;
-  /**
-   * The {@link DuckDBColumn}s of the layer's table, used to query its features.
-   */
-  columns: DuckDBColumn[];
-  /**
-   * The name of the geometry column in the GeoParquet file, used to query the
-   * file directly in generated code.
-   */
-  geometryColumn: string;
+}
+
+/** Represents a catalog entry for a {@link CartoKitLayer} backed by GeoJSON. */
+export interface GeoJSONCatalogEntry extends DuckDBCatalogEntry {
+  /** The type of the catalog entry ('geojson'). */
+  type: 'geojson';
+}
+
+/** Represents a catalog entry for a {@link CartoKitLayer} backed by GeoParquet. */
+export interface GeoParquetCatalogEntry extends DuckDBCatalogEntry {
+  /** The type of the catalog entry ('geoparquet'). */
+  type: 'geoparquet';
+}
+
+/**
+ * Represents a catalog entry for a {@link CartoKitLayer} derived from another
+ * layer's table.
+ */
+export interface TableCatalogEntry extends DuckDBCatalogEntry {
+  /** The type of the catalog entry ('table'). */
+  type: 'table';
 }
 
 /** Represents a catalog entry for a {@link CartoKitLayer} backed by PMTiles. */
-interface PMTilesCatalogEntry {
+export interface PMTilesCatalogEntry {
   /** The type of the catalog entry ('pmtiles'). */
   type: 'pmtiles';
   /** The geometry type of the vector tile source layer. */
@@ -111,8 +109,11 @@ interface PMTilesCatalogEntry {
 }
 
 /** Represents a layer entry in the catalog. */
-type CatalogEntry =
-  GeoJSONCatalogEntry | GeoParquetCatalogEntry | PMTilesCatalogEntry;
+export type CatalogEntry =
+  | GeoJSONCatalogEntry
+  | GeoParquetCatalogEntry
+  | TableCatalogEntry
+  | PMTilesCatalogEntry;
 
 /** Represents a catalog mapping layerIds to layer metadata. */
 export type Catalog = Record<CartoKitLayer['id'], CatalogEntry>;

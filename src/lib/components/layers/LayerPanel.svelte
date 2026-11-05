@@ -3,11 +3,15 @@
 
   import LayerEntry from '$lib/components/layers/LayerEntry.svelte';
   import { ir } from '$lib/stores/ir';
+
+  let layers = $derived(
+    Object.values($ir.layers).filter((layer) => !layer.layout.deleted)
+  );
 </script>
 
-{#if Object.keys($ir.layers).length > 0}
+{#if layers.length > 0}
   <ul class="flex flex-col gap-4 p-4 font-mono text-white">
-    {#each orderBy(Object.values($ir.layers), 'layout.z', 'desc') as layer (layer.id)}
+    {#each orderBy(layers, 'layout.z', 'desc') as layer (layer.id)}
       <LayerEntry {layer} />
     {/each}
   </ul>

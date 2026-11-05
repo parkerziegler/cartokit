@@ -3,7 +3,10 @@ import { orderBy } from 'lodash-es';
 import { codegenLayer } from '$lib/codegen/codegen-layer';
 import { codegenMapStyle } from '$lib/codegen/codegen-map-style';
 import { codegenProjection } from '$lib/codegen/codegen-projection';
-import { codegenSource } from '$lib/codegen/codegen-source';
+import {
+  codegenRegistrations,
+  codegenSource
+} from '$lib/codegen/codegen-source';
 import { withDefault } from '$lib/codegen/utils';
 import type { CartoKitIR } from '$lib/types';
 import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
@@ -28,7 +31,7 @@ export function codegenMap(
     'layout.z',
     'asc'
   ).reduce((p, layer) => {
-    return p.concat('\n\n' + codegenSource(layer, analysis));
+    return p.concat('\n\n' + codegenSource(layer, ir, analysis));
   }, '');
   const layerRenders = orderBy(
     Object.values(ir.layers),
@@ -68,8 +71,10 @@ export function codegenMap(
 
   ${analysis.library === 'maplibre' ? projection : ''}
 
-  map.on('load', ${analysis.isFetchGeoJSONRequired || analysis.isDuckDBRequired ? 'async ' : ''}() => {
-    ${analysis.isDuckDBRequired ? `const { conn${analysis.isDuckDBDataProtocolRequired ? ', db' : ''} } = await initDB();` : ''}
+  map.on('load', ${analysis.isDuckDBRequired ? 'async ' : ''}() => {
+    ${analysis.isDuckDBRequired ? `const { conn${analysis.isFileRegistrationRequired ? ', db' : ''} } = await initDB();` : ''}
+
+    ${codegenRegistrations(ir)}
 
     ${layerSources}
 

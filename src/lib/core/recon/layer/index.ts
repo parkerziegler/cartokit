@@ -1,12 +1,10 @@
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
 import { removeLayerListeners } from '$lib/interaction/events';
 import { addLayer } from '$lib/interaction/layer';
-import { catalog } from '$lib/state/catalog.svelte';
 import { db } from '$lib/state/db.svelte';
 import { feature } from '$lib/state/feature.svelte';
 import { layerId } from '$lib/state/layerId.svelte';
 import { map } from '$lib/state/map.svelte';
-import type { GeoParquetCatalogEntry } from '$lib/types/catalog';
 import { readTableAsGeoJSON } from '$lib/utils/db';
 import { getAffiliatedLayerIds } from '$lib/utils/layer';
 import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
@@ -31,20 +29,13 @@ export async function reconLayerDiffs(
 
       // Add the source to the map.
       switch (layer.source.type) {
-        case 'geojson': {
-          map.value!.addSource(layer.id, {
-            type: 'geojson',
-            data: layer.source.data,
-            generateId: true
-          });
-          break;
-        }
-        case 'geoparquet': {
-          const entry = catalog.value[layer.id] as GeoParquetCatalogEntry;
+        case 'geojson':
+        case 'geoparquet':
+        case 'table': {
           const geojson = await readTableAsGeoJSON(
             db.value!.conn,
             layer.id,
-            entry
+            layer.source.table
           );
 
           map.value!.addSource(layer.id, {

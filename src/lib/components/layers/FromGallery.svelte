@@ -6,9 +6,9 @@
   import LineIcon from '$lib/components/icons/LineIcon.svelte';
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
+  import LoadingIndicator from '$lib/components/shared/LoadingIndicator.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
-  import type { CartoKitSource } from '$lib/types';
   import type { GalleryItem } from '$lib/types/gallery';
   import { GALLERY_ITEMS } from '$lib/utils/gallery';
 
@@ -48,7 +48,7 @@
     map.value!.on('sourcedata', handleSourceLoaded(layerId));
   }
 
-  function formatToDisplay(format: CartoKitSource['type']) {
+  function formatToDisplay(format: GalleryItem['format']) {
     switch (format) {
       case 'geojson':
         return 'GeoJSON';
@@ -74,9 +74,10 @@
     >
       {#if loadingId === item.id}
         <div class="absolute inset-0 z-10 rounded-sm bg-white/20">
-          <span
-            class="loader absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-          ></span>
+          <LoadingIndicator
+            class="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            variant="big"
+          />
         </div>
       {/if}
       <enhanced:img src={item.src} alt={item.displayName} class="rounded-xs" />
@@ -103,29 +104,3 @@
     </button>
   {/each}
 </div>
-
-<style lang="postcss">
-  @reference 'tailwindcss';
-
-  .loader {
-    @apply relative inline-block h-8 w-8;
-  }
-  .loader::after,
-  .loader::before {
-    @apply absolute top-0 left-0 h-8 w-8 rounded-full bg-slate-400;
-    content: '';
-    animation: animloader 0.5s ease-in-out infinite;
-  }
-
-  @keyframes animloader {
-    0% {
-      transform: scale(0);
-      opacity: 1;
-    }
-
-    100% {
-      transform: scale(1);
-      opacity: 0;
-    }
-  }
-</style>

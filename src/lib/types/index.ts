@@ -1,5 +1,3 @@
-import type { FeatureCollection } from 'geojson';
-
 import type { BasemapProvider } from '$lib/types/basemap';
 import type {
   CategoricalColorScheme,
@@ -8,7 +6,7 @@ import type {
   RampDirection,
   SchemeDirection
 } from '$lib/types/color';
-import type { TransformationCall } from '$lib/types/transformation';
+import type { CartoKitSource } from '$lib/types/source';
 
 /** The valid number of steps in a {@link QuantitativeColorScale}. */
 export type QuantitativeStepCount = 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -168,139 +166,6 @@ export type Channel = 'fill' | 'stroke' | 'size' | 'dot' | 'heatmap-weight';
 export type VisualizationType = 'Quantitative' | 'Categorical' | 'Constant';
 
 /**
- * Represents the underlying data and metadata of a GeoJSON layer. This object
- * maintains two copies of a layer's GeoJSON data in memory:
- *
- *   1. The source GeoJSON at the time of layer creation. All accumulated trans-
- *      formations are executed against this copy to produce the current
- *      GeoJSON.
- *   2. The current GeoJSON of the layer, used for display.
- *
- * @property type The type of the source, 'geojson'.
- * @property location The location of the source, either a remote API endpoint
- * or a local file on disk.
- * @property data The current GeoJSON data of the layer.
- * @property sourceData The source GeoJSON data of the layer.
- * @property transformations The transformations applied to the layer.
- */
-export interface CartoKitGeoJSONSource {
-  type: 'geojson';
-  location:
-    | {
-        type: 'api';
-        url: string;
-      }
-    | {
-        type: 'file';
-        file: File;
-      };
-  data: FeatureCollection;
-  sourceData: FeatureCollection;
-  transformations: TransformationCall[];
-}
-
-/** Represents a GeoParquet data source. */
-export interface CartoKitGeoParquetSource {
-  /** The type of the data source, 'geoparquet'. */
-  type: 'geoparquet';
-  /**
-   * The location of the source, either a remote API endpoint or a local file on
-   * disk.
-   */
-  location:
-    | {
-        type: 'api';
-        url: string;
-      }
-    | {
-        type: 'file';
-        file: File;
-      };
-}
-
-/**
- * Represents the possible geometry types of a vector layer.
- */
-export type VectorGeometry = 'Point' | 'Line' | 'Polygon';
-
-/**
- * Represents the possible attribute types of a vector layer, assuming encoding
- * using Tippecanoe: https://github.com/felt/tippecanoe.
- */
-export type VectorAttribute =
-  | {
-      type: 'number';
-      attribute: string;
-      min: number;
-      max: number;
-      values: number[];
-      count: number;
-    }
-  | {
-      type: 'string';
-      attribute: string;
-      values: string[];
-      count: number;
-    }
-  | {
-      type: 'boolean';
-      attribute: string;
-      values: boolean[];
-      count: number;
-    };
-
-/**
- * Represents the tilestats associated with a vector layer, assuming encoding
- * using Tippecanoe: https://github.com/felt/tippecanoe.
- */
-export interface TileStats {
-  layers: {
-    layer: string;
-    count: number;
-    geometry: VectorGeometry;
-    attributes: VectorAttribute[];
-  }[];
-}
-
-/**
- * Represents an entry in the vector_layers Array of a TileJSON-compliant vector
- * tile source: https://github.com/mapbox/tilejson-spec/tree/master/3.0.0#33-vector_layers
- */
-export interface VectorLayer {
-  id: string;
-  description: string;
-  minzoom: number;
-  maxzoom: number;
-  fields: Record<string, 'Number' | 'String' | 'Boolean'>;
-}
-
-/**
- * Represents the underlying data and metadata of a vector tile layer.
- *
- * @property type The type of the source, 'pmtiles'.
- * @property location The location of the source, a remote API endpoint.
- * @property sourceLayerId The id of the source layer in the vector tile archive.
- * @property tilestats The {@link TileStats} metadata of the vector tile source.
- * @property vectorLayers The {@link VectorLayer} metadata of the vector tile source.
- */
-export interface CartoKitPMTilesSource {
-  type: 'pmtiles';
-  location: {
-    type: 'api';
-    url: string;
-  };
-  sourceLayerId: string;
-  tilestats: TileStats;
-  vectorLayers: VectorLayer[];
-}
-
-/**
- * Represents the possible data sources for a layer.
- */
-export type CartoKitSource =
-  CartoKitGeoJSONSource | CartoKitGeoParquetSource | CartoKitPMTilesSource;
-
-/**
  * Represents the layout of a layer.
  *
  * @property visible Whether the layer is visible.
@@ -308,6 +173,7 @@ export type CartoKitSource =
  * @property tooltip.visible Whether the layer's tooltip is visible.
  */
 interface LayerLayout {
+  deleted: boolean;
   visible: boolean;
   z: number;
   tooltip: {
