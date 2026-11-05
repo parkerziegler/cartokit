@@ -1,16 +1,12 @@
 import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
 import { reconChoropleth } from '$lib/core/recon/layer-type/choropleth';
-import { reconDotDensity } from '$lib/core/recon/layer-type/dot-density';
 import { reconHeatmap } from '$lib/core/recon/layer-type/heatmap';
-import { reconLine } from '$lib/core/recon/layer-type/line';
 import { reconPoint } from '$lib/core/recon/layer-type/point';
 import { reconPolygon } from '$lib/core/recon/layer-type/polygon';
 import { reconProportionalSymbol } from '$lib/core/recon/layer-type/proportional-symbol';
 import type {
   CartoKitChoroplethLayer,
-  CartoKitDotDensityLayer,
   CartoKitHeatmapLayer,
-  CartoKitLineLayer,
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer
@@ -35,39 +31,23 @@ export async function reconLayerTypeDiffs(
         case 'Choropleth': {
           reconChoropleth(
             diff.layerId,
-            diff.payload.sourceLayerType,
+            diff.payload.sourceLayerType as 'Polygon',
             targetIR.layers[diff.layerId] as CartoKitChoroplethLayer
-          );
-          break;
-        }
-        case 'Dot Density': {
-          reconDotDensity(
-            diff.layerId,
-            diff.payload.sourceLayerType,
-            targetIR.layers[diff.layerId] as CartoKitDotDensityLayer
           );
           break;
         }
         case 'Heatmap': {
           reconHeatmap(
             diff.layerId,
-            diff.payload.sourceLayerType,
+            diff.payload.sourceLayerType as 'Point' | 'Proportional Symbol',
             targetIR.layers[diff.layerId] as CartoKitHeatmapLayer
-          );
-          break;
-        }
-        case 'Line': {
-          reconLine(
-            diff.layerId,
-            diff.payload.sourceLayerType,
-            targetIR.layers[diff.layerId] as CartoKitLineLayer
           );
           break;
         }
         case 'Point': {
           reconPoint(
             diff.layerId,
-            diff.payload.sourceLayerType,
+            diff.payload.sourceLayerType as 'Heatmap' | 'Proportional Symbol',
             targetIR.layers[diff.layerId] as CartoKitPointLayer
           );
           break;
@@ -75,7 +55,7 @@ export async function reconLayerTypeDiffs(
         case 'Polygon': {
           reconPolygon(
             diff.layerId,
-            diff.payload.sourceLayerType,
+            diff.payload.sourceLayerType as 'Choropleth',
             targetIR.layers[diff.layerId] as CartoKitPolygonLayer
           );
           break;
@@ -83,7 +63,7 @@ export async function reconLayerTypeDiffs(
         case 'Proportional Symbol': {
           reconProportionalSymbol(
             diff.layerId,
-            diff.payload.sourceLayerType,
+            diff.payload.sourceLayerType as 'Heatmap' | 'Point',
             targetIR.layers[diff.layerId] as CartoKitProportionalSymbolLayer
           );
           break;

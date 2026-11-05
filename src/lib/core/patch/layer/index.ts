@@ -3,10 +3,9 @@ import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { generateCartoKitLayer } from '$lib/interaction/layer';
 import { catalog } from '$lib/state/catalog.svelte';
 import { db } from '$lib/state/db.svelte';
-import type { CartoKitSource } from '$lib/types';
-import type { DuckDBTable } from '$lib/types/db';
+import type { CartoKitSource } from '$lib/types/source';
 import { buildCatalog } from '$lib/utils/catalog';
-import { createTable, readTableAsGeoJSON } from '$lib/utils/db';
+import { createTable } from '$lib/utils/db';
 import { CartoKitPMTiles } from '$lib/utils/pmtiles';
 
 /**
@@ -27,7 +26,6 @@ export async function patchLayerDiffs(
   switch (diff.type) {
     case 'add-layer': {
       let source: CartoKitSource;
-      let table: DuckDBTable | undefined;
 
       switch (diff.payload.type) {
         case 'pmtiles': {
@@ -47,49 +45,38 @@ export async function patchLayerDiffs(
           };
           break;
         }
-        case 'geojson': {
-          table = await createTable(
-            db.value!.db,
-            db.value!.conn,
-            diff.layerId,
-            diff.payload.location
-          );
-          const geojson = await readTableAsGeoJSON(
-            db.value!.conn,
-            diff.layerId,
-            table
-          );
-
+        case 'geojson':
+        case 'geoparquet':
           source = {
-            type: 'geojson',
+            type: diff.payload.type,
             location: diff.payload.location,
-            data: geojson,
-            sourceData: geojson,
-            transformations: []
+            table: await createTable(
+              db.value!.db,
+              db.value!.conn,
+              diff.layerId,
+              diff.payload.location
+            )
           };
           break;
-        }
-        case 'geoparquet': {
-          table = await createTable(
-            db.value!.db,
-            db.value!.conn,
-            diff.layerId,
-            diff.payload.location
-          );
-
+        case 'table':
           source = {
-            type: 'geoparquet',
-            location: diff.payload.location
+            type: 'table',
+            location: diff.payload.location,
+            table: await createTable(
+              db.value!.db,
+              db.value!.conn,
+              diff.layerId,
+              diff.payload.location
+            )
           };
           break;
-        }
       }
 
       // Build the catalog entry.
       const catalogPatch = await buildCatalog(
         diff.layerId,
         source,
-        db.value && table ? { conn: db.value.conn, table } : undefined
+        db.value?.conn
       );
       catalog.value = { ...catalog.value, ...catalogPatch };
 
@@ -104,7 +91,8 @@ export async function patchLayerDiffs(
         type: 'remove-layer',
         layerId: diff.layerId,
         payload: {
-          sourceLayerType: layer.type
+          sourceLayerType: layer.type,
+          strategy: 'default'
         }
       };
 
@@ -164,22 +152,26 @@ export async function patchLayerDiffs(
           break;
         case 'geojson':
         case 'geoparquet':
+        case 'table':
           inverse = {
             type: 'add-layer',
             layerId: diff.layerId,
             payload: {
-              type: layer.source.type,
-              displayName: layer.displayName,
-              location: layer.source.location
+              ...layer.source,
+              displayName: layer.displayName
             }
           };
 
-          // Drop the layer's table.
-          await db.value!.conn.query(`DROP TABLE IF EXISTS ${diff.layerId};`);
+          // If the user elects to remove all dependent layers, drop the table
+          // from the database.
+          if (diff.payload.strategy === 'remove-all-dependent-layers') {
+            // Drop the layer's table.
+            await db.value!.conn.query(`DROP TABLE IF EXISTS ${diff.layerId};`);
+          }
       }
 
       // Apply the patch.
-      delete ir.layers[diff.layerId];
+      ir.layers[diff.layerId].layout.deleted = true;
 
       break;
     }

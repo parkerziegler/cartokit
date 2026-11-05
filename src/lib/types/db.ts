@@ -1,3 +1,13 @@
+/** Valid return types of DuckDB's GEOMETRY_TYPE enum. */
+export type DuckDBGeometryType =
+  | 'POINT'
+  | 'LINESTRING'
+  | 'POLYGON'
+  | 'MULTIPOINT'
+  | 'MULTILINESTRING'
+  | 'MULTIPOLYGON'
+  | 'GEOMETRYCOLLECTION';
+
 /** A column of a DuckDB table, as reported by DESCRIBE. */
 export interface DuckDBColumn {
   /** The name of the column. */

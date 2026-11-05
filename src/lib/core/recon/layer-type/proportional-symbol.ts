@@ -12,15 +12,11 @@ import { redraw } from '$lib/utils/layer/redraw';
  */
 export function reconProportionalSymbol(
   sourceLayerId: string,
-  sourceLayerType: LayerType,
+  sourceLayerType: Extract<LayerType, 'Heatmap' | 'Point'>,
   targetLayer: CartoKitProportionalSymbolLayer
 ): void {
   switch (sourceLayerType) {
-    case 'Choropleth':
-    case 'Dot Density':
     case 'Heatmap':
-    case 'Line':
-    case 'Polygon':
       redraw({
         map: map.value!,
         sourceLayerId,
@@ -35,8 +31,6 @@ export function reconProportionalSymbol(
         'circle-radius',
         deriveSize(targetLayer.id, targetLayer.style.size)
       );
-      break;
-    case 'Proportional Symbol':
       break;
   }
 }

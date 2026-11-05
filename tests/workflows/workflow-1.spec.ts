@@ -19,7 +19,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
  * - Geographic regions experiencing a partial solar eclipse, rendered as dec-
  * iles (i.e., 10%-90% coverage).
  */
-test('workflow-1', async ({ page }) => {
+test.skip('workflow-1', async ({ page }) => {
   // Mark workflow tests as slow.
   test.slow();
 

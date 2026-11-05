@@ -6,9 +6,15 @@ import {
   getJsDelivrBundles,
   selectBundle
 } from '@duckdb/duckdb-wasm';
-import type { Feature, FeatureCollection } from 'geojson';
+import type { Feature, FeatureCollection, Geometry } from 'geojson';
 
-import type { DuckDBColumn, DuckDBTable } from '$lib/types/db';
+import type {
+  DuckDBColumn,
+  DuckDBGeometryType,
+  DuckDBTable
+} from '$lib/types/db';
+import type { CartoKitSource, CartoKitTableSource } from '$lib/types/source';
+import type { Transformation } from '$lib/types/transformation';
 
 const DUCKDB_BUNDLES = getJsDelivrBundles();
 
@@ -70,6 +76,45 @@ export function generateCreateTableStatement(layerId: string, source: string) {
 }
 
 /**
+ * Generate the SQL expression that applies a {@link Transformation} to a
+ * geometry column.
+ *
+ * @param op The {@link Transformation} to apply.
+ * @param geometryColumn The name of the geometry column to transform.
+ * @returns A SQL expression evaluating to the transformed geometry.
+ */
+export function generateTransformationExpression(
+  transformation: Transformation,
+  geometryColumn: string
+): string {
+  switch (transformation.type) {
+    case 'Buffer':
+      return `ST_Transform(ST_Buffer(ST_Transform(${quoteIdentifier(geometryColumn)}, 'EPSG:4326', 'EPSG:3857', always_xy := true), ${transformation.params.distance}), 'EPSG:3857', 'EPSG:4326', always_xy := true)`;
+    case 'Centroid':
+      return `ST_Centroid(${quoteIdentifier(geometryColumn)})`;
+    case 'Envelope':
+      return `ST_Envelope(${quoteIdentifier(geometryColumn)})`;
+  }
+}
+
+/**
+ * Generate a SQL CREATE TABLE statement for a layer derived from another
+ * layer's table, replacing the parent's geometry with its transformed geometry.
+ *
+ * @param layerId The layerId to use as the table name.
+ * @param location The location of the derived {@link CartoKitTableSource}.
+ * @param geometryColumn The name of the parent table's geometry column.
+ * @returns A SQL CREATE TABLE statement.
+ */
+export function generateCreateDerivedTableStatement(
+  layerId: string,
+  { parentLayerId, transformation }: CartoKitTableSource['location'],
+  geometryColumn: string
+) {
+  return `CREATE TABLE ${layerId} AS SELECT * REPLACE (${generateTransformationExpression(transformation, geometryColumn)} AS ${quoteIdentifier(geometryColumn)}) FROM ${parentLayerId};`;
+}
+
+/**
  * Generate the select list of a query reading all data as GeoJSON-ready
  * columns: nested properties serialized to JSON, and the geometry serialized
  * to GeoJSON in a column named geom.
@@ -102,7 +147,7 @@ export function generateSelectList({ columns, geometryColumn }: DuckDBTable) {
  * @returns A SQL SELECT statement.
  */
 export function generateSelectStatement(layerId: string, table: DuckDBTable) {
-  return `SELECT ${generateSelectList(table)} FROM ${layerId}`;
+  return `SELECT ${generateSelectList(table)} FROM ${layerId};`;
 }
 
 /**
@@ -147,7 +192,7 @@ function isNestedType(columnType: string): boolean {
  * Inspect a newly-created table for the column storing geometry.
  *
  * @param conn The active DuckDB database connection.
- * @param layerId The id of the layer whose table should be normalized.
+ * @param layerId The id of the layer to inspect.
  * @returns A {@link DuckDBTable}.
  */
 async function inspectTableForGeometry(
@@ -170,35 +215,82 @@ async function inspectTableForGeometry(
 }
 
 /**
+ * Query the geometry type of a DuckDB table using ST_GeometryType:
+ * https://duckdb.org/docs/2.0/core_extensions/spatial/functions#st_geometrytype
+ *
+ * @param conn The active DuckDB database connection.
+ * @param layerId The id of the layer to inspect.
+ * @param geometryColumn The name of the layer's geometry column.
+ * @returns A Promise resolving to an Object containing the geometry_type of the
+ * layerId.
+ * @throws If no valid geometries can be found.
+ */
+export async function queryGeometryType(
+  conn: AsyncDuckDBConnection,
+  layerId: string,
+  geometryColumn: string
+): Promise<DuckDBGeometryType> {
+  const [row] = (
+    await conn.query(
+      `SELECT ST_GeometryType(${geometryColumn})::VARCHAR AS geometry_type FROM ${quoteIdentifier(layerId)} WHERE ${geometryColumn} IS NOT NULL LIMIT 1;`
+    )
+  )
+    .toArray()
+    .map((row: { toJSON: () => { geometry_type: DuckDBGeometryType } }) =>
+      row.toJSON()
+    );
+
+  if (!row) {
+    throw new Error(
+      `Could not find a valid geometry type for layer ${layerId}.`
+    );
+  }
+
+  return row.geometry_type;
+}
+
+/**
  * Create a table for a layer in the local, in-memory DuckDB database.
  *
  * @param db The DuckDB database instance.
  * @param conn The active DuckDB database connection.
  * @param layerId The id of the layer to create.
- * @param location Information on the storage of the layer being added.
+ * @param location Information on the storage of the layer being added. Layers
+ * derived from another layer's table are created by transforming that table.
  * @returns The newly-created {@link DuckDBTable}.
  */
 export async function createTable(
   db: AsyncDuckDB,
   conn: AsyncDuckDBConnection,
   layerId: string,
-  location: { type: 'api'; url: string } | { type: 'file'; file: File }
+  location: Exclude<CartoKitSource, { type: 'pmtiles' }>['location']
 ): Promise<DuckDBTable> {
-  let source: string;
-
-  if (location.type === 'api') {
-    source = location.url;
-  } else {
-    await db.registerFileHandle(
-      location.file.name,
-      location.file,
-      DuckDBDataProtocol.BROWSER_FILEREADER,
-      true
-    );
-    source = location.file.name;
+  switch (location.type) {
+    case 'api':
+      await conn.query(generateCreateTableStatement(layerId, location.url));
+      break;
+    case 'file':
+      await db.registerFileHandle(
+        location.file.name,
+        location.file,
+        DuckDBDataProtocol.BROWSER_FILEREADER,
+        true
+      );
+      await conn.query(
+        generateCreateTableStatement(layerId, location.file.name)
+      );
+      break;
+    case 'table': {
+      const { geometryColumn } = await inspectTableForGeometry(
+        conn,
+        location.parentLayerId
+      );
+      await conn.query(
+        generateCreateDerivedTableStatement(layerId, location, geometryColumn)
+      );
+      break;
+    }
   }
-
-  await conn.query(generateCreateTableStatement(layerId, source));
 
   return await inspectTableForGeometry(conn, layerId);
 }
@@ -251,3 +343,16 @@ export function toFeatureCollection(
     features
   };
 }
+
+export const GEOMETRY_TYPES_TO_TRANSFORMATION_TYPES = new Map<
+  Geometry['type'],
+  Transformation['type'][]
+>([
+  ['LineString', ['Buffer', 'Centroid', 'Envelope']],
+  ['MultiLineString', ['Buffer', 'Centroid', 'Envelope']],
+  ['Point', ['Buffer']],
+  ['MultiPoint', ['Buffer']],
+  ['Polygon', ['Buffer', 'Centroid', 'Envelope']],
+  ['MultiPolygon', ['Buffer', 'Centroid', 'Envelope']],
+  ['GeometryCollection', []]
+]);

@@ -2,8 +2,6 @@
   import type { Map } from 'maplibre-gl';
 
   import DownloadData from '$lib/components/data/DownloadData.svelte';
-  import TransformData from '$lib/components/data/TransformData.svelte';
-  import TransformationEditor from '$lib/components/data/TransformationEditor.svelte';
   import ViewData from '$lib/components/data/ViewData.svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import LayerTypeSelect from '$lib/components/layer-types/LayerTypeSelect.svelte';
@@ -29,8 +27,6 @@
   }
 
   let { map, layer }: Props = $props();
-
-  let transformationEditorActive = $state(false);
 
   function onPropertiesMenuClose() {
     if (feature.value?.id) {
@@ -63,9 +59,7 @@
     'ease-cubic-out absolute top-4 right-4 z-10 max-h-[calc(100%-9rem)] w-80 transition-[max-height,translate,width] duration-[200ms,400ms,200ms]',
     {
       'max-h-[calc(100%-25.25rem)]': $layout.dataVisible,
-      'translate-x-[-33.333333vw]': $layout.editorVisible,
-      'flex w-100 flex-col overflow-hidden': transformationEditorActive,
-      'overflow-auto': !transformationEditorActive
+      'translate-x-[-33.333333vw]': $layout.editorVisible
     }
   ]}
 >
@@ -82,42 +76,33 @@
     {#snippet subtitle()}
       <div class="flex gap-2">
         <ViewData />
-        {#if layer.source.type === 'geojson'}
+        {#if layer.source.type !== 'pmtiles'}
           <DownloadData {layer} />
-          <TransformData bind:active={transformationEditorActive} />
         {/if}
       </div>
     {/snippet}
   </MenuTitle>
-  {#if transformationEditorActive && layer.source.type === 'geojson'}
-    <TransformationEditor
-      layerId={layer.id}
-      transformations={layer.source.transformations}
-      {map}
-    />
-  {:else}
-    {#if layer.source.type === 'pmtiles'}
-      <MenuItem title="Source Layer">
-        <SourceLayerSelect layerId={layer.id} source={layer.source} />
-      </MenuItem>
-    {/if}
-    <MenuItem title="Layer Type">
-      <LayerTypeSelect {layer} />
+  {#if layer.source.type === 'pmtiles'}
+    <MenuItem title="Source Layer">
+      <SourceLayerSelect layerId={layer.id} source={layer.source} />
     </MenuItem>
-    {#if layer.type === 'Choropleth'}
-      <ChoroplethPropertiesPanel {layer} />
-    {:else if layer.type === 'Dot Density'}
-      <DotDensityPropertiesPanel {layer} />
-    {:else if layer.type === 'Heatmap'}
-      <HeatmapPropertiesPanel {layer} />
-    {:else if layer.type === 'Line'}
-      <LinePropertiesPanel {layer} />
-    {:else if layer.type === 'Point'}
-      <PointPropertiesPanel {layer} />
-    {:else if layer.type === 'Polygon'}
-      <PolygonPropertiesPanel {layer} />
-    {:else if layer.type === 'Proportional Symbol'}
-      <ProportionalSymbolPropertiesPanel {layer} />
-    {/if}
+  {/if}
+  <MenuItem title="Layer Type">
+    <LayerTypeSelect {layer} />
+  </MenuItem>
+  {#if layer.type === 'Choropleth'}
+    <ChoroplethPropertiesPanel {layer} />
+  {:else if layer.type === 'Dot Density'}
+    <DotDensityPropertiesPanel {layer} />
+  {:else if layer.type === 'Heatmap'}
+    <HeatmapPropertiesPanel {layer} />
+  {:else if layer.type === 'Line'}
+    <LinePropertiesPanel {layer} />
+  {:else if layer.type === 'Point'}
+    <PointPropertiesPanel {layer} />
+  {:else if layer.type === 'Polygon'}
+    <PolygonPropertiesPanel {layer} />
+  {:else if layer.type === 'Proportional Symbol'}
+    <ProportionalSymbolPropertiesPanel {layer} />
   {/if}
 </Menu>

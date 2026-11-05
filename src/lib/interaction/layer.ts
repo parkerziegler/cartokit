@@ -13,7 +13,8 @@ import {
 import { deriveSize } from '$lib/interaction/geometry';
 import { catalog } from '$lib/state/catalog.svelte';
 import { ir } from '$lib/stores/ir';
-import type { CartoKitLayer, CartoKitSource } from '$lib/types';
+import type { CartoKitLayer } from '$lib/types';
+import type { CartoKitSource } from '$lib/types/source';
 import { randomColor } from '$lib/utils/color';
 import {
   DEFAULT_OPACITY,
@@ -64,6 +65,7 @@ export function generateCartoKitLayer(
           }
         },
         layout: {
+          deleted: false,
           visible: true,
           z,
           tooltip: {
@@ -89,6 +91,7 @@ export function generateCartoKitLayer(
           }
         },
         layout: {
+          deleted: false,
           visible: true,
           z,
           tooltip: {
@@ -119,6 +122,7 @@ export function generateCartoKitLayer(
           }
         },
         layout: {
+          deleted: false,
           visible: true,
           z,
           tooltip: {
@@ -187,34 +191,6 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
       break;
     }
     case 'Dot Density': {
-      // Add a separate source for the polygon outlines of the dot density layer.
-      // Ensure it does not already exist from a previous transition before adding it.
-      if (!map.getSource(`${layer.id}-outlines`)) {
-        map.addSource(`${layer.id}-outlines`, {
-          type: 'geojson',
-          data:
-            layer.source.type === 'geojson'
-              ? layer.source.sourceData
-              : { type: 'FeatureCollection', features: [] },
-          generateId: true
-        });
-      }
-
-      // Add a transparent layer to the map for the outlines.
-      // This is the layer we'll instrument for hover and select effects.
-      map.addLayer(
-        {
-          id: `${layer.id}-outlines`,
-          type: 'fill',
-          source: `${layer.id}-outlines`,
-          paint: {
-            'fill-color': 'transparent',
-            'fill-opacity': 0
-          }
-        },
-        beforeId
-      );
-
       const fillPaint = layer.style.fill.visible
         ? {
             'circle-color': layer.style.fill.color,
@@ -242,6 +218,7 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         {
           id: layer.id,
           source: layer.id,
+          'source-layer': sourceLayer,
           type: 'circle',
           paint: {
             ...fillPaint,
@@ -252,10 +229,8 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         beforeId
       );
 
-      // We cannot create Dot Density layers with vector tile sources.
-      // Therefore, we do not pass the sourceLayerId argument to these calls.
-      instrumentPolygonHover(map, `${layer.id}-outlines`);
-      instrumentPolygonSelect(map, `${layer.id}-outlines`);
+      instrumentPolygonHover(map, layer.id, sourceLayer);
+      instrumentPolygonSelect(map, layer.id, sourceLayer);
       break;
     }
     case 'Heatmap': {

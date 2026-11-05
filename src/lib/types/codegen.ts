@@ -30,28 +30,13 @@ export interface CartoKitBackend {
  */
 export interface CartoKitBackendAnalysis extends CartoKitBackend {
   /**
-   * A Boolean value indicating whether \@turf/turf is required to support
-   * cross-geometry transformations.
-   */
-  isTurfRequired: boolean;
-  /**
-   * A Boolean value indicating whether we need to insert a function to fetch
-   * GeoJSON hosted at a remote URL.
-   */
-  isFetchGeoJSONRequired: boolean;
-  /**
-   * A Boolean value indicating whether we need to insert an import of the
-   * GeoJSON namespace.
-   */
-  isGeoJSONNamespaceRequired: boolean;
-  /**
    * A Boolean value indicating whether we need to include the PMTiles client
    * library.
    */
   isPMTilesRequired: boolean;
   /**
    * A Boolean value indicating whether we need to include DuckDB to load
-   * GeoParquet sources.
+   * GeoParquet sources or derive layers from other layers.
    */
   isDuckDBRequired: boolean;
   /**
@@ -59,6 +44,11 @@ export interface CartoKitBackendAnalysis extends CartoKitBackend {
    * support registering local GeoParquet files.
    */
   isDuckDBDataProtocolRequired: boolean;
+  /**
+   * A Boolean value indicating whether we need the DuckDB instance to register
+   * local GeoParquet files or uploaded GeoJSON files read by derived layers.
+   */
+  isFileRegistrationRequired: boolean;
 }
 
 /**

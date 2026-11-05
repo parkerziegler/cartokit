@@ -1,21 +1,16 @@
 import type { AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 import * as d3 from 'd3';
 
-import type {
-  CartoKitGeoJSONSource,
-  CartoKitGeoParquetSource,
-  CartoKitSource,
-  QuantitativeStepCount
-} from '$lib/types';
+import type { QuantitativeStepCount } from '$lib/types';
 import {
   type AttributeEntry,
   type Catalog,
   type CategoricalAttributeEntry,
   type QuantitativeAttributeEntry
 } from '$lib/types/catalog';
-import { type DuckDBTable } from '$lib/types/db';
+import type { CartoKitPMTilesSource, CartoKitSource } from '$lib/types/source';
 import { quoteIdentifier } from '$lib/utils/db';
-import { getFeatureCollectionGeometryType } from '$lib/utils/geojson';
+import { getGeoJSONGeometryType } from '$lib/utils/geojson';
 import { getGeoParquetGeometryType } from '$lib/utils/geoparquet';
 import { selectTileStats } from '$lib/utils/pmtiles';
 import {
@@ -23,25 +18,28 @@ import {
   deriveJenksBreaks,
   deriveQuantiles
 } from '$lib/utils/scales';
+import type { Geometry } from 'geojson';
 
 /**
  * Get the geometry type of data sources stored in DuckDB.
  *
  * @param conn active {@link AsyncDuckDBConnection} to the database.
- * @param source A {@link CartoKitGeoJSONSource} or a {@link CartoKitGeoParquetSource}.
+ * @param source A {@link CartoKitGeoJSONSource}, {@link CartoKitGeoParquetSource},
+ * or {@link CartoKitTableSource}.
  * @param layerId The layer id.
  * @param geometryColumn The name of the geometry column in the layer's table.
  * @returns The {@link Geometry['type']} of the source.
  */
 async function deriveGeometryType(
   conn: AsyncDuckDBConnection,
-  source: CartoKitGeoJSONSource | CartoKitGeoParquetSource,
+  source: Exclude<CartoKitSource, CartoKitPMTilesSource>,
   layerId: string,
   geometryColumn: string
-) {
+): Promise<Geometry['type']> {
   switch (source.type) {
     case 'geojson':
-      return getFeatureCollectionGeometryType(source.sourceData);
+    case 'table':
+      return await getGeoJSONGeometryType(conn, layerId, geometryColumn);
     case 'geoparquet':
       return await getGeoParquetGeometryType(
         conn,
@@ -120,29 +118,27 @@ function deriveCategoricalAttributeEntry(
  *
  * @param layerId The id of the {@link CartoKitLayer} to add to the catalog.
  * @param source The {@link CartoKitSource} of the layer.
- * @param table The layer's {@link DuckDBTable}. Required for GeoJSON and
- * GeoParquet sources.
+ * @param conn The active DuckDB database connection. Required for sources
+ * stored in DuckDB.
  * @returns The built {@link Catalog}.
  */
 export async function buildCatalog(
   layerId: string,
   source: CartoKitSource,
-  db?: {
-    conn: AsyncDuckDBConnection;
-    table: DuckDBTable;
-  }
+  conn?: AsyncDuckDBConnection
 ): Promise<Catalog> {
   const catalog: Catalog = {};
 
   switch (source.type) {
     case 'geojson':
-    case 'geoparquet': {
-      if (!db) {
+    case 'geoparquet':
+    case 'table': {
+      if (!conn) {
         throw new Error(
           'A DuckDB database must be provided for catalog construction.'
         );
       }
-      const { columns, geometryColumn } = db.table;
+      const { columns, geometryColumn } = source.table;
       const tableName = quoteIdentifier(layerId);
 
       const numericColumns = columns
@@ -155,7 +151,7 @@ export async function buildCatalog(
       // Query the feature count, the domains and extents of all numeric
       // columns, and the distinct values of all categorical columns.
       const summary = (
-        await db.conn.query(
+        await conn.query(
           `SELECT ${[
             'count(*) AS ck_count',
             ...numericColumns.map(
@@ -202,15 +198,13 @@ export async function buildCatalog(
       catalog[layerId] = {
         type: source.type,
         geometryType: await deriveGeometryType(
-          db.conn,
+          conn,
           source,
           layerId,
           geometryColumn
         ),
         count: summary.ck_count as number,
-        attributes,
-        columns,
-        geometryColumn
+        attributes
       };
       break;
     }

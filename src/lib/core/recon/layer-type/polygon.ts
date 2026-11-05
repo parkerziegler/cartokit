@@ -1,6 +1,5 @@
 import { map } from '$lib/state/map.svelte';
 import type { CartoKitPolygonLayer, LayerType } from '$lib/types';
-import { redraw } from '$lib/utils/layer/redraw';
 
 /**
  * Reconcile a {@link CartoKitLayer} to a {@link CartoKitPolygonLayer}.
@@ -11,7 +10,7 @@ import { redraw } from '$lib/utils/layer/redraw';
  */
 export function reconPolygon(
   sourceLayerId: string,
-  sourceLayerType: LayerType,
+  sourceLayerType: Extract<LayerType, 'Choropleth'>,
   targetLayer: CartoKitPolygonLayer
 ): void {
   switch (sourceLayerType) {
@@ -25,18 +24,5 @@ export function reconPolygon(
       );
       break;
     }
-    case 'Dot Density':
-    case 'Point':
-    case 'Proportional Symbol':
-      redraw({
-        map: map.value!,
-        sourceLayerId,
-        targetLayer
-      });
-      break;
-    case 'Heatmap':
-    case 'Line':
-    case 'Polygon':
-      break;
   }
 }

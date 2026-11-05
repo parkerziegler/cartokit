@@ -7,11 +7,12 @@
   import type { PageData } from './$types';
 
   import { page } from '$app/state';
-  import Cursor from '$lib/components/cursor/Cursor.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
   import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
+  import ContextMenu from '$lib/components/mouse/ContextMenu.svelte';
+  import Cursor from '$lib/components/mouse/Cursor.svelte';
   import PropertiesMenu from '$lib/components/properties/PropertiesMenu.svelte';
   import Alert from '$lib/components/shared/Alert.svelte';
   import DataTable from '$lib/components/shared/DataTable.svelte';
@@ -32,6 +33,7 @@
   import { applyCustomBasemapLabels } from '$lib/utils/basemap';
   import { initDB } from '$lib/utils/db';
   import { registerKeybinding } from '$lib/utils/keybinding';
+  import { contextMenu } from '$lib/state/context-menu.svelte';
 
   interface Props {
     data: PageData;
@@ -42,41 +44,23 @@
   let map = $state<Map>();
   let features = $state<Feature[]>([]);
   let table = $derived.by<{ columns: string[]; rows: Feature[] }>(() => {
-    if (layerId.value) {
-      const layer = $ir.layers[layerId.value];
-
-      switch (layer.source.type) {
-        case 'geojson': {
-          return {
-            rows: layer.source.data.features,
-            columns: Object.keys(
-              layer.source.data.features[0]?.properties ?? {}
-            )
-          };
-        }
-        case 'geoparquet':
-        case 'pmtiles': {
-          if (features.length > 0) {
-            return {
-              rows: features,
-              columns: Object.keys(features[0].properties ?? {})
-            };
-          }
-
-          const queriedFeatures =
-            map?.queryRenderedFeatures({
-              layers: [layer.id]
-            }) ?? [];
-
-          return {
-            rows: queriedFeatures,
-            columns: Object.keys(queriedFeatures[0]?.properties ?? {})
-          };
-        }
-      }
+    const layer = $ir.layers[layerId.value!];
+    if (features.length > 0) {
+      return {
+        rows: features,
+        columns: Object.keys(features[0].properties ?? {})
+      };
     }
 
-    return { columns: [], rows: [] };
+    const queriedFeatures =
+      map?.queryRenderedFeatures({
+        layers: [layer.id]
+      }) ?? [];
+
+    return {
+      rows: queriedFeatures,
+      columns: Object.keys(queriedFeatures[0]?.properties ?? {})
+    };
   });
 
   // We intentionally capture the values of data.userId and data.enableChat
@@ -138,6 +122,9 @@
 
         return ir;
       });
+
+      // Clear the context menu, if present.
+      contextMenu.layerId = '';
     });
 
     map.on('zoom', (event) => {
@@ -146,6 +133,9 @@
 
         return ir;
       });
+
+      // Clear the context menu, if present.
+      contextMenu.layerId = '';
     });
 
     map.on('pitch', (event) => {
@@ -154,6 +144,9 @@
 
         return ir;
       });
+
+      // Clear the context menu, if present.
+      contextMenu.layerId = '';
     });
 
     map.on('rotate', (event) => {
@@ -162,6 +155,9 @@
 
         return ir;
       });
+
+      // Clear the context menu, if present.
+      contextMenu.layerId = '';
     });
 
     map.on('style.load', (event) => {
@@ -303,4 +299,7 @@
   {/if}
   <Cursor />
   <Popup />
+  {#key contextMenu.layerId}
+    <ContextMenu />
+  {/key}
 </main>

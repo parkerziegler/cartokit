@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { kebabCase } from 'lodash-es';
+  import { snakeCase } from 'lodash-es';
   import { onMount } from 'svelte';
 
   import { tooltip } from '$lib/attachments/tooltip';
   import DownloadIcon from '$lib/components/icons/DownloadIcon.svelte';
+  import { db } from '$lib/state/db.svelte';
   import type { CartoKitLayer } from '$lib/types';
-  import { downloadJson } from '$lib/utils/download';
+  import { downloadBlob } from '$lib/utils/download';
+  import { copyTableToGeoJSON } from '$lib/utils/geojson';
+  import { copyTableToGeoParquet } from '$lib/utils/geoparquet';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
   interface Props {
@@ -14,9 +17,33 @@
 
   let { layer }: Props = $props();
 
-  function onClick() {
-    if (layer.source.type === 'geojson') {
-      downloadJson(layer.source.data, `${kebabCase(layer.displayName)}.json`);
+  async function onClick() {
+    if (db.value && layer.source.type !== 'pmtiles') {
+      let blob: Blob;
+      let ext: string;
+
+      switch (layer.source.type) {
+        case 'geojson':
+        case 'table':
+          blob = await copyTableToGeoJSON(
+            db.value.db,
+            db.value.conn,
+            layer.id,
+            layer.displayName
+          );
+          ext = '.json';
+          break;
+        case 'geoparquet':
+          blob = await copyTableToGeoParquet(
+            db.value.db,
+            db.value.conn,
+            layer.id,
+            layer.displayName
+          );
+          ext = '.parquet';
+      }
+
+      downloadBlob(blob, `${snakeCase(layer.displayName)}${ext}`);
     }
   }
 

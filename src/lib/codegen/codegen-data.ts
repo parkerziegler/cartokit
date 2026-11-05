@@ -1,5 +1,8 @@
+import { db } from '$lib/state/db.svelte';
 import type { CartoKitIR } from '$lib/types';
 import type { CartokitCodegenDataFile } from '$lib/types/codegen';
+import { copyTableToGeoJSON } from '$lib/utils/geojson';
+import { copyTableToGeoParquet } from '$lib/utils/geoparquet';
 
 /**
  * Generate the data files for all layers sourced from a file upload.
@@ -10,8 +13,6 @@ import type { CartokitCodegenDataFile } from '$lib/types/codegen';
 export async function codegenDataFiles(
   ir: CartoKitIR
 ): Promise<CartokitCodegenDataFile[]> {
-  const encoder = new TextEncoder();
-
   return Promise.all(
     Object.values(ir.layers).flatMap((layer) => {
       if (layer.source.location.type !== 'file') {
@@ -19,22 +20,38 @@ export async function codegenDataFiles(
       }
 
       switch (layer.source.type) {
-        case 'geojson':
-          return {
-            path: `src/data/${layer.source.location.file.name.replace(/\.geojson$/i, '.json')}`,
-            bytes: encoder.encode(
-              JSON.stringify(layer.source.sourceData, null, 2)
-            )
-          };
+        case 'geojson': {
+          const { file } = layer.source.location;
+
+          return copyTableToGeoJSON(
+            db.value!.db,
+            db.value!.conn,
+            layer.id,
+            layer.displayName
+          )
+            .then((blob) => blob.bytes())
+            .then((bytes) => ({
+              path: `public/data/${file.name}`,
+              bytes
+            }));
+        }
         case 'geoparquet': {
           const { file } = layer.source.location;
 
-          return file.arrayBuffer().then((buffer) => ({
-            path: `public/data/${file.name}`,
-            bytes: new Uint8Array(buffer)
-          }));
+          return copyTableToGeoParquet(
+            db.value!.db,
+            db.value!.conn,
+            layer.id,
+            layer.displayName
+          )
+            .then((blob) => blob.bytes())
+            .then((bytes) => ({
+              path: `public/data/${file.name}`,
+              bytes
+            }));
         }
-        default:
+        case 'pmtiles':
+        case 'table':
           return [];
       }
     })

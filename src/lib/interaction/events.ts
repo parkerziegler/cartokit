@@ -9,6 +9,7 @@ import { ir } from '$lib/stores/ir';
 import { layout } from '$lib/stores/layout';
 import type { CartoKitLayer } from '$lib/types';
 import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
+import { contextMenu } from '$lib/state/context-menu.svelte';
 
 /**
  * Add a hover effect to all features in a point layer.
@@ -362,11 +363,17 @@ function addSelectListeners(
 
   map.on('click', lyrId, onClick);
 
-  const layerListeners = listeners.value.get(lyrId)!;
+  function onContextMenu() {
+    contextMenu.layerId = lyrId;
+  }
 
+  map.on('contextmenu', lyrId, onContextMenu);
+
+  const layerListeners = listeners.value.get(lyrId)!;
   listeners.value.set(lyrId, {
     ...layerListeners,
-    click: onClick
+    click: onClick,
+    contextmenu: onContextMenu
   });
 }
 
@@ -441,6 +448,9 @@ export function onFeatureLeave(
         'selected'
       );
     }
+
+    // Remove the context menu in all instances.
+    contextMenu.layerId = '';
   };
 }
 
