@@ -1,10 +1,10 @@
 import type { Map } from 'maplibre-gl';
 
 /**
-  * Apply custom naming conventions for basemap labels, overriding definitions from OpenStreetMap.
-  * 
-  * @param map The top-level {@link Map} instance.
-  */
+ * Apply custom naming conventions for basemap labels, overriding definitions from OpenStreetMap.
+ *
+ * @param map The top-level {@link Map} instance.
+ */
 export function applyCustomBasemapLabels(map: Map): void {
   const style = map.getStyle();
 
