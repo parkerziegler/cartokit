@@ -8,6 +8,7 @@ import typescript from 'prettier/plugins/typescript';
 import { analyzeIR } from '$lib/codegen/analysis';
 import { codegenCSS } from '$lib/codegen/codegen-css';
 import { codegenDB } from '$lib/codegen/codegen-db';
+import { codegenMapStyle } from '$lib/codegen/codegen-map-style';
 import { codegenHTML } from '$lib/codegen/codegen-html';
 import { codegenImports } from '$lib/codegen/codegen-imports';
 import { codegenPackageJson } from '$lib/codegen/codegen-package-json';
@@ -85,7 +86,13 @@ export async function codegen(
     },
     { text: html, language: 'html' as const, path: 'index.html' },
     { text: css, language: 'css' as const, path: 'src/style.css' },
-    { text: packageJson, language: 'json' as const, path: 'package.json' }
+    { text: packageJson, language: 'json' as const, path: 'package.json' },
+    { text: packageJson, language: 'json' as const, path: 'package.json' },
+    {
+      text: codegenMapStyle(ir, analysis.language),
+      language: analysis.language,
+      path: `src/map-style.${analysis.language === 'typescript' ? 'ts' : 'js'}`
+    }
   ];
 
   if (analysis.isDuckDBRequired) {

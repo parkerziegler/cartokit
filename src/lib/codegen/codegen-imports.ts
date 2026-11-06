@@ -58,7 +58,8 @@ export function codegenImports(
       : '',
     analysis.isDuckDBRequired
       ? "import { initDB, toFeatureCollection } from './db';"
-      : ''
+      : '',
+    "import { applyCustomBasemapLabels } from './map-style';"
   ]
     .filter(Boolean)
     .join('\n');
