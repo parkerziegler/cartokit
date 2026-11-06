@@ -230,8 +230,8 @@ importers:
         specifier: ^3.9.6
         version: 3.9.10
       simple-statistics:
-        specifier: ^7.12.1
-        version: 7.12.1
+        specifier: ^8.0.0
+        version: 8.0.0
       ts-blank-space:
         specifier: ^0.9.0
         version: 0.9.0
@@ -2904,8 +2904,8 @@ packages:
     resolution: {integrity: sha512-6x6dK6zJdpTzF4sQeNYxwtvBzf6Eg4GtlesS94HOvTudUeyK2WXAaIfmDgsyslYrRBeFIlsi54AYsFGUuhmvrQ==}
     engines: {node: '>= 0.4'}
 
-  simple-statistics@7.12.1:
-    resolution: {integrity: sha512-LYRvHhZceO9MTzDw6ptt3PBoOHuiTqNU5Ew5MLjjcLwuzgfATMf1oMFdgDW7elVDGwZvi98pGoUoFhwuXTHTRA==}
+  simple-statistics@8.0.0:
+    resolution: {integrity: sha512-LiiSF7yROeA/ppntYUT4u1BiSgRPyDktmuNXX6fWFGKMgD69BM7lTwfA8IYProO9BBXlNJNxtm++dIYdrO09Uw==}
 
   sirv@3.0.2:
     resolution: {integrity: sha512-2wcC/oGxHis/BoHkkPwldgiPSYcpZK3JU28WoMVv55yHJgcZ8rlXvuG9iZggz+sU1d4bRgIGASwyWqjxu3FM0g==}
@@ -6402,7 +6402,7 @@ snapshots:
       side-channel-map: 1.0.1
       side-channel-weakmap: 1.0.2
 
-  simple-statistics@7.12.1: {}
+  simple-statistics@8.0.0: {}
 
   sirv@3.0.2:
     dependencies:
