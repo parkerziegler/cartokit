@@ -1,7 +1,6 @@
 import { orderBy } from 'lodash-es';
 
 import { codegenLayer } from '$lib/codegen/codegen-layer';
-import { codegenMapStyle } from '$lib/codegen/codegen-map-style';
 import { codegenProjection } from '$lib/codegen/codegen-projection';
 import { codegenSource } from '$lib/codegen/codegen-source';
 import { withDefault } from '$lib/codegen/utils';
@@ -49,7 +48,7 @@ export function codegenMap(
   const mapOptions = [
     `${analysis.library === 'mapbox' ? `accessToken: 'YOUR_MAPBOX_ACCESS_TOKEN'` : ''}`,
     "container: 'map'",
-    `style: ${codegenMapStyle(ir)}`,
+    `style: '${ir.basemap.url.replace(/=.+$/, '=_MAPTILER_API_KEY')}'`,
     `center: [${ir.center.join(', ')}]`,
     `zoom: ${ir.zoom}`,
     withDefault('bearing', ir.bearing),
@@ -66,14 +65,17 @@ export function codegenMap(
     ${mapOptions}
   });
 
-  ${analysis.library === 'maplibre' ? projection : ''}
-
   map.on('load', ${analysis.isFetchGeoJSONRequired || analysis.isDuckDBRequired ? 'async ' : ''}() => {
     ${analysis.isDuckDBRequired ? `const { conn${analysis.isDuckDBDataProtocolRequired ? ', db' : ''} } = await initDB();` : ''}
 
     ${layerSources}
 
     ${layerRenders}
+  });
+
+  map.on('style.load', (event) => {
+    applyCustomBasemapLabels(event.target);
+    ${analysis.library === 'maplibre' ? projection : ''}
   });
   `;
 }
