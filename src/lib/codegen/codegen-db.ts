@@ -14,7 +14,7 @@ export function codegenDB(
   // Get the AST nodes for variables and functions we want to incldue in the
   // generated code.
   const astNodes = [
-    tsSourceFile.getVariableStatement('MANUAL_BUNDLES'),
+    tsSourceFile.getVariableStatement('DUCKDB_BUNDLES'),
     tsSourceFile.getFunction('initDB'),
     tsSourceFile.getFunction('toFeatureCollection')
   ].filter((astNode) => astNode !== undefined);

@@ -96,10 +96,11 @@ export function codegenSource(
       const selectList = generateSelectList(entry).replace(/[`\\$]/g, '\\$&');
 
       // If loading a local GeoParquet file from public/data, add a call to
-      // register it.
+      // register it. Resolve the URL against the page, since DuckDB's worker
+      // runs from a blob: URL that can't resolve root-relative paths.
       let register = '';
       if (layer.source.location.type === 'file') {
-        register = `await db.registerFileURL("${url}", "/data/${url}", DuckDBDataProtocol.HTTP, false);`;
+        register = `await db.registerFileURL("${url}", new URL("/data/${url}", window.location.href).href, DuckDBDataProtocol.HTTP, false);`;
       }
 
       const addSource = `const ${dataIdent} = await conn.query(

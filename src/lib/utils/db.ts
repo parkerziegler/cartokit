@@ -2,13 +2,15 @@ import {
   AsyncDuckDB,
   type AsyncDuckDBConnection,
   ConsoleLogger,
-  DuckDBDataProtocol
+  DuckDBDataProtocol,
+  getJsDelivrBundles,
+  selectBundle
 } from '@duckdb/duckdb-wasm';
-import eh_worker from '@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url';
-import duckdb_wasm_eh from '@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url';
 import type { Feature, FeatureCollection } from 'geojson';
 
 import type { DuckDBColumn, DuckDBTable } from '$lib/types/db';
+
+const DUCKDB_BUNDLES = getJsDelivrBundles();
 
 /**
  * Initialize a DuckDB in-memory database.
@@ -19,11 +21,19 @@ import type { DuckDBColumn, DuckDBTable } from '$lib/types/db';
  *  3. The active {@link AsyncDuckDBConnection}.
  */
 export async function initDB() {
+  const bundle = await selectBundle(DUCKDB_BUNDLES);
+  const workerURL = URL.createObjectURL(
+    new Blob([`importScripts("${bundle.mainWorker}");`], {
+      type: 'text/javascript'
+    })
+  );
+
   // Instantiate the asynchronous version of DuckDB-wasm
-  const worker = new Worker(eh_worker);
+  const worker = new Worker(workerURL);
   const logger = new ConsoleLogger();
   const db = new AsyncDuckDB(logger, worker);
-  await db.instantiate(duckdb_wasm_eh);
+  await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+  URL.revokeObjectURL(workerURL);
 
   // Cast types that Arrow would otherwise surface as BigInt or Decimal objects
   // to plain numbers. MapLibre cannot serialize these when tiling GeoJSON.
