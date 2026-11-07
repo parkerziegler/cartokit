@@ -1,5 +1,4 @@
 <script lang="ts">
-  import duckdb_wasm_eh from '@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url';
   import type { Feature } from 'geojson';
   import { addProtocol, Map } from 'maplibre-gl';
   import * as pmtiles from 'pmtiles';
@@ -229,14 +228,6 @@
     });
   }
 </script>
-
-<svelte:head>
-  <!--
-    Start downloading the DuckDB-wasm module during page load, rather than
-    waiting for initDB to request it in onMount.
-  -->
-  <link rel="preload" href={duckdb_wasm_eh} as="fetch" crossorigin="" />
-</svelte:head>
 
 <main class="absolute inset-0 overflow-hidden dark:bg-black">
   <div
