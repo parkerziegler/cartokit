@@ -1,9 +1,13 @@
 import type { AsyncDuckDB, AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 import type { Geometry } from 'geojson';
 
+import type { DuckDBTable } from '$lib/types/db';
 import { queryGeometryType, quoteIdentifier } from '$lib/utils/db';
 import { DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES } from '$lib/utils/sf';
 import { snakeCase } from 'lodash-es';
+
+// The feature id column ST_Read adds to tables read through GDAL.
+const OGC_FID = 'OGC_FID';
 
 /**
  * Get the {@link Geometry['type']} of a GeoJSON layer.
@@ -31,23 +35,47 @@ export async function getGeoJSONGeometryType(
 /**
  * Copy a table in DuckDB to a GeoJSON Blob.
  *
+ * We build the FeatureCollection in SQL and write it with DuckDB's own JSON
+ * writer rather than COPY ... (FORMAT GDAL). GDAL writes through its own file
+ * layer, which can't write to DuckDB-wasm's virtual file system, so GDAL COPY
+ * fails with "Cannot write feature" for every input:
+ * https://github.com/duckdb/duckdb-wasm/issues/1840
+ *
  * @param db The active DuckDB database instance.
  * @param conn The active DuckDB database connection.
  * @param layerId The id of the layer to query for data.
  * @param displayName The display name of the layer, used to generate a file
  * name for use in DuckDB's virtual file system.
+ * @param table The layer's {@link DuckDBTable}.
  * @returns A Promise resolving to a Blob containing the GeoJSON data, as bytes.
  */
 export async function copyTableToGeoJSON(
   db: AsyncDuckDB,
   conn: AsyncDuckDBConnection,
   layerId: string,
-  displayName: string
+  displayName: string,
+  { columns, geometryColumn }: DuckDBTable
 ): Promise<Blob> {
   const fileName = `${snakeCase(displayName)}.json`;
-  await conn.query(`COPY (SELECT * FROM ${quoteIdentifier(layerId)};)
+  const geometry = quoteIdentifier(geometryColumn);
+
+  // ST_Read adds an OGC_FID column holding each feature's id. Write it as the
+  // feature's top-level id, as GDAL does, rather than as a property; otherwise,
+  // reading the file back with ST_Read yields a duplicate OGC_FID column.
+  const hasFID = columns.some(({ column_name }) => column_name === OGC_FID);
+  const excluded = [geometry, ...(hasFID ? [quoteIdentifier(OGC_FID)] : [])];
+
+  await conn.query(`COPY (
+  SELECT 'FeatureCollection' AS type,
+    list({
+      'type': 'Feature',${hasFID ? `\n      'id': ${quoteIdentifier(OGC_FID)},` : ''}
+      'properties': struct_pack(*COLUMNS(* EXCLUDE (${excluded.join(', ')}))),
+      'geometry': ST_AsGeoJSON(${geometry})::JSON
+    }) AS features
+  FROM ${quoteIdentifier(layerId)}
+)
 TO ${quoteIdentifier(fileName)}
-WITH (FORMAT GDAL, Driver 'GeoJSON');`);
+(FORMAT JSON);`);
 
   const geojsonBytes = (await db.copyFileToBuffer(
     fileName

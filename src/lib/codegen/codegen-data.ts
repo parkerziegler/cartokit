@@ -27,7 +27,8 @@ export async function codegenDataFiles(
             db.value!.db,
             db.value!.conn,
             layer.id,
-            layer.displayName
+            layer.displayName,
+            layer.source.table
           )
             .then((blob) => blob.bytes())
             .then((bytes) => ({

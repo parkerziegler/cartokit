@@ -25,6 +25,23 @@ export async function patchLayerDiffs(
 
   switch (diff.type) {
     case 'add-layer': {
+      // Check if the layer was previously soft deleted; if so, we can just
+      // toggle the flag.
+      if (ir.layers[diff.layerId]?.layout?.deleted) {
+        const layer = ir.layers[diff.layerId];
+        layer.layout.deleted = false;
+
+        inverse = {
+          type: 'remove-layer',
+          layerId: diff.layerId,
+          payload: {
+            sourceLayerType: layer.type,
+            strategy: 'soft'
+          }
+        };
+        break;
+      }
+
       let source: CartoKitSource;
 
       switch (diff.payload.type) {
@@ -92,7 +109,7 @@ export async function patchLayerDiffs(
         layerId: diff.layerId,
         payload: {
           sourceLayerType: layer.type,
-          strategy: 'default'
+          strategy: 'hard'
         }
       };
 
@@ -161,17 +178,16 @@ export async function patchLayerDiffs(
               displayName: layer.displayName
             }
           };
-
-          // If the user elects to remove all dependent layers, drop the table
-          // from the database.
-          if (diff.payload.strategy === 'remove-all-dependent-layers') {
-            // Drop the layer's table.
-            await db.value!.conn.query(`DROP TABLE IF EXISTS ${diff.layerId};`);
-          }
       }
 
-      // Apply the patch.
-      ir.layers[diff.layerId].layout.deleted = true;
+      // If using a hard delete strategy, drop the layer's table and delete it.
+      if (diff.payload.strategy === 'hard') {
+        await db.value!.conn.query(`DROP TABLE IF EXISTS ${diff.layerId};`);
+        delete ir.layers[diff.layerId];
+      } else {
+        // Otherwise, flag the layer as soft deleted.
+        ir.layers[diff.layerId].layout.deleted = true;
+      }
 
       break;
     }

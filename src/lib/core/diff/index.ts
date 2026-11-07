@@ -303,8 +303,7 @@ interface AddLayerDiff extends LayerDiff {
       });
 }
 
-export type RemoveLayerStrategy =
-  'default' | 'keep-data-as-needed' | 'remove-all-dependent-layers';
+export type RemoveLayerStrategy = 'soft' | 'hard';
 
 interface RemoveLayerDiff extends LayerDiff {
   type: 'remove-layer';

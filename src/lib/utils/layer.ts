@@ -3,6 +3,7 @@ import type { Map as MapLibreGLMap } from 'maplibre-gl';
 
 import type { LayerType } from '$lib/types';
 import type { VectorGeometry } from '$lib/types/source';
+import type { Transformation } from '$lib/types/transformation';
 
 /**
  * Determine whether a map layer id is affiliated with an existing
@@ -57,38 +58,50 @@ export function getAffiliatedLayerIds(
     );
 }
 
-// A map of GeoJSON Geometry types to the supported cartokit layer types.
-export const GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
+// A map of SF Geometry types to the supported cartokit layer types.
+export const SF_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   Geometry['type'],
-  LayerType[]
+  { type: LayerType; transformation?: Transformation['type'] }[]
 >([
-  ['Point', ['Point', 'Proportional Symbol', 'Heatmap']],
-  ['MultiPoint', ['Point', 'Proportional Symbol', 'Heatmap']],
-  ['LineString', ['Line']],
-  ['MultiLineString', ['Line']],
-  ['Polygon', ['Polygon', 'Choropleth']],
-  ['MultiPolygon', ['Polygon', 'Choropleth']],
-  ['GeometryCollection', []]
-]);
-
-export const GEOPARQUET_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
-  Geometry['type'],
-  LayerType[]
->([
-  ['Point', ['Point', 'Proportional Symbol', 'Heatmap']],
-  ['MultiPoint', ['Point', 'Proportional Symbol', 'Heatmap']],
-  ['LineString', ['Line']],
-  ['MultiLineString', ['Line']],
-  ['Polygon', ['Polygon', 'Choropleth']],
-  ['MultiPolygon', ['Polygon', 'Choropleth']],
+  [
+    'Point',
+    [{ type: 'Point' }, { type: 'Proportional Symbol' }, { type: 'Heatmap' }]
+  ],
+  [
+    'MultiPoint',
+    [{ type: 'Point' }, { type: 'Proportional Symbol' }, { type: 'Heatmap' }]
+  ],
+  ['LineString', [{ type: 'Line' }]],
+  ['MultiLineString', [{ type: 'Line' }]],
+  [
+    'Polygon',
+    [
+      { type: 'Polygon' },
+      { type: 'Choropleth' },
+      { type: 'Point', transformation: 'Centroid' },
+      { type: 'Proportional Symbol', transformation: 'Centroid' }
+    ]
+  ],
+  [
+    'MultiPolygon',
+    [
+      { type: 'Polygon' },
+      { type: 'Choropleth' },
+      { type: 'Point', transformation: 'Centroid' },
+      { type: 'Proportional Symbol', transformation: 'Centroid' }
+    ]
+  ],
   ['GeometryCollection', []]
 ]);
 
 export const PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   VectorGeometry,
-  LayerType[]
+  { type: LayerType; transformation?: Transformation['type'] }[]
 >([
-  ['Point', ['Point', 'Proportional Symbol', 'Heatmap']],
-  ['Line', ['Line']],
-  ['Polygon', ['Polygon', 'Choropleth']]
+  [
+    'Point',
+    [{ type: 'Point' }, { type: 'Proportional Symbol' }, { type: 'Heatmap' }]
+  ],
+  ['Line', [{ type: 'Line' }]],
+  ['Polygon', [{ type: 'Polygon' }, { type: 'Choropleth' }]]
 ]);

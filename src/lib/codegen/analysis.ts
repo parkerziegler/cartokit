@@ -64,7 +64,7 @@ function isFileRegistrationRequired(ir: CartoKitIR): boolean {
     isDuckDBDataProtocolRequired(ir) ||
     Object.values(ir.layers).some(
       (layer) =>
-        layer.source.type === 'geoparquet' &&
+        layer.source.type === 'geojson' &&
         layer.source.location.type === 'file' &&
         getLayerDescendants(ir, layer.id).size > 0
     )

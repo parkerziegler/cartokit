@@ -288,6 +288,7 @@
     { hidden: !contextMenu.layerId }
   ]}
   bind:this={contextMenuRef}
+  data-testid="context-menu"
 >
   <p class="px-2 py-1.5 text-xs tracking-wider text-slate-300 uppercase">
     Analysis

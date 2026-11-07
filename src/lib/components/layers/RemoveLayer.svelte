@@ -31,19 +31,19 @@
     if (descendants.size > 0) {
       confirmRemoval = true;
     } else {
-      await removeLayer(layer.id, 'default');
+      await removeLayer(layer.id, 'hard');
     }
   }
 
   async function onClickKeepData() {
-    await removeLayer(layer.id, 'keep-data-as-needed');
+    await removeLayer(layer.id, 'soft');
   }
 
   async function onClickRemoveDependantLayers() {
     return Promise.all(
       Array.from(descendants)
         .concat(layer.id)
-        .map((layerId) => removeLayer(layerId, 'remove-all-dependent-layers'))
+        .map((layerId) => removeLayer(layerId, 'hard'))
     );
   }
 
@@ -74,7 +74,11 @@
 </button>
 {#if confirmRemoval}
   <Portal class="absolute" style="top: {top}px; left: {left + 48}px;">
-    <Dialog bind:showDialog={confirmRemoval} class="w-80 shadow-lg">
+    <Dialog
+      bind:showDialog={confirmRemoval}
+      class="w-80 shadow-lg"
+      testId="confirm-remove-layer-dialog"
+    >
       {#snippet header()}
         <p class="font-sans text-sm font-medium tracking-wider">
           Remove this layer?

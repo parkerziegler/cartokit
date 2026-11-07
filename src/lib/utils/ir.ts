@@ -16,7 +16,8 @@ export function getLayerDescendants(
   for (const layer of Object.values(ir.layers)) {
     if (
       layer.source.type === 'table' &&
-      layer.source.location.parentLayerId === parentLayerId
+      layer.source.location.parentLayerId === parentLayerId &&
+      !layer.layout.deleted
     ) {
       descendants.add(layer.id);
     }

@@ -1,5 +1,3 @@
-import { camelCase } from 'lodash-es';
-
 import { codegenMap } from '$lib/codegen/codegen-map';
 import type { CartoKitIR } from '$lib/types';
 import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
@@ -58,26 +56,12 @@ export function codegenImports(
     .filter(Boolean)
     .join('\n');
 
-  const fileImports = Object.values(ir.layers)
-    .flatMap((layer) => {
-      if (
-        layer.source.type !== 'geojson' ||
-        layer.source.location.type !== 'file'
-      ) {
-        return [];
-      }
-
-      return `import ${camelCase(layer.displayName)} from './data/${layer.source.location.file.name.replace(/\.geojson$/i, '.json')}';`;
-    })
-    .join('\n');
-
   const cssImports = `import '${analysis.library}-gl/dist/${analysis.library}-gl.css';
 import './style.css'`;
 
   return [
     libraryImports,
     cssImports,
-    fileImports,
     analysis.library === 'maplibre' ? `setWorkerUrl(workerUrl)` : '',
     codegenMap(ir, analysis)
   ]

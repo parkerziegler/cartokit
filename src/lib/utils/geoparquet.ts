@@ -88,7 +88,7 @@ export async function copyTableToGeoParquet(
   displayName: string
 ): Promise<Blob> {
   const fileName = `${snakeCase(displayName)}.parquet`;
-  await conn.query(`COPY (SELECT * FROM ${quoteIdentifier(layerId)};)
+  await conn.query(`COPY (SELECT * FROM ${quoteIdentifier(layerId)})
 TO ${quoteIdentifier(fileName)}
 (FORMAT PARQUET, COMPRESSION ZSTD);`);
 

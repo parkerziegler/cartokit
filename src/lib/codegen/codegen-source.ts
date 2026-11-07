@@ -37,9 +37,8 @@ function codegenSourceName({
  */
 export function codegenRegistrations(ir: CartoKitIR): string {
   const promises = Object.values(ir.layers).flatMap((layer) =>
-    ['geoparquet', 'geojson'].includes(layer.source.type) &&
-    layer.source.location.type === 'file'
-      ? `db.registerFileURL("${layer.source.location.file.name}", new URL("/data/${layer.source.location.file.name}", window.location.href).href, DuckDBDataProtocol.HTTP, false)`
+    layer.source.type === 'geoparquet' && layer.source.location.type === 'file'
+      ? `db.registerFileURL("${layer.source.location.file.name}", new URL("/data/${layer.source.location.file.name}", DuckDBDataProtocol.HTTP, false)`
       : []
   );
 
@@ -101,14 +100,12 @@ function codegenDuckDBSource(
  * @param ir The {@link CartoKitIR}.
  * @param source A {@link CartoKitGeoJSONSource}.
  * @param layerId The id of the layer the source belongs to.
- * @param dataIdent The identifier the layer's data is bound to in generated code.
  * @returns A program fragment adding the GeoJSON source to the map.
  */
 function codegenGeoJSONSource(
   ir: CartoKitIR,
   source: CartoKitGeoJSONSource,
-  layerId: string,
-  dataIdent: string
+  layerId: string
 ) {
   const deleted = ir.layers[layerId].layout.deleted;
   let createTable = '';
@@ -119,7 +116,9 @@ function codegenGeoJSONSource(
   }
 
   const data =
-    source.location.type === 'api' ? `"${source.location.url}"` : dataIdent;
+    source.location.type === 'api'
+      ? `"${source.location.url}"`
+      : `"/data/${source.location.file.name}"`;
 
   return [
     createTable,
@@ -233,7 +232,7 @@ export function codegenSource(
 
   switch (layer.source.type) {
     case 'geojson':
-      return codegenGeoJSONSource(ir, layer.source, layer.id, dataIdent);
+      return codegenGeoJSONSource(ir, layer.source, layer.id);
     case 'geoparquet':
       return codegenGeoParquetSource(ir, layer.source, layer.id, dataIdent);
     case 'table':

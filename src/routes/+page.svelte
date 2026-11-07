@@ -182,7 +182,7 @@
 
     map.on('error', (err) => {
       console.error(err);
-      error.set('A map rendering error occurred.');
+      error.set('An error occurred. Please start a new session.');
     });
 
     const destroyHistory = initHistory();

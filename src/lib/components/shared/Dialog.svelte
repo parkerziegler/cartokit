@@ -7,6 +7,7 @@
     class?: string;
     showDialog?: boolean;
     header?: Snippet;
+    testId?: string;
     children: Snippet;
   }
 
@@ -14,6 +15,7 @@
     class: className,
     showDialog = $bindable(false),
     header,
+    testId = '',
     children
   }: Props = $props();
   let dialog: HTMLDialogElement;
@@ -44,6 +46,7 @@
       dialog.close();
     }
   }}
+  data-testid={testId}
 >
   <div class="flex items-center justify-between px-4 py-2">
     {@render header?.()}
