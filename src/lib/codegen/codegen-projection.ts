@@ -18,11 +18,7 @@ export function codegenProjection(
     }
     case 'maplibre': {
       return ir.projection === 'globe'
-        ? `
-        map.on('style.load', () => {
-          map.setProjection({ type: 'globe' });
-        });
-      `
+        ? `map.setProjection({ type: 'globe' });`
         : '';
     }
   }

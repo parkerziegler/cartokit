@@ -1,3 +1,5 @@
+import type { Map } from 'maplibre-gl';
+
 import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
 
 // CARTO
@@ -425,3 +427,28 @@ export const TILE_URLS = {
     `https://tiles.stadiamaps.com/styles/${tileId}.json`,
   Custom: () => ''
 };
+
+/**
+ * Apply custom naming conventions for basemap labels, overriding definitions
+ * from OpenStreetMap.
+ *
+ * @param map The top-level {@link Map} instance.
+ */
+export function applyCustomBasemapLabels(map: Map) {
+  const style = map.getStyle();
+
+  for (const layer of style.layers) {
+    if (layer.type !== 'symbol' || layer['source-layer'] !== 'water_name') {
+      continue;
+    }
+
+    // Use setLayoutProperty in lieu of resetting the full map style.
+    map.setLayoutProperty(layer.id, 'text-field', [
+      'match',
+      ['get', 'name:en'],
+      ['Sea of Japan', 'East Sea'],
+      'Sea of Japan / East Sea',
+      ['get', 'name:en']
+    ]);
+  }
+}

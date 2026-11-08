@@ -29,6 +29,7 @@
   import { user } from '$lib/state/user.svelte';
   import { createInitialIR, ir } from '$lib/stores/ir';
   import { layout } from '$lib/stores/layout';
+  import { applyCustomBasemapLabels } from '$lib/utils/basemap';
   import { initDB } from '$lib/utils/db';
   import { registerKeybinding } from '$lib/utils/keybinding';
 
@@ -164,6 +165,7 @@
     });
 
     map.on('style.load', (event) => {
+      applyCustomBasemapLabels(event.target);
       event.target.setProjection({ type: $ir.projection });
     });
 

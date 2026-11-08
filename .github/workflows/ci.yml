@@ -10,6 +10,13 @@ on:
 
 jobs:
   test:
+    env:
+      PUBLIC_MAPTILER_API_KEY: ci
+      VERCEL_ENV: development
+      OPENAI_API_KEY: ci
+      CLOUDFLARE_ACCOUNT_ID: ci
+      CLOUDFLARE_API_TOKEN: ci
+      KV_NAMESPACE_ID: ci
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -22,6 +29,8 @@ jobs:
           node-version: 'lts/*'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Check
+        run: pnpm run check
       - name: Lint
         run: pnpm lint
       - name: Run unit tests

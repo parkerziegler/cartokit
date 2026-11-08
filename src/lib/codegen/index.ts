@@ -85,6 +85,7 @@ export async function codegen(
     },
     { text: html, language: 'html' as const, path: 'index.html' },
     { text: css, language: 'css' as const, path: 'src/style.css' },
+    { text: packageJson, language: 'json' as const, path: 'package.json' },
     { text: packageJson, language: 'json' as const, path: 'package.json' }
   ];
 
