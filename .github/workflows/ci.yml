@@ -10,6 +10,13 @@ on:
 
 jobs:
   test:
+    env:
+      PUBLIC_MAPTILER_API_KEY: ci
+      VERCEL_ENV: development
+      OPENAI_API_KEY: ci
+      CLOUDFLARE_ACCOUNT_ID: ci
+      CLOUDFLARE_API_TOKEN: ci
+      KV_NAMESPACE_ID: ci
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
