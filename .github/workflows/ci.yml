@@ -22,6 +22,8 @@ jobs:
           node-version: 'lts/*'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Check
+        run: pnpm run check
       - name: Lint
         run: pnpm lint
       - name: Run unit tests

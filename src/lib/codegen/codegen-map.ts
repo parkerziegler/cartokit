@@ -58,24 +58,28 @@ export function codegenMap(
     .filter(Boolean)
     .join(',\n');
 
-  return `
-  ${protocol}
+  const map = `const map = new ${analysis.library === 'mapbox' ? 'mapboxgl.' : ''}Map({
+  ${mapOptions}
+});`;
 
-  const map = new ${analysis.library === 'mapbox' ? 'mapboxgl.' : ''}Map({
-    ${mapOptions}
-  });
+  const mapLoad = layerSources
+    ? `
+map.on('load', ${analysis.isFetchGeoJSONRequired || analysis.isDuckDBRequired ? 'async ' : ''}() => {
+  ${analysis.isDuckDBRequired ? `const { conn${analysis.isDuckDBDataProtocolRequired ? ', db' : ''} } = await initDB();` : ''}
 
-  map.on('load', ${analysis.isFetchGeoJSONRequired || analysis.isDuckDBRequired ? 'async ' : ''}() => {
-    ${analysis.isDuckDBRequired ? `const { conn${analysis.isDuckDBDataProtocolRequired ? ', db' : ''} } = await initDB();` : ''}
+  ${layerSources}
 
-    ${layerSources}
+  ${layerRenders}
+});
+  `
+    : '';
 
-    ${layerRenders}
-  });
+  const mapStyleLoad =
+    analysis.library === 'maplibre' && projection
+      ? `map.on('style.load', () => {
+  ${projection}
+});`
+      : '';
 
-  map.on('style.load', (event) => {
-    applyCustomBasemapLabels(event.target);
-    ${analysis.library === 'maplibre' ? projection : ''}
-  });
-  `;
+  return [protocol, map, mapLoad, mapStyleLoad].filter(Boolean).join('\n\n');
 }
