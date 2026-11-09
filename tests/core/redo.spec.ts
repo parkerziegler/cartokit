@@ -128,18 +128,22 @@ test.describe('redo', () => {
     expect(await layerTypeSelect.inputValue()).toBe('Polygon');
 
     // Instead of redoing, perform a new action.
-    await layerTypeSelect.selectOption('Point');
-    expect(await layerTypeSelect.inputValue()).toBe('Point');
+    const fillColorInput = page.getByTestId('fill-color-input');
+    const previousHex = await fillColorInput.inputValue();
+    await fillColorInput.press('ControlOrMeta+A');
+    await fillColorInput.press('Backspace');
+    await fillColorInput.pressSequentially('#f2df16');
+    expect(await fillColorInput.inputValue()).toBe('#f2df16');
 
     // Attempt to redo.
     // This should have no effect since the redo stack was cleared.
     await page.keyboard.press('ControlOrMeta+Shift+z');
 
-    // Verify that the layer type is still Point.
-    expect(await layerTypeSelect.inputValue()).toBe('Point');
+    // Verify that the fill color has not changed.
+    expect(await fillColorInput.inputValue()).toBe('#f2df16');
 
-    // Undo should take us back to Polygon.
+    // Undo should restore the old fill color.
     await page.keyboard.press('ControlOrMeta+z');
-    expect(await layerTypeSelect.inputValue()).toBe('Polygon');
+    expect(await fillColorInput.inputValue()).toBe(previousHex);
   });
 });

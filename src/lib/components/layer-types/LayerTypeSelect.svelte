@@ -17,7 +17,7 @@
 
   let layerTypes = $derived(getLayerTypes(layer) ?? []);
   let options = $derived(
-    layerTypes.map(({ type }) => ({
+    layerTypes.map((type) => ({
       value: type,
       label: type
     }))
@@ -41,13 +41,6 @@
   async function onLayerTypeChange(
     event: Event & { currentTarget: EventTarget & HTMLSelectElement }
   ) {
-    // Check if the target layer type requires a transformation based on the
-    // current layer's geometry.
-    const targetLayerType = event.currentTarget.value as LayerType;
-    const transformation = layerTypes.find(
-      ({ type }) => type === targetLayerType
-    )?.transformation;
-
     const diff: CartoKitDiff = {
       type: 'layer-type',
       layerId: layer.id,
