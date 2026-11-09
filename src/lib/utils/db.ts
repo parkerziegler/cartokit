@@ -6,7 +6,7 @@ import {
   getJsDelivrBundles,
   selectBundle
 } from '@duckdb/duckdb-wasm';
-import type { Feature, FeatureCollection, Geometry } from 'geojson';
+import type { Feature, FeatureCollection } from 'geojson';
 
 import type {
   DuckDBColumn,
@@ -343,16 +343,3 @@ export function toFeatureCollection(
     features
   };
 }
-
-export const GEOMETRY_TYPES_TO_TRANSFORMATION_TYPES = new Map<
-  Geometry['type'],
-  Transformation['type'][]
->([
-  ['LineString', ['Buffer', 'Centroid', 'Envelope']],
-  ['MultiLineString', ['Buffer', 'Centroid', 'Envelope']],
-  ['Point', ['Buffer']],
-  ['MultiPoint', ['Buffer']],
-  ['Polygon', ['Buffer', 'Centroid', 'Envelope']],
-  ['MultiPolygon', ['Buffer', 'Centroid', 'Envelope']],
-  ['GeometryCollection', []]
-]);

@@ -1,12 +1,12 @@
 <script lang="ts">
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
+  import type { BufferTransformation } from '$lib/types/transformation';
 
   interface Props {
-    distance: number;
-    onchange: (distance: number) => void;
+    params: BufferTransformation['params'];
   }
 
-  let { distance, onchange }: Props = $props();
+  let { params = $bindable() }: Props = $props();
 
   const fieldId = 'buffer-distance-input';
 </script>
@@ -17,8 +17,8 @@
     id={fieldId}
     min={0}
     step={100}
-    value={distance}
-    {onchange}
+    value={params.distance}
+    onchange={(distance) => (params.distance = distance)}
     class="w-16 px-1 py-0.5 text-right"
   />
 </div>

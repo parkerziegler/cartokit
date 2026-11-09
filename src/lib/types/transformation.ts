@@ -1,4 +1,4 @@
-interface BufferTransformation {
+export interface BufferTransformation {
   type: 'Buffer';
   params: {
     distance: number;
