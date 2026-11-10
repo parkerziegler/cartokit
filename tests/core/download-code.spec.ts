@@ -253,12 +253,9 @@ test.describe('download-code', () => {
       });
     });
 
-    // Collect the IDs of all sources on cartokit's map, removing the suffix
-    // from cartokit-only Dot Density outline sources.
+    // Collect the IDs of all sources on cartokit's map.
     const sourceIds = await page.evaluate(() =>
-      Object.keys(window.__map!.getStyle().sources).map((id) =>
-        id.replace(/-outlines$/, '')
-      )
+      Object.keys(window.__map!.getStyle().sources)
     );
 
     try {

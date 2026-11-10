@@ -181,20 +181,6 @@ interface MaxSizeDiff extends LayerDiff {
   };
 }
 
-interface DotValueDiff extends LayerDiff {
-  type: 'dot-value';
-  payload: {
-    value: number;
-  };
-}
-
-interface DotAttributeDiff extends LayerDiff {
-  type: 'dot-attribute';
-  payload: {
-    attribute: string;
-  };
-}
-
 interface HeatmapOpacityDiff extends LayerDiff {
   type: 'heatmap-opacity';
   payload: {
@@ -398,8 +384,6 @@ export type CartoKitDiff =
   | SizeDiff
   | MinSizeDiff
   | MaxSizeDiff
-  | DotValueDiff
-  | DotAttributeDiff
   | HeatmapOpacityDiff
   | HeatmapRadiusDiff
   | HeatmapRampDiff

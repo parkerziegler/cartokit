@@ -26,7 +26,8 @@ export async function patchLayerDiffs(
   switch (diff.type) {
     case 'add-layer': {
       // Check if the layer was previously soft deleted; if so, we can just
-      // toggle the flag.
+      // toggle the flag. Hard deleted layers will not exist in the IR, hence
+      // the need for optional chaining.
       if (ir.layers[diff.layerId]?.layout?.deleted) {
         const layer = ir.layers[diff.layerId];
         layer.layout.deleted = false;
@@ -67,24 +68,24 @@ export async function patchLayerDiffs(
           source = {
             type: diff.payload.type,
             location: diff.payload.location,
-            table: await createTable(
-              db.value!.db,
-              db.value!.conn,
-              diff.layerId,
-              diff.payload.location
-            )
+            table: await createTable({
+              db: db.value!.db,
+              conn: db.value!.conn,
+              layerId: diff.layerId,
+              location: diff.payload.location
+            })
           };
           break;
         case 'table':
           source = {
             type: 'table',
             location: diff.payload.location,
-            table: await createTable(
-              db.value!.db,
-              db.value!.conn,
-              diff.layerId,
-              diff.payload.location
-            )
+            table: await createTable({
+              db: db.value!.db,
+              conn: db.value!.conn,
+              layerId: diff.layerId,
+              location: diff.payload.location
+            })
           };
           break;
       }
@@ -93,7 +94,7 @@ export async function patchLayerDiffs(
       const catalogPatch = await buildCatalog(
         diff.layerId,
         source,
-        db.value?.conn
+        db.value!.conn
       );
       catalog.value = { ...catalog.value, ...catalogPatch };
 

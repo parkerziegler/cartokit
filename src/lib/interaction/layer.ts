@@ -190,49 +190,6 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
       instrumentPolygonSelect(map, layer.id, sourceLayer);
       break;
     }
-    case 'Dot Density': {
-      const fillPaint = layer.style.fill.visible
-        ? {
-            'circle-color': layer.style.fill.color,
-            'circle-opacity': layer.style.fill.opacity
-          }
-        : {
-            'circle-color': 'transparent',
-            'circle-opacity': 0
-          };
-
-      const strokePaint = layer.style.stroke.visible
-        ? {
-            'circle-stroke-color': layer.style.stroke.color,
-            'circle-stroke-width': layer.style.stroke.width,
-            'circle-stroke-opacity': layer.style.stroke.opacity
-          }
-        : {
-            'circle-stroke-color': 'transparent',
-            'circle-stroke-width': 0,
-            'circle-stroke-opacity': 0
-          };
-
-      // Add the dot density layer to the map.
-      map.addLayer(
-        {
-          id: layer.id,
-          source: layer.id,
-          'source-layer': sourceLayer,
-          type: 'circle',
-          paint: {
-            ...fillPaint,
-            ...strokePaint,
-            'circle-radius': layer.style.size
-          }
-        },
-        beforeId
-      );
-
-      instrumentPolygonHover(map, layer.id, sourceLayer);
-      instrumentPolygonSelect(map, layer.id, sourceLayer);
-      break;
-    }
     case 'Heatmap': {
       // Add a transparent layer to the map for the points.
       // This is the layer we'll instrument for hover and select effects.

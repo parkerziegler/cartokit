@@ -152,13 +152,12 @@ export type LayerType =
   | 'Polygon'
   | 'Choropleth'
   | 'Proportional Symbol'
-  | 'Dot Density'
   | 'Heatmap';
 
 /**
  * Represents the encoding channels of a layer.
  */
-export type Channel = 'fill' | 'stroke' | 'size' | 'dot' | 'heatmap-weight';
+export type Channel = 'fill' | 'stroke' | 'size' | 'heatmap-weight';
 
 /**
  * Represents the visualization type for a given channel.
@@ -278,24 +277,6 @@ export interface CartoKitChoroplethLayer extends Layer {
 }
 
 /**
- * Represents a Dot Density layer in cartokit. Dot Density layers map a data
- * value to a specific number of dots within a region. The size of the dots is
- * constant.
- *
- * @property type The type of the layer, 'Dot Density'.
- * @property style The style of the layer.
- */
-export interface CartoKitDotDensityLayer extends Layer {
-  type: 'Dot Density';
-  style: {
-    dot: DotDensityStyle;
-    size: number;
-    fill: ConstantStyle;
-    stroke: ConstantStroke;
-  };
-}
-
-/**
  * Represents a Heatmap layer in cartokit. Heatmap layers map a data value to the
  * color of a region using a color ramp.
  *
@@ -315,7 +296,6 @@ export interface CartoKitHeatmapLayer extends Layer {
  */
 export type CartoKitLayer =
   | CartoKitChoroplethLayer
-  | CartoKitDotDensityLayer
   | CartoKitHeatmapLayer
   | CartoKitLineLayer
   | CartoKitPointLayer
@@ -416,22 +396,6 @@ export interface ProportionalSymbolStyle {
   attribute: string;
   min: number;
   max: number;
-}
-
-/**
- * Represents a dot density dot style object. A dot density dot style object
- * specifies the attribute of the GeoJSON data to divide by the dot value of the
- * layer to produce a discrete number of dots. The size of the dots is constant.
- *
- * @property attribute The attribute of the GeoJSON data to map to
- * the number of dots.
- * @property size The size of the dots.
- * @property value The dot value, representing the ratio of source
- * data units to number of dots.
- */
-export interface DotDensityStyle {
-  attribute: string;
-  value: number;
 }
 
 /**

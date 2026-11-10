@@ -35,15 +35,6 @@
   let editingParams = $state(false);
   let hovering = $state(false);
 
-  // Re-run the live preview whenever params change while hovering.
-  $effect(() => {
-    $state.snapshot(transformation.params);
-
-    if (hovering) {
-      untrack(() => speculate());
-    }
-  });
-
   onMount(() => {
     const off = registerKeybinding(transformation.type.charAt(0), onClick, {
       requireMetaAndOption: true
@@ -59,16 +50,17 @@
     }
 
     const { geometryColumn } = source.table;
-    const transformed = generateTransformationExpression(
-      transformation,
-      geometryColumn
-    );
 
     // Restrict speculation to features intersecting the current viewport.
     const [west, south, east, north] = map.value!.getBounds().toArray().flat();
     const viewport = `ST_MakeEnvelope(${west}, ${south}, ${east}, ${north})`;
 
-    const query = `SELECT ST_AsGeoJSON(${transformed}) AS geom FROM ${contextMenu.layerId} WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
+    const query = `SELECT ST_AsGeoJSON(${generateTransformationExpression(
+      transformation,
+      geometryColumn
+    )}) AS geom
+FROM ${contextMenu.layerId}
+WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
     const geojson = toFeatureCollection(await db.value.conn.query(query));
 
     const id = `${contextMenu.layerId}-speculate`;
@@ -167,6 +159,15 @@
   function onClickParams() {
     editingParams = true;
   }
+
+  // Re-run the live preview whenever params change while hovering.
+  $effect(() => {
+    $state.snapshot(transformation.params);
+
+    if (hovering) {
+      untrack(() => speculate());
+    }
+  });
 </script>
 
 <li

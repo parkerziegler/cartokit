@@ -1,7 +1,6 @@
 <script lang="ts">
   import { tooltip } from '$lib/attachments/tooltip';
   import ChoroplethIcon from '$lib/components/icons/ChoroplethIcon.svelte';
-  import DotDensityIcon from '$lib/components/icons/DotDensityIcon.svelte';
   import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
   import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
   import LayerVisibleIcon from '$lib/components/icons/LayerVisibleIcon.svelte';
@@ -13,7 +12,6 @@
   import TooltipIcon from '$lib/components/icons/TooltipIcon.svelte';
   import RemoveLayer from '$lib/components/layers/RemoveLayer.svelte';
   import ChoroplethLegend from '$lib/components/legends/ChoroplethLegend.svelte';
-  import DotDensityLegend from '$lib/components/legends/DotDensityLegend.svelte';
   import HeatmapLegend from '$lib/components/legends/HeatmapLegend.svelte';
   import LineLegend from '$lib/components/legends/LineLegend.svelte';
   import PointLegend from '$lib/components/legends/PointLegend.svelte';
@@ -155,8 +153,6 @@
       <span class="shrink-0">
         {#if layer.type === 'Choropleth'}
           <ChoroplethIcon />
-        {:else if layer.type === 'Dot Density'}
-          <DotDensityIcon />
         {:else if layer.type === 'Heatmap'}
           <HeatmapIcon />
         {:else if layer.type === 'Line'}
@@ -223,8 +219,6 @@
   </div>
   {#if layer.type === 'Choropleth'}
     <ChoroplethLegend {layer} />
-  {:else if layer.type === 'Dot Density'}
-    <DotDensityLegend {layer} />
   {:else if layer.type === 'Heatmap'}
     <HeatmapLegend {layer} />
   {:else if layer.type === 'Line'}

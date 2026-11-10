@@ -392,11 +392,6 @@ export function onFeatureLeave(
 ): (event: MapMouseEvent) => void {
   return (event: MapMouseEvent): void => {
     const layerIds = Object.values(layers).map((layer) => {
-      // For dot density layers, we need to deselect the outlines layer.
-      if (layer.type === 'Dot Density') {
-        return `${layer.id}-outlines`;
-      }
-
       // For heatmap layers, we need to deselect the points layer.
       if (layer.type === 'Heatmap') {
         return `${layer.id}-points`;

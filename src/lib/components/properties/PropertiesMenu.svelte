@@ -6,7 +6,6 @@
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
   import LayerTypeSelect from '$lib/components/layer-types/LayerTypeSelect.svelte';
   import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
-  import DotDensityPropertiesPanel from '$lib/components/properties/DotDensityPropertiesPanel.svelte';
   import HeatmapPropertiesPanel from '$lib/components/properties/HeatmapPropertiesPanel.svelte';
   import LinePropertiesPanel from '$lib/components/properties/LinePropertiesPanel.svelte';
   import PointPropertiesPanel from '$lib/components/properties/PointPropertiesPanel.svelte';
@@ -92,8 +91,6 @@
   </MenuItem>
   {#if layer.type === 'Choropleth'}
     <ChoroplethPropertiesPanel {layer} />
-  {:else if layer.type === 'Dot Density'}
-    <DotDensityPropertiesPanel {layer} />
   {:else if layer.type === 'Heatmap'}
     <HeatmapPropertiesPanel {layer} />
   {:else if layer.type === 'Line'}

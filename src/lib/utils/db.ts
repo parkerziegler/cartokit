@@ -249,22 +249,29 @@ export async function queryGeometryType(
   return row.geometry_type;
 }
 
+interface CreateTableParams {
+  db: AsyncDuckDB;
+  conn: AsyncDuckDBConnection;
+  layerId: string;
+  location: Exclude<CartoKitSource, { type: 'pmtiles' }>['location'];
+}
+
 /**
  * Create a table for a layer in the local, in-memory DuckDB database.
  *
- * @param db The DuckDB database instance.
- * @param conn The active DuckDB database connection.
- * @param layerId The id of the layer to create.
- * @param location Information on the storage of the layer being added. Layers
- * derived from another layer's table are created by transforming that table.
+ * @param params The {@link CreateTableParams}.
+ * @param params.db The DuckDB database instance.
+ * @param params.conn The active DuckDB database connection.
+ * @param params.layerId The id of the layer to create.
+ * @param params.location Information on the storage of the layer being added.
  * @returns The newly-created {@link DuckDBTable}.
  */
-export async function createTable(
-  db: AsyncDuckDB,
-  conn: AsyncDuckDBConnection,
-  layerId: string,
-  location: Exclude<CartoKitSource, { type: 'pmtiles' }>['location']
-): Promise<DuckDBTable> {
+export async function createTable({
+  db,
+  conn,
+  layerId,
+  location
+}: CreateTableParams): Promise<DuckDBTable> {
   switch (location.type) {
     case 'api':
       await conn.query(generateCreateTableStatement(layerId, location.url));

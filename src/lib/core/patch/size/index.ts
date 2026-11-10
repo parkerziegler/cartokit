@@ -1,7 +1,6 @@
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import type {
-  CartoKitDotDensityLayer,
   CartoKitPointLayer,
   CartoKitProportionalSymbolLayer
 } from '$lib/types';
@@ -23,8 +22,7 @@ export async function patchSizeDiffs(
 
   switch (diff.type) {
     case 'size': {
-      const layer = ir.layers[diff.layerId] as
-        CartoKitPointLayer | CartoKitDotDensityLayer;
+      const layer = ir.layers[diff.layerId] as CartoKitPointLayer;
 
       // Derive the inverse diff prior to applying the patch.
       inverse = {

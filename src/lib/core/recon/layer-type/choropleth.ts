@@ -10,7 +10,7 @@ import type { CartoKitChoroplethLayer, LayerType } from '$lib/types';
  * @param targetLayer The definition of the target {@link CartoKitChoroplethLayer}.
  */
 export function reconChoropleth(
-  sourceLayerId: string,
+  _sourceLayerId: string,
   sourceLayerType: Extract<LayerType, 'Polygon'>,
   targetLayer: CartoKitChoroplethLayer
 ): void {

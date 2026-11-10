@@ -104,12 +104,12 @@ describe('buildCatalog', () => {
           type: 'application/json'
         })
       },
-      table: await createTable(
-        testDB.db as unknown as AsyncDuckDB,
+      table: await createTable({
+        db: testDB.db as unknown as AsyncDuckDB,
         conn,
         layerId,
-        { type: 'api', url: fileName }
-      )
+        location: { type: 'api', url: fileName }
+      })
     };
   });
 
