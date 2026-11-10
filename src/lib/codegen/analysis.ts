@@ -59,7 +59,7 @@ function isDuckDBDataProtocolRequired(ir: CartoKitIR): boolean {
  * @param ir The current {@link CartoKitIR}.
  * @returns A Boolean value indicating whether file registration is required.
  */
-function isFileRegistrationRequired(ir: CartoKitIR): boolean {
+function isDuckDBFileRegistrationRequired(ir: CartoKitIR): boolean {
   return (
     isDuckDBDataProtocolRequired(ir) ||
     Object.values(ir.layers).some(
@@ -88,6 +88,6 @@ export function analyzeIR(
     isPMTilesRequired: isPMTilesRequired(ir, backend),
     isDuckDBRequired: isDuckDBRequired(ir),
     isDuckDBDataProtocolRequired: isDuckDBDataProtocolRequired(ir),
-    isFileRegistrationRequired: isFileRegistrationRequired(ir)
+    isDuckDBFileRegistrationRequired: isDuckDBFileRegistrationRequired(ir)
   };
 }

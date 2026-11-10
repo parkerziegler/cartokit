@@ -3,7 +3,7 @@ import { orderBy } from 'lodash-es';
 import { codegenLayer } from '$lib/codegen/codegen-layer';
 import { codegenProjection } from '$lib/codegen/codegen-projection';
 import {
-  codegenRegistrations,
+  codegenDuckDBFileRegistrations,
   codegenSource
 } from '$lib/codegen/codegen-source';
 import { withDefault } from '$lib/codegen/utils';
@@ -70,7 +70,7 @@ export function codegenMap(
 map.on('load', ${analysis.isDuckDBRequired ? 'async ' : ''}() => {
   ${analysis.isDuckDBRequired ? `const { conn${analysis.isDuckDBDataProtocolRequired ? ', db' : ''} } = await initDB();` : ''}
 
-  ${codegenRegistrations(ir)}
+  ${codegenDuckDBFileRegistrations(ir)}
 
   ${layerSources}
 

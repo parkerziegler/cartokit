@@ -71,22 +71,30 @@ FROM metadata;`
   return DUCKDB_GEOMETRY_TYPES_TO_GEOJSON_GEOMETRY_TYPES[geometryType];
 }
 
+interface CopyTableToGeoParquetParams {
+  db: AsyncDuckDB;
+  conn: AsyncDuckDBConnection;
+  layerId: string;
+  displayName: string;
+}
+
 /**
  * Copy a table in DuckDB to a GeoParquet Blob.
  *
- * @param db The active DuckDB database instance.
- * @param conn The active DuckDB database connection.
- * @param layerId The id of the layer to query for data.
- * @param displayName The display name of the layer, used to generate a file
- * name for use in DuckDB's virtual file system.
+ * @param params The {@link CopyTableToGeoParquetParams}.
+ * @param params.db The active DuckDB database instance.
+ * @param params.conn The active DuckDB database connection.
+ * @param params.layerId The id of the layer to query for data.
+ * @param params.displayName The display name of the layer, used to generate a
+ * file name for use in DuckDB's virtual file system.
  * @returns A Promise resolving to a Blob containing the GeoParquet data, as bytes.
  */
-export async function copyTableToGeoParquet(
-  db: AsyncDuckDB,
-  conn: AsyncDuckDBConnection,
-  layerId: string,
-  displayName: string
-): Promise<Blob> {
+export async function copyTableToGeoParquet({
+  db,
+  conn,
+  layerId,
+  displayName
+}: CopyTableToGeoParquetParams): Promise<Blob> {
   const fileName = `${snakeCase(displayName)}.parquet`;
   await conn.query(`COPY (SELECT * FROM ${quoteIdentifier(layerId)})
 TO ${quoteIdentifier(fileName)}

@@ -25,22 +25,22 @@
       switch (layer.source.type) {
         case 'geojson':
         case 'table':
-          blob = await copyTableToGeoJSON(
-            db.value.db,
-            db.value.conn,
-            layer.id,
-            layer.displayName,
-            layer.source.table
-          );
+          blob = await copyTableToGeoJSON({
+            db: db.value.db,
+            conn: db.value.conn,
+            layerId: layer.id,
+            displayName: layer.displayName,
+            table: layer.source.table
+          });
           ext = '.json';
           break;
         case 'geoparquet':
-          blob = await copyTableToGeoParquet(
-            db.value.db,
-            db.value.conn,
-            layer.id,
-            layer.displayName
-          );
+          blob = await copyTableToGeoParquet({
+            db: db.value.db,
+            conn: db.value.conn,
+            layerId: layer.id,
+            displayName: layer.displayName
+          });
           ext = '.parquet';
       }
 

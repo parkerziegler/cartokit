@@ -48,7 +48,7 @@ export interface CartoKitBackendAnalysis extends CartoKitBackend {
    * A Boolean value indicating whether we need the DuckDB instance to register
    * local GeoParquet files or uploaded GeoJSON files read by derived layers.
    */
-  isFileRegistrationRequired: boolean;
+  isDuckDBFileRegistrationRequired: boolean;
 }
 
 /**

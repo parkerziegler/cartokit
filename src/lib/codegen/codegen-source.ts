@@ -35,10 +35,13 @@ function codegenSourceName({
  * @param ir The {@link CartoKitIR}.
  * @returns A (potentially empty) program fragment.
  */
-export function codegenRegistrations(ir: CartoKitIR): string {
+export function codegenDuckDBFileRegistrations(ir: CartoKitIR): string {
   const promises = Object.values(ir.layers).flatMap((layer) =>
-    layer.source.type === 'geoparquet' && layer.source.location.type === 'file'
-      ? `db.registerFileURL("${layer.source.location.file.name}", new URL("/data/${layer.source.location.file.name}", DuckDBDataProtocol.HTTP, false)`
+    (layer.source.type === 'geoparquet' ||
+      (layer.source.type === 'geojson' &&
+        getLayerDescendants(ir, layer.id).size > 0)) &&
+    layer.source.location.type === 'file'
+      ? `db.registerFileURL("${layer.source.location.file.name}", new URL("/data/${layer.source.location.file.name}", window.location.href).href, DuckDBDataProtocol.HTTP, false)`
       : []
   );
 
@@ -52,61 +55,81 @@ export function codegenRegistrations(ir: CartoKitIR): string {
   }
 }
 
+interface CodegenDuckDBSourceParams {
+  ir: CartoKitIR;
+  createStatement: string;
+  layerId: string;
+  table: DuckDBTable;
+  dataIdent: string;
+}
+
 /**
  * Generate a program fragment that creates a layer's table in DuckDB, queries
  * its features, and adds them to the map as a GeoJSON source.
  *
- * @param createStatement The SQL CREATE TABLE statement for the layer's table.
- * @param layerId The id of the layer the source belongs to.
- * @param table The {@link DuckDBTable} the statement creates.
- * @param dataIdent The identifier the layer's data is bound to in generated code.
+ * @param params The {@link CodegenDuckDBSourceParams}.
+ * @param params.ir The {@link CartoKitIR}.
+ * @param params.createStatement The SQL CREATE TABLE statement for the layer's
+ * table.
+ * @param params.layerId The layer id.
+ * @param params.table The {@link DuckDBTable} the statement creates.
+ * @param params.dataIdent The identifier the layer's data is bound to in
+ * generated code.
  * @returns A program fragment adding the source to the map.
  */
-function codegenDuckDBSource(
-  ir: CartoKitIR,
-  createStatement: string,
-  layerId: string,
-  table: DuckDBTable,
-  dataIdent: string
-) {
+function codegenDuckDBSource({
+  ir,
+  createStatement,
+  layerId,
+  table,
+  dataIdent
+}: CodegenDuckDBSourceParams) {
   const layer = ir.layers[layerId];
   const dependents = getLayerDescendants(ir, layer.id);
 
   // If the layer is flagged as deleted but still has dependents, ensure that we
   // generate a statement to create the table.
   if (layer.layout.deleted && dependents.size > 0) {
-    return `await conn.query(\`
-      ${createStatement}
-    \`);`;
+    return `await conn.query(\`${createStatement}\`);`;
   }
 
   const selectStatement = generateSelectStatement(layerId, table);
   return [
     `const ${dataIdent} = await conn.query(\`
-      ${createStatement}
-      ${selectStatement}
-    \`);`,
+    ${createStatement}
+    ${selectStatement}
+  \`);`,
     `map.addSource("${layerId}", {
-      type: "geojson",
-      data: toFeatureCollection(${dataIdent})
-    });`
+  type: "geojson",
+  data: toFeatureCollection(${dataIdent})
+});`
   ].join('\n\n');
 }
 
+interface CodegenSourceParams<T> {
+  ir: CartoKitIR;
+  source: T;
+  layerId: string;
+  dataIdent: string;
+}
+
 /**
- * Generate a program fragment for a {@link CartoKitGeoJSONSource}. If other
- * layers are derived from the layer, the data is also loaded into a DuckDB table.
+ * Generate a program fragment for a {@link CartoKitGeoJSONSource}.
  *
- * @param ir The {@link CartoKitIR}.
- * @param source A {@link CartoKitGeoJSONSource}.
- * @param layerId The id of the layer the source belongs to.
+ * If other layers are derived from this layer, the GeoJSON data is also loaded
+ * into a DuckDB table.
+ *
+ * @param params The {@link CodegenSourceParams}.
+ * @param params.ir The {@link CartoKitIR}.
+ * @param params.source A {@link CartoKitGeoJSONSource}.
+ * @param params.layerId The layer id.
  * @returns A program fragment adding the GeoJSON source to the map.
  */
-function codegenGeoJSONSource(
-  ir: CartoKitIR,
-  source: CartoKitGeoJSONSource,
-  layerId: string
-) {
+function codegenGeoJSONSource({
+  ir,
+  source,
+  layerId
+}: CodegenSourceParams<CartoKitGeoJSONSource>) {
   const deleted = ir.layers[layerId].layout.deleted;
   let createTable = '';
 
@@ -124,9 +147,9 @@ function codegenGeoJSONSource(
     createTable,
     !deleted
       ? `map.addSource("${layerId}", {
-      type: "geojson",
-      data: ${data}
-    });`
+  type: "geojson",
+  data: ${data}
+});`
       : undefined
   ]
     .filter(Boolean)
@@ -134,27 +157,32 @@ function codegenGeoJSONSource(
 }
 
 /**
- * Generate a program fragment for a {@link CartoKitGeoParquetSource}: load the
- * data into a DuckDB table, then add it to the map as a GeoJSON source.
+ * Generate a program fragment for a {@link CartoKitGeoParquetSource}.
  *
- * @param source A {@link CartoKitGeoParquetSource}.
- * @param layerId The id of the layer the source belongs to.
- * @param dataIdent The identifier the layer's data is bound to in generated code.
+ * @param params The {@link CodegenSourceParams}.
+ * @param params.ir The {@link CartoKitIR}.
+ * @param params.source A {@link CartoKitGeoParquetSource}.
+ * @param params.layerId The layer id.
+ * @param params.dataIdent The identifier the layer's data is bound to in
+ * generated code.
  * @returns A program fragment adding the source to the map.
  */
-function codegenGeoParquetSource(
-  ir: CartoKitIR,
-  source: CartoKitGeoParquetSource,
-  layerId: string,
-  dataIdent: string
-) {
-  return codegenDuckDBSource(
+function codegenGeoParquetSource({
+  ir,
+  source,
+  layerId,
+  dataIdent
+}: CodegenSourceParams<CartoKitGeoParquetSource>) {
+  return codegenDuckDBSource({
     ir,
-    generateCreateTableStatement(layerId, codegenSourceName(source)),
+    createStatement: generateCreateTableStatement(
+      layerId,
+      codegenSourceName(source)
+    ),
     layerId,
-    source.table,
+    table: source.table,
     dataIdent
-  );
+  });
 }
 
 /**
@@ -162,29 +190,31 @@ function codegenGeoParquetSource(
  * derived table from its parent in DuckDB, then add it to the map as a GeoJSON
  * source.
  *
- * @param source A {@link CartoKitTableSource}.
- * @param layerId The id of the layer the source belongs to.
- * @param dataIdent The identifier the layer's data is bound to in generated code.
+ * @param params The {@link CodegenSourceParams}.
+ * @param params.ir The {@link CartoKitIR}.
+ * @param params.source A {@link CartoKitTableSource}.
+ * @param params.layerId The layer id.
+ * @param params.dataIdent The identifier the layer's data is bound to in
+ * generated code.
  * @returns A program fragment adding the source to the map.
  */
-function codegenTableSource(
-  ir: CartoKitIR,
-  source: CartoKitTableSource,
-  layerId: string,
-  dataIdent: string
-) {
-  // A derived table replaces its parent's geometry under the same column name.
-  return codegenDuckDBSource(
+function codegenTableSource({
+  ir,
+  source,
+  layerId,
+  dataIdent
+}: CodegenSourceParams<CartoKitTableSource>) {
+  return codegenDuckDBSource({
     ir,
-    generateCreateDerivedTableStatement(
+    createStatement: generateCreateDerivedTableStatement(
       layerId,
       source.location,
       source.table.geometryColumn
     ),
     layerId,
-    source.table,
+    table: source.table,
     dataIdent
-  );
+  });
 }
 
 /**
@@ -192,7 +222,7 @@ function codegenTableSource(
  * reads PMTiles through the `pmtiles://` protocol; Mapbox reads the URL directly.
  *
  * @param source A {@link CartoKitPMTilesSource}.
- * @param layerId The id of the layer the source belongs to.
+ * @param layerId The layer id.
  * @param analysis The {@link CartoKitBackendAnalysis} for the current
  * {@link CartoKitIR}.
  * @returns A program fragment adding the vector source to the map.
@@ -208,9 +238,9 @@ function codegenPMTilesSource(
       : source.location.url;
 
   return `map.addSource("${layerId}", {
-          type: "vector",
-          url: ${JSON.stringify(url)}
-        });`;
+  type: "vector",
+  url: ${JSON.stringify(url)}
+});`;
 }
 
 /**
@@ -232,11 +262,26 @@ export function codegenSource(
 
   switch (layer.source.type) {
     case 'geojson':
-      return codegenGeoJSONSource(ir, layer.source, layer.id);
+      return codegenGeoJSONSource({
+        ir,
+        source: layer.source,
+        layerId: layer.id,
+        dataIdent
+      });
     case 'geoparquet':
-      return codegenGeoParquetSource(ir, layer.source, layer.id, dataIdent);
+      return codegenGeoParquetSource({
+        ir,
+        source: layer.source,
+        layerId: layer.id,
+        dataIdent
+      });
     case 'table':
-      return codegenTableSource(ir, layer.source, layer.id, dataIdent);
+      return codegenTableSource({
+        ir,
+        source: layer.source,
+        layerId: layer.id,
+        dataIdent
+      });
     case 'pmtiles':
       return codegenPMTilesSource(layer.source, layer.id, analysis);
   }

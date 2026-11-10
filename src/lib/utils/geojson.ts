@@ -32,6 +32,14 @@ export async function getGeoJSONGeometryType(
   return DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES[geometryType];
 }
 
+interface CopyTableToGeoJSONParams {
+  db: AsyncDuckDB;
+  conn: AsyncDuckDBConnection;
+  layerId: string;
+  displayName: string;
+  table: DuckDBTable;
+}
+
 /**
  * Copy a table in DuckDB to a GeoJSON Blob.
  *
@@ -41,21 +49,22 @@ export async function getGeoJSONGeometryType(
  * fails with "Cannot write feature" for every input:
  * https://github.com/duckdb/duckdb-wasm/issues/1840
  *
- * @param db The active DuckDB database instance.
- * @param conn The active DuckDB database connection.
- * @param layerId The id of the layer to query for data.
- * @param displayName The display name of the layer, used to generate a file
- * name for use in DuckDB's virtual file system.
- * @param table The layer's {@link DuckDBTable}.
+ * @param params The {@link CopyTableToGeoJSONParams}.
+ * @param params.db The active DuckDB database instance.
+ * @param params.conn The active DuckDB database connection.
+ * @param params.layerId The id of the layer to query for data.
+ * @param params.displayName The display name of the layer, used to generate a
+ * file name for use in DuckDB's virtual file system.
+ * @param params.table The layer's {@link DuckDBTable}.
  * @returns A Promise resolving to a Blob containing the GeoJSON data, as bytes.
  */
-export async function copyTableToGeoJSON(
-  db: AsyncDuckDB,
-  conn: AsyncDuckDBConnection,
-  layerId: string,
-  displayName: string,
-  { columns, geometryColumn }: DuckDBTable
-): Promise<Blob> {
+export async function copyTableToGeoJSON({
+  db,
+  conn,
+  layerId,
+  displayName,
+  table: { columns, geometryColumn }
+}: CopyTableToGeoJSONParams): Promise<Blob> {
   const fileName = `${snakeCase(displayName)}.json`;
   const geometry = quoteIdentifier(geometryColumn);
 

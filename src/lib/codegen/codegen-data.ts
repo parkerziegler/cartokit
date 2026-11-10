@@ -23,13 +23,13 @@ export async function codegenDataFiles(
         case 'geojson': {
           const { file } = layer.source.location;
 
-          return copyTableToGeoJSON(
-            db.value!.db,
-            db.value!.conn,
-            layer.id,
-            layer.displayName,
-            layer.source.table
-          )
+          return copyTableToGeoJSON({
+            db: db.value!.db,
+            conn: db.value!.conn,
+            layerId: layer.id,
+            displayName: layer.displayName,
+            table: layer.source.table
+          })
             .then((blob) => blob.bytes())
             .then((bytes) => ({
               path: `public/data/${file.name}`,
@@ -39,12 +39,12 @@ export async function codegenDataFiles(
         case 'geoparquet': {
           const { file } = layer.source.location;
 
-          return copyTableToGeoParquet(
-            db.value!.db,
-            db.value!.conn,
-            layer.id,
-            layer.displayName
-          )
+          return copyTableToGeoParquet({
+            db: db.value!.db,
+            conn: db.value!.conn,
+            layerId: layer.id,
+            displayName: layer.displayName
+          })
             .then((blob) => blob.bytes())
             .then((bytes) => ({
               path: `public/data/${file.name}`,
