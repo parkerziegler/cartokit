@@ -5,10 +5,10 @@
 
   interface Props {
     class?: ClassValue;
-    variant?: 'normal' | 'big';
+    variant?: 'tiny' | 'big';
   }
 
-  let { class: className, variant = 'normal' }: Props = $props();
+  let { class: className, variant = 'tiny' }: Props = $props();
 
   const indicatorTransition = $derived({
     x: prefersReducedMotion.current ? 0 : 8,
@@ -25,7 +25,7 @@
     class={[
       'loader inline-block rounded-full',
       {
-        'size-4 border-2': variant === 'normal',
+        'size-4 border-2': variant === 'tiny',
         'size-8 border-4': variant === 'big'
       }
     ]}

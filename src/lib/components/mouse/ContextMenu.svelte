@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { computePosition, flip, offset, shift } from '@floating-ui/dom';
+  import {
+    computePosition,
+    flip,
+    offset,
+    shift,
+    type VirtualElement
+  } from '@floating-ui/dom';
 
   import Transformation from '$lib/components/transformation/Transformation.svelte';
   import { catalog } from '$lib/state/catalog.svelte';
@@ -52,21 +58,29 @@
   });
 
   $effect(() => {
-    const cursorRef = document.getElementById('cursor')!;
-
     if (availableTransformations.length > 0) {
-      computePosition(cursorRef, contextMenuRef, {
+      const { x: anchorX, y: anchorY } = contextMenu;
+      const anchor: VirtualElement = {
+        getBoundingClientRect: () => ({
+          x: anchorX,
+          y: anchorY,
+          top: anchorY,
+          left: anchorX,
+          bottom: anchorY,
+          right: anchorX,
+          width: 0,
+          height: 0
+        })
+      };
+
+      computePosition(anchor, contextMenuRef, {
         placement: 'bottom',
-        middleware: [offset(6), flip(), shift({ padding: 8 })]
+        middleware: [offset(10), flip(), shift({ padding: 8 })]
       }).then(({ x, y }) => {
         Object.assign(contextMenuRef.style, {
           left: `${x}px`,
           top: `${y}px`
         });
-      });
-    } else {
-      Object.assign(contextMenuRef.style, {
-        display: 'none'
       });
     }
   });

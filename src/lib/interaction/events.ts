@@ -363,7 +363,9 @@ function addSelectListeners(
 
   map.on('click', lyrId, onClick);
 
-  function onContextMenu() {
+  function onContextMenu(e: MapMouseEvent) {
+    contextMenu.x = e.originalEvent.clientX;
+    contextMenu.y = e.originalEvent.clientY;
     contextMenu.layerId = lyrId;
   }
 

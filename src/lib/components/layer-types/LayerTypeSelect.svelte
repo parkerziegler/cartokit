@@ -15,9 +15,8 @@
 
   let { layer }: Props = $props();
 
-  let layerTypes = $derived(getLayerTypes(layer) ?? []);
   let options = $derived(
-    layerTypes.map((type) => ({
+    (getLayerTypes(layer) ?? []).map((type) => ({
       value: type,
       label: type
     }))

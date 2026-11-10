@@ -10,7 +10,7 @@
   interface Props {
     onclick?: MouseEventHandler<HTMLButtonElement>;
     class?: string;
-    variant?: 'tiny' | 'normal';
+    variant?: 'tiny' | 'big';
     disabled?: boolean;
     loading?: boolean;
     success?: boolean;
@@ -21,7 +21,7 @@
   let {
     onclick = () => {},
     class: className = '',
-    variant = 'normal',
+    variant = 'big',
     disabled = false,
     loading = false,
     success = false,
