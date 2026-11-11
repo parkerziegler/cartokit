@@ -1,22 +1,16 @@
-import type { AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
+import type { AsyncDuckDB, AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 import type { Geometry } from 'geojson';
+import { snakeCase } from 'lodash-es';
 
-import { quoteIdentifier } from '$lib/utils/db';
+import { queryGeometryType, quoteIdentifier } from '$lib/utils/db';
+import { DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES } from '$lib/utils/sf';
 
-// A map of the geometry types reported by DuckDB's ST_GeometryType to GeoJSON
-// Geometry types.
-const DUCKDB_GEOMETRY_TYPES_TO_GEOJSON_GEOMETRY_TYPES: Record<
-  string,
-  Geometry['type']
-> = {
-  POINT: 'Point',
-  MULTIPOINT: 'MultiPoint',
-  LINESTRING: 'LineString',
-  MULTILINESTRING: 'MultiLineString',
-  POLYGON: 'Polygon',
-  MULTIPOLYGON: 'MultiPolygon',
-  GEOMETRYCOLLECTION: 'GeometryCollection'
-};
+interface GetGeoParquetGeometryTypeParams {
+  conn: AsyncDuckDBConnection;
+  source: string;
+  layerId: string;
+  geometryColumn: string;
+}
 
 /**
  * Get the {@link Geometry['type']} of a GeoParquet file from the geometry_types
@@ -24,20 +18,20 @@ const DUCKDB_GEOMETRY_TYPES_TO_GEOJSON_GEOMETRY_TYPES: Record<
  * GeoParquet spec permits geometry_types to be empty, in which case we fall
  * back to the type of the first non-null geometry in the layer's table.
  *
- * @param conn The active DuckDB database connection.
- * @param source The URL or registered file name of the GeoParquet file.
- * @param layerId The id of the layer whose table holds the file's data.
- * @param geometryColumn The name of the geometry column in the layer's table.
+ * @param params The {@link GetGeoParquetGeometryTypeParams}.
+ * @param params.conn The active DuckDB database connection.
+ * @param params.source The URL or registered file name of the GeoParquet file.
+ * @param params.layerId The id of the layer whose table holds the file's data.
+ * @param params.geometryColumn The name of the geometry column in the layer's
+ * table.
  * @returns The {@link Geometry['type']} of the GeoParquet file.
  */
-export async function getGeoParquetGeometryType(
-  conn: AsyncDuckDBConnection,
-  source: string,
-  layerId: string,
-  geometryColumn: string
-): Promise<Geometry['type']> {
-  const geometry = quoteIdentifier(geometryColumn);
-
+export async function getGeoParquetGeometryType({
+  conn,
+  source,
+  layerId,
+  geometryColumn
+}: GetGeoParquetGeometryTypeParams): Promise<Geometry['type']> {
   const [metadata] = (
     await conn.query(
       `WITH metadata AS (
@@ -62,17 +56,46 @@ FROM metadata;`
     return metadata.geometry_type as Geometry['type'];
   }
 
-  const [row] = (
-    await conn.query(
-      `SELECT ST_GeometryType(${geometry})::VARCHAR AS geometry_type FROM ${quoteIdentifier(layerId)} WHERE ${geometry} IS NOT NULL LIMIT 1;`
-    )
-  )
-    .toArray()
-    .map((row: { toJSON: () => { geometry_type: string } }) => row.toJSON());
+  const geometryType = await queryGeometryType(conn, layerId, geometryColumn);
 
-  if (!row) {
-    throw new Error('No geometries found.');
-  }
+  return DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES[geometryType];
+}
 
-  return DUCKDB_GEOMETRY_TYPES_TO_GEOJSON_GEOMETRY_TYPES[row.geometry_type];
+interface CopyTableToGeoParquetParams {
+  db: AsyncDuckDB;
+  conn: AsyncDuckDBConnection;
+  layerId: string;
+  displayName: string;
+}
+
+/**
+ * Copy a table in DuckDB to a GeoParquet Blob.
+ *
+ * @param params The {@link CopyTableToGeoParquetParams}.
+ * @param params.db The active DuckDB database instance.
+ * @param params.conn The active DuckDB database connection.
+ * @param params.layerId The id of the layer to query for data.
+ * @param params.displayName The display name of the layer, used to generate a
+ * file name for use in DuckDB's virtual file system.
+ * @returns A Promise resolving to a Blob containing the GeoParquet data, as bytes.
+ */
+export async function copyTableToGeoParquet({
+  db,
+  conn,
+  layerId,
+  displayName
+}: CopyTableToGeoParquetParams): Promise<Blob> {
+  const fileName = `${snakeCase(displayName)}.parquet`;
+  await conn.query(`COPY (SELECT * FROM ${quoteIdentifier(layerId)})
+TO ${quoteIdentifier(fileName)}
+(FORMAT PARQUET, COMPRESSION ZSTD);`);
+
+  const geoparquetBytes = (await db.copyFileToBuffer(
+    fileName
+  )) as Uint8Array<ArrayBuffer>;
+  const blob = new Blob([geoparquetBytes], {
+    type: 'application/octet-stream'
+  });
+
+  return blob;
 }

@@ -2,7 +2,10 @@ import { orderBy } from 'lodash-es';
 
 import { codegenLayer } from '$lib/codegen/codegen-layer';
 import { codegenProjection } from '$lib/codegen/codegen-projection';
-import { codegenSource } from '$lib/codegen/codegen-source';
+import {
+  codegenDuckDBFileRegistrations,
+  codegenSource
+} from '$lib/codegen/codegen-source';
 import { withDefault } from '$lib/codegen/utils';
 import type { CartoKitIR } from '$lib/types';
 import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
@@ -27,7 +30,7 @@ export function codegenMap(
     'layout.z',
     'asc'
   ).reduce((p, layer) => {
-    return p.concat('\n\n' + codegenSource(layer, analysis));
+    return p.concat('\n\n' + codegenSource(layer, ir, analysis));
   }, '');
   const layerRenders = orderBy(
     Object.values(ir.layers),
@@ -64,8 +67,10 @@ export function codegenMap(
 
   const mapLoad = layerSources
     ? `
-map.on('load', ${analysis.isFetchGeoJSONRequired || analysis.isDuckDBRequired ? 'async ' : ''}() => {
+map.on('load', ${analysis.isDuckDBRequired ? 'async ' : ''}() => {
   ${analysis.isDuckDBRequired ? `const { conn${analysis.isDuckDBDataProtocolRequired ? ', db' : ''} } = await initDB();` : ''}
+
+  ${codegenDuckDBFileRegistrations(ir)}
 
   ${layerSources}
 

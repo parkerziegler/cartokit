@@ -3,10 +3,9 @@ import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { generateCartoKitLayer } from '$lib/interaction/layer';
 import { catalog } from '$lib/state/catalog.svelte';
 import { db } from '$lib/state/db.svelte';
-import type { CartoKitSource } from '$lib/types';
-import type { DuckDBTable } from '$lib/types/db';
+import type { CartoKitSource } from '$lib/types/source';
 import { buildCatalog } from '$lib/utils/catalog';
-import { createTable, readTableAsGeoJSON } from '$lib/utils/db';
+import { createTable } from '$lib/utils/db';
 import { CartoKitPMTiles } from '$lib/utils/pmtiles';
 
 /**
@@ -26,8 +25,25 @@ export async function patchLayerDiffs(
 
   switch (diff.type) {
     case 'add-layer': {
+      // Check if the layer was previously soft deleted; if so, we can just
+      // toggle the flag. Hard deleted layers will not exist in the IR, hence
+      // the need for optional chaining.
+      if (ir.layers[diff.layerId]?.layout?.deleted) {
+        const layer = ir.layers[diff.layerId];
+        layer.layout.deleted = false;
+
+        inverse = {
+          type: 'remove-layer',
+          layerId: diff.layerId,
+          payload: {
+            sourceLayerType: layer.type,
+            strategy: 'soft'
+          }
+        };
+        break;
+      }
+
       let source: CartoKitSource;
-      let table: DuckDBTable | undefined;
 
       switch (diff.payload.type) {
         case 'pmtiles': {
@@ -47,49 +63,38 @@ export async function patchLayerDiffs(
           };
           break;
         }
-        case 'geojson': {
-          table = await createTable(
-            db.value!.db,
-            db.value!.conn,
-            diff.layerId,
-            diff.payload.location
-          );
-          const geojson = await readTableAsGeoJSON(
-            db.value!.conn,
-            diff.layerId,
-            table
-          );
-
+        case 'geojson':
+        case 'geoparquet':
           source = {
-            type: 'geojson',
+            type: diff.payload.type,
             location: diff.payload.location,
-            data: geojson,
-            sourceData: geojson,
-            transformations: []
+            table: await createTable({
+              db: db.value!.db,
+              conn: db.value!.conn,
+              layerId: diff.layerId,
+              location: diff.payload.location
+            })
           };
           break;
-        }
-        case 'geoparquet': {
-          table = await createTable(
-            db.value!.db,
-            db.value!.conn,
-            diff.layerId,
-            diff.payload.location
-          );
-
+        case 'table':
           source = {
-            type: 'geoparquet',
-            location: diff.payload.location
+            type: 'table',
+            location: diff.payload.location,
+            table: await createTable({
+              db: db.value!.db,
+              conn: db.value!.conn,
+              layerId: diff.layerId,
+              location: diff.payload.location
+            })
           };
           break;
-        }
       }
 
       // Build the catalog entry.
       const catalogPatch = await buildCatalog(
         diff.layerId,
         source,
-        db.value && table ? { conn: db.value.conn, table } : undefined
+        db.value!.conn
       );
       catalog.value = { ...catalog.value, ...catalogPatch };
 
@@ -104,7 +109,8 @@ export async function patchLayerDiffs(
         type: 'remove-layer',
         layerId: diff.layerId,
         payload: {
-          sourceLayerType: layer.type
+          sourceLayerType: layer.type,
+          strategy: 'hard'
         }
       };
 
@@ -164,22 +170,25 @@ export async function patchLayerDiffs(
           break;
         case 'geojson':
         case 'geoparquet':
+        case 'table':
           inverse = {
             type: 'add-layer',
             layerId: diff.layerId,
             payload: {
-              type: layer.source.type,
-              displayName: layer.displayName,
-              location: layer.source.location
+              ...layer.source,
+              displayName: layer.displayName
             }
           };
-
-          // Drop the layer's table.
-          await db.value!.conn.query(`DROP TABLE IF EXISTS ${diff.layerId};`);
       }
 
-      // Apply the patch.
-      delete ir.layers[diff.layerId];
+      // If using a hard delete strategy, drop the layer's table and delete it.
+      if (diff.payload.strategy === 'hard') {
+        await db.value!.conn.query(`DROP TABLE IF EXISTS ${diff.layerId};`);
+        delete ir.layers[diff.layerId];
+      } else {
+        // Otherwise, flag the layer as soft deleted.
+        ir.layers[diff.layerId].layout.deleted = true;
+      }
 
       break;
     }

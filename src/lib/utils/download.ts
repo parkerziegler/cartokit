@@ -17,17 +17,3 @@ export function downloadBlob(blob: Blob, fileName: string) {
     a.remove();
   }, 1000);
 }
-
-/**
- * Downloads structured content to JSON.
- *
- * @param content The content to download.
- * @param fileName The name of the file to download.
- */
-export function downloadJson<T>(content: T, fileName: string) {
-  const blob = new Blob([JSON.stringify(content, null, 2)], {
-    type: 'application/json'
-  });
-
-  downloadBlob(blob, fileName);
-}

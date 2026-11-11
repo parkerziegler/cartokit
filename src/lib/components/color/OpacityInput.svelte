@@ -11,7 +11,7 @@
 
   interface Props {
     layerId: string;
-    channel: Exclude<Channel, 'size' | 'dot' | 'heatmap-weight'>;
+    channel: Exclude<Channel, 'size' | 'heatmap-weight'>;
     style: QuantitativeStyle | CategoricalStyle | ConstantStyle;
   }
 

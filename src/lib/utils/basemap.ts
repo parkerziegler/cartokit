@@ -432,6 +432,9 @@ export const TILE_URLS = {
  * Apply custom naming conventions for basemap labels, overriding definitions
  * from OpenStreetMap.
  *
+ * Overrides fall back to the basemap's own text-field, so all other labels
+ * render exactly as the basemap defines them.
+ *
  * @param map The top-level {@link Map} instance.
  */
 export function applyCustomBasemapLabels(map: Map) {
@@ -442,13 +445,21 @@ export function applyCustomBasemapLabels(map: Map) {
       continue;
     }
 
+    // Legacy property functions (e.g., { stops }) can't be nested inside an
+    // expression, so leave those layers untouched.
+    const textField = layer.layout?.['text-field'];
+
+    if (!(typeof textField === 'string' || Array.isArray(textField))) {
+      continue;
+    }
+
     // Use setLayoutProperty in lieu of resetting the full map style.
     map.setLayoutProperty(layer.id, 'text-field', [
       'match',
       ['get', 'name:en'],
       ['Sea of Japan', 'East Sea'],
       'Sea of Japan / East Sea',
-      ['get', 'name:en']
+      textField
     ]);
   }
 }

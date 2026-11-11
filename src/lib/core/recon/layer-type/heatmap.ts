@@ -11,23 +11,13 @@ import { redraw } from '$lib/utils/layer/redraw';
  */
 export function reconHeatmap(
   sourceLayerId: string,
-  sourceLayerType: LayerType,
+  sourceLayerType: Extract<LayerType, 'Point' | 'Proportional Symbol'>,
   targetLayer: CartoKitHeatmapLayer
 ): void {
   switch (sourceLayerType) {
-    case 'Choropleth':
-    case 'Dot Density':
-    case 'Line':
-    case 'Polygon':
-    case 'Heatmap':
-      break;
     case 'Point':
     case 'Proportional Symbol':
-      redraw({
-        map: map.value!,
-        sourceLayerId,
-        targetLayer
-      });
+      redraw(map.value!, sourceLayerId, targetLayer);
       break;
   }
 }

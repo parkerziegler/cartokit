@@ -34,7 +34,6 @@
           { label: 'Range', value: 'Quantitative' },
           { label: 'Categories', value: 'Categorical' }
         ];
-      case 'Dot Density':
       case 'Heatmap':
       case 'Line':
       case 'Polygon':

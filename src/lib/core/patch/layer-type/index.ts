@@ -1,12 +1,17 @@
 import type { CartoKitDiff } from '$lib/core/diff';
 import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
 import { patchChoropleth } from '$lib/core/patch/layer-type/choropleth';
-import { patchDotDensity } from '$lib/core/patch/layer-type/dot-density';
 import { patchHeatmap } from '$lib/core/patch/layer-type/heatmap';
-import { patchLine } from '$lib/core/patch/layer-type/line';
 import { patchPoint } from '$lib/core/patch/layer-type/point';
 import { patchPolygon } from '$lib/core/patch/layer-type/polygon';
 import { patchProportionalSymbol } from '$lib/core/patch/layer-type/proportional-symbol';
+import type {
+  CartoKitChoroplethLayer,
+  CartoKitHeatmapLayer,
+  CartoKitPointLayer,
+  CartoKitPolygonLayer,
+  CartoKitProportionalSymbolLayer
+} from '$lib/types';
 
 /**
  * Patch layer-type-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.
@@ -40,25 +45,30 @@ export async function patchLayerTypeDiffs(
       // Apply the patch.
       switch (diff.payload.targetLayerType) {
         case 'Choropleth':
-          ir.layers[diff.layerId] = patchChoropleth(sourceLayer);
-          break;
-        case 'Dot Density':
-          ir.layers[diff.layerId] = patchDotDensity(sourceLayer);
+          ir.layers[diff.layerId] = patchChoropleth(
+            sourceLayer as CartoKitPolygonLayer
+          );
           break;
         case 'Heatmap':
-          ir.layers[diff.layerId] = patchHeatmap(sourceLayer);
-          break;
-        case 'Line':
-          ir.layers[diff.layerId] = patchLine(sourceLayer);
+          ir.layers[diff.layerId] = patchHeatmap(
+            sourceLayer as CartoKitPointLayer | CartoKitProportionalSymbolLayer
+          );
           break;
         case 'Point':
-          ir.layers[diff.layerId] = patchPoint(sourceLayer);
+          ir.layers[diff.layerId] = patchPoint(
+            sourceLayer as
+              CartoKitHeatmapLayer | CartoKitProportionalSymbolLayer
+          );
           break;
         case 'Polygon':
-          ir.layers[diff.layerId] = patchPolygon(sourceLayer);
+          ir.layers[diff.layerId] = patchPolygon(
+            sourceLayer as CartoKitChoroplethLayer
+          );
           break;
         case 'Proportional Symbol':
-          ir.layers[diff.layerId] = patchProportionalSymbol(sourceLayer);
+          ir.layers[diff.layerId] = patchProportionalSymbol(
+            sourceLayer as CartoKitHeatmapLayer | CartoKitPointLayer
+          );
           break;
       }
 

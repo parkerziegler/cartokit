@@ -1,7 +1,8 @@
 import type { Geometry } from 'geojson';
 import type { Map as MapLibreGLMap } from 'maplibre-gl';
 
-import type { LayerType, VectorGeometry } from '$lib/types';
+import type { LayerType } from '$lib/types';
+import type { VectorGeometry } from '$lib/types/source';
 
 /**
  * Determine whether a map layer id is affiliated with an existing
@@ -56,39 +57,7 @@ export function getAffiliatedLayerIds(
     );
 }
 
-// A map of GeoJSON Geometry types to the supported cartokit layer types.
-export const GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
-  Geometry['type'],
-  LayerType[]
->([
-  ['Point', ['Point', 'Proportional Symbol', 'Heatmap']],
-  ['MultiPoint', ['Point', 'Proportional Symbol', 'Heatmap']],
-  ['LineString', ['Line', 'Point', 'Proportional Symbol']],
-  ['MultiLineString', ['Line', 'Point', 'Proportional Symbol']],
-  [
-    'Polygon',
-    ['Polygon', 'Choropleth', 'Point', 'Proportional Symbol', 'Dot Density']
-  ],
-  [
-    'MultiPolygon',
-    ['Polygon', 'Choropleth', 'Point', 'Proportional Symbol', 'Dot Density']
-  ],
-  ['GeometryCollection', []]
-]);
-
-export const PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
-  VectorGeometry,
-  LayerType[]
->([
-  ['Point', ['Point', 'Proportional Symbol', 'Heatmap']],
-  ['Line', ['Line']],
-  ['Polygon', ['Polygon', 'Choropleth']]
-]);
-
-// A map of GeoParquet Geometry types to the supported cartokit layer types.
-// GeoParquet geometry cannot be transformed, so only layer types that render
-// the source geometry directly are supported.
-export const GEOPARQUET_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
+export const SIMPLE_FEATURES_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   Geometry['type'],
   LayerType[]
 >([
@@ -99,4 +68,13 @@ export const GEOPARQUET_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   ['Polygon', ['Polygon', 'Choropleth']],
   ['MultiPolygon', ['Polygon', 'Choropleth']],
   ['GeometryCollection', []]
+]);
+
+export const PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
+  VectorGeometry,
+  LayerType[]
+>([
+  ['Point', ['Point', 'Proportional Symbol', 'Heatmap']],
+  ['Line', ['Line']],
+  ['Polygon', ['Polygon', 'Choropleth']]
 ]);

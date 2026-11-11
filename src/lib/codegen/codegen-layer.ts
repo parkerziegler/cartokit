@@ -18,8 +18,7 @@ export function codegenLayer(layer: CartoKitLayer, beforeId?: string): string {
 
   switch (layer.type) {
     case 'Point':
-    case 'Proportional Symbol':
-    case 'Dot Density': {
+    case 'Proportional Symbol': {
       const fill = codegenFill(layer);
       const stroke = codegenStroke(layer);
 

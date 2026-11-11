@@ -97,10 +97,6 @@ test.describe('undo', () => {
   });
 
   test('should undo removing a layer', async ({ page }) => {
-    // Undoing a "remove-layer" diff applies an "add-layer" diff taken from the
-    // undo stack, which crosses a structured clone boundary into the catalog
-    // worker. Collect page errors so a failure to clone surfaces here, rather
-    // than as a layer that silently fails to return.
     const errors: Error[] = [];
     page.on('pageerror', (error) => errors.push(error));
 
@@ -114,8 +110,6 @@ test.describe('undo', () => {
     // Undo the "remove-layer" diff.
     await page.keyboard.press('ControlOrMeta+z');
 
-    // Wait for the layer to return; restoring it rebuilds its catalog in a
-    // worker thread.
     await expect(layerEntry).toHaveCount(1, { timeout: 10000 });
     await expect(layerEntry).toContainText('Climate Impact Regions');
 

@@ -1,69 +1,35 @@
 /**
- * Represents the kind of transformation.
+ * A transformation that buffers each geometry by a fixed distance, via
+ * ST_Buffer.
  */
-export type TransformationKind = 'geometric' | 'user';
+export interface BufferTransformation {
+  /** The type of the transformation, 'Buffer'. */
+  type: 'Buffer';
+  args: {
+    /** The buffer distance, in meters. */
+    distance: number;
+  };
+}
 
-/**
- * Represents a transformation applied to a layer.
- */
-interface BaseTransformation {
-  /** The function name of the transformation. */
-  name: string;
-  /** The function parameters of the transformation. */
-  params: string[];
-  /** The types of the function parameters of the transformation. */
-  paramTypes: string[];
-  /** The type of the function return value of the transformation. */
-  returnType: string;
-  /** The TypeScript function body of the transformation. */
-  definitionTS: string;
-  /** The JavaScript function body of the transformation. */
-  definitionJS: string;
+/** A transformation that reduces each geometry to its centroid. */
+interface CentroidTransformation {
+  /** The type of the transformation, 'Centroid'. */
+  type: 'Centroid';
+  /** Centroid takes no parameters. */
+  args: Record<string, never>;
 }
 
 /**
- * Represents a {@link BaseTransformation} modifying the geometry of a layer.
+ * A transformation that reduces each geometry to its bounding box, via
+ * ST_Envelope.
  */
-export interface GeometricTransformation extends BaseTransformation {
-  /** The kind of the transformation, used for type discrimination. */
-  kind: 'geometric';
+interface EnvelopeTransformation {
+  /** The type of the transformation, 'Envelope'. */
+  type: 'Envelope';
+  /** Envelope takes no parameters. */
+  args: Record<string, never>;
 }
 
-/**
- * Represents a {@link BaseTransformation} defined by a user.
- */
-export interface UserTransformation extends BaseTransformation {
-  /** The kind of the transformation, used for type discrimination. */
-  kind: 'user';
-}
-
-/**
- * Represents the definition of a transformation on GeoJSON data.
- */
-export type Transformation = GeometricTransformation | UserTransformation;
-
-/**
- * Represents a concrete call of a {@link GeometricTransformation}.
- */
-export interface GeometricTransformationCall extends BaseTransformation {
-  /** The kind of the transformation, used for type discrimination. */
-  kind: 'geometric';
-  /** Argument values passed to the transformation. */
-  args: (string | number)[];
-}
-
-/**
- * Represents a concrete call of a {@link UserTransformation}.
- */
-export interface UserTransformationCall extends BaseTransformation {
-  /** The kind of the transformation, used for type discrimination. */
-  kind: 'user';
-  /** Argument values passed to the transformation. */
-  args: (string | number)[];
-}
-
-/**
- * Represents a concrete call of a {@link Transformation}.
- */
-export type TransformationCall =
-  GeometricTransformationCall | UserTransformationCall;
+/** The possible transformations that can be applied to a layer's table. */
+export type Transformation =
+  BufferTransformation | CentroidTransformation | EnvelopeTransformation;

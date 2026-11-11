@@ -68,20 +68,6 @@ const LAYER_TYPE_DIFFS: Record<LayerType, string[]> = {
     'add-stroke',
     'remove-stroke'
   ],
-  'Dot Density': [
-    'fill-color',
-    'fill-opacity',
-    'add-fill',
-    'remove-fill',
-    'stroke-color',
-    'stroke-width',
-    'stroke-opacity',
-    'add-stroke',
-    'remove-stroke',
-    'size',
-    'dot-attribute',
-    'dot-value'
-  ],
   Heatmap: [
     'heatmap-ramp',
     'heatmap-ramp-direction',
@@ -445,7 +431,6 @@ function makeSourceLayerIdsSchema(ids: string[]) {
 
 const LayerTypeSchema = z.union([
   z.literal('Choropleth'),
-  z.literal('Dot Density'),
   z.literal('Heatmap'),
   z.literal('Line'),
   z.literal('Point'),
@@ -662,18 +647,6 @@ const MaxSizeDiff = z.object({
   })
 });
 
-const DotValueDiff = z.object({
-  type: z.literal('dot-value'),
-  layerId: z.string(),
-  payload: z.object({ value: z.number().min(0) })
-});
-
-const DotAttributeDiff = z.object({
-  type: z.literal('dot-attribute'),
-  layerId: z.string(),
-  payload: z.object({ attribute: z.string() })
-});
-
 const HeatmapOpacityDiff = z.object({
   type: z.literal('heatmap-opacity'),
   layerId: z.string(),
@@ -880,8 +853,6 @@ const DiffSchema = z.object({
       SizeDiff,
       MinSizeDiff,
       MaxSizeDiff,
-      DotValueDiff,
-      DotAttributeDiff,
       HeatmapOpacityDiff,
       HeatmapRadiusDiff,
       HeatmapRampDiff,

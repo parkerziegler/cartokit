@@ -10,7 +10,7 @@
   import TextInput from '$lib/components/shared/TextInput.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { map } from '$lib/state/map.svelte';
-  import type { CartoKitSource } from '$lib/types';
+  import type { CartoKitSource } from '$lib/types/source';
   import { extname } from '$lib/utils/file';
 
   const closeModal = getContext<() => void>('close-modal');

@@ -44,24 +44,3 @@ export function deriveSize(
     rMax
   ];
 }
-
-/**
- * Obtain a starting dot value for a {@link CartoKitDotDensityLayer} based on
- * the maximum value of the data attribute.
- *
- * @param layerId The ID of the {@link CartoKitDotDensityLayer}.
- * @param attribute The attribute of the {@link CartoKitDotDensityLayer} to use
- * for the starting dot value.
- * @returns The starting dot value.
- */
-export function deriveDotDensityStartingValue(
-  layerId: string,
-  attribute: string
-): number {
-  const { min, max } = catalog.value[layerId].attributes[
-    attribute
-  ] as QuantitativeAttributeEntry;
-
-  // Aim for a ratio where the number of dots is 10% of the range.
-  return (max - min) * 0.1 || 1;
-}

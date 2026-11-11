@@ -5,9 +5,9 @@
   import { ir } from '$lib/stores/ir';
 </script>
 
-{#if Object.keys($ir.layers).length > 0}
+{#if Object.values($ir.layers).some((layer) => !layer.layout.deleted)}
   <ul class="flex flex-col gap-4 p-4 font-mono text-white">
-    {#each orderBy(Object.values($ir.layers), 'layout.z', 'desc') as layer (layer.id)}
+    {#each orderBy( Object.values($ir.layers).filter((layer) => !layer.layout.deleted), 'layout.z', 'desc' ) as layer (layer.id)}
       <LayerEntry {layer} />
     {/each}
   </ul>

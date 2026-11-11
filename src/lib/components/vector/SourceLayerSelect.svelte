@@ -2,7 +2,7 @@
   import Select from '$lib/components/shared/Select.svelte';
   import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
   import { error } from '$lib/state/error.svelte';
-  import type { CartoKitPMTilesSource } from '$lib/types';
+  import type { CartoKitPMTilesSource } from '$lib/types/source';
 
   interface Props {
     layerId: string;

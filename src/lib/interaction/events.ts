@@ -9,6 +9,7 @@ import { ir } from '$lib/stores/ir';
 import { layout } from '$lib/stores/layout';
 import type { CartoKitLayer } from '$lib/types';
 import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
+import { contextMenu } from '$lib/state/context-menu.svelte';
 
 /**
  * Add a hover effect to all features in a point layer.
@@ -362,11 +363,19 @@ function addSelectListeners(
 
   map.on('click', lyrId, onClick);
 
-  const layerListeners = listeners.value.get(lyrId)!;
+  function onContextMenu(e: MapMouseEvent) {
+    contextMenu.x = e.originalEvent.clientX;
+    contextMenu.y = e.originalEvent.clientY;
+    contextMenu.layerId = lyrId;
+  }
 
+  map.on('contextmenu', lyrId, onContextMenu);
+
+  const layerListeners = listeners.value.get(lyrId)!;
   listeners.value.set(lyrId, {
     ...layerListeners,
-    click: onClick
+    click: onClick,
+    contextmenu: onContextMenu
   });
 }
 
@@ -383,11 +392,6 @@ export function onFeatureLeave(
 ): (event: MapMouseEvent) => void {
   return (event: MapMouseEvent): void => {
     const layerIds = Object.values(layers).map((layer) => {
-      // For dot density layers, we need to deselect the outlines layer.
-      if (layer.type === 'Dot Density') {
-        return `${layer.id}-outlines`;
-      }
-
       // For heatmap layers, we need to deselect the points layer.
       if (layer.type === 'Heatmap') {
         return `${layer.id}-points`;
@@ -441,6 +445,9 @@ export function onFeatureLeave(
         'selected'
       );
     }
+
+    // Remove the context menu in all instances.
+    contextMenu.layerId = '';
   };
 }
 

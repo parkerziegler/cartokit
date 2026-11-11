@@ -3,62 +3,7 @@ import type {
   CartoKitBackend,
   CartoKitBackendAnalysis
 } from '$lib/types/codegen';
-
-/**
- * Determine whether @turf/turf is required for cross-geometry transformations.
- *
- * @param ir – The CartoKit IR.
- * @returns – A Boolean value indicating whether @turf/turf is required.
- */
-function isTurfRequired(ir: CartoKitIR): boolean {
-  return Object.values(ir.layers).some(
-    (layer) =>
-      layer.source.type === 'geojson' &&
-      layer.source.transformations.filter(
-        (transformation) => transformation.kind === 'geometric'
-      ).length > 0
-  );
-}
-
-/**
- * Determine whether we need to insert a function to fetch GeoJSON hosted at a
- * remote URL.
- *
- * @param ir – The CartoKit IR.
- * @returns – A Boolean value indicting whether we need to insert a function to
- * fetch GeoJSON hosted at a remote URL.
- */
-function isFetchGeoJSONRequired(ir: CartoKitIR): boolean {
-  return Object.values(ir.layers).some(
-    (layer) =>
-      layer.source.type === 'geojson' &&
-      layer.source.location.type === 'api' &&
-      layer.source.transformations.length > 0
-  );
-}
-
-/**
- * Determine whether we need to insert an import of the GeoJSON namespace.
- * This is only relevant for TypeScript codegen.
- *
- * @param ir The CartoKit IR.
- * @param backend The code generation {@link CartoKitBackend} for the analysis.
- * @returns A Boolean value indicating whether we need to include the
- * @types/geojson devDependency.
- */
-export function isGeoJSONNamespaceRequired(
-  ir: CartoKitIR,
-  backend: CartoKitBackend
-): boolean {
-  return (
-    backend.language === 'typescript' &&
-    Object.values(ir.layers).some(
-      (layer) =>
-        layer.source.type === 'geojson' &&
-        layer.source.transformations.length > 0
-    )
-  );
-}
+import { getLayerDescendants } from '$lib/utils/ir';
 
 /**
  * Determine whether we need to include the PMTiles client library.
@@ -79,14 +24,16 @@ export function isPMTilesRequired(
 }
 
 /**
- * Determine whether we need to include DuckDB to load GeoParquet sources.
+ * Determine whether we need to include DuckDB to load GeoParquet sources or
+ * derive layers from other layers.
  *
  * @param ir The current {@link CartoKitIR}.
  * @returns A Boolean value indicating whether DuckDB is required.
  */
 function isDuckDBRequired(ir: CartoKitIR): boolean {
   return Object.values(ir.layers).some(
-    (layer) => layer.source.type === 'geoparquet'
+    (layer) =>
+      layer.source.type === 'geoparquet' || layer.source.type === 'table'
   );
 }
 
@@ -106,6 +53,25 @@ function isDuckDBDataProtocolRequired(ir: CartoKitIR): boolean {
 }
 
 /**
+ * Determine whether we need the DuckDB instance to register files, either local
+ * GeoParquet files or uploaded GeoJSON files read by derived layers.
+ *
+ * @param ir The current {@link CartoKitIR}.
+ * @returns A Boolean value indicating whether file registration is required.
+ */
+function isDuckDBFileRegistrationRequired(ir: CartoKitIR): boolean {
+  return (
+    isDuckDBDataProtocolRequired(ir) ||
+    Object.values(ir.layers).some(
+      (layer) =>
+        layer.source.type === 'geojson' &&
+        layer.source.location.type === 'file' &&
+        getLayerDescendants(ir, layer.id).size > 0
+    )
+  );
+}
+
+/**
  * Analyze the CartoKit IR to glean relevant information for code generation.
  *
  * @param ir The CartoKit IR.
@@ -119,11 +85,9 @@ export function analyzeIR(
   return {
     language: backend.language,
     library: backend.library,
-    isTurfRequired: isTurfRequired(ir),
-    isFetchGeoJSONRequired: isFetchGeoJSONRequired(ir),
-    isGeoJSONNamespaceRequired: isGeoJSONNamespaceRequired(ir, backend),
     isPMTilesRequired: isPMTilesRequired(ir, backend),
     isDuckDBRequired: isDuckDBRequired(ir),
-    isDuckDBDataProtocolRequired: isDuckDBDataProtocolRequired(ir)
+    isDuckDBDataProtocolRequired: isDuckDBDataProtocolRequired(ir),
+    isDuckDBFileRegistrationRequired: isDuckDBFileRegistrationRequired(ir)
   };
 }

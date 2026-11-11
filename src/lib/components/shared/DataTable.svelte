@@ -3,30 +3,28 @@
   import * as d3 from 'd3';
   import type { Feature } from 'geojson';
   import { orderBy, isEqual } from 'lodash-es';
+  import type { Map } from 'maplibre-gl';
+  import { onMount } from 'svelte';
   import type { ClassValue } from 'svelte/elements';
   import { slide } from 'svelte/transition';
 
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
-  import { map } from '$lib/state/map.svelte';
-  import type { CartoKitSource } from '$lib/types';
   import { pluralize } from '$lib/utils/formatters/shared';
 
   interface Props {
-    rows: Feature[];
-    columns: string[];
-    tableName: string;
-    onClose: () => void;
-    sourceType: CartoKitSource['type'];
     class?: ClassValue;
+    layerId: string;
+    map: Map;
+    onClose: () => void;
+    tableName: string;
   }
 
   let {
-    rows,
-    columns,
-    tableName,
+    class: className = '',
+    layerId,
+    map,
     onClose,
-    sourceType,
-    class: className = ''
+    tableName
   }: Props = $props();
 
   const ROW_HEIGHT = 33;
@@ -34,8 +32,22 @@
 
   let root: HTMLDivElement;
 
+  let rows = $state<Feature[]>([]);
+  let columns = $state<string[]>([]);
   let sort = $state<{ col: string; desc: boolean }>({ col: '', desc: true });
   let selectedRow = $state<Feature | null>(null);
+
+  onMount(() => {
+    // Query visible map features once on mount.
+    queryRenderedFeatures();
+
+    // Initialize an event listener to update features on map idle.
+    map.on('idle', queryRenderedFeatures);
+
+    return () => {
+      map.off('idle', queryRenderedFeatures);
+    };
+  });
 
   const data = $derived(
     orderBy<Feature>(rows, `properties['${sort.col}']`, [
@@ -53,6 +65,17 @@
       root.scrollTop = 0;
     }
   });
+
+  function queryRenderedFeatures() {
+    const features = map.queryRenderedFeatures({
+      layers: [layerId]
+    });
+
+    if (features.length > 0) {
+      rows = features;
+      columns = Object.keys(features[0].properties);
+    }
+  }
 
   function minlengthof(d: Feature[], length: number) {
     return Math.min(d.length, length);
@@ -80,7 +103,7 @@
     selectedRow = materializedRow;
     const bounds = bbox(materializedRow);
 
-    map.value!.fitBounds(
+    map.fitBounds(
       [
         [bounds[0], bounds[1]],
         [bounds[2], bounds[3]]
@@ -113,9 +136,7 @@
     <div class="flex gap-4">
       <span
         >{d3.format(',')(data.length)}
-        {pluralize('Feature', data.length)}{sourceType !== 'geojson'
-          ? ' in Viewport'
-          : ''}</span
+        {pluralize('Feature', data.length)} in Viewport</span
       >
       <button onclick={onClose}>
         <CloseIcon />

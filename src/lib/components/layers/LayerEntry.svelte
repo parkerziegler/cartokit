@@ -1,19 +1,17 @@
 <script lang="ts">
   import { tooltip } from '$lib/attachments/tooltip';
   import ChoroplethIcon from '$lib/components/icons/ChoroplethIcon.svelte';
-  import DotDensityIcon from '$lib/components/icons/DotDensityIcon.svelte';
   import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
   import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
   import LayerVisibleIcon from '$lib/components/icons/LayerVisibleIcon.svelte';
   import LineIcon from '$lib/components/icons/LineIcon.svelte';
-  import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
   import PointIcon from '$lib/components/icons/PointIcon.svelte';
   import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
+  import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
   import TooltipHiddenIcon from '$lib/components/icons/TooltipHiddenIcon.svelte';
   import TooltipIcon from '$lib/components/icons/TooltipIcon.svelte';
-  import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
+  import RemoveLayer from '$lib/components/layers/RemoveLayer.svelte';
   import ChoroplethLegend from '$lib/components/legends/ChoroplethLegend.svelte';
-  import DotDensityLegend from '$lib/components/legends/DotDensityLegend.svelte';
   import HeatmapLegend from '$lib/components/legends/HeatmapLegend.svelte';
   import LineLegend from '$lib/components/legends/LineLegend.svelte';
   import PointLegend from '$lib/components/legends/PointLegend.svelte';
@@ -53,18 +51,6 @@
       layerId: layer.id,
       payload: {
         visible: !layer.layout.tooltip.visible
-      }
-    };
-
-    await applyDiff(diff);
-  }
-
-  async function removeLayer() {
-    const diff: CartoKitDiff = {
-      type: 'remove-layer',
-      layerId: layer.id,
-      payload: {
-        sourceLayerType: layer.type
       }
     };
 
@@ -167,8 +153,6 @@
       <span class="shrink-0">
         {#if layer.type === 'Choropleth'}
           <ChoroplethIcon />
-        {:else if layer.type === 'Dot Density'}
-          <DotDensityIcon />
         {:else if layer.type === 'Heatmap'}
           <HeatmapIcon />
         {:else if layer.type === 'Line'}
@@ -230,22 +214,11 @@
           <TooltipHiddenIcon />
         {/if}
       </button>
-      <button
-        {@attach tooltip({
-          content: 'Remove Layer'
-        })}
-        onclick={removeLayer}
-        class="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-slate-500 focus:bg-slate-500"
-        data-testid="remove-layer-button"
-      >
-        <MinusIcon />
-      </button>
+      <RemoveLayer {layer} />
     </div>
   </div>
   {#if layer.type === 'Choropleth'}
     <ChoroplethLegend {layer} />
-  {:else if layer.type === 'Dot Density'}
-    <DotDensityLegend {layer} />
   {:else if layer.type === 'Heatmap'}
     <HeatmapLegend {layer} />
   {:else if layer.type === 'Line'}

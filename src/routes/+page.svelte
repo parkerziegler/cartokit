@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Feature } from 'geojson';
   import { addProtocol, Map } from 'maplibre-gl';
   import * as pmtiles from 'pmtiles';
   import { onMount } from 'svelte';
@@ -7,11 +6,12 @@
   import type { PageData } from './$types';
 
   import { page } from '$app/state';
-  import Cursor from '$lib/components/cursor/Cursor.svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
   import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
   import AddLayer from '$lib/components/layers/AddLayer.svelte';
   import LayerPanel from '$lib/components/layers/LayerPanel.svelte';
+  import ContextMenu from '$lib/components/mouse/ContextMenu.svelte';
+  import Cursor from '$lib/components/mouse/Cursor.svelte';
   import PropertiesMenu from '$lib/components/properties/PropertiesMenu.svelte';
   import Alert from '$lib/components/shared/Alert.svelte';
   import DataTable from '$lib/components/shared/DataTable.svelte';
@@ -21,6 +21,7 @@
   import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
   import { onFeatureLeave } from '$lib/interaction/events';
   import { chat } from '$lib/state/chat.svelte';
+  import { contextMenu } from '$lib/state/context-menu.svelte';
   import { db } from '$lib/state/db.svelte';
   import { error } from '$lib/state/error.svelte';
   import { initHistory } from '$lib/state/history.svelte';
@@ -40,44 +41,6 @@
   let { data }: Props = $props();
 
   let map = $state<Map>();
-  let features = $state<Feature[]>([]);
-  let table = $derived.by<{ columns: string[]; rows: Feature[] }>(() => {
-    if (layerId.value) {
-      const layer = $ir.layers[layerId.value];
-
-      switch (layer.source.type) {
-        case 'geojson': {
-          return {
-            rows: layer.source.data.features,
-            columns: Object.keys(
-              layer.source.data.features[0]?.properties ?? {}
-            )
-          };
-        }
-        case 'geoparquet':
-        case 'pmtiles': {
-          if (features.length > 0) {
-            return {
-              rows: features,
-              columns: Object.keys(features[0].properties ?? {})
-            };
-          }
-
-          const queriedFeatures =
-            map?.queryRenderedFeatures({
-              layers: [layer.id]
-            }) ?? [];
-
-          return {
-            rows: queriedFeatures,
-            columns: Object.keys(queriedFeatures[0]?.properties ?? {})
-          };
-        }
-      }
-    }
-
-    return { columns: [], rows: [] };
-  });
 
   // We intentionally capture the values of data.userId and data.enableChat
   // from the load function in +page.server.ts.
@@ -138,6 +101,9 @@
 
         return ir;
       });
+
+      // Clear the context menu, if present.
+      contextMenu.layerId = '';
     });
 
     map.on('zoom', (event) => {
@@ -146,6 +112,9 @@
 
         return ir;
       });
+
+      // Clear the context menu, if present.
+      contextMenu.layerId = '';
     });
 
     map.on('pitch', (event) => {
@@ -154,6 +123,9 @@
 
         return ir;
       });
+
+      // Clear the context menu, if present.
+      contextMenu.layerId = '';
     });
 
     map.on('rotate', (event) => {
@@ -162,6 +134,9 @@
 
         return ir;
       });
+
+      // Clear the context menu, if present.
+      contextMenu.layerId = '';
     });
 
     map.on('style.load', (event) => {
@@ -169,24 +144,9 @@
       event.target.setProjection({ type: $ir.projection });
     });
 
-    // Add an idle listener that will update features in the DataTable when a
-    // PMTiles or GeoParquet layer is active. GeoJSON layers already have their
-    // data available in memory, so we can populate the DataTable directly.
-    map.on('idle', (e) => {
-      const currentLayer = layerId.value
-        ? $ir.layers[layerId.value]
-        : undefined;
-
-      if (currentLayer && currentLayer.source.type !== 'geojson') {
-        features = e.target.queryRenderedFeatures({
-          layers: [currentLayer.id]
-        });
-      }
-    });
-
     map.on('error', (err) => {
       console.error(err);
-      error.set('A map rendering error occurred.');
+      error.set('An error occurred. Please start a new session.');
     });
 
     const destroyHistory = initHistory();
@@ -272,18 +232,17 @@
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
       <span class="text-slate-400">E</span>
     </button>
-    {#if $layout.dataVisible && layerId.value}
+    {#if map && layerId.value && $layout.dataVisible}
       {@const layer = $ir.layers[layerId.value]}
       <DataTable
-        rows={table.rows}
-        columns={table.columns}
-        tableName={layer.displayName}
-        onClose={onViewDataClose}
-        sourceType={layer.source.type}
         class={[
           'ease-cubic-out absolute bottom-0 h-72 transition-all duration-400',
           $layout.editorVisible ? 'w-2/3' : 'w-full'
         ]}
+        layerId={layerId.value}
+        {map}
+        onClose={onViewDataClose}
+        tableName={layer.displayName}
       />
     {/if}
   </div>
@@ -303,4 +262,7 @@
   {/if}
   <Cursor />
   <Popup />
+  {#key contextMenu.layerId}
+    <ContextMenu />
+  {/key}
 </main>

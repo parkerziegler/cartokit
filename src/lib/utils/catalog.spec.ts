@@ -12,12 +12,11 @@ import {
   NODE_RUNTIME,
   VoidLogger
 } from '@duckdb/duckdb-wasm/blocking';
-import type { FeatureCollection } from 'geojson';
 import { beforeAll, describe, expect, test } from 'vitest';
 
-import type { CartoKitLayer, QuantitativeStepCount } from '$lib/types';
+import type { QuantitativeStepCount } from '$lib/types';
 import type { Catalog, QuantitativeAttributeEntry } from '$lib/types/catalog';
-import type { DuckDBTable } from '$lib/types/db';
+import type { CartoKitGeoJSONSource } from '$lib/types/source';
 import { buildCatalog } from '$lib/utils/catalog';
 import { createTable } from '$lib/utils/db';
 
@@ -85,8 +84,9 @@ function selectQuantitativeEntries(catalog: Catalog, layerId: string) {
 }
 
 describe('buildCatalog', () => {
+  const layerId = 'us_counties_unemployment__1';
   let conn: AsyncDuckDBConnection;
-  const tables: Record<string, DuckDBTable> = {};
+  let source: CartoKitGeoJSONSource;
 
   beforeAll(async () => {
     const testDB = await initTestDB();
@@ -96,26 +96,7 @@ describe('buildCatalog', () => {
     // then create its table by reading from the registered file name.
     testDB.db.registerFileText(fileName, JSON.stringify(fixture));
 
-    tables[layer.id] = await createTable(
-      testDB.db as unknown as AsyncDuckDB,
-      conn,
-      layer.id,
-      { type: 'api', url: fileName }
-    );
-  });
-
-  const layer: CartoKitLayer = {
-    id: 'us_counties_unemployment__1',
-    type: 'Polygon',
-    displayName: 'US Counties Unemployment',
-    layout: {
-      visible: true,
-      z: 0,
-      tooltip: {
-        visible: true
-      }
-    },
-    source: {
+    source = {
       type: 'geojson',
       location: {
         type: 'file',
@@ -123,33 +104,18 @@ describe('buildCatalog', () => {
           type: 'application/json'
         })
       },
-      data: fixture as FeatureCollection,
-      sourceData: fixture as FeatureCollection,
-      transformations: []
-    },
-    style: {
-      fill: {
-        type: 'Constant',
-        color: '#000000',
-        opacity: 0.5,
-        visible: true
-      },
-      stroke: {
-        type: 'Constant',
-        color: '#000000',
-        width: 1,
-        opacity: 0.5,
-        visible: true
-      }
-    }
-  };
+      table: await createTable({
+        db: testDB.db as unknown as AsyncDuckDB,
+        conn,
+        layerId,
+        location: { type: 'api', url: fileName }
+      })
+    };
+  });
 
   test('should build a catalog with minimum and maximum values', async () => {
-    const catalog = await buildCatalog(layer.id, layer.source, {
-      conn,
-      table: tables[layer.id]
-    });
-    const entries = selectQuantitativeEntries(catalog, layer.id);
+    const catalog = await buildCatalog(layerId, source, conn);
+    const entries = selectQuantitativeEntries(catalog, layerId);
 
     expect(entries.length).toBeGreaterThan(0);
     entries.forEach((entry) => {
@@ -159,11 +125,8 @@ describe('buildCatalog', () => {
   });
 
   test('should produce a defined domain on all attributes', async () => {
-    const catalog = await buildCatalog(layer.id, layer.source, {
-      conn,
-      table: tables[layer.id]
-    });
-    const entries = selectQuantitativeEntries(catalog, layer.id);
+    const catalog = await buildCatalog(layerId, source, conn);
+    const entries = selectQuantitativeEntries(catalog, layerId);
 
     expect(entries.length).toBeGreaterThan(0);
     entries.forEach((entry) => {
@@ -173,11 +136,8 @@ describe('buildCatalog', () => {
   });
 
   test('should produce defined breaks on all attributes', async () => {
-    const catalog = await buildCatalog(layer.id, layer.source, {
-      conn,
-      table: tables[layer.id]
-    });
-    const entries = selectQuantitativeEntries(catalog, layer.id);
+    const catalog = await buildCatalog(layerId, source, conn);
+    const entries = selectQuantitativeEntries(catalog, layerId);
 
     expect(entries.length).toBeGreaterThan(0);
     entries.forEach((entry) => {

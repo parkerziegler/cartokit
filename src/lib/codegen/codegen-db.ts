@@ -1,12 +1,16 @@
-import tsBlankSpace from 'ts-blank-space';
-import { Project, SyntaxKind } from 'ts-morph';
+import { Project, SyntaxKind, ScriptTarget, ModuleKind, ts } from 'ts-morph';
 
 import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
 import dbSrc from '$lib/utils/db?raw';
 
 // Create a new project using ts-morph to parse the source code for TypeScript.
-const project = new Project({ useInMemoryFileSystem: true });
-const tsSourceFile = project.createSourceFile('db.ts', dbSrc);
+const projectTS = new Project({
+  useInMemoryFileSystem: true,
+  compilerOptions: {
+    target: ScriptTarget.ESNext
+  }
+});
+const tsSourceFile = projectTS.createSourceFile('db.ts', dbSrc);
 
 export function codegenDB(
   language: CartoKitBackendAnalysis['language']
@@ -60,7 +64,18 @@ export function codegenDB(
 
 ${body}`;
 
-  // Use tsBlankSpace to erase type syntax rather than emitting via ts-morph.
-  // The latter will strip intentional newlines, harming readability.
-  return language === 'typescript' ? program : tsBlankSpace(program);
+  if (language === 'typescript') {
+    return program;
+  }
+
+  // Strip types from the program. This is a single-file transform, so we don't
+  // need a full ts-morph Project here.
+  return ts
+    .transpileModule(program, {
+      compilerOptions: {
+        target: ScriptTarget.ESNext,
+        module: ModuleKind.ESNext
+      }
+    })
+    .outputText.replaceAll(/^(\s*)(export|return)\b/gm, '\n$1$2');
 }

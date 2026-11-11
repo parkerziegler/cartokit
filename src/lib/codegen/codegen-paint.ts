@@ -44,22 +44,6 @@ export function codegenFill(layer: CartoKitLayer): string {
         .filter(Boolean)
         .join(',\n');
     }
-    case 'Dot Density': {
-      if (!layer.style.fill) {
-        return `'circle-opacity': 0`;
-      }
-
-      return [
-        withDefault('circle-color', layer.style.fill.color),
-        withDefault('circle-radius', layer.style.size),
-        withDefault(
-          'circle-opacity',
-          layer.style.fill.visible ? layer.style.fill.opacity : 0
-        )
-      ]
-        .filter(Boolean)
-        .join(',\n');
-    }
     case 'Line':
       return '';
     case 'Polygon': {
@@ -105,8 +89,7 @@ export function codegenFill(layer: CartoKitLayer): string {
 export function codegenStroke(layer: CartoKitLayer): string {
   switch (layer.type) {
     case 'Point':
-    case 'Proportional Symbol':
-    case 'Dot Density': {
+    case 'Proportional Symbol': {
       if (!layer.style.stroke.visible) {
         return '';
       }

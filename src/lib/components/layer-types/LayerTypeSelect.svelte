@@ -5,8 +5,7 @@
   import { error } from '$lib/state/error.svelte';
   import type { CartoKitLayer, LayerType } from '$lib/types';
   import {
-    GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES,
-    GEOPARQUET_GEOMETRY_TYPES_TO_LAYER_TYPES,
+    SIMPLE_FEATURES_GEOMETRY_TYPES_TO_LAYER_TYPES,
     PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES
   } from '$lib/utils/layer';
 
@@ -17,9 +16,9 @@
   let { layer }: Props = $props();
 
   let options = $derived(
-    (getLayerTypes(layer) ?? []).map((layerType) => ({
-      value: layerType,
-      label: layerType
+    (getLayerTypes(layer) ?? []).map((type) => ({
+      value: type,
+      label: type
     }))
   );
 
@@ -27,11 +26,12 @@
     const entry = catalog.value[layer.id];
 
     switch (entry.type) {
-      case 'geojson': {
-        return GEOJSON_GEOMETRY_TYPES_TO_LAYER_TYPES.get(entry.geometryType);
-      }
-      case 'geoparquet': {
-        return GEOPARQUET_GEOMETRY_TYPES_TO_LAYER_TYPES.get(entry.geometryType);
+      case 'geojson':
+      case 'geoparquet':
+      case 'table': {
+        return SIMPLE_FEATURES_GEOMETRY_TYPES_TO_LAYER_TYPES.get(
+          entry.geometryType
+        );
       }
       case 'pmtiles': {
         return PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES.get(entry.geometryType);
