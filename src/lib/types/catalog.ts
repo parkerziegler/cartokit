@@ -67,7 +67,7 @@ export type AttributeEntry =
 
 /** Represents the base fields for a {@link CartoKitLayer} stored in DuckDB. */
 interface DuckDBCatalogEntry {
-  /** The geometry type of the GeoParquet file's primary geometry column. */
+  /** The geometry type of the file's primary geometry column. */
   geometryType: Geometry['type'];
   /** The number of features in the layer. */
   count: number;

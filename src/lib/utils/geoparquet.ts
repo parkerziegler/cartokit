@@ -20,24 +20,33 @@ const DUCKDB_GEOMETRY_TYPES_TO_GEOJSON_GEOMETRY_TYPES: Record<
   GEOMETRYCOLLECTION: 'GeometryCollection'
 };
 
+interface GetGeoParquetGeometryTypeParams {
+  conn: AsyncDuckDBConnection;
+  source: string;
+  layerId: string;
+  geometryColumn: string;
+}
+
 /**
  * Get the {@link Geometry['type']} of a GeoParquet file from the geometry_types
  * recorded for its primary geometry column in the file's geo metadata. The
  * GeoParquet spec permits geometry_types to be empty, in which case we fall
  * back to the type of the first non-null geometry in the layer's table.
  *
- * @param conn The active DuckDB database connection.
- * @param source The URL or registered file name of the GeoParquet file.
- * @param layerId The id of the layer whose table holds the file's data.
- * @param geometryColumn The name of the geometry column in the layer's table.
+ * @param params The {@link GetGeoParquetGeometryTypeParams}.
+ * @param params.conn The active DuckDB database connection.
+ * @param params.source The URL or registered file name of the GeoParquet file.
+ * @param params.layerId The id of the layer whose table holds the file's data.
+ * @param params.geometryColumn The name of the geometry column in the layer's
+ * table.
  * @returns The {@link Geometry['type']} of the GeoParquet file.
  */
-export async function getGeoParquetGeometryType(
-  conn: AsyncDuckDBConnection,
-  source: string,
-  layerId: string,
-  geometryColumn: string
-): Promise<Geometry['type']> {
+export async function getGeoParquetGeometryType({
+  conn,
+  source,
+  layerId,
+  geometryColumn
+}: GetGeoParquetGeometryTypeParams): Promise<Geometry['type']> {
   const [metadata] = (
     await conn.query(
       `WITH metadata AS (

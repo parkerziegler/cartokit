@@ -17,11 +17,7 @@ export function reconPoint(
 ): void {
   switch (sourceLayerType) {
     case 'Heatmap':
-      redraw({
-        map: map.value!,
-        sourceLayerId,
-        targetLayer
-      });
+      redraw(map.value!, sourceLayerId, targetLayer);
       break;
     case 'Proportional Symbol':
       // Update the circle-radius of the existing layer. All other paint

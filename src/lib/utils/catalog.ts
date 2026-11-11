@@ -1,5 +1,6 @@
 import type { AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 import * as d3 from 'd3';
+import type { Geometry } from 'geojson';
 
 import type { QuantitativeStepCount } from '$lib/types';
 import {
@@ -18,37 +19,46 @@ import {
   deriveJenksBreaks,
   deriveQuantiles
 } from '$lib/utils/scales';
-import type { Geometry } from 'geojson';
+
+interface DeriveGeometryTypeParams {
+  conn: AsyncDuckDBConnection;
+  source: Exclude<CartoKitSource, CartoKitPMTilesSource>;
+  layerId: string;
+  geometryColumn: string;
+}
 
 /**
  * Get the geometry type of data sources stored in DuckDB.
  *
- * @param conn active {@link AsyncDuckDBConnection} to the database.
- * @param source A {@link CartoKitGeoJSONSource}, {@link CartoKitGeoParquetSource},
+ * @param params The {@link DeriveGeometryTypeParams}.
+ * @param params.conn The active {@link AsyncDuckDBConnection} to the database.
+ * @param params.source A {@link CartoKitGeoJSONSource}, {@link CartoKitGeoParquetSource},
  * or {@link CartoKitTableSource}.
- * @param layerId The layer id.
- * @param geometryColumn The name of the geometry column in the layer's table.
+ * @param params.layerId The layer id.
+ * @param params.geometryColumn The name of the geometry column in the layer's
+ * table.
  * @returns The {@link Geometry['type']} of the source.
  */
-async function deriveGeometryType(
-  conn: AsyncDuckDBConnection,
-  source: Exclude<CartoKitSource, CartoKitPMTilesSource>,
-  layerId: string,
-  geometryColumn: string
-): Promise<Geometry['type']> {
+async function deriveGeometryType({
+  conn,
+  source,
+  layerId,
+  geometryColumn
+}: DeriveGeometryTypeParams): Promise<Geometry['type']> {
   switch (source.type) {
     case 'geojson':
     case 'table':
       return await getGeoJSONGeometryType(conn, layerId, geometryColumn);
     case 'geoparquet':
-      return await getGeoParquetGeometryType(
+      return await getGeoParquetGeometryType({
         conn,
-        source.location.type === 'api'
-          ? source.location.url
-          : source.location.file.name,
+        source:
+          source.location.type === 'api'
+            ? source.location.url
+            : source.location.file.name,
         layerId,
         geometryColumn
-      );
+      });
   }
 }
 
@@ -197,12 +207,12 @@ export async function buildCatalog(
 
       catalog[layerId] = {
         type: source.type,
-        geometryType: await deriveGeometryType(
+        geometryType: await deriveGeometryType({
           conn,
           source,
           layerId,
           geometryColumn
-        ),
+        }),
         count: summary.ck_count as number,
         attributes
       };

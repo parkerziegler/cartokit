@@ -22,6 +22,7 @@ import {
   DEFAULT_STROKE_OPACITY,
   DEFAULT_STROKE_WIDTH
 } from '$lib/utils/constants';
+import { getAffiliatedLayerIds } from '$lib/utils/layer';
 
 /**
  * Generate a {@link CartoKitLayer} for a given {@link CartoKitSource}.
@@ -136,8 +137,37 @@ export function generateCartoKitLayer(
 }
 
 /**
- * Add a {@link CartoKitLayer} to the map, beneath the labels of the active
- * basemap.
+ * Get the id of the map layer a {@link CartoKitLayer} should be added before,
+ * so that it is drawn according to its z-index.
+ *
+ * @param map The top-level {@link Map} instance.
+ * @param layer The {@link CartoKitLayer} being added to the map.
+ * @returns The id of the layer to insert before, if any.
+ */
+function getBeforeId(map: Map, layer: CartoKitLayer): string | undefined {
+  const { layers, basemap } = get(ir);
+  const layersAbove = Object.values(layers)
+    .filter(
+      ({ id, layout }) =>
+        id !== layer.id && !layout.deleted && layout.z > layer.layout.z
+    )
+    .sort((a, b) => a.layout.z - b.layout.z);
+
+  for (const { id } of layersAbove) {
+    const [bottomLayerId] = getAffiliatedLayerIds(map, id);
+
+    if (bottomLayerId) {
+      return bottomLayerId;
+    }
+  }
+
+  return basemap.beforeId;
+}
+
+/**
+ * Add a {@link CartoKitLayer} to the map at its z-index, hidden if the layer is
+ * not visible. Layers drawn above all other layers are added beneath the labels
+ * of the active basemap.
  *
  * @param map The top-level {@link Map} instance.
  * @param layer The {@link CartoKitLayer} to add to the map.
@@ -145,7 +175,7 @@ export function generateCartoKitLayer(
 export function addLayer(map: Map, layer: CartoKitLayer): void {
   const sourceLayer =
     layer.source.type === 'pmtiles' ? layer.source.sourceLayerId : undefined;
-  const beforeId = get(ir).basemap.beforeId;
+  const beforeId = getBeforeId(map, layer);
 
   switch (layer.type) {
     case 'Choropleth': {

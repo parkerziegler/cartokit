@@ -79,7 +79,7 @@ export function generateCreateTableStatement(layerId: string, source: string) {
  * Generate the SQL expression that applies a {@link Transformation} to a
  * geometry column.
  *
- * @param op The {@link Transformation} to apply.
+ * @param transformation The {@link Transformation} to apply.
  * @param geometryColumn The name of the geometry column to transform.
  * @returns A SQL expression evaluating to the transformed geometry.
  */

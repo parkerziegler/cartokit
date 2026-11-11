@@ -1,22 +1,14 @@
 import type { DuckDBTable } from '$lib/types/db';
 import type { Transformation } from '$lib/types/transformation';
 
-/**
- * Represents the underlying data and metadata of a GeoJSON layer. This object
- * maintains two copies of a layer's GeoJSON data in memory:
- *
- *   1. The source GeoJSON at the time of layer creation. All accumulated trans-
- *      formations are executed against this copy to produce the current
- *      GeoJSON.
- *   2. The current GeoJSON of the layer, used for display.
- *
- * @property type The type of the source, 'geojson'.
- * @property location The location of the source, either a remote API endpoint
- * or a local file on disk.
- * @property table The {@link DuckDBTable} storing the source's data.
- */
+/** Represents a GeoJSON data source. */
 export interface CartoKitGeoJSONSource {
+  /** The type of the source, 'geojson'. */
   type: 'geojson';
+  /**
+   * The location of the source, either a remote API endpoint or a local file on
+   * disk.
+   */
   location:
     | {
         type: 'api';
@@ -26,6 +18,7 @@ export interface CartoKitGeoJSONSource {
         type: 'file';
         file: File;
       };
+  /** The {@link DuckDBTable} storing the source's data. */
   table: DuckDBTable;
 }
 
@@ -106,23 +99,20 @@ export interface VectorLayer {
   fields: Record<string, 'Number' | 'String' | 'Boolean'>;
 }
 
-/**
- * Represents the underlying data and metadata of a vector tile layer.
- *
- * @property type The type of the source, 'pmtiles'.
- * @property location The location of the source, a remote API endpoint.
- * @property sourceLayerId The id of the source layer in the vector tile archive.
- * @property tilestats The {@link TileStats} metadata of the vector tile source.
- * @property vectorLayers The {@link VectorLayer} metadata of the vector tile source.
- */
+/** Represents the underlying data and metadata of a vector tile layer. */
 export interface CartoKitPMTilesSource {
+  /** The type of the source, 'pmtiles'. */
   type: 'pmtiles';
+  /** The location of the source, a remote API endpoint. */
   location: {
     type: 'api';
     url: string;
   };
+  /** The id of the source layer in the vector tile archive. */
   sourceLayerId: string;
+  /** The {@link TileStats} metadata of the vector tile source. */
   tilestats: TileStats;
+  /** The {@link VectorLayer} metadata of the vector tile source. */
   vectorLayers: VectorLayer[];
 }
 

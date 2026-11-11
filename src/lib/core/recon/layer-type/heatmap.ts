@@ -17,11 +17,7 @@ export function reconHeatmap(
   switch (sourceLayerType) {
     case 'Point':
     case 'Proportional Symbol':
-      redraw({
-        map: map.value!,
-        sourceLayerId,
-        targetLayer
-      });
+      redraw(map.value!, sourceLayerId, targetLayer);
       break;
   }
 }

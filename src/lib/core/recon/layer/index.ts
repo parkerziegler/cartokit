@@ -141,11 +141,7 @@ export async function reconLayerDiffs(
     case 'source-layer': {
       const targetLayer = targetIR.layers[diff.layerId];
 
-      redraw({
-        map: map.value!,
-        sourceLayerId: diff.layerId,
-        targetLayer
-      });
+      redraw(map.value!, diff.layerId, targetLayer);
 
       break;
     }

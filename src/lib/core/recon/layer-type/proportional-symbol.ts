@@ -17,11 +17,7 @@ export function reconProportionalSymbol(
 ): void {
   switch (sourceLayerType) {
     case 'Heatmap':
-      redraw({
-        map: map.value!,
-        sourceLayerId,
-        targetLayer
-      });
+      redraw(map.value!, sourceLayerId, targetLayer);
       break;
     case 'Point':
       // Update the circle-radius of the existing layer. All other paint
