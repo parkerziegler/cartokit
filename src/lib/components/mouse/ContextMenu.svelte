@@ -27,7 +27,7 @@
         return [
           {
             type: 'Buffer',
-            params: {
+            args: {
               distance: getDefaultBufferDistanceByZoom(map.value!.getZoom())
             }
           }
@@ -39,17 +39,17 @@
         return [
           {
             type: 'Buffer',
-            params: {
+            args: {
               distance: getDefaultBufferDistanceByZoom(map.value!.getZoom())
             }
           },
           {
             type: 'Centroid',
-            params: {}
+            args: {}
           },
           {
             type: 'Envelope',
-            params: {}
+            args: {}
           }
         ];
       case 'GeometryCollection':

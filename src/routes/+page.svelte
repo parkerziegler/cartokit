@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Feature } from 'geojson';
   import { addProtocol, Map } from 'maplibre-gl';
   import * as pmtiles from 'pmtiles';
   import { onMount } from 'svelte';
@@ -42,26 +41,6 @@
   let { data }: Props = $props();
 
   let map = $state<Map>();
-  let features = $state<Feature[]>([]);
-  let table = $derived.by<{ columns: string[]; rows: Feature[] }>(() => {
-    const layer = $ir.layers[layerId.value!];
-    if (features.length > 0) {
-      return {
-        rows: features,
-        columns: Object.keys(features[0].properties ?? {})
-      };
-    }
-
-    const queriedFeatures =
-      map?.queryRenderedFeatures({
-        layers: [layer.id]
-      }) ?? [];
-
-    return {
-      rows: queriedFeatures,
-      columns: Object.keys(queriedFeatures[0]?.properties ?? {})
-    };
-  });
 
   // We intentionally capture the values of data.userId and data.enableChat
   // from the load function in +page.server.ts.
@@ -165,21 +144,6 @@
       event.target.setProjection({ type: $ir.projection });
     });
 
-    // Add an idle listener that will update features in the DataTable when a
-    // PMTiles or GeoParquet layer is active. GeoJSON layers already have their
-    // data available in memory, so we can populate the DataTable directly.
-    map.on('idle', (e) => {
-      const currentLayer = layerId.value
-        ? $ir.layers[layerId.value]
-        : undefined;
-
-      if (currentLayer && currentLayer.source.type !== 'geojson') {
-        features = e.target.queryRenderedFeatures({
-          layers: [currentLayer.id]
-        });
-      }
-    });
-
     map.on('error', (err) => {
       console.error(err);
       error.set('An error occurred. Please start a new session.');
@@ -268,18 +232,17 @@
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
       <span class="text-slate-400">E</span>
     </button>
-    {#if $layout.dataVisible && layerId.value}
+    {#if map && $layout.dataVisible && layerId.value}
       {@const layer = $ir.layers[layerId.value]}
       <DataTable
-        rows={table.rows}
-        columns={table.columns}
-        tableName={layer.displayName}
-        onClose={onViewDataClose}
-        sourceType={layer.source.type}
         class={[
           'ease-cubic-out absolute bottom-0 h-72 transition-all duration-400',
           $layout.editorVisible ? 'w-2/3' : 'w-full'
         ]}
+        layerId={layerId.value}
+        {map}
+        onClose={onViewDataClose}
+        tableName={layer.displayName}
       />
     {/if}
   </div>

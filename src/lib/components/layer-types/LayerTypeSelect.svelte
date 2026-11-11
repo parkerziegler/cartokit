@@ -5,7 +5,7 @@
   import { error } from '$lib/state/error.svelte';
   import type { CartoKitLayer, LayerType } from '$lib/types';
   import {
-    SF_GEOMETRY_TYPES_TO_LAYER_TYPES,
+    SIMPLE_FEATURES_GEOMETRY_TYPES_TO_LAYER_TYPES,
     PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES
   } from '$lib/utils/layer';
 
@@ -29,7 +29,9 @@
       case 'geojson':
       case 'geoparquet':
       case 'table': {
-        return SF_GEOMETRY_TYPES_TO_LAYER_TYPES.get(entry.geometryType);
+        return SIMPLE_FEATURES_GEOMETRY_TYPES_TO_LAYER_TYPES.get(
+          entry.geometryType
+        );
       }
       case 'pmtiles': {
         return PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES.get(entry.geometryType);

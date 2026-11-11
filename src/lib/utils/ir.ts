@@ -1,7 +1,7 @@
 import type { CartoKitIR } from '$lib/types';
 
 /**
- * Get the ids of the layers derived directly from a layer.
+ * Get the ids of the layers directly derived from the queried layer.
  *
  * @param ir The {@link CartoKitIR}.
  * @param parentLayerId The id of the parent layer.

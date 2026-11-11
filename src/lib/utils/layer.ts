@@ -57,8 +57,7 @@ export function getAffiliatedLayerIds(
     );
 }
 
-// A map of SF Geometry types to the supported cartokit layer types.
-export const SF_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
+export const SIMPLE_FEATURES_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   Geometry['type'],
   LayerType[]
 >([

@@ -28,7 +28,7 @@
 
   let { transformation: tx }: Props = $props();
 
-  // Edits to transformation params are local to this instance until the
+  // Edits to transformation args are local to this instance until the
   // transformation is applied.
   // svelte-ignore state_referenced_locally
   let transformation = $state(tx);
@@ -160,9 +160,9 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
     editingParams = true;
   }
 
-  // Re-run the live preview whenever params change while hovering.
+  // Re-run the live preview whenever args change while hovering.
   $effect(() => {
-    $state.snapshot(transformation.params);
+    $state.snapshot(transformation.args);
 
     if (hovering) {
       untrack(() => speculate());
@@ -184,7 +184,7 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
         </div>
       </div></button
     >
-    {#if Object.keys(transformation.params).length > 0}
+    {#if Object.keys(transformation.args).length > 0}
       <button
         {@attach tooltip({ content: 'Adjust Parameters' })}
         onclick={onClickParams}
@@ -196,7 +196,7 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
   {#if editingParams}
     <div transition:slide>
       {#if transformation.type === 'Buffer'}
-        <BufferParams bind:params={transformation.params} />
+        <BufferParams bind:args={transformation.args} />
       {/if}
     </div>
   {/if}

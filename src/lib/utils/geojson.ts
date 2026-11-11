@@ -1,13 +1,10 @@
 import type { AsyncDuckDB, AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 import type { Geometry } from 'geojson';
+import { snakeCase } from 'lodash-es';
 
 import type { DuckDBTable } from '$lib/types/db';
 import { queryGeometryType, quoteIdentifier } from '$lib/utils/db';
 import { DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES } from '$lib/utils/sf';
-import { snakeCase } from 'lodash-es';
-
-// The feature id column ST_Read adds to tables read through GDAL.
-const OGC_FID = 'OGC_FID';
 
 /**
  * Get the {@link Geometry['type']} of a GeoJSON layer.
@@ -23,14 +20,13 @@ export async function getGeoJSONGeometryType(
   layerId: string,
   geometryColumn: string
 ): Promise<Geometry['type']> {
-  const geometryType = await queryGeometryType(
-    conn,
-    layerId,
-    quoteIdentifier(geometryColumn)
-  );
+  const geometryType = await queryGeometryType(conn, layerId, geometryColumn);
 
   return DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES[geometryType];
 }
+
+// The feature id column ST_Read adds to tables read through GDAL.
+const OGC_FID = 'OGC_FID';
 
 interface CopyTableToGeoJSONParams {
   db: AsyncDuckDB;
@@ -43,7 +39,7 @@ interface CopyTableToGeoJSONParams {
 /**
  * Copy a table in DuckDB to a GeoJSON Blob.
  *
- * We build the FeatureCollection in SQL and write it with DuckDB's own JSON
+ * Build the FeatureCollection in SQL and write it with DuckDB's own JSON
  * writer rather than COPY ... (FORMAT GDAL). GDAL writes through its own file
  * layer, which can't write to DuckDB-wasm's virtual file system, so GDAL COPY
  * fails with "Cannot write feature" for every input:

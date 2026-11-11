@@ -1,4 +1,4 @@
-import type * as maplibregl from 'maplibre-gl';
+import type { Map } from 'maplibre-gl';
 
 import { addLayer } from '$lib/interaction/layer';
 import { removeLayerListeners } from '$lib/interaction/events';
@@ -10,12 +10,12 @@ import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
 /**
  * Redraw a layer on the map given the source and target layer definitions.
  *
- * @param map The {@link maplibregl.Map} instance.
+ * @param map The {@link Map} instance.
  * @param sourceLayerId The id of the source layer.
  * @param targetLayer The definition of the target layer.
  */
 export function redraw(
-  map: maplibregl.Map,
+  map: Map,
   sourceLayerId: string,
   targetLayer: CartoKitLayer
 ): void {

@@ -20,7 +20,7 @@ export function getDefaultBufferDistanceByZoom(zoom: number) {
   } else if (zoom < 14) {
     return 5_000;
   } else if (zoom < 16) {
-    return 2_5000;
+    return 2_500;
   }
 
   return 1000;

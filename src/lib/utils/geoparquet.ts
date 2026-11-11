@@ -2,23 +2,8 @@ import type { AsyncDuckDB, AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 import type { Geometry } from 'geojson';
 import { snakeCase } from 'lodash-es';
 
-import type { DuckDBGeometryType } from '$lib/types/db';
 import { queryGeometryType, quoteIdentifier } from '$lib/utils/db';
-
-// A map of the geometry types reported by DuckDB's ST_GeometryType to GeoJSON
-// Geometry types.
-const DUCKDB_GEOMETRY_TYPES_TO_GEOJSON_GEOMETRY_TYPES: Record<
-  DuckDBGeometryType,
-  Geometry['type']
-> = {
-  POINT: 'Point',
-  MULTIPOINT: 'MultiPoint',
-  LINESTRING: 'LineString',
-  MULTILINESTRING: 'MultiLineString',
-  POLYGON: 'Polygon',
-  MULTIPOLYGON: 'MultiPolygon',
-  GEOMETRYCOLLECTION: 'GeometryCollection'
-};
+import { DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES } from '$lib/utils/sf';
 
 interface GetGeoParquetGeometryTypeParams {
   conn: AsyncDuckDBConnection;
@@ -71,13 +56,9 @@ FROM metadata;`
     return metadata.geometry_type as Geometry['type'];
   }
 
-  const geometryType = await queryGeometryType(
-    conn,
-    layerId,
-    quoteIdentifier(geometryColumn)
-  );
+  const geometryType = await queryGeometryType(conn, layerId, geometryColumn);
 
-  return DUCKDB_GEOMETRY_TYPES_TO_GEOJSON_GEOMETRY_TYPES[geometryType];
+  return DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES[geometryType];
 }
 
 interface CopyTableToGeoParquetParams {

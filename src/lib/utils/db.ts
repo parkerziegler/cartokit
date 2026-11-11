@@ -89,7 +89,7 @@ export function generateTransformationExpression(
 ): string {
   switch (transformation.type) {
     case 'Buffer':
-      return `ST_Transform(ST_Buffer(ST_Transform(${quoteIdentifier(geometryColumn)}, 'EPSG:4326', 'EPSG:3857', always_xy := true), ${transformation.params.distance}), 'EPSG:3857', 'EPSG:4326', always_xy := true)`;
+      return `ST_Transform(ST_Buffer(ST_Transform(${quoteIdentifier(geometryColumn)}, 'EPSG:4326', 'EPSG:3857', always_xy := true), ${transformation.args.distance}), 'EPSG:3857', 'EPSG:4326', always_xy := true)`;
     case 'Centroid':
       return `ST_Centroid(${quoteIdentifier(geometryColumn)})`;
     case 'Envelope':
@@ -232,7 +232,7 @@ export async function queryGeometryType(
 ): Promise<DuckDBGeometryType> {
   const [row] = (
     await conn.query(
-      `SELECT ST_GeometryType(${geometryColumn})::VARCHAR AS geometry_type FROM ${quoteIdentifier(layerId)} WHERE ${geometryColumn} IS NOT NULL LIMIT 1;`
+      `SELECT ST_GeometryType(${quoteIdentifier(geometryColumn)})::VARCHAR AS geometry_type FROM ${quoteIdentifier(layerId)} WHERE ${geometryColumn} IS NOT NULL LIMIT 1;`
     )
   )
     .toArray()
@@ -275,7 +275,8 @@ export async function createTable({
   switch (location.type) {
     case 'api':
       await conn.query(generateCreateTableStatement(layerId, location.url));
-      break;
+
+      return await inspectTableForGeometry(conn, layerId);
     case 'file':
       await db.registerFileHandle(
         location.file.name,
@@ -286,20 +287,21 @@ export async function createTable({
       await conn.query(
         generateCreateTableStatement(layerId, location.file.name)
       );
-      break;
+
+      return await inspectTableForGeometry(conn, layerId);
     case 'table': {
-      const { geometryColumn } = await inspectTableForGeometry(
-        conn,
-        location.parentLayerId
-      );
+      const table = await inspectTableForGeometry(conn, location.parentLayerId);
       await conn.query(
-        generateCreateDerivedTableStatement(layerId, location, geometryColumn)
+        generateCreateDerivedTableStatement(
+          layerId,
+          location,
+          table.geometryColumn
+        )
       );
-      break;
+
+      return table;
     }
   }
-
-  return await inspectTableForGeometry(conn, layerId);
 }
 
 /**

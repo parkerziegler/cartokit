@@ -3,10 +3,10 @@
   import type { BufferTransformation } from '$lib/types/transformation';
 
   interface Props {
-    params: BufferTransformation['params'];
+    args: BufferTransformation['args'];
   }
 
-  let { params = $bindable() }: Props = $props();
+  let { args = $bindable() }: Props = $props();
 
   const fieldId = 'buffer-distance-input';
 </script>
@@ -17,8 +17,8 @@
     id={fieldId}
     min={0}
     step={100}
-    value={params.distance}
-    onchange={(distance) => (params.distance = distance)}
+    value={args.distance}
+    onchange={(distance) => (args.distance = distance)}
     class="w-16 px-1 py-0.5 text-right"
   />
 </div>

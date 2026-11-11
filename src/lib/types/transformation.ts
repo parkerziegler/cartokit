@@ -5,7 +5,7 @@
 export interface BufferTransformation {
   /** The type of the transformation, 'Buffer'. */
   type: 'Buffer';
-  params: {
+  args: {
     /** The buffer distance, in meters. */
     distance: number;
   };
@@ -16,7 +16,7 @@ interface CentroidTransformation {
   /** The type of the transformation, 'Centroid'. */
   type: 'Centroid';
   /** Centroid takes no parameters. */
-  params: Record<string, never>;
+  args: Record<string, never>;
 }
 
 /**
@@ -27,7 +27,7 @@ interface EnvelopeTransformation {
   /** The type of the transformation, 'Envelope'. */
   type: 'Envelope';
   /** Envelope takes no parameters. */
-  params: Record<string, never>;
+  args: Record<string, never>;
 }
 
 /** The possible transformations that can be applied to a layer's table. */
