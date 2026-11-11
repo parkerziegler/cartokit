@@ -21,6 +21,7 @@
   import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
   import { onFeatureLeave } from '$lib/interaction/events';
   import { chat } from '$lib/state/chat.svelte';
+  import { contextMenu } from '$lib/state/context-menu.svelte';
   import { db } from '$lib/state/db.svelte';
   import { error } from '$lib/state/error.svelte';
   import { initHistory } from '$lib/state/history.svelte';
@@ -32,7 +33,6 @@
   import { applyCustomBasemapLabels } from '$lib/utils/basemap';
   import { initDB } from '$lib/utils/db';
   import { registerKeybinding } from '$lib/utils/keybinding';
-  import { contextMenu } from '$lib/state/context-menu.svelte';
 
   interface Props {
     data: PageData;
@@ -232,7 +232,7 @@
       {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
       <span class="text-slate-400">E</span>
     </button>
-    {#if map && $layout.dataVisible && layerId.value}
+    {#if map && layerId.value && $layout.dataVisible}
       {@const layer = $ir.layers[layerId.value]}
       <DataTable
         class={[
