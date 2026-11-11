@@ -333,7 +333,7 @@ export async function readTableAsGeoJSON(
  * @returns A GeoJSON {@link FeatureCollection}.
  */
 export function toFeatureCollection(
-  results: Awaited<ReturnType<AsyncDuckDBConnection['query']>>
+  results: Pick<Awaited<ReturnType<AsyncDuckDBConnection['query']>>, 'toArray'>
 ): FeatureCollection {
   const features = results
     .toArray()

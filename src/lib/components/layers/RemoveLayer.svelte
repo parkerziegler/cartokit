@@ -9,6 +9,7 @@
     type CartoKitDiff,
     type RemoveLayerStrategy
   } from '$lib/core/diff';
+  import { contextMenu } from '$lib/state/context-menu.svelte';
   import { ir } from '$lib/stores/ir';
   import type { CartoKitLayer } from '$lib/types';
   import { conjugate, pluralize } from '$lib/utils/formatters/shared';
@@ -58,6 +59,11 @@
     };
 
     await applyDiff(diff);
+
+    // If the layer was the context menu layer, reset the state.
+    if (layerId === contextMenu.layerId) {
+      contextMenu.layerId = '';
+    }
   }
 </script>
 

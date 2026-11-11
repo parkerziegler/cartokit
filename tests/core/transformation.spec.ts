@@ -229,7 +229,7 @@ test.describe('transformation', () => {
         .toBe(true);
 
       // Adjust the Buffer distance.
-      const distance = Number(await distanceInput.inputValue()) * 10;
+      const distance = Number(await distanceInput.inputValue()) * 2;
       await distanceInput.fill(distance.toString());
       await distanceInput.press('Enter');
 

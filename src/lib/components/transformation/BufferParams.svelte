@@ -1,5 +1,4 @@
 <script lang="ts">
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
   import type { BufferTransformation } from '$lib/types/transformation';
 
   interface Props {
@@ -13,12 +12,10 @@
 
 <div class="flex items-center justify-between px-2 py-1 text-white">
   <label class="text-slate-400" for={fieldId}>Distance (m)</label>
-  <NumberInput
+  <input
     id={fieldId}
-    min={0}
-    step={100}
-    value={args.distance}
-    onchange={(distance) => (args.distance = distance)}
-    class="w-16 px-1 py-0.5 text-right"
+    type="number"
+    bind:value={args.distance}
+    class="w-16 border border-transparent bg-inherit p-1 text-right hover:border-slate-600 focus:border-slate-600"
   />
 </div>

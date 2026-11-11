@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { FeatureCollection } from 'geojson';
   import { snakeCase, uniqueId } from 'lodash-es';
   import type { GeoJSONSource } from 'maplibre-gl';
   import { onMount, untrack } from 'svelte';
@@ -34,6 +35,7 @@
   let transformation = $state(tx);
   let editingParams = $state(false);
   let hovering = $state(false);
+  let ref: HTMLLIElement;
 
   onMount(() => {
     const off = registerKeybinding(transformation.type.charAt(0), onClick, {
@@ -43,11 +45,20 @@
     return off;
   });
 
+  // Incremented on each speculation, so stale results can be discarded.
+  let generation = 0;
+
   async function speculate() {
     const { source } = $ir.layers[contextMenu.layerId];
     if (!db.value || source.type === 'pmtiles') {
       return;
     }
+
+    const gen = ++generation;
+
+    // Cancel any in-flight speculation query. This only affects queries
+    // started with conn.send, which only speculation uses.
+    await db.value.conn.cancelSent();
 
     const { geometryColumn } = source.table;
 
@@ -61,7 +72,27 @@
     )}) AS geom
 FROM ${contextMenu.layerId}
 WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
-    const geojson = toFeatureCollection(await db.value.conn.query(query));
+
+    // Use conn.send rather than conn.query: the worker executes a sent query
+    // in slices, so a later cancelSent can interrupt it.
+    let batches;
+    try {
+      const reader = await db.value.conn.send(query);
+      batches = await reader.readAll();
+    } catch {
+      // The query was cancelled by a newer speculation.
+      return;
+    }
+
+    // Discard results superseded by a newer speculation or by ending preview.
+    if (gen !== generation) {
+      return;
+    }
+
+    const geojson: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: batches.flatMap((batch) => toFeatureCollection(batch).features)
+    };
 
     const id = `${contextMenu.layerId}-speculate`;
     const speculatedSource = map.value!.getSource<GeoJSONSource>(id);
@@ -78,11 +109,18 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
       generateId: true
     });
 
-    // Derive the color for speculative layers based on the theme.
-    const color = $ir.basemap.mode === 'dark' ? '#ffffff' : '#000000';
+    const selectedLayer = $ir.layers[contextMenu.layerId];
+    const fallbackColor = $ir.basemap.mode === 'dark' ? '#ffffff' : '#000000';
 
     switch (transformation.type) {
-      case 'Buffer':
+      case 'Buffer': {
+        const color =
+          'fill' in selectedLayer.style &&
+          selectedLayer.style.fill.visible &&
+          selectedLayer.style.fill.type === 'Constant'
+            ? selectedLayer.style.fill.color
+            : fallbackColor;
+
         map.value!.addLayer({
           id,
           type: 'fill',
@@ -93,13 +131,15 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
           }
         });
         break;
+      }
       case 'Centroid':
         map.value!.addLayer({
           id,
           type: 'circle',
           source: id,
           paint: {
-            'circle-color': color,
+            'circle-color': fallbackColor,
+            'circle-opacity': 0.5,
             'circle-radius': DEFAULT_SIZE
           }
         });
@@ -110,7 +150,8 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
           type: 'line',
           source: id,
           paint: {
-            'line-color': color
+            'line-color': fallbackColor,
+            'line-opacity': 0.5
           }
         });
         break;
@@ -123,23 +164,15 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
 
   function onMouseLeave() {
     hovering = false;
-    const id = `${contextMenu.layerId}-speculate`;
-
-    if (map.value?.getLayer(id)) {
-      map.value.removeLayer(id);
-    }
-
-    if (map.value?.getSource(id)) {
-      map.value.removeSource(id);
-    }
   }
 
   async function onClick() {
     const parentLayerId = contextMenu.layerId;
     const displayName = `${$ir.layers[parentLayerId].displayName} (${transformation.type}s)`;
 
-    // Close the context menu.
-    contextMenu.layerId = '';
+    // Reset state; this will trigger preview removal via the $effect below.
+    hovering = false;
+    editingParams = false;
 
     await applyDiff({
       type: 'add-layer',
@@ -154,18 +187,38 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
         }
       }
     });
+
+    // Close the context menu.
+    contextMenu.layerId = '';
   }
 
   function onClickParams() {
-    editingParams = true;
+    editingParams = !editingParams;
   }
 
   // Re-run the live preview whenever args change while hovering.
   $effect(() => {
     $state.snapshot(transformation.args);
 
-    if (hovering) {
+    if (hovering || (editingParams && ref.contains(document.activeElement))) {
       untrack(() => speculate());
+    }
+  });
+
+  $effect(() => {
+    if (!hovering && !editingParams) {
+      // Ensure an in-flight speculation doesn't re-add the preview.
+      generation++;
+
+      const id = `${contextMenu.layerId}-speculate`;
+
+      if (map.value?.getLayer(id)) {
+        map.value.removeLayer(id);
+      }
+
+      if (map.value?.getSource(id)) {
+        map.value.removeSource(id);
+      }
     }
   });
 </script>
@@ -174,6 +227,7 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
   class="flex flex-col transition-colors hover:bg-slate-800"
   onmouseenter={onMouseEnter}
   onmouseleave={onMouseLeave}
+  bind:this={ref}
 >
   <div class="flex gap-1.5 rounded-sm px-2 py-1.5 text-white">
     <button class="flex flex-1 justify-between" onclick={onClick}
@@ -189,7 +243,7 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
         {@attach tooltip({ content: 'Adjust Parameters' })}
         onclick={onClickParams}
       >
-        <ChevronIcon height={10} width={10} />
+        <ChevronIcon height={10} width={10} rotate={editingParams ? 180 : 0} />
       </button>
     {/if}
   </div>
