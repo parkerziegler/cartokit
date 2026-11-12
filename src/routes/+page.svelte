@@ -262,7 +262,5 @@
   {/if}
   <Cursor />
   <Popup />
-  {#key contextMenu.layerId}
-    <ContextMenu />
-  {/key}
+  <ContextMenu />
 </main>

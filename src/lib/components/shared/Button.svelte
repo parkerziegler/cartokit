@@ -76,7 +76,7 @@
           <CheckIcon />
         </span>
       {:else if loading}
-        <LoadingIndicator class="inset-0" />
+        <LoadingIndicator class="absolute inset-0" />
       {/if}
     </span>
   {/if}

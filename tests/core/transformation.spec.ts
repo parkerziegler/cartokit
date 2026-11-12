@@ -257,6 +257,58 @@ test.describe('transformation', () => {
       await expect(layerEntries).toHaveCount(2);
       await expect(layerEntries.first()).toContainText('(Buffers)');
     });
+
+    test('should remove the Preview when the map zooms while editing Buffer parameters', async ({
+      page
+    }) => {
+      // Right click on a Point feature.
+      await page
+        .locator('#map')
+        .click({ button: 'right', position: { x: 500, y: 350 } });
+
+      const contextMenu = page.getByTestId('context-menu');
+      await expect(contextMenu).toBeVisible();
+
+      // Hover the Buffer entry.
+      const bufferEntry = contextMenu
+        .getByRole('listitem')
+        .filter({ hasText: 'Buffer' });
+      await bufferEntry.hover();
+
+      // Open the Buffer's parameters.
+      await bufferEntry.getByRole('button').last().click();
+      await expect(bufferEntry.getByLabel('Distance (m)')).toBeVisible();
+
+      // Wait for the Preview to render.
+      await waitForMapIdle(page);
+
+      // Move the mouse off the context menu, onto the map. The Preview should
+      // persist because the parameters are still open.
+      await page.mouse.move(500, 300);
+      await expect
+        .poll(() =>
+          page.evaluate(
+            () => !!window.__map!.getLayer('us_power_plants__1-speculate')
+          )
+        )
+        .toBe(true);
+
+      // Zoom the map, which closes the context menu.
+      await page.mouse.wheel(0, -500);
+      await expect(contextMenu).not.toBeVisible();
+
+      // Ensure the Preview is removed.
+      await waitForMapIdle(page);
+      await expect
+        .poll(() =>
+          page.evaluate(
+            () =>
+              !window.__map!.getLayer('us_power_plants__1-speculate') &&
+              !window.__map!.getSource('us_power_plants__1-speculate')
+          )
+        )
+        .toBe(true);
+    });
   });
 
   test.describe('Transformation dependencies', () => {
