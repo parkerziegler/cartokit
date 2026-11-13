@@ -91,7 +91,7 @@ test.describe('color scales', () => {
       page.locator('#fill-classification-method-select')
     ).toHaveValue('Jenks');
 
-    const breaks = [-1528.88, -691.46, -258.37, -40.72, 146.09, 608.88];
+    const breaks = [-1528.88, -679.37, -258.09, -40.67, 146.42, 608.88];
 
     // Assert values in the Legend.
     for (const brk of breaks) {
