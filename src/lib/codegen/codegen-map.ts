@@ -37,6 +37,10 @@ export function codegenMap(
     'layout.z',
     'asc'
   ).reduce((p, layer) => {
+    if (layer.layout.deleted) {
+      return p;
+    }
+
     return p.concat('\n\n' + codegenLayer(layer, ir.basemap.beforeId));
   }, '');
 

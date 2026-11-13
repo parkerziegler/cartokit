@@ -51,7 +51,7 @@ test.describe('color scales', () => {
       page.locator('#fill-classification-method-select')
     ).toHaveValue('Quantile');
 
-    const quantiles = [-1528.88, -77.05, 4, 25.89, 71.08, 608.88];
+    const quantiles = [-1528.88, -71.62, 4.54, 26.31, 71.87, 608.88];
 
     // Assert values in the Legend.
     for (const quantile of quantiles) {
@@ -91,7 +91,7 @@ test.describe('color scales', () => {
       page.locator('#fill-classification-method-select')
     ).toHaveValue('Jenks');
 
-    const breaks = [-1528.88, -653.58, -256.85, -40.91, 146.09, 608.88];
+    const breaks = [-1528.88, -691.46, -258.37, -40.72, 146.09, 608.88];
 
     // Assert values in the Legend.
     for (const brk of breaks) {
@@ -145,7 +145,8 @@ test.describe('color scales', () => {
 
     // Assert values in the Legend.
     const deciles = [
-      -1528.88, -148.83, -60.8, -7.48, 8.89, 21.08, 33.83, 62.79, 105.7, 608.88
+      -1528.88, -142.63, -55.83, -5.98, 9.43, 21.48, 34.24, 63.83, 106.27,
+      608.88
     ];
 
     for (const decile of deciles) {
@@ -160,7 +161,7 @@ test.describe('color scales', () => {
     await expect(page.locator('#fill-step-count-select')).toHaveValue('3');
 
     // Assert values in the Legend.
-    const terciles = [-1528.88, -7.48, 33.83, 608.88];
+    const terciles = [-1528.88, -5.98, 34.24, 608.88];
 
     for (const tercile of terciles) {
       await expect(page.getByTestId('choropleth-legend')).toContainText(
@@ -226,7 +227,7 @@ test.describe('color scales', () => {
       page.locator('#fill-classification-method-select')
     ).toHaveValue('Quantile');
 
-    const quantiles = [-1528.88, -77.05, 4, 25.89, 71.08, 608.88];
+    const quantiles = [-1528.88, -71.62, 4.54, 26.31, 71.87, 608.88];
 
     // Assert values in the legend.
     for (const quantile of quantiles) {

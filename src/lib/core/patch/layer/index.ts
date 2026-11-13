@@ -183,7 +183,9 @@ export async function patchLayerDiffs(
 
       // If using a hard delete strategy, drop the layer's table and delete it.
       if (diff.payload.strategy === 'hard') {
-        await db.value!.conn.query(`DROP TABLE IF EXISTS ${diff.layerId};`);
+        if (layer.source.type !== 'pmtiles') {
+          await db.value!.conn.query(`DROP TABLE IF EXISTS ${diff.layerId};`);
+        }
         delete ir.layers[diff.layerId];
       } else {
         // Otherwise, flag the layer as soft deleted.

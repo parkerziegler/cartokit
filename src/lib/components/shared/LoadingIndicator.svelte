@@ -5,10 +5,10 @@
 
   interface Props {
     class?: ClassValue;
-    variant?: 'tiny' | 'big';
+    variant?: 'sm' | 'base' | 'lg';
   }
 
-  let { class: className, variant = 'tiny' }: Props = $props();
+  let { class: className, variant = 'base' }: Props = $props();
 
   const indicatorTransition = $derived({
     x: prefersReducedMotion.current ? 0 : 8,
@@ -17,16 +17,17 @@
 </script>
 
 <span
-  class={['absolute', className]}
+  class={className}
   data-testid="loading-indicator"
   transition:fly={indicatorTransition}
 >
   <span
     class={[
-      'loader inline-block rounded-full',
+      'loader inline-block rounded-full align-middle',
       {
-        'size-4 border-2': variant === 'tiny',
-        'size-8 border-4': variant === 'big'
+        'size-3 border-[1.5px]': variant === 'sm',
+        'size-4 border-2': variant === 'base',
+        'size-8 border-4': variant === 'lg'
       }
     ]}
   ></span>

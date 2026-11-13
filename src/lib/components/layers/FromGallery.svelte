@@ -75,8 +75,8 @@
       {#if loadingId === item.id}
         <div class="absolute inset-0 z-10 rounded-sm bg-white/20">
           <LoadingIndicator
-            class="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-            variant="big"
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            variant="lg"
           />
         </div>
       {/if}
