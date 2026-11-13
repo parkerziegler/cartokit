@@ -89,11 +89,11 @@ export function generateTransformationExpression(
 ): string {
   switch (transformation.type) {
     case 'Buffer':
-      // Repair invalid input (e.g., zero-width spikes) before buffering, since
-      // GEOS's buffer overlay can throw a TopologyException on invalid
-      // polygons. ST_MakeValid may emit stray LineStrings alongside polygons;
-      // ST_CollectionExtract keeps only the parts of the highest dimension,
-      // so Points and LineStrings pass through unchanged.
+      // Repair invalid input before buffering, since GEOS's buffer overlay can
+      // throw a TopologyException on invalid polygons. ST_MakeValid may emit
+      // stray LineStrings alongside polygons; ST_CollectionExtract keeps only
+      // the parts of the highest dimension, so Points and LineStrings pass
+      // through unchanged.
       return `ST_Transform(ST_Buffer(ST_Transform(ST_CollectionExtract(ST_MakeValid(${quoteIdentifier(geometryColumn)})),'EPSG:4326', 'EPSG:3857', always_xy := true), ${transformation.args.distance}), 'EPSG:3857', 'EPSG:4326', always_xy := true)`;
     case 'Centroid':
       return `ST_Centroid(${quoteIdentifier(geometryColumn)})`;

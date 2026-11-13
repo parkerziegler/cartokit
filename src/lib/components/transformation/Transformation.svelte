@@ -8,6 +8,7 @@
   import { tooltip } from '$lib/attachments/tooltip';
   import ChevronIcon from '$lib/components/icons/ChevronIcon.svelte';
   import Key from '$lib/components/shared/Key.svelte';
+  import LoadingIndicator from '$lib/components/shared/LoadingIndicator.svelte';
   import BufferParams from '$lib/components/transformation/BufferParams.svelte';
   import { applyDiff } from '$lib/core/diff';
   import { contextMenu } from '$lib/state/context-menu.svelte';
@@ -22,7 +23,6 @@
     toFeatureCollection
   } from '$lib/utils/db';
   import { registerKeybinding } from '$lib/utils/keybinding';
-  import LoadingIndicator from '../shared/LoadingIndicator.svelte';
 
   interface Props {
     transformation: Transformation;
@@ -234,7 +234,7 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
   });
 
   $effect(() => {
-    if (!hovering) {
+    if (!hovering && !editingParams) {
       removePreview(contextMenu.layerId);
     }
   });
