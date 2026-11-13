@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { ckmeans } from 'simple-statistics';
+import { ckmeansBreaks } from 'simple-statistics';
 
 /**
  * Derive quantiles for a given attribute and number of breaks k.
@@ -59,11 +59,6 @@ export function deriveJenksBreaks(domain: number[], k: number): number[] {
     return [];
   }
 
-  const breaks = ckmeans(domain, k).map(
-    (cluster) => cluster[cluster.length - 1]
-  );
-  // Remove the last break—this corresponds to the max.
-  breaks.pop();
-
-  return breaks;
+  // Exclude min and max.
+  return ckmeansBreaks(domain, k).slice(1, -1);
 }
