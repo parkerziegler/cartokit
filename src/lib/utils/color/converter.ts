@@ -1,9 +1,9 @@
 import {
   type QuantitativeColorRamp,
   type QuantitativeColorScheme
-} from '$lib/types/color';
-import { DEFAULT_QUANTITATIVE_SCHEME } from '$lib/utils/constants';
-import { isQuantitativeColorScheme } from '$lib/utils/color/scheme';
+} from '#lib/types/color.ts';
+import { DEFAULT_QUANTITATIVE_SCHEME } from '#lib/utils/constants.ts';
+import { isQuantitativeColorScheme } from '#lib/utils/color/scheme.ts';
 
 /**
  * Convert a {@link QuantitativeColorScheme} to a {@link QuantitativeColorRamp}.

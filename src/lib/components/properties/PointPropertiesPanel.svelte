@@ -1,12 +1,12 @@
 <script lang="ts">
-  import ColorControls from '$lib/components/color/ColorControls.svelte';
-  import FillModifier from '$lib/components/color/FillModifier.svelte';
-  import OpacityInput from '$lib/components/color/OpacityInput.svelte';
-  import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
-  import StrokePicker from '$lib/components/color/StrokePicker.svelte';
-  import PointSize from '$lib/components/point/PointSize.svelte';
-  import MenuItem from '$lib/components/shared/MenuItem.svelte';
-  import type { CartoKitPointLayer } from '$lib/types';
+  import ColorControls from '#lib/components/color/ColorControls.svelte';
+  import FillModifier from '#lib/components/color/FillModifier.svelte';
+  import OpacityInput from '#lib/components/color/OpacityInput.svelte';
+  import StrokeModifier from '#lib/components/color/StrokeModifier.svelte';
+  import StrokePicker from '#lib/components/color/StrokePicker.svelte';
+  import PointSize from '#lib/components/point/PointSize.svelte';
+  import MenuItem from '#lib/components/shared/MenuItem.svelte';
+  import type { CartoKitPointLayer } from '#lib/types/index.ts';
 
   interface Props {
     layer: CartoKitPointLayer;

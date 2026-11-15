@@ -1,6 +1,6 @@
 import type { SvelteHTMLElements } from 'svelte/elements';
 
-import type { ThemeMode } from '$lib/types';
+import type { ThemeMode } from '#lib/types/index.ts';
 
 /**
  * Represents a basemap style in cartokit.

@@ -1,17 +1,17 @@
 <script lang="ts">
   import { onMount, setContext } from 'svelte';
 
-  import { tooltip } from '$lib/attachments/tooltip';
-  import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
-  import FromAPI from '$lib/components/layers/FromAPI.svelte';
-  import FromFile from '$lib/components/layers/FromFile.svelte';
-  import FromGallery from '$lib/components/layers/FromGallery.svelte';
-  import Modal from '$lib/components/shared/Modal.svelte';
-  import TabItem from '$lib/components/shared/TabItem.svelte';
-  import Tabs from '$lib/components/shared/Tabs.svelte';
-  import { map } from '$lib/state/map.svelte';
-  import { registerKeybinding } from '$lib/utils/keybinding';
-  import { db } from '$lib/state/db.svelte';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import PlusIcon from '#lib/components/icons/PlusIcon.svelte';
+  import FromAPI from '#lib/components/layers/FromAPI.svelte';
+  import FromFile from '#lib/components/layers/FromFile.svelte';
+  import FromGallery from '#lib/components/layers/FromGallery.svelte';
+  import Modal from '#lib/components/shared/Modal.svelte';
+  import TabItem from '#lib/components/shared/TabItem.svelte';
+  import Tabs from '#lib/components/shared/Tabs.svelte';
+  import { map } from '#lib/state/map.svelte.ts';
+  import { registerKeybinding } from '#lib/utils/keybinding.ts';
+  import { db } from '#lib/state/db.svelte.ts';
 
   setContext('close-modal', () => {
     showModal = false;

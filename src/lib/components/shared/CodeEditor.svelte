@@ -12,7 +12,7 @@
     cssSyntaxTheme,
     editorTheme,
     syntaxTheme
-  } from '$lib/utils/codemirror';
+  } from '#lib/utils/codemirror.ts';
 
   interface ReadonlyCodeEditorConfig {
     kind: 'readonly';

@@ -1,6 +1,10 @@
 import { PMTiles } from 'pmtiles';
 
-import type { CartoKitSource, TileStats, VectorLayer } from '$lib/types/source';
+import type {
+  CartoKitSource,
+  TileStats,
+  VectorLayer
+} from '#lib/types/source.ts';
 
 interface Metadata {
   type?: string;

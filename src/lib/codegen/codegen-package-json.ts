@@ -1,6 +1,6 @@
 import { dependencies, devDependencies } from '../../../package.json';
 
-import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
+import type { CartoKitBackendAnalysis } from '#lib/types/codegen.ts';
 
 // mapbox-gl is not a cartokit dependency, so Renovate keeps this version
 // current via the custom manager in renovate.json.

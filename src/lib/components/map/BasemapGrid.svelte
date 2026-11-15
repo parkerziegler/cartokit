@@ -1,14 +1,14 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
-  import Button from '$lib/components/shared/Button.svelte';
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import { ir } from '$lib/stores/ir';
-  import type { ThemeMode } from '$lib/types';
-  import type { Basemap, BasemapProvider } from '$lib/types/basemap';
-  import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
+  import Button from '#lib/components/shared/Button.svelte';
+  import FieldLabel from '#lib/components/shared/FieldLabel.svelte';
+  import TextInput from '#lib/components/shared/TextInput.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import { ir } from '#lib/stores/ir.ts';
+  import type { ThemeMode } from '#lib/types/index.ts';
+  import type { Basemap, BasemapProvider } from '#lib/types/basemap.ts';
+  import { BASEMAPS, TILE_URLS } from '#lib/utils/basemap.ts';
 
   interface Props {
     provider: BasemapProvider;

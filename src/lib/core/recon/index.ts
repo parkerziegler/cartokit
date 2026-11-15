@@ -1,14 +1,14 @@
 import { flow } from 'lodash-es';
 
-import type { CartoKitDiff } from '$lib/core/diff';
-import { reconFillDiffs } from '$lib/core/recon/fill';
-import { reconHeatmapDiffs } from '$lib/core/recon/heatmap';
-import { reconLayerDiffs } from '$lib/core/recon/layer';
-import { reconLayerTypeDiffs } from '$lib/core/recon/layer-type';
-import { reconMapDiffs } from '$lib/core/recon/map';
-import { reconSizeDiffs } from '$lib/core/recon/size';
-import { reconStrokeDiffs } from '$lib/core/recon/stroke';
-import type { CartoKitIR } from '$lib/types';
+import type { CartoKitDiff } from '#lib/core/diff/index.ts';
+import { reconFillDiffs } from '#lib/core/recon/fill/index.ts';
+import { reconHeatmapDiffs } from '#lib/core/recon/heatmap/index.ts';
+import { reconLayerDiffs } from '#lib/core/recon/layer/index.ts';
+import { reconLayerTypeDiffs } from '#lib/core/recon/layer-type/index.ts';
+import { reconMapDiffs } from '#lib/core/recon/map/index.ts';
+import { reconSizeDiffs } from '#lib/core/recon/size/index.ts';
+import { reconStrokeDiffs } from '#lib/core/recon/stroke/index.ts';
+import type { CartoKitIR } from '#lib/types/index.ts';
 
 export interface ReconFnParams {
   diff: CartoKitDiff;

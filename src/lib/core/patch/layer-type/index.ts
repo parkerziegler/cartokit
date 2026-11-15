@@ -1,17 +1,17 @@
-import type { CartoKitDiff } from '$lib/core/diff';
-import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
-import { patchChoropleth } from '$lib/core/patch/layer-type/choropleth';
-import { patchHeatmap } from '$lib/core/patch/layer-type/heatmap';
-import { patchPoint } from '$lib/core/patch/layer-type/point';
-import { patchPolygon } from '$lib/core/patch/layer-type/polygon';
-import { patchProportionalSymbol } from '$lib/core/patch/layer-type/proportional-symbol';
+import type { CartoKitDiff } from '#lib/core/diff/index.ts';
+import type { PatchFnParams, PatchFnResult } from '#lib/core/patch/index.ts';
+import { patchChoropleth } from '#lib/core/patch/layer-type/choropleth.ts';
+import { patchHeatmap } from '#lib/core/patch/layer-type/heatmap.ts';
+import { patchPoint } from '#lib/core/patch/layer-type/point.ts';
+import { patchPolygon } from '#lib/core/patch/layer-type/polygon.ts';
+import { patchProportionalSymbol } from '#lib/core/patch/layer-type/proportional-symbol.ts';
 import type {
   CartoKitChoroplethLayer,
   CartoKitHeatmapLayer,
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer
-} from '$lib/types';
+} from '#lib/types/index.ts';
 
 /**
  * Patch layer-type-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.

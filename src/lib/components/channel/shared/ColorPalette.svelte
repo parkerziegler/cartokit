@@ -3,8 +3,8 @@
     CategoricalColorScheme,
     QuantitativeColorScheme,
     SchemeDirection
-  } from '$lib/types/color';
-  import { materializeColorScheme } from '$lib/utils/color/scheme';
+  } from '#lib/types/color.ts';
+  import { materializeColorScheme } from '#lib/utils/color/scheme.ts';
 
   interface Props {
     scheme: CategoricalColorScheme | QuantitativeColorScheme;

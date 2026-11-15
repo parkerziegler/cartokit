@@ -8,8 +8,8 @@
   } from '@floating-ui/dom';
   import { orderBy } from 'lodash-es';
 
-  import { popup } from '$lib/state/popup.svelte';
-  import { ir } from '$lib/stores/ir';
+  import { popup } from '#lib/state/popup.svelte.ts';
+  import { ir } from '#lib/stores/ir.ts';
 
   const MAX_DISPLAYED_PROPERTIES = 10;
 

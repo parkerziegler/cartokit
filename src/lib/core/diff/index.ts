@@ -1,10 +1,10 @@
 import { get } from 'svelte/store';
 
-import { patch } from '$lib/core/patch';
-import { recon } from '$lib/core/recon';
-import { diffs } from '$lib/state/diffs.svelte';
-import { history } from '$lib/state/history.svelte';
-import { ir } from '$lib/stores/ir';
+import { patch } from '#lib/core/patch/index.ts';
+import { recon } from '#lib/core/recon/index.ts';
+import { diffs } from '#lib/state/diffs.svelte.ts';
+import { history } from '#lib/state/history.svelte.ts';
+import { ir } from '#lib/stores/ir.ts';
 import type {
   CartoKitIR,
   CartoKitLayer,
@@ -13,20 +13,20 @@ import type {
   QuantitativeColorScale,
   QuantitativeStepCount,
   VisualizationType
-} from '$lib/types';
+} from '#lib/types/index.ts';
 import type {
   CategoricalColorScheme,
   QuantitativeColorRamp,
   QuantitativeColorScheme,
   RampDirection,
   SchemeDirection
-} from '$lib/types/color';
+} from '#lib/types/color.ts';
 import type {
   CartoKitGeoJSONSource,
   CartoKitGeoParquetSource,
   CartoKitPMTilesSource,
   CartoKitTableSource
-} from '$lib/types/source';
+} from '#lib/types/source.ts';
 
 interface LayerDiff {
   layerId: CartoKitLayer['id'];

@@ -4,8 +4,8 @@
   import { prefersReducedMotion } from 'svelte/motion';
   import { fly } from 'svelte/transition';
 
-  import CheckIcon from '$lib/components/icons/CheckIcon.svelte';
-  import LoadingIndicator from '$lib/components/shared/LoadingIndicator.svelte';
+  import CheckIcon from '#lib/components/icons/CheckIcon.svelte';
+  import LoadingIndicator from '#lib/components/shared/LoadingIndicator.svelte';
 
   interface Props {
     onclick?: MouseEventHandler<HTMLButtonElement>;

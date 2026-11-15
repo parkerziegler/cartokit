@@ -1,9 +1,9 @@
 <script lang="ts">
-  import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import type { CartoKitProportionalSymbolLayer } from '$lib/types';
+  import AttributeSelect from '#lib/components/data/AttributeSelect.svelte';
+  import FieldLabel from '#lib/components/shared/FieldLabel.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import type { CartoKitProportionalSymbolLayer } from '#lib/types/index.ts';
 
   interface Props {
     layer: CartoKitProportionalSymbolLayer;

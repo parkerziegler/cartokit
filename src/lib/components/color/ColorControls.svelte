@@ -1,17 +1,17 @@
 <script lang="ts">
-  import ColorRampSelect from '$lib/components/color/ColorRampSelect.svelte';
-  import ColorSchemeSelect from '$lib/components/color/ColorSchemeSelect.svelte';
-  import FillPicker from '$lib/components/color/FillPicker.svelte';
-  import OpacityInput from '$lib/components/color/OpacityInput.svelte';
-  import AttributeSelect from '$lib/components/data/AttributeSelect.svelte';
-  import ClassificationMethodSelect from '$lib/components/scale/ClassificationMethodSelect.svelte';
-  import StepsSelect from '$lib/components/scale/StepCountSelect.svelte';
-  import VisualizationTypeSelect from '$lib/components/scale/VisualizationTypeSelect.svelte';
+  import ColorRampSelect from '#lib/components/color/ColorRampSelect.svelte';
+  import ColorSchemeSelect from '#lib/components/color/ColorSchemeSelect.svelte';
+  import FillPicker from '#lib/components/color/FillPicker.svelte';
+  import OpacityInput from '#lib/components/color/OpacityInput.svelte';
+  import AttributeSelect from '#lib/components/data/AttributeSelect.svelte';
+  import ClassificationMethodSelect from '#lib/components/scale/ClassificationMethodSelect.svelte';
+  import StepsSelect from '#lib/components/scale/StepCountSelect.svelte';
+  import VisualizationTypeSelect from '#lib/components/scale/VisualizationTypeSelect.svelte';
   import type {
     CategoricalFill,
     ConstantFill,
     QuantitativeFill
-  } from '$lib/types';
+  } from '#lib/types/index.ts';
 
   interface Props {
     layerId: string;

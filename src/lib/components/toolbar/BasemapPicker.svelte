@@ -2,17 +2,17 @@
   import { Map } from 'maplibre-gl';
   import { onMount, setContext } from 'svelte';
 
-  import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
-  import { tooltip } from '$lib/attachments/tooltip';
-  import BasemapGrid from '$lib/components/map/BasemapGrid.svelte';
-  import Modal from '$lib/components/shared/Modal.svelte';
-  import TabItem from '$lib/components/shared/TabItem.svelte';
-  import Tabs from '$lib/components/shared/Tabs.svelte';
-  import { ir } from '$lib/stores/ir';
-  import { layout } from '$lib/stores/layout';
-  import type { BasemapProvider } from '$lib/types/basemap';
-  import { BASEMAPS } from '$lib/utils/basemap';
-  import { registerKeybinding } from '$lib/utils/keybinding';
+  import { PUBLIC_MAPTILER_API_KEY } from '$app/env/public';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import BasemapGrid from '#lib/components/map/BasemapGrid.svelte';
+  import Modal from '#lib/components/shared/Modal.svelte';
+  import TabItem from '#lib/components/shared/TabItem.svelte';
+  import Tabs from '#lib/components/shared/Tabs.svelte';
+  import { ir } from '#lib/stores/ir.ts';
+  import { layout } from '#lib/stores/layout.ts';
+  import type { BasemapProvider } from '#lib/types/basemap.ts';
+  import { BASEMAPS } from '#lib/utils/basemap.ts';
+  import { registerKeybinding } from '#lib/utils/keybinding.ts';
 
   interface Props {
     map: Map;
@@ -126,9 +126,9 @@
     bodyClass="min-h-0 overflow-y-auto overflow-x-hidden"
   >
     {#each providers as provider, i (provider)}
-      <TabItem title={provider} defaultOpen={i === 0}>
-        <BasemapGrid {provider} />
-      </TabItem>
+      <TabItem title={provider} defaultOpen={i === 0}
+        ><BasemapGrid {provider} /></TabItem
+      >
     {/each}
   </Tabs>
 </Modal>

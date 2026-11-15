@@ -1,26 +1,26 @@
 <script lang="ts">
-  import { tooltip } from '$lib/attachments/tooltip';
-  import ChoroplethIcon from '$lib/components/icons/ChoroplethIcon.svelte';
-  import HeatmapIcon from '$lib/components/icons/HeatmapIcon.svelte';
-  import LayerHiddenIcon from '$lib/components/icons/LayerHiddenIcon.svelte';
-  import LayerVisibleIcon from '$lib/components/icons/LayerVisibleIcon.svelte';
-  import LineIcon from '$lib/components/icons/LineIcon.svelte';
-  import PointIcon from '$lib/components/icons/PointIcon.svelte';
-  import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
-  import ProportionalSymbolIcon from '$lib/components/icons/ProportionalSymbolIcon.svelte';
-  import TooltipHiddenIcon from '$lib/components/icons/TooltipHiddenIcon.svelte';
-  import TooltipIcon from '$lib/components/icons/TooltipIcon.svelte';
-  import RemoveLayer from '$lib/components/layers/RemoveLayer.svelte';
-  import ChoroplethLegend from '$lib/components/legends/ChoroplethLegend.svelte';
-  import HeatmapLegend from '$lib/components/legends/HeatmapLegend.svelte';
-  import LineLegend from '$lib/components/legends/LineLegend.svelte';
-  import PointLegend from '$lib/components/legends/PointLegend.svelte';
-  import PolygonLegend from '$lib/components/legends/PolygonLegend.svelte';
-  import ProportionalSymbolLegend from '$lib/components/legends/ProportionalSymbolLegend.svelte';
-  import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import { layerId } from '$lib/state/layerId.svelte';
-  import type { CartoKitLayer } from '$lib/types';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import ChoroplethIcon from '#lib/components/icons/ChoroplethIcon.svelte';
+  import HeatmapIcon from '#lib/components/icons/HeatmapIcon.svelte';
+  import LayerHiddenIcon from '#lib/components/icons/LayerHiddenIcon.svelte';
+  import LayerVisibleIcon from '#lib/components/icons/LayerVisibleIcon.svelte';
+  import LineIcon from '#lib/components/icons/LineIcon.svelte';
+  import PointIcon from '#lib/components/icons/PointIcon.svelte';
+  import PolygonIcon from '#lib/components/icons/PolygonIcon.svelte';
+  import ProportionalSymbolIcon from '#lib/components/icons/ProportionalSymbolIcon.svelte';
+  import TooltipHiddenIcon from '#lib/components/icons/TooltipHiddenIcon.svelte';
+  import TooltipIcon from '#lib/components/icons/TooltipIcon.svelte';
+  import RemoveLayer from '#lib/components/layers/RemoveLayer.svelte';
+  import ChoroplethLegend from '#lib/components/legends/ChoroplethLegend.svelte';
+  import HeatmapLegend from '#lib/components/legends/HeatmapLegend.svelte';
+  import LineLegend from '#lib/components/legends/LineLegend.svelte';
+  import PointLegend from '#lib/components/legends/PointLegend.svelte';
+  import PolygonLegend from '#lib/components/legends/PolygonLegend.svelte';
+  import ProportionalSymbolLegend from '#lib/components/legends/ProportionalSymbolLegend.svelte';
+  import TextInput from '#lib/components/shared/TextInput.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import { layerId } from '#lib/state/layerId.svelte.ts';
+  import type { CartoKitLayer } from '#lib/types/index.ts';
 
   interface Props {
     layer: CartoKitLayer;

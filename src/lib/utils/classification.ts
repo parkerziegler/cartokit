@@ -1,5 +1,5 @@
-import type { QuantitativeColorScale } from '$lib/types';
-import type { CartoKitSource } from '$lib/types/source';
+import type { QuantitativeColorScale } from '#lib/types/index.ts';
+import type { CartoKitSource } from '#lib/types/source.ts';
 
 export const CLASSIFICATION_METHODS: QuantitativeColorScale['type'][] = [
   'Continuous',

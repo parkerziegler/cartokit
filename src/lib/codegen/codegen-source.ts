@@ -1,20 +1,20 @@
 import { camelCase } from 'lodash-es';
 
-import type { CartoKitIR, CartoKitLayer } from '$lib/types';
-import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
-import type { DuckDBTable } from '$lib/types/db';
+import type { CartoKitIR, CartoKitLayer } from '#lib/types/index.ts';
+import type { CartoKitBackendAnalysis } from '#lib/types/codegen.ts';
+import type { DuckDBTable } from '#lib/types/db.ts';
 import type {
   CartoKitGeoJSONSource,
   CartoKitGeoParquetSource,
   CartoKitPMTilesSource,
   CartoKitTableSource
-} from '$lib/types/source';
+} from '#lib/types/source.ts';
 import {
   generateCreateTableStatement,
   generateCreateDerivedTableStatement,
   generateSelectStatement
-} from '$lib/utils/db';
-import { getLayerDescendants } from '$lib/utils/ir';
+} from '#lib/utils/db.ts';
+import { getLayerDescendants } from '#lib/utils/ir.ts';
 
 /**
  * Get the name a source's data is read under in generated code: its URL, or the

@@ -1,21 +1,21 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { tooltip } from '$lib/attachments/tooltip';
-  import CompilerOptions from '$lib/components/editor/CompilerOptions.svelte';
-  import Program from '$lib/components/editor/Program.svelte';
-  import ViteIcon from '$lib/components/icons/ViteIcon.svelte';
-  import TabItem from '$lib/components/shared/TabItem.svelte';
-  import Tabs from '$lib/components/shared/Tabs.svelte';
-  import { ir } from '$lib/stores/ir';
-  import { program } from '$lib/stores/program';
-  import { downloadBlob } from '$lib/utils/download';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import CompilerOptions from '#lib/components/editor/CompilerOptions.svelte';
+  import Program from '#lib/components/editor/Program.svelte';
+  import ViteIcon from '#lib/components/icons/ViteIcon.svelte';
+  import TabItem from '#lib/components/shared/TabItem.svelte';
+  import Tabs from '#lib/components/shared/Tabs.svelte';
+  import { ir } from '#lib/stores/ir.ts';
+  import { program } from '#lib/stores/program.ts';
+  import { downloadBlob } from '#lib/utils/download.ts';
 
   const PROJECT_NAME = 'cartokit-project';
 
   async function onExportClick() {
     // Lazy-load the zip module so fflate stays out of the main bundle.
-    const { zipProject } = await import('$lib/utils/zip');
+    const { zipProject } = await import('#lib/utils/zip.ts');
 
     downloadBlob(
       await zipProject($ir, $program, PROJECT_NAME),

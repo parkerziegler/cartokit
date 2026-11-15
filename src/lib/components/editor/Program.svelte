@@ -2,11 +2,11 @@
   import { EditorView } from 'codemirror';
   import { onMount } from 'svelte';
 
-  import { tooltip } from '$lib/attachments/tooltip';
-  import ClipboardCheckIcon from '$lib/components/icons/ClipboardCheckIcon.svelte';
-  import ClipboardIcon from '$lib/components/icons/ClipboardIcon.svelte';
-  import CodeEditor from '$lib/components/shared/CodeEditor.svelte';
-  import { registerKeybinding } from '$lib/utils/keybinding';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import ClipboardCheckIcon from '#lib/components/icons/ClipboardCheckIcon.svelte';
+  import ClipboardIcon from '#lib/components/icons/ClipboardIcon.svelte';
+  import CodeEditor from '#lib/components/shared/CodeEditor.svelte';
+  import { registerKeybinding } from '#lib/utils/keybinding.ts';
 
   interface Props {
     doc: string;

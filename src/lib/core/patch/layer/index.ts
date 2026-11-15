@@ -1,12 +1,12 @@
-import type { CartoKitDiff } from '$lib/core/diff';
-import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
-import { generateCartoKitLayer } from '$lib/interaction/layer';
-import { catalog } from '$lib/state/catalog.svelte';
-import { db } from '$lib/state/db.svelte';
-import type { CartoKitSource } from '$lib/types/source';
-import { buildCatalog } from '$lib/utils/catalog';
-import { createTable } from '$lib/utils/db';
-import { CartoKitPMTiles } from '$lib/utils/pmtiles';
+import type { CartoKitDiff } from '#lib/core/diff/index.ts';
+import type { PatchFnParams, PatchFnResult } from '#lib/core/patch/index.ts';
+import { generateCartoKitLayer } from '#lib/interaction/layer.ts';
+import { catalog } from '#lib/state/catalog.svelte.ts';
+import { db } from '#lib/state/db.svelte.ts';
+import type { CartoKitSource } from '#lib/types/source.ts';
+import { buildCatalog } from '#lib/utils/catalog.ts';
+import { createTable } from '#lib/utils/db.ts';
+import { CartoKitPMTiles } from '#lib/utils/pmtiles.ts';
 
 /**
  * Patch layer-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.

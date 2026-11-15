@@ -1,7 +1,7 @@
 import { Project, SyntaxKind, ScriptTarget, ModuleKind, ts } from 'ts-morph';
 
-import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
-import dbSrc from '$lib/utils/db?raw';
+import type { CartoKitBackendAnalysis } from '#lib/types/codegen.ts';
+import dbSrc from '#lib/utils/db?raw';
 
 // Create a new project using ts-morph to parse the source code for TypeScript.
 const projectTS = new Project({

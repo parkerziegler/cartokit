@@ -1,15 +1,15 @@
 import type { Map, MapLayerMouseEvent, MapMouseEvent } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
-import { feature } from '$lib/state/feature.svelte';
-import { layerId } from '$lib/state/layerId.svelte';
-import { listeners, type LayerListeners } from '$lib/state/listeners.svelte';
-import { popup } from '$lib/state/popup.svelte';
-import { ir } from '$lib/stores/ir';
-import { layout } from '$lib/stores/layout';
-import type { CartoKitLayer } from '$lib/types';
-import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
-import { contextMenu } from '$lib/state/context-menu.svelte';
+import { feature } from '#lib/state/feature.svelte.ts';
+import { layerId } from '#lib/state/layerId.svelte.ts';
+import { listeners, type LayerListeners } from '#lib/state/listeners.svelte.ts';
+import { popup } from '#lib/state/popup.svelte.ts';
+import { ir } from '#lib/stores/ir.ts';
+import { layout } from '#lib/stores/layout.ts';
+import type { CartoKitLayer } from '#lib/types/index.ts';
+import { getCanonicalLayerId, getSourceId } from '#lib/utils/layer/id.ts';
+import { contextMenu } from '#lib/state/context-menu.svelte.ts';
 
 /**
  * Add a hover effect to all features in a point layer.

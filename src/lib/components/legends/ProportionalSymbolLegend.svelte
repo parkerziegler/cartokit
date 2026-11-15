@@ -1,13 +1,13 @@
 <script lang="ts">
   import * as d3 from 'd3';
 
-  import CategoricalLegend from '$lib/components/legends/CategoricalLegend.svelte';
-  import QuantitativeLegend from '$lib/components/legends/QuantitativeLegend.svelte';
-  import { catalog } from '$lib/state/catalog.svelte';
-  import type { CartoKitProportionalSymbolLayer } from '$lib/types';
-  import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
-  import { hexWithOpacity } from '$lib/utils/color';
-  import { signedSqrt, signedSquare } from '$lib/utils/number';
+  import CategoricalLegend from '#lib/components/legends/CategoricalLegend.svelte';
+  import QuantitativeLegend from '#lib/components/legends/QuantitativeLegend.svelte';
+  import { catalog } from '#lib/state/catalog.svelte.ts';
+  import type { CartoKitProportionalSymbolLayer } from '#lib/types/index.ts';
+  import type { QuantitativeAttributeEntry } from '#lib/types/catalog.ts';
+  import { hexWithOpacity } from '#lib/utils/color.ts';
+  import { signedSqrt, signedSquare } from '#lib/utils/number.ts';
 
   interface Props {
     layer: CartoKitProportionalSymbolLayer;

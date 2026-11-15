@@ -2,8 +2,8 @@ import type { AsyncDuckDB, AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 import type { Geometry } from 'geojson';
 import { snakeCase } from 'lodash-es';
 
-import { queryGeometryType, quoteIdentifier } from '$lib/utils/db';
-import { DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES } from '$lib/utils/sf';
+import { queryGeometryType, quoteIdentifier } from '#lib/utils/db.ts';
+import { DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES } from '#lib/utils/sf.ts';
 
 interface GetGeoParquetGeometryTypeParams {
   conn: AsyncDuckDBConnection;

@@ -1,6 +1,6 @@
-import type { CartoKitDiff } from '$lib/core/diff';
-import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
-import { catalog } from '$lib/state/catalog.svelte';
+import type { CartoKitDiff } from '#lib/core/diff/index.ts';
+import type { PatchFnParams, PatchFnResult } from '#lib/core/patch/index.ts';
+import { catalog } from '#lib/state/catalog.svelte.ts';
 import type {
   CartoKitChoroplethLayer,
   CartoKitPointLayer,
@@ -9,27 +9,27 @@ import type {
   CategoricalColorScale,
   ContinuousColorScale,
   QuantitativeColorScale
-} from '$lib/types';
+} from '#lib/types/index.ts';
 import type {
   CategoricalAttributeEntry,
   QuantitativeAttributeEntry
-} from '$lib/types/catalog';
+} from '#lib/types/catalog.ts';
 import {
   selectCategoricalAttribute,
   selectQuantitativeAttribute
-} from '$lib/utils/attribute';
-import { randomColor } from '$lib/utils/color';
+} from '#lib/utils/attribute.ts';
+import { randomColor } from '#lib/utils/color.ts';
 import {
   convertRampToScheme,
   convertSchemeToRamp
-} from '$lib/utils/color/converter';
+} from '#lib/utils/color/converter.ts';
 import {
   DEFAULT_CATEGORICAL_SCHEME,
   DEFAULT_COUNT,
   DEFAULT_METHOD,
   DEFAULT_QUANTITATIVE_SCHEME,
   DEFAULT_SCHEME_DIRECTION
-} from '$lib/utils/constants';
+} from '#lib/utils/constants.ts';
 
 /**
  * Patch fill-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.

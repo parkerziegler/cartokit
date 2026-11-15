@@ -1,8 +1,8 @@
 <script lang="ts">
-  import CategoricalLegend from '$lib/components/legends/CategoricalLegend.svelte';
-  import QuantitativeLegend from '$lib/components/legends/QuantitativeLegend.svelte';
-  import type { CartoKitPointLayer } from '$lib/types';
-  import { formatFeatureCount } from '$lib/utils/formatters/feature';
+  import CategoricalLegend from '#lib/components/legends/CategoricalLegend.svelte';
+  import QuantitativeLegend from '#lib/components/legends/QuantitativeLegend.svelte';
+  import type { CartoKitPointLayer } from '#lib/types/index.ts';
+  import { formatFeatureCount } from '#lib/utils/formatters/feature.ts';
 
   interface Props {
     layer: CartoKitPointLayer;

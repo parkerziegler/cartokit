@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { validateRange } from '$lib/utils/validators/range';
+  import { validateRange } from '#lib/utils/validators/range.ts';
 
   interface Props {
     value: number;

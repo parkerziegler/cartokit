@@ -1,9 +1,13 @@
 <script lang="ts">
-  import ColorRamp from '$lib/components/channel/shared/ColorRamp.svelte';
-  import { catalog } from '$lib/state/catalog.svelte';
-  import type { ConstantStroke, LayerType, QuantitativeFill } from '$lib/types';
-  import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
-  import { materializeColorScheme } from '$lib/utils/color/scheme';
+  import ColorRamp from '#lib/components/channel/shared/ColorRamp.svelte';
+  import { catalog } from '#lib/state/catalog.svelte.ts';
+  import type {
+    ConstantStroke,
+    LayerType,
+    QuantitativeFill
+  } from '#lib/types/index.ts';
+  import type { QuantitativeAttributeEntry } from '#lib/types/catalog.ts';
+  import { materializeColorScheme } from '#lib/utils/color/scheme.ts';
 
   interface Props {
     fill: QuantitativeFill;

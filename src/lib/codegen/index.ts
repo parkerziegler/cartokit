@@ -5,19 +5,19 @@ import html from 'prettier/plugins/html';
 import postcss from 'prettier/plugins/postcss';
 import typescript from 'prettier/plugins/typescript';
 
-import { analyzeIR } from '$lib/codegen/analysis';
-import { codegenCSS } from '$lib/codegen/codegen-css';
-import { codegenDB } from '$lib/codegen/codegen-db';
-import { codegenHTML } from '$lib/codegen/codegen-html';
-import { codegenImports } from '$lib/codegen/codegen-imports';
-import { codegenPackageJson } from '$lib/codegen/codegen-package-json';
-import { codegenTsconfigJson } from '$lib/codegen/codegen-tsconfig-json';
-import type { CartoKitIR } from '$lib/types';
+import { analyzeIR } from '#lib/codegen/analysis.ts';
+import { codegenCSS } from '#lib/codegen/codegen-css.ts';
+import { codegenDB } from '#lib/codegen/codegen-db.ts';
+import { codegenHTML } from '#lib/codegen/codegen-html.ts';
+import { codegenImports } from '#lib/codegen/codegen-imports.ts';
+import { codegenPackageJson } from '#lib/codegen/codegen-package-json.ts';
+import { codegenTsconfigJson } from '#lib/codegen/codegen-tsconfig-json.ts';
+import type { CartoKitIR } from '#lib/types/index.ts';
 import type {
   CartoKitBackend,
   CartokitCodegenProgramFile,
   CartokitCodegenLanguage
-} from '$lib/types/codegen';
+} from '#lib/types/codegen.ts';
 
 /**
  * Format cartokit-generated program text.

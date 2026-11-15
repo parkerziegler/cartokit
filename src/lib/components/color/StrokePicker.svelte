@@ -1,9 +1,9 @@
 <script lang="ts">
-  import HexInput from '$lib/components/color/HexInput.svelte';
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import type { ConstantStroke } from '$lib/types';
+  import HexInput from '#lib/components/color/HexInput.svelte';
+  import FieldLabel from '#lib/components/shared/FieldLabel.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import type { ConstantStroke } from '#lib/types/index.ts';
   interface Props {
     layerId: string;
     stroke: ConstantStroke;

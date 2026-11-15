@@ -2,8 +2,8 @@ import type {
   CartoKitHeatmapLayer,
   CartoKitPointLayer,
   CartoKitProportionalSymbolLayer
-} from '$lib/types';
-import { selectQuantitativeAttribute } from '$lib/utils/attribute';
+} from '#lib/types/index.ts';
+import { selectQuantitativeAttribute } from '#lib/utils/attribute.ts';
 import {
   DEFAULT_FILL,
   DEFAULT_MAX_SIZE,
@@ -11,7 +11,7 @@ import {
   DEFAULT_OPACITY,
   DEFAULT_STROKE,
   DEFAULT_STROKE_WIDTH
-} from '$lib/utils/constants';
+} from '#lib/utils/constants.ts';
 
 /**
  * Patch a {@link CartoKitHeatmapLayer} or a {@link CartoKitPointLayer} to a

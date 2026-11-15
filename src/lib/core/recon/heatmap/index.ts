@@ -1,8 +1,8 @@
-import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
-import { deriveColorRamp } from '$lib/interaction/color';
-import { deriveHeatmapWeight } from '$lib/interaction/weight';
-import { map } from '$lib/state/map.svelte';
-import type { CartoKitHeatmapLayer } from '$lib/types';
+import type { ReconFnParams, ReconFnResult } from '#lib/core/recon/index.ts';
+import { deriveColorRamp } from '#lib/interaction/color.ts';
+import { deriveHeatmapWeight } from '#lib/interaction/weight.ts';
+import { map } from '#lib/state/map.svelte.ts';
+import type { CartoKitHeatmapLayer } from '#lib/types/index.ts';
 
 /**
  * Reconcile heatmap-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.

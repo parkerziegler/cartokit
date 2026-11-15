@@ -1,14 +1,17 @@
 <script lang="ts">
-  import { focus } from '$lib/actions/focus.svelte';
-  import { onClickOutside } from '$lib/attachments/on-click-outside';
-  import { tooltip } from '$lib/attachments/tooltip';
-  import ColorRamp from '$lib/components/channel/shared/ColorRamp.svelte';
-  import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import Portal from '$lib/components/shared/Portal.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import type { QuantitativeColorRamp, RampDirection } from '$lib/types/color';
-  import { QUANTITATIVE_COLOR_RAMPS } from '$lib/utils/color/ramp';
+  import { focus } from '#lib/actions/focus.svelte.ts';
+  import { onClickOutside } from '#lib/attachments/on-click-outside.ts';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import ColorRamp from '#lib/components/channel/shared/ColorRamp.svelte';
+  import ReverseIcon from '#lib/components/icons/ReverseIcon.svelte';
+  import FieldLabel from '#lib/components/shared/FieldLabel.svelte';
+  import Portal from '#lib/components/shared/Portal.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import type {
+    QuantitativeColorRamp,
+    RampDirection
+  } from '#lib/types/color.ts';
+  import { QUANTITATIVE_COLOR_RAMPS } from '#lib/utils/color/ramp.ts';
 
   interface Props {
     layerId: string;

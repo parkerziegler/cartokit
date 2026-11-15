@@ -1,8 +1,8 @@
 import type { Geometry } from 'geojson';
 
-import type { CartoKitLayer } from '$lib/types';
-import type { AttributeKind } from '$lib/types/attribute';
-import type { VectorGeometry } from '$lib/types/source';
+import type { CartoKitLayer } from '#lib/types/index.ts';
+import type { AttributeKind } from '#lib/types/attribute.ts';
+import type { VectorGeometry } from '#lib/types/source.ts';
 
 /**
  * Represents a per-attribute catalog entry for a quantitative attribute,

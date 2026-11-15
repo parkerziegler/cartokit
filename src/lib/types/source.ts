@@ -1,5 +1,5 @@
-import type { DuckDBTable } from '$lib/types/db';
-import type { Transformation } from '$lib/types/transformation';
+import type { DuckDBTable } from '#lib/types/db.ts';
+import type { Transformation } from '#lib/types/transformation.ts';
 
 /** Represents a GeoJSON data source. */
 export interface CartoKitGeoJSONSource {

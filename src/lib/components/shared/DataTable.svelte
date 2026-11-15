@@ -8,8 +8,8 @@
   import type { ClassValue } from 'svelte/elements';
   import { slide } from 'svelte/transition';
 
-  import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
-  import { pluralize } from '$lib/utils/formatters/shared';
+  import CloseIcon from '#lib/components/icons/CloseIcon.svelte';
+  import { pluralize } from '#lib/utils/formatters/shared.ts';
 
   interface Props {
     class?: ClassValue;

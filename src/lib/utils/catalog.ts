@@ -2,23 +2,26 @@ import type { AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 import * as d3 from 'd3';
 import type { Geometry } from 'geojson';
 
-import type { QuantitativeStepCount } from '$lib/types';
+import type { QuantitativeStepCount } from '#lib/types/index.ts';
 import {
   type AttributeEntry,
   type Catalog,
   type CategoricalAttributeEntry,
   type QuantitativeAttributeEntry
-} from '$lib/types/catalog';
-import type { CartoKitPMTilesSource, CartoKitSource } from '$lib/types/source';
-import { quoteIdentifier } from '$lib/utils/db';
-import { getGeoJSONGeometryType } from '$lib/utils/geojson';
-import { getGeoParquetGeometryType } from '$lib/utils/geoparquet';
-import { selectTileStats } from '$lib/utils/pmtiles';
+} from '#lib/types/catalog.ts';
+import type {
+  CartoKitPMTilesSource,
+  CartoKitSource
+} from '#lib/types/source.ts';
+import { quoteIdentifier } from '#lib/utils/db.ts';
+import { getGeoJSONGeometryType } from '#lib/utils/geojson.ts';
+import { getGeoParquetGeometryType } from '#lib/utils/geoparquet.ts';
+import { selectTileStats } from '#lib/utils/pmtiles.ts';
 import {
   deriveEqualIntervals,
   deriveJenksBreaks,
   deriveQuantiles
-} from '$lib/utils/scales';
+} from '#lib/utils/scales.ts';
 
 interface DeriveGeometryTypeParams {
   conn: AsyncDuckDBConnection;

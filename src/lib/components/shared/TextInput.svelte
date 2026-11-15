@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { FormEventHandler, KeyboardEventHandler } from 'svelte/elements';
 
-  import { onClickOutside } from '$lib/attachments/on-click-outside';
+  import { onClickOutside } from '#lib/attachments/on-click-outside.ts';
 
   interface Props {
     value: string;

@@ -1,4 +1,4 @@
-import type { CartoKitSource } from '$lib/types/source';
+import type { CartoKitSource } from '#lib/types/source.ts';
 
 // CartoKit default values.
 export const DEFAULT_FILL = '#000000';

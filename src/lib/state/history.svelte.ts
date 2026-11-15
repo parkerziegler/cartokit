@@ -1,6 +1,6 @@
 import { on } from 'svelte/events';
 
-import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
 
 // Use $state.raw to avoid deep reactivity and Proxies.
 //

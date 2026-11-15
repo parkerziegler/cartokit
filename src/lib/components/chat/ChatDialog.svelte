@@ -3,10 +3,10 @@
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
 
-  import { tooltip } from '$lib/attachments/tooltip';
-  import { chat } from '$lib/state/chat.svelte';
-  import type { Prompt } from '$lib/types/llm';
-  import { pluralize } from '$lib/utils/formatters/shared';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import { chat } from '#lib/state/chat.svelte.ts';
+  import type { Prompt } from '#lib/types/llm.ts';
+  import { pluralize } from '#lib/utils/formatters/shared.ts';
 
   interface Props {
     ref?: HTMLDivElement;

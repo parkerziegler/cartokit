@@ -5,24 +5,24 @@
   import { onMount, untrack } from 'svelte';
   import { slide } from 'svelte/transition';
 
-  import { tooltip } from '$lib/attachments/tooltip';
-  import ChevronIcon from '$lib/components/icons/ChevronIcon.svelte';
-  import Key from '$lib/components/shared/Key.svelte';
-  import LoadingIndicator from '$lib/components/shared/LoadingIndicator.svelte';
-  import BufferParams from '$lib/components/transformation/BufferParams.svelte';
-  import { applyDiff } from '$lib/core/diff';
-  import { contextMenu } from '$lib/state/context-menu.svelte';
-  import { db } from '$lib/state/db.svelte';
-  import { map } from '$lib/state/map.svelte';
-  import { ir } from '$lib/stores/ir';
-  import type { Transformation } from '$lib/types/transformation';
-  import { DEFAULT_SIZE } from '$lib/utils/constants';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import ChevronIcon from '#lib/components/icons/ChevronIcon.svelte';
+  import Key from '#lib/components/shared/Key.svelte';
+  import LoadingIndicator from '#lib/components/shared/LoadingIndicator.svelte';
+  import BufferParams from '#lib/components/transformation/BufferParams.svelte';
+  import { applyDiff } from '#lib/core/diff/index.ts';
+  import { contextMenu } from '#lib/state/context-menu.svelte.ts';
+  import { db } from '#lib/state/db.svelte.ts';
+  import { map } from '#lib/state/map.svelte.ts';
+  import { ir } from '#lib/stores/ir.ts';
+  import type { Transformation } from '#lib/types/transformation.ts';
+  import { DEFAULT_SIZE } from '#lib/utils/constants.ts';
   import {
     generateTransformationExpression,
     quoteIdentifier,
     toFeatureCollection
-  } from '$lib/utils/db';
-  import { registerKeybinding } from '$lib/utils/keybinding';
+  } from '#lib/utils/db.ts';
+  import { registerKeybinding } from '#lib/utils/keybinding.ts';
 
   interface Props {
     transformation: Transformation;

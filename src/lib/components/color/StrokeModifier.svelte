@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { tooltip } from '$lib/attachments/tooltip';
-  import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
-  import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import type { ConstantStroke } from '$lib/types';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import MinusIcon from '#lib/components/icons/MinusIcon.svelte';
+  import PlusIcon from '#lib/components/icons/PlusIcon.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import type { ConstantStroke } from '#lib/types/index.ts';
 
   interface Props {
     layerId: string;

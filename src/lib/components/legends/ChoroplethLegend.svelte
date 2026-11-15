@@ -1,7 +1,7 @@
 <script lang="ts">
-  import CategoricalLegend from '$lib/components/legends/CategoricalLegend.svelte';
-  import QuantitativeLegend from '$lib/components/legends/QuantitativeLegend.svelte';
-  import type { CartoKitChoroplethLayer } from '$lib/types';
+  import CategoricalLegend from '#lib/components/legends/CategoricalLegend.svelte';
+  import QuantitativeLegend from '#lib/components/legends/QuantitativeLegend.svelte';
+  import type { CartoKitChoroplethLayer } from '#lib/types/index.ts';
 
   interface Props {
     layer: CartoKitChoroplethLayer;

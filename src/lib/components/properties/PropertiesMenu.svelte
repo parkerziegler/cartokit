@@ -1,24 +1,24 @@
 <script lang="ts">
   import type { Map } from 'maplibre-gl';
 
-  import DownloadData from '$lib/components/data/DownloadData.svelte';
-  import ViewData from '$lib/components/data/ViewData.svelte';
-  import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
-  import LayerTypeSelect from '$lib/components/layer-types/LayerTypeSelect.svelte';
-  import ChoroplethPropertiesPanel from '$lib/components/properties/ChoroplethPropertiesPanel.svelte';
-  import HeatmapPropertiesPanel from '$lib/components/properties/HeatmapPropertiesPanel.svelte';
-  import LinePropertiesPanel from '$lib/components/properties/LinePropertiesPanel.svelte';
-  import PointPropertiesPanel from '$lib/components/properties/PointPropertiesPanel.svelte';
-  import PolygonPropertiesPanel from '$lib/components/properties/PolygonPropertiesPanel.svelte';
-  import ProportionalSymbolPropertiesPanel from '$lib/components/properties/ProportionalSymbolPropertiesPanel.svelte';
-  import Menu from '$lib/components/shared/Menu.svelte';
-  import MenuItem from '$lib/components/shared/MenuItem.svelte';
-  import MenuTitle from '$lib/components/shared/MenuTitle.svelte';
-  import SourceLayerSelect from '$lib/components/vector/SourceLayerSelect.svelte';
-  import { feature } from '$lib/state/feature.svelte';
-  import { layerId } from '$lib/state/layerId.svelte';
-  import { layout } from '$lib/stores/layout';
-  import type { CartoKitLayer } from '$lib/types';
+  import DownloadData from '#lib/components/data/DownloadData.svelte';
+  import ViewData from '#lib/components/data/ViewData.svelte';
+  import CloseIcon from '#lib/components/icons/CloseIcon.svelte';
+  import LayerTypeSelect from '#lib/components/layer-types/LayerTypeSelect.svelte';
+  import ChoroplethPropertiesPanel from '#lib/components/properties/ChoroplethPropertiesPanel.svelte';
+  import HeatmapPropertiesPanel from '#lib/components/properties/HeatmapPropertiesPanel.svelte';
+  import LinePropertiesPanel from '#lib/components/properties/LinePropertiesPanel.svelte';
+  import PointPropertiesPanel from '#lib/components/properties/PointPropertiesPanel.svelte';
+  import PolygonPropertiesPanel from '#lib/components/properties/PolygonPropertiesPanel.svelte';
+  import ProportionalSymbolPropertiesPanel from '#lib/components/properties/ProportionalSymbolPropertiesPanel.svelte';
+  import Menu from '#lib/components/shared/Menu.svelte';
+  import MenuItem from '#lib/components/shared/MenuItem.svelte';
+  import MenuTitle from '#lib/components/shared/MenuTitle.svelte';
+  import SourceLayerSelect from '#lib/components/vector/SourceLayerSelect.svelte';
+  import { feature } from '#lib/state/feature.svelte.ts';
+  import { layerId } from '#lib/state/layerId.svelte.ts';
+  import { layout } from '#lib/stores/layout.ts';
+  import type { CartoKitLayer } from '#lib/types/index.ts';
 
   interface Props {
     map: Map;

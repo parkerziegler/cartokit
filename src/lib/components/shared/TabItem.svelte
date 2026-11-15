@@ -5,7 +5,7 @@
   import {
     TabContext,
     type SelectedTab
-  } from '$lib/components/shared/Tabs.svelte';
+  } from '#lib/components/shared/Tabs.svelte';
 
   interface Props {
     class?: (open: boolean) => ClassValue;

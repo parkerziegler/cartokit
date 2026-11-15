@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { BufferTransformation } from '$lib/types/transformation';
+  import type { BufferTransformation } from '#lib/types/transformation.ts';
 
   interface Props {
     args: BufferTransformation['args'];

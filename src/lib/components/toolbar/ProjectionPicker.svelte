@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { tooltip } from '$lib/attachments/tooltip';
-  import GlobeIcon from '$lib/components/icons/GlobeIcon.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import { map } from '$lib/state/map.svelte';
-  import { ir } from '$lib/stores/ir';
-  import { registerKeybinding } from '$lib/utils/keybinding';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import GlobeIcon from '#lib/components/icons/GlobeIcon.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import { map } from '#lib/state/map.svelte.ts';
+  import { ir } from '#lib/stores/ir.ts';
+  import { registerKeybinding } from '#lib/utils/keybinding.ts';
 
   onMount(() => {
     const deregisterKeybinding = registerKeybinding('g', onToggleGlobe);

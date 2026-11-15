@@ -1,8 +1,8 @@
 import type { ExpressionSpecification } from 'maplibre-gl';
 
-import { catalog } from '$lib/state/catalog.svelte';
-import type { CartoKitHeatmapLayer } from '$lib/types';
-import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
+import { catalog } from '#lib/state/catalog.svelte.ts';
+import type { CartoKitHeatmapLayer } from '#lib/types/index.ts';
+import type { QuantitativeAttributeEntry } from '#lib/types/catalog.ts';
 
 /**
  * Derive an ExpressionSpecification or number for the weight of a

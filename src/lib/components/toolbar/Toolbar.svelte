@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { Map } from 'maplibre-gl';
 
-  import ActionPicker from '$lib/components/toolbar/ActionPicker.svelte';
-  import BasemapPicker from '$lib/components/toolbar/BasemapPicker.svelte';
-  import ProjectionPicker from '$lib/components/toolbar/ProjectionPicker.svelte';
-  import ChatButton from '$lib/components/chat/ChatButton.svelte';
-  import { chat } from '$lib/state/chat.svelte';
-  import { layout } from '$lib/stores/layout';
+  import ActionPicker from '#lib/components/toolbar/ActionPicker.svelte';
+  import BasemapPicker from '#lib/components/toolbar/BasemapPicker.svelte';
+  import ProjectionPicker from '#lib/components/toolbar/ProjectionPicker.svelte';
+  import ChatButton from '#lib/components/chat/ChatButton.svelte';
+  import { chat } from '#lib/state/chat.svelte.ts';
+  import { layout } from '#lib/stores/layout.ts';
 
   interface Props {
     map: Map;

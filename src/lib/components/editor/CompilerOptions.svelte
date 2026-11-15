@@ -1,9 +1,9 @@
 <script lang="ts">
   import { slide } from 'svelte/transition';
 
-  import ChevronIcon from '$lib/components/icons/ChevronIcon.svelte';
-  import GearIcon from '$lib/components/icons/GearIcon.svelte';
-  import { backend } from '$lib/stores/backend';
+  import ChevronIcon from '#lib/components/icons/ChevronIcon.svelte';
+  import GearIcon from '#lib/components/icons/GearIcon.svelte';
+  import { backend } from '#lib/stores/backend.ts';
 
   let optionsExpanded = $state(false);
 

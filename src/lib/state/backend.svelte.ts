@@ -1,4 +1,4 @@
-import type { CartoKitBackend } from '$lib/types/codegen';
+import type { CartoKitBackend } from '#lib/types/codegen.ts';
 
 export const backend = $state<{ value: CartoKitBackend }>({
   value: {

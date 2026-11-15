@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { tooltip } from '$lib/attachments/tooltip';
-  import TableIcon from '$lib/components/icons/TableIcon.svelte';
-  import { layout } from '$lib/stores/layout';
-  import { registerKeybinding } from '$lib/utils/keybinding';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import TableIcon from '#lib/components/icons/TableIcon.svelte';
+  import { layout } from '#lib/stores/layout.ts';
+  import { registerKeybinding } from '#lib/utils/keybinding.ts';
 
   function onViewDataClick() {
     layout.update((layout) => {

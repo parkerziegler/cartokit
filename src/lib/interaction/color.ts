@@ -7,12 +7,12 @@ import type {
   CategoricalStyle,
   QuantitativeStyle,
   HeatmapStyle
-} from '$lib/types';
-import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
-import { DEFAULT_FILL } from '$lib/utils/constants';
-import { materializeColorRamp } from '$lib/utils/color/ramp';
-import { materializeColorScheme } from '$lib/utils/color/scheme';
-import { catalog } from '$lib/state/catalog.svelte';
+} from '#lib/types/index.ts';
+import type { QuantitativeAttributeEntry } from '#lib/types/catalog.ts';
+import { DEFAULT_FILL } from '#lib/utils/constants.ts';
+import { materializeColorRamp } from '#lib/utils/color/ramp.ts';
+import { materializeColorScheme } from '#lib/utils/color/scheme.ts';
+import { catalog } from '#lib/state/catalog.svelte.ts';
 
 /**
  * Derive a MapLibre GL JS expression for a choropleth color scale.

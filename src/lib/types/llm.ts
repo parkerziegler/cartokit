@@ -1,5 +1,5 @@
-import type { CartoKitDiff } from '$lib/core/diff';
-import type { CartoKitIR, CartoKitLayer } from '$lib/types';
+import type { CartoKitDiff } from '#lib/core/diff/index.ts';
+import type { CartoKitIR, CartoKitLayer } from '#lib/types/index.ts';
 
 /**
  * Represents the set of models cartokit supports prompting. This is the source

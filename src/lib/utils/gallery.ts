@@ -1,12 +1,12 @@
-import BuildingFootprints from '$lib/assets/gallery/building-footprints.webp?enhanced';
-import ClimateImpacts from '$lib/assets/gallery/climate-impacts.webp?enhanced';
-import Earthquakes from '$lib/assets/gallery/earthquakes.webp?enhanced';
-import Election2024 from '$lib/assets/gallery/election-2024.webp?enhanced';
-import JapanPop from '$lib/assets/gallery/japan-pop.webp?enhanced';
-import PowerPlants from '$lib/assets/gallery/power-plants.webp?enhanced';
-import UrbanAreas from '$lib/assets/gallery/urban-areas.webp?enhanced';
-import Wildfires from '$lib/assets/gallery/wildfires.webp?enhanced';
-import type { GalleryItem } from '$lib/types/gallery';
+import BuildingFootprints from '#lib/assets/gallery/building-footprints.webp?enhanced';
+import ClimateImpacts from '#lib/assets/gallery/climate-impacts.webp?enhanced';
+import Earthquakes from '#lib/assets/gallery/earthquakes.webp?enhanced';
+import Election2024 from '#lib/assets/gallery/election-2024.webp?enhanced';
+import JapanPop from '#lib/assets/gallery/japan-pop.webp?enhanced';
+import PowerPlants from '#lib/assets/gallery/power-plants.webp?enhanced';
+import UrbanAreas from '#lib/assets/gallery/urban-areas.webp?enhanced';
+import Wildfires from '#lib/assets/gallery/wildfires.webp?enhanced';
+import type { GalleryItem } from '#lib/types/gallery.ts';
 
 export const GALLERY_ITEMS: GalleryItem[] = [
   {

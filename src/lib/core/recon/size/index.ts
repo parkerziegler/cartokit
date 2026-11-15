@@ -1,7 +1,7 @@
-import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
-import { deriveSize } from '$lib/interaction/geometry';
-import { map } from '$lib/state/map.svelte';
-import type { CartoKitProportionalSymbolLayer } from '$lib/types';
+import type { ReconFnParams, ReconFnResult } from '#lib/core/recon/index.ts';
+import { deriveSize } from '#lib/interaction/geometry.ts';
+import { map } from '#lib/state/map.svelte.ts';
+import type { CartoKitProportionalSymbolLayer } from '#lib/types/index.ts';
 
 /**
  * Reconcile size-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.

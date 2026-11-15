@@ -1,6 +1,6 @@
 import type { Geometry } from 'geojson';
 
-import type { DuckDBGeometryType } from '$lib/types/db';
+import type { DuckDBGeometryType } from '#lib/types/db.ts';
 
 export const DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES: Record<
   DuckDBGeometryType,

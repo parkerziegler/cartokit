@@ -1,7 +1,7 @@
 import type { Map } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
-import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
+import { deriveColorRamp, deriveColorScale } from '#lib/interaction/color.ts';
 import {
   instrumentLineHover,
   instrumentLineSelect,
@@ -9,20 +9,20 @@ import {
   instrumentPointSelect,
   instrumentPolygonHover,
   instrumentPolygonSelect
-} from '$lib/interaction/events';
-import { deriveSize } from '$lib/interaction/geometry';
-import { catalog } from '$lib/state/catalog.svelte';
-import { ir } from '$lib/stores/ir';
-import type { CartoKitLayer } from '$lib/types';
-import type { CartoKitSource } from '$lib/types/source';
-import { randomColor } from '$lib/utils/color';
+} from '#lib/interaction/events.ts';
+import { deriveSize } from '#lib/interaction/geometry.ts';
+import { catalog } from '#lib/state/catalog.svelte.ts';
+import { ir } from '#lib/stores/ir.ts';
+import type { CartoKitLayer } from '#lib/types/index.ts';
+import type { CartoKitSource } from '#lib/types/source.ts';
+import { randomColor } from '#lib/utils/color.ts';
 import {
   DEFAULT_OPACITY,
   DEFAULT_SIZE,
   DEFAULT_STROKE_OPACITY,
   DEFAULT_STROKE_WIDTH
-} from '$lib/utils/constants';
-import { getAffiliatedLayerIds } from '$lib/utils/layer';
+} from '#lib/utils/constants.ts';
+import { getAffiliatedLayerIds } from '#lib/utils/layer.ts';
 
 /**
  * Generate a {@link CartoKitLayer} for a given {@link CartoKitSource}.

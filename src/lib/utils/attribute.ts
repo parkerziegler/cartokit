@@ -1,4 +1,4 @@
-import { catalog } from '$lib/state/catalog.svelte';
+import { catalog } from '#lib/state/catalog.svelte.ts';
 
 /**
  * Select the first quantitative attribute from a dataset.

@@ -1,9 +1,9 @@
-import type { CartoKitIR } from '$lib/types';
+import type { CartoKitIR } from '#lib/types/index.ts';
 import type {
   CartoKitBackend,
   CartoKitBackendAnalysis
-} from '$lib/types/codegen';
-import { getLayerDescendants } from '$lib/utils/ir';
+} from '#lib/types/codegen.ts';
+import { getLayerDescendants } from '#lib/utils/ir.ts';
 
 /**
  * Determine whether we need to include the PMTiles client library.

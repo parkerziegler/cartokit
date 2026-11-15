@@ -1,9 +1,9 @@
 import type { ExpressionSpecification } from 'maplibre-gl';
 
-import { catalog } from '$lib/state/catalog.svelte';
-import type { ProportionalSymbolStyle } from '$lib/types';
-import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
-import { signedSqrt } from '$lib/utils/number';
+import { catalog } from '#lib/state/catalog.svelte.ts';
+import type { ProportionalSymbolStyle } from '#lib/types/index.ts';
+import type { QuantitativeAttributeEntry } from '#lib/types/catalog.ts';
+import { signedSqrt } from '#lib/utils/number.ts';
 
 /**
  * Derive a MapLibre GL JS expression for a proportional symbol radius scale.

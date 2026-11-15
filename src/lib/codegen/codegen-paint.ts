@@ -1,8 +1,8 @@
-import { withDefault } from '$lib/codegen/utils';
-import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
-import { deriveSize } from '$lib/interaction/geometry';
-import { deriveHeatmapWeight } from '$lib/interaction/weight';
-import type { CartoKitLayer } from '$lib/types';
+import { withDefault } from '#lib/codegen/utils.ts';
+import { deriveColorRamp, deriveColorScale } from '#lib/interaction/color.ts';
+import { deriveSize } from '#lib/interaction/geometry.ts';
+import { deriveHeatmapWeight } from '#lib/interaction/weight.ts';
+import type { CartoKitLayer } from '#lib/types/index.ts';
 
 /**
  * Generate a program fragment representing the layer's fill.
