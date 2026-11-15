@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as d3 from 'd3';
 
-  import { DEFAULT_FILL } from '$lib/utils/constants';
+  import { DEFAULT_FILL } from '#lib/utils/constants.ts';
 
   interface Props {
     hex: string;

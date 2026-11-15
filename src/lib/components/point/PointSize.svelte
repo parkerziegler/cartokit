@@ -1,7 +1,7 @@
 <script lang="ts">
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import FieldLabel from '#lib/components/shared/FieldLabel.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
 
   interface Props {
     layerId: string;

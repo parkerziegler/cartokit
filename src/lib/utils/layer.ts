@@ -1,8 +1,8 @@
 import type { Geometry } from 'geojson';
 import type { Map as MapLibreGLMap } from 'maplibre-gl';
 
-import type { LayerType } from '$lib/types';
-import type { VectorGeometry } from '$lib/types/source';
+import type { LayerType } from '#lib/types/index.ts';
+import type { VectorGeometry } from '#lib/types/source.ts';
 
 /**
  * Determine whether a map layer id is affiliated with an existing

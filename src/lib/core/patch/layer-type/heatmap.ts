@@ -2,13 +2,13 @@ import type {
   CartoKitHeatmapLayer,
   CartoKitPointLayer,
   CartoKitProportionalSymbolLayer
-} from '$lib/types';
+} from '#lib/types/index.ts';
 import {
   DEFAULT_HEATMAP_INTENSITY,
   DEFAULT_HEATMAP_RADIUS,
   DEFAULT_RAMP,
   DEFAULT_SCHEME_DIRECTION
-} from '$lib/utils/constants';
+} from '#lib/utils/constants.ts';
 
 /**
  * Patch a {@link CartoKitPointLayer} or a

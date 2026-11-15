@@ -1,19 +1,19 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
 
-  import { onClickOutside } from '$lib/attachments/on-click-outside';
-  import CartokitIcon from '$lib/components/icons/CartokitIcon.svelte';
-  import ChevronIcon from '$lib/components/icons/ChevronIcon.svelte';
-  import UploadIcon from '$lib/components/icons/UploadIcon.svelte';
-  import Alert from '$lib/components/shared/Alert.svelte';
-  import Key from '$lib/components/shared/Key.svelte';
-  import Menu from '$lib/components/shared/Menu.svelte';
-  import Portal from '$lib/components/shared/Portal.svelte';
-  import { applyDiff } from '$lib/core/diff';
-  import { diffs } from '$lib/state/diffs.svelte';
-  import { ir } from '$lib/stores/ir';
-  import { downloadBlob } from '$lib/utils/download';
-  import { registerKeybinding } from '$lib/utils/keybinding';
+  import { onClickOutside } from '#lib/attachments/on-click-outside.ts';
+  import CartokitIcon from '#lib/components/icons/CartokitIcon.svelte';
+  import ChevronIcon from '#lib/components/icons/ChevronIcon.svelte';
+  import UploadIcon from '#lib/components/icons/UploadIcon.svelte';
+  import Alert from '#lib/components/shared/Alert.svelte';
+  import Key from '#lib/components/shared/Key.svelte';
+  import Menu from '#lib/components/shared/Menu.svelte';
+  import Portal from '#lib/components/shared/Portal.svelte';
+  import { applyDiff } from '#lib/core/diff/index.ts';
+  import { diffs } from '#lib/state/diffs.svelte.ts';
+  import { ir } from '#lib/stores/ir.ts';
+  import { downloadBlob } from '#lib/utils/download.ts';
+  import { registerKeybinding } from '#lib/utils/keybinding.ts';
 
   let actionPickerActive = $state(false);
   let actionMenu = $state<HTMLDivElement>();

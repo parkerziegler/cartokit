@@ -2,15 +2,15 @@
   import { snakeCase, uniqueId } from 'lodash-es';
   import { getContext } from 'svelte';
 
-  import AlertIcon from '$lib/components/icons/AlertIcon.svelte';
-  import Alert from '$lib/components/shared/Alert.svelte';
-  import Button from '$lib/components/shared/Button.svelte';
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import FileInput from '$lib/components/shared/FileInput.svelte';
-  import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { applyDiff } from '$lib/core/diff';
-  import type { CartoKitSource } from '$lib/types/source';
-  import { extname } from '$lib/utils/file';
+  import AlertIcon from '#lib/components/icons/AlertIcon.svelte';
+  import Alert from '#lib/components/shared/Alert.svelte';
+  import Button from '#lib/components/shared/Button.svelte';
+  import FieldLabel from '#lib/components/shared/FieldLabel.svelte';
+  import FileInput from '#lib/components/shared/FileInput.svelte';
+  import TextInput from '#lib/components/shared/TextInput.svelte';
+  import { applyDiff } from '#lib/core/diff/index.ts';
+  import type { CartoKitSource } from '#lib/types/source.ts';
+  import { extname } from '#lib/utils/file.ts';
 
   const closeModal = getContext<() => void>('close-modal');
 

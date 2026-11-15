@@ -1,4 +1,4 @@
-import type { LLM, Prompt } from '$lib/types/llm';
+import type { LLM, Prompt } from '#lib/types/llm.ts';
 
 export const MODELS: { value: LLM; label: string }[] = [
   { value: 'gpt-5.6-luna', label: 'GPT-5.6 Luna' },

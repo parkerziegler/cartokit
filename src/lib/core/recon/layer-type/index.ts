@@ -1,16 +1,16 @@
-import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
-import { reconChoropleth } from '$lib/core/recon/layer-type/choropleth';
-import { reconHeatmap } from '$lib/core/recon/layer-type/heatmap';
-import { reconPoint } from '$lib/core/recon/layer-type/point';
-import { reconPolygon } from '$lib/core/recon/layer-type/polygon';
-import { reconProportionalSymbol } from '$lib/core/recon/layer-type/proportional-symbol';
+import type { ReconFnParams, ReconFnResult } from '#lib/core/recon/index.ts';
+import { reconChoropleth } from '#lib/core/recon/layer-type/choropleth.ts';
+import { reconHeatmap } from '#lib/core/recon/layer-type/heatmap.ts';
+import { reconPoint } from '#lib/core/recon/layer-type/point.ts';
+import { reconPolygon } from '#lib/core/recon/layer-type/polygon.ts';
+import { reconProportionalSymbol } from '#lib/core/recon/layer-type/proportional-symbol.ts';
 import type {
   CartoKitChoroplethLayer,
   CartoKitHeatmapLayer,
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer
-} from '$lib/types';
+} from '#lib/types/index.ts';
 
 /**
  * Reconcile layer type-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.

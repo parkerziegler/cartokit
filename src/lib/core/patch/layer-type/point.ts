@@ -2,14 +2,14 @@ import type {
   CartoKitHeatmapLayer,
   CartoKitPointLayer,
   CartoKitProportionalSymbolLayer
-} from '$lib/types';
-import { randomColor } from '$lib/utils/color';
+} from '#lib/types/index.ts';
+import { randomColor } from '#lib/utils/color.ts';
 import {
   DEFAULT_OPACITY,
   DEFAULT_SIZE,
   DEFAULT_STROKE,
   DEFAULT_STROKE_WIDTH
-} from '$lib/utils/constants';
+} from '#lib/utils/constants.ts';
 
 /**
  * Patch a {@link CartoKitHeatmapLayer} or a

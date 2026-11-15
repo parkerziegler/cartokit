@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { onClickOutside } from '$lib/attachments/on-click-outside';
-  import { tooltip } from '$lib/attachments/tooltip';
-  import Chat from '$lib/components/chat/Chat.svelte';
-  import ChatIcon from '$lib/components/icons/ChatIcon.svelte';
-  import { registerKeybinding } from '$lib/utils/keybinding';
+  import { onClickOutside } from '#lib/attachments/on-click-outside.ts';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import Chat from '#lib/components/chat/Chat.svelte';
+  import ChatIcon from '#lib/components/icons/ChatIcon.svelte';
+  import { registerKeybinding } from '#lib/utils/keybinding.ts';
 
   let chatVisible = $state(false);
   let requestInFlight = $state(false);

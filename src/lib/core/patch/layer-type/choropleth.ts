@@ -1,13 +1,16 @@
-import { catalog } from '$lib/state/catalog.svelte';
-import type { CartoKitChoroplethLayer, CartoKitPolygonLayer } from '$lib/types';
-import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
-import { selectQuantitativeAttribute } from '$lib/utils/attribute';
+import { catalog } from '#lib/state/catalog.svelte.ts';
+import type {
+  CartoKitChoroplethLayer,
+  CartoKitPolygonLayer
+} from '#lib/types/index.ts';
+import type { QuantitativeAttributeEntry } from '#lib/types/catalog.ts';
+import { selectQuantitativeAttribute } from '#lib/utils/attribute.ts';
 import {
   DEFAULT_COUNT,
   DEFAULT_METHOD,
   DEFAULT_QUANTITATIVE_SCHEME,
   DEFAULT_SCHEME_DIRECTION
-} from '$lib/utils/constants';
+} from '#lib/utils/constants.ts';
 
 /**
  * Patch a {@link CartoKitPolygonLayer} to a {@link CartoKitChoroplethLayer}.

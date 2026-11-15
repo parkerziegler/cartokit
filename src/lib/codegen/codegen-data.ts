@@ -1,8 +1,8 @@
-import { db } from '$lib/state/db.svelte';
-import type { CartoKitIR } from '$lib/types';
-import type { CartokitCodegenDataFile } from '$lib/types/codegen';
-import { copyTableToGeoJSON } from '$lib/utils/geojson';
-import { copyTableToGeoParquet } from '$lib/utils/geoparquet';
+import { db } from '#lib/state/db.svelte.ts';
+import type { CartoKitIR } from '#lib/types/index.ts';
+import type { CartokitCodegenDataFile } from '#lib/types/codegen.ts';
+import { copyTableToGeoJSON } from '#lib/utils/geojson.ts';
+import { copyTableToGeoParquet } from '#lib/utils/geoparquet.ts';
 
 /**
  * Generate the data files for all layers sourced from a file upload.

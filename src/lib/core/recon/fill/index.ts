@@ -1,12 +1,12 @@
-import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
-import { deriveColorScale } from '$lib/interaction/color';
-import { map } from '$lib/state/map.svelte';
+import type { ReconFnParams, ReconFnResult } from '#lib/core/recon/index.ts';
+import { deriveColorScale } from '#lib/interaction/color.ts';
+import { map } from '#lib/state/map.svelte.ts';
 import type {
   CartoKitChoroplethLayer,
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer
-} from '$lib/types';
+} from '#lib/types/index.ts';
 
 /**
  * Reconcile fill-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.

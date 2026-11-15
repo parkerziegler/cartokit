@@ -1,14 +1,14 @@
 import { orderBy } from 'lodash-es';
 
-import { codegenLayer } from '$lib/codegen/codegen-layer';
-import { codegenProjection } from '$lib/codegen/codegen-projection';
+import { codegenLayer } from '#lib/codegen/codegen-layer.ts';
+import { codegenProjection } from '#lib/codegen/codegen-projection.ts';
 import {
   codegenDuckDBFileRegistrations,
   codegenSource
-} from '$lib/codegen/codegen-source';
-import { withDefault } from '$lib/codegen/utils';
-import type { CartoKitIR } from '$lib/types';
-import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
+} from '#lib/codegen/codegen-source.ts';
+import { withDefault } from '#lib/codegen/utils.ts';
+import type { CartoKitIR } from '#lib/types/index.ts';
+import type { CartoKitBackendAnalysis } from '#lib/types/codegen.ts';
 
 /**
  * Generate a program fragment for layer sources, layer renders, and the

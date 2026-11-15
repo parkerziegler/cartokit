@@ -5,7 +5,7 @@ import {
   CLOUDFLARE_API_TOKEN,
   CLOUDFLARE_ACCOUNT_ID,
   KV_NAMESPACE_ID
-} from '$env/static/private';
+} from '$app/env/private';
 
 const client = new Cloudflare({ apiToken: CLOUDFLARE_API_TOKEN });
 

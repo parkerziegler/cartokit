@@ -6,18 +6,18 @@ import type {
 } from 'openai/resources/chat/completions';
 import { z } from 'zod';
 
-import { OPENAI_API_KEY } from '$env/static/private';
+import { OPENAI_API_KEY } from '$app/env/private';
 import type { RequestHandler } from './$types';
 
-import type { LayerType } from '$lib/types';
-import type { BasemapProvider } from '$lib/types/basemap';
-import type { LLMRequest, LLMRequestState, Prompt } from '$lib/types/llm';
-import { BASEMAPS, TILE_URLS } from '$lib/utils/basemap';
-import { QUANTITATIVE_COLOR_RAMPS } from '$lib/utils/color/ramp';
+import type { LayerType } from '#lib/types/index.ts';
+import type { BasemapProvider } from '#lib/types/basemap.ts';
+import type { LLMRequest, LLMRequestState, Prompt } from '#lib/types/llm.ts';
+import { BASEMAPS, TILE_URLS } from '#lib/utils/basemap.ts';
+import { QUANTITATIVE_COLOR_RAMPS } from '#lib/utils/color/ramp.ts';
 import {
   CATEGORICAL_COLOR_SCHEMES,
   QUANTITATIVE_COLOR_SCHEMES
-} from '$lib/utils/color/scheme';
+} from '#lib/utils/color/scheme.ts';
 
 // Initialize the OpenAI client.
 const openai = new OpenAI({
@@ -283,6 +283,7 @@ export const POST = (async ({ request }) => {
     const LayerIdSchema = makeLayerIdSchema(
       requestState.layers.map((layer) => layer.id)
     );
+
     const attrsSchemas = new Map(
       requestState.layers.map((layer) => [
         layer.id,

@@ -1,15 +1,15 @@
 import { flow } from 'lodash-es';
 
-import type { CartoKitDiff } from '$lib/core/diff';
-import { patchFillDiffs } from '$lib/core/patch/fill';
-import { patchHeatmapDiffs } from '$lib/core/patch/heatmap';
-import { patchLayerDiffs } from '$lib/core/patch/layer';
-import { patchLayerTypeDiffs } from '$lib/core/patch/layer-type';
-import { patchMapDiffs } from '$lib/core/patch/map';
-import { patchSizeDiffs } from '$lib/core/patch/size';
-import { patchStrokeDiffs } from '$lib/core/patch/stroke';
+import type { CartoKitDiff } from '#lib/core/diff/index.ts';
+import { patchFillDiffs } from '#lib/core/patch/fill/index.ts';
+import { patchHeatmapDiffs } from '#lib/core/patch/heatmap/index.ts';
+import { patchLayerDiffs } from '#lib/core/patch/layer/index.ts';
+import { patchLayerTypeDiffs } from '#lib/core/patch/layer-type/index.ts';
+import { patchMapDiffs } from '#lib/core/patch/map/index.ts';
+import { patchSizeDiffs } from '#lib/core/patch/size/index.ts';
+import { patchStrokeDiffs } from '#lib/core/patch/stroke/index.ts';
 
-import type { CartoKitIR } from '$lib/types';
+import type { CartoKitIR } from '#lib/types/index.ts';
 
 export interface PatchFnParams {
   diff: CartoKitDiff;

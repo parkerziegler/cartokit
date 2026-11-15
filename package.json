@@ -42,9 +42,10 @@
     "@eslint/compat": "^2.1.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.62.1",
-    "@sveltejs/adapter-vercel": "^6.3.4",
+    "@sveltejs/adapter-vercel": "^7.0.0",
     "@sveltejs/enhanced-img": "^1.0.0",
-    "@sveltejs/kit": "^2.70.3",
+    "@sveltejs/kit": "^3.0.0",
+    "@sveltejs/load-config": "^0.2.2",
     "@sveltejs/vite-plugin-svelte": "^7.3.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/d3": "^7.4.3",
@@ -59,7 +60,7 @@
     "postcss": "^8.5.26",
     "prettier-plugin-svelte": "^4.1.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "svelte": "^5.57.0",
+    "svelte": "^5.57.2",
     "svelte-check": "^4.7.6",
     "tailwindcss": "^4.3.3",
     "tslib": "^2.8.1",
@@ -69,5 +70,9 @@
     "vitest": "^5.0.5"
   },
   "type": "module",
-  "packageManager": "pnpm@12.18.0"
+  "packageManager": "pnpm@12.18.0",
+  "imports": {
+    "#lib": "./src/lib/index.js",
+    "#lib/*": "./src/lib/*"
+  }
 }

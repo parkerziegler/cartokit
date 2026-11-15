@@ -1,5 +1,5 @@
-import type { CartoKitIR } from '$lib/types';
-import type { CartoKitBackend } from '$lib/types/codegen';
+import type { CartoKitIR } from '#lib/types/index.ts';
+import type { CartoKitBackend } from '#lib/types/codegen.ts';
 
 /**
  * Generate a program fragment for the map's projection.

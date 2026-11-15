@@ -2,9 +2,9 @@ import type { AsyncDuckDB, AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 import type { Geometry } from 'geojson';
 import { snakeCase } from 'lodash-es';
 
-import type { DuckDBTable } from '$lib/types/db';
-import { queryGeometryType, quoteIdentifier } from '$lib/utils/db';
-import { DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES } from '$lib/utils/sf';
+import type { DuckDBTable } from '#lib/types/db.ts';
+import { queryGeometryType, quoteIdentifier } from '#lib/utils/db.ts';
+import { DUCKDB_GEOMETRY_TYPES_TO_SIMPLE_FEATURES_GEOMETRY_TYPES } from '#lib/utils/sf.ts';
 
 /**
  * Get the {@link Geometry['type']} of a GeoJSON layer.

@@ -1,5 +1,5 @@
-import { map } from '$lib/state/map.svelte';
-import type { CartoKitPolygonLayer, LayerType } from '$lib/types';
+import { map } from '#lib/state/map.svelte.ts';
+import type { CartoKitPolygonLayer, LayerType } from '#lib/types/index.ts';
 
 /**
  * Reconcile a {@link CartoKitLayer} to a {@link CartoKitPolygonLayer}.

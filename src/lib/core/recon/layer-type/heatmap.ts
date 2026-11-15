@@ -1,6 +1,6 @@
-import { map } from '$lib/state/map.svelte';
-import type { CartoKitHeatmapLayer, LayerType } from '$lib/types';
-import { redraw } from '$lib/utils/layer/redraw';
+import { map } from '#lib/state/map.svelte.ts';
+import type { CartoKitHeatmapLayer, LayerType } from '#lib/types/index.ts';
+import { redraw } from '#lib/utils/layer/redraw.ts';
 
 /**
  * Reconcile a {@link CartoKitLayer} to a {@link CartoKitHeatmapLayer}.

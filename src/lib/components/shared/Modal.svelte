@@ -4,7 +4,7 @@
   import { cubicOut } from 'svelte/easing';
   import { Tween } from 'svelte/motion';
 
-  import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
+  import CloseIcon from '#lib/components/icons/CloseIcon.svelte';
 
   interface Props {
     showModal?: boolean;

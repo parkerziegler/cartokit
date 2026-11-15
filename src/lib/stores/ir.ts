@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-import type { CartoKitIR } from '$lib/types';
+import type { CartoKitIR } from '#lib/types/index.ts';
 
 /**
  * Create a fresh {@link CartoKitIR} in its initial state.

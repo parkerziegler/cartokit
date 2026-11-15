@@ -14,11 +14,14 @@ import {
 } from '@duckdb/duckdb-wasm/blocking';
 import { beforeAll, describe, expect, test } from 'vitest';
 
-import type { QuantitativeStepCount } from '$lib/types';
-import type { Catalog, QuantitativeAttributeEntry } from '$lib/types/catalog';
-import type { CartoKitGeoJSONSource } from '$lib/types/source';
-import { buildCatalog } from '$lib/utils/catalog';
-import { createTable } from '$lib/utils/db';
+import type { QuantitativeStepCount } from '#lib/types/index.ts';
+import type {
+  Catalog,
+  QuantitativeAttributeEntry
+} from '#lib/types/catalog.ts';
+import type { CartoKitGeoJSONSource } from '#lib/types/source.ts';
+import { buildCatalog } from '#lib/utils/catalog.ts';
+import { createTable } from '#lib/utils/db.ts';
 
 // Fixture file information.
 const fileName = 'us-counties-unemployment.json';

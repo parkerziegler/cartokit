@@ -1,12 +1,12 @@
-import type { BasemapProvider } from '$lib/types/basemap';
+import type { BasemapProvider } from '#lib/types/basemap.ts';
 import type {
   CategoricalColorScheme,
   QuantitativeColorRamp,
   QuantitativeColorScheme,
   RampDirection,
   SchemeDirection
-} from '$lib/types/color';
-import type { CartoKitSource } from '$lib/types/source';
+} from '#lib/types/color.ts';
+import type { CartoKitSource } from '#lib/types/source.ts';
 
 /** The valid number of steps in a {@link QuantitativeColorScale}. */
 export type QuantitativeStepCount = 3 | 4 | 5 | 6 | 7 | 8 | 9;

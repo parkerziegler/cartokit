@@ -1,10 +1,10 @@
 import { strToU8, zipSync, type Zippable } from 'fflate';
 
-import favicon from '$lib/utils/favicon.svg?raw';
+import favicon from '#lib/utils/favicon.svg?raw';
 
-import { codegenDataFiles } from '$lib/codegen/codegen-data';
-import type { CartoKitIR } from '$lib/types';
-import type { CartokitCodegenProgramFile } from '$lib/types/codegen';
+import { codegenDataFiles } from '#lib/codegen/codegen-data.ts';
+import type { CartoKitIR } from '#lib/types/index.ts';
+import type { CartokitCodegenProgramFile } from '#lib/types/codegen.ts';
 
 /**
  * Bundle a cartokit-generated Vite project into a .zip archive.

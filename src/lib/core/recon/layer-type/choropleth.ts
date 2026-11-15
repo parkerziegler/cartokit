@@ -1,6 +1,6 @@
-import { deriveColorScale } from '$lib/interaction/color';
-import { map } from '$lib/state/map.svelte';
-import type { CartoKitChoroplethLayer, LayerType } from '$lib/types';
+import { deriveColorScale } from '#lib/interaction/color.ts';
+import { map } from '#lib/state/map.svelte.ts';
+import type { CartoKitChoroplethLayer, LayerType } from '#lib/types/index.ts';
 
 /**
  * Reconcile a {@link CartoKitLayer} to a {@link CartoKitChoroplethLayer}.

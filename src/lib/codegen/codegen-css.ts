@@ -1,4 +1,4 @@
-import type { CartoKitIR } from '$lib/types';
+import type { CartoKitIR } from '#lib/types/index.ts';
 
 export function codegenCSS(ir: CartoKitIR) {
   return `body {

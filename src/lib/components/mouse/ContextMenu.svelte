@@ -7,12 +7,12 @@
     type VirtualElement
   } from '@floating-ui/dom';
 
-  import Transformation from '$lib/components/transformation/Transformation.svelte';
-  import { catalog } from '$lib/state/catalog.svelte';
-  import { contextMenu } from '$lib/state/context-menu.svelte';
-  import { map } from '$lib/state/map.svelte';
-  import type { Transformation as ITransformation } from '$lib/types/transformation';
-  import { getDefaultBufferDistanceByZoom } from '$lib/utils/transformation';
+  import Transformation from '#lib/components/transformation/Transformation.svelte';
+  import { catalog } from '#lib/state/catalog.svelte.ts';
+  import { contextMenu } from '#lib/state/context-menu.svelte.ts';
+  import { map } from '#lib/state/map.svelte.ts';
+  import type { Transformation as ITransformation } from '#lib/types/transformation.ts';
+  import { getDefaultBufferDistanceByZoom } from '#lib/utils/transformation.ts';
 
   let contextMenuRef: HTMLDivElement;
   let availableTransformations = $derived.by((): ITransformation[] => {

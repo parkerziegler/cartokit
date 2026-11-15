@@ -1,5 +1,5 @@
-import { codegenFill, codegenStroke } from '$lib/codegen/codegen-paint';
-import type { CartoKitLayer } from '$lib/types';
+import { codegenFill, codegenStroke } from '#lib/codegen/codegen-paint.ts';
+import type { CartoKitLayer } from '#lib/types/index.ts';
 
 /**
  * Generate a program fragment for a {@link CartoKitLayer}.

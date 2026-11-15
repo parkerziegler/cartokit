@@ -1,13 +1,13 @@
 <script lang="ts">
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import FieldLabel from '#lib/components/shared/FieldLabel.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
   import type {
     CategoricalStyle,
     Channel,
     ConstantStyle,
     QuantitativeStyle
-  } from '$lib/types';
-  import { percentToDecimal, decimalToPercent } from '$lib/utils/number';
+  } from '#lib/types/index.ts';
+  import { percentToDecimal, decimalToPercent } from '#lib/utils/number.ts';
 
   interface Props {
     layerId: string;

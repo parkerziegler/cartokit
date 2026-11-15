@@ -1,6 +1,6 @@
-import { codegenMap } from '$lib/codegen/codegen-map';
-import type { CartoKitIR } from '$lib/types';
-import type { CartoKitBackendAnalysis } from '$lib/types/codegen';
+import { codegenMap } from '#lib/codegen/codegen-map.ts';
+import type { CartoKitIR } from '#lib/types/index.ts';
+import type { CartoKitBackendAnalysis } from '#lib/types/codegen.ts';
 
 /**
  * Generate named imports for required classes and functions from maplibre-gl.

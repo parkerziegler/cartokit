@@ -1,7 +1,7 @@
 import type { SvelteHTMLElements } from 'svelte/elements';
 
-import type { CartoKitLayer } from '$lib/types';
-import type { CartoKitSource } from '$lib/types/source';
+import type { CartoKitLayer } from '#lib/types/index.ts';
+import type { CartoKitSource } from '#lib/types/source.ts';
 
 /** Represents a dataset gallery item in cartokit. */
 export interface GalleryItem {

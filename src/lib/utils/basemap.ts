@@ -1,64 +1,64 @@
 import type { Map } from 'maplibre-gl';
 
-import { PUBLIC_MAPTILER_API_KEY } from '$env/static/public';
+import { PUBLIC_MAPTILER_API_KEY } from '$app/env/public';
 
 // CARTO
-import DarkMatter from '$lib/assets/basemaps/carto/dark-matter.webp?enhanced';
-import Positron from '$lib/assets/basemaps/carto/positron.webp?enhanced';
-import Voyager from '$lib/assets/basemaps/carto/voyager.webp?enhanced';
+import DarkMatter from '#lib/assets/basemaps/carto/dark-matter.webp?enhanced';
+import Positron from '#lib/assets/basemaps/carto/positron.webp?enhanced';
+import Voyager from '#lib/assets/basemaps/carto/voyager.webp?enhanced';
 
 // Maptiler
-import AquarelleDark from '$lib/assets/basemaps/maptiler/aquarelle-dark.webp?enhanced';
-import AquarelleVivid from '$lib/assets/basemaps/maptiler/aquarelle-vivid.webp?enhanced';
-import Aquarelle from '$lib/assets/basemaps/maptiler/aquarelle.webp?enhanced';
-import BackdropDark from '$lib/assets/basemaps/maptiler/backdrop-dark.webp?enhanced';
-import BackdropLight from '$lib/assets/basemaps/maptiler/backdrop-light.webp?enhanced';
-import Backdrop from '$lib/assets/basemaps/maptiler/backdrop.webp?enhanced';
-import BasicV2Dark from '$lib/assets/basemaps/maptiler/basic-v2-dark.webp?enhanced';
-import BasicV2Light from '$lib/assets/basemaps/maptiler/basic-v2-light.webp?enhanced';
-import BasicV2 from '$lib/assets/basemaps/maptiler/basic-v2.webp?enhanced';
-import BrightV2Dark from '$lib/assets/basemaps/maptiler/bright-v2-dark.webp?enhanced';
-import BrightV2Light from '$lib/assets/basemaps/maptiler/bright-v2-light.webp?enhanced';
-import BrightV2Pastel from '$lib/assets/basemaps/maptiler/bright-v2-pastel.webp?enhanced';
-import BrightV2 from '$lib/assets/basemaps/maptiler/bright-v2.webp?enhanced';
-import DatavizDark from '$lib/assets/basemaps/maptiler/dataviz-dark.webp?enhanced';
-import DatavizLight from '$lib/assets/basemaps/maptiler/dataviz-light.webp?enhanced';
-import Dataviz from '$lib/assets/basemaps/maptiler/dataviz.webp?enhanced';
-import Hybrid from '$lib/assets/basemaps/maptiler/hybrid.webp?enhanced';
-import LandscapeDark from '$lib/assets/basemaps/maptiler/landscape-dark.webp?enhanced';
-import LandscapeVivid from '$lib/assets/basemaps/maptiler/landscape-vivid.webp?enhanced';
-import Landscape from '$lib/assets/basemaps/maptiler/landscape.webp?enhanced';
-import Ocean from '$lib/assets/basemaps/maptiler/ocean.webp?enhanced';
-import Openstreetmap from '$lib/assets/basemaps/maptiler/openstreetmap.webp?enhanced';
-import OutdoorV2Dark from '$lib/assets/basemaps/maptiler/outdoor-v2-dark.webp?enhanced';
-import OutdoorV2 from '$lib/assets/basemaps/maptiler/outdoor-v2.webp?enhanced';
-import Satellite from '$lib/assets/basemaps/maptiler/satellite.webp?enhanced';
-import StreetsV2Dark from '$lib/assets/basemaps/maptiler/streets-v2-dark.webp?enhanced';
-import StreetsV2Light from '$lib/assets/basemaps/maptiler/streets-v2-light.webp?enhanced';
-import StreetsV2Pastel from '$lib/assets/basemaps/maptiler/streets-v2-pastel.webp?enhanced';
-import StreetsV2 from '$lib/assets/basemaps/maptiler/streets-v2.webp?enhanced';
-import TonerV2Lite from '$lib/assets/basemaps/maptiler/toner-v2-lite.webp?enhanced';
-import TonerV2 from '$lib/assets/basemaps/maptiler/toner-v2.webp?enhanced';
-import TopoV2Dark from '$lib/assets/basemaps/maptiler/topo-v2-dark.webp?enhanced';
-import TopoV2Pastel from '$lib/assets/basemaps/maptiler/topo-v2-pastel.webp?enhanced';
-import TopoV2Topographique from '$lib/assets/basemaps/maptiler/topo-v2-topographique.webp?enhanced';
-import TopoV2 from '$lib/assets/basemaps/maptiler/topo-v2.webp?enhanced';
-import WinterV2Dark from '$lib/assets/basemaps/maptiler/winter-v2-dark.webp?enhanced';
-import WinterV2 from '$lib/assets/basemaps/maptiler/winter-v2.webp?enhanced';
+import AquarelleDark from '#lib/assets/basemaps/maptiler/aquarelle-dark.webp?enhanced';
+import AquarelleVivid from '#lib/assets/basemaps/maptiler/aquarelle-vivid.webp?enhanced';
+import Aquarelle from '#lib/assets/basemaps/maptiler/aquarelle.webp?enhanced';
+import BackdropDark from '#lib/assets/basemaps/maptiler/backdrop-dark.webp?enhanced';
+import BackdropLight from '#lib/assets/basemaps/maptiler/backdrop-light.webp?enhanced';
+import Backdrop from '#lib/assets/basemaps/maptiler/backdrop.webp?enhanced';
+import BasicV2Dark from '#lib/assets/basemaps/maptiler/basic-v2-dark.webp?enhanced';
+import BasicV2Light from '#lib/assets/basemaps/maptiler/basic-v2-light.webp?enhanced';
+import BasicV2 from '#lib/assets/basemaps/maptiler/basic-v2.webp?enhanced';
+import BrightV2Dark from '#lib/assets/basemaps/maptiler/bright-v2-dark.webp?enhanced';
+import BrightV2Light from '#lib/assets/basemaps/maptiler/bright-v2-light.webp?enhanced';
+import BrightV2Pastel from '#lib/assets/basemaps/maptiler/bright-v2-pastel.webp?enhanced';
+import BrightV2 from '#lib/assets/basemaps/maptiler/bright-v2.webp?enhanced';
+import DatavizDark from '#lib/assets/basemaps/maptiler/dataviz-dark.webp?enhanced';
+import DatavizLight from '#lib/assets/basemaps/maptiler/dataviz-light.webp?enhanced';
+import Dataviz from '#lib/assets/basemaps/maptiler/dataviz.webp?enhanced';
+import Hybrid from '#lib/assets/basemaps/maptiler/hybrid.webp?enhanced';
+import LandscapeDark from '#lib/assets/basemaps/maptiler/landscape-dark.webp?enhanced';
+import LandscapeVivid from '#lib/assets/basemaps/maptiler/landscape-vivid.webp?enhanced';
+import Landscape from '#lib/assets/basemaps/maptiler/landscape.webp?enhanced';
+import Ocean from '#lib/assets/basemaps/maptiler/ocean.webp?enhanced';
+import Openstreetmap from '#lib/assets/basemaps/maptiler/openstreetmap.webp?enhanced';
+import OutdoorV2Dark from '#lib/assets/basemaps/maptiler/outdoor-v2-dark.webp?enhanced';
+import OutdoorV2 from '#lib/assets/basemaps/maptiler/outdoor-v2.webp?enhanced';
+import Satellite from '#lib/assets/basemaps/maptiler/satellite.webp?enhanced';
+import StreetsV2Dark from '#lib/assets/basemaps/maptiler/streets-v2-dark.webp?enhanced';
+import StreetsV2Light from '#lib/assets/basemaps/maptiler/streets-v2-light.webp?enhanced';
+import StreetsV2Pastel from '#lib/assets/basemaps/maptiler/streets-v2-pastel.webp?enhanced';
+import StreetsV2 from '#lib/assets/basemaps/maptiler/streets-v2.webp?enhanced';
+import TonerV2Lite from '#lib/assets/basemaps/maptiler/toner-v2-lite.webp?enhanced';
+import TonerV2 from '#lib/assets/basemaps/maptiler/toner-v2.webp?enhanced';
+import TopoV2Dark from '#lib/assets/basemaps/maptiler/topo-v2-dark.webp?enhanced';
+import TopoV2Pastel from '#lib/assets/basemaps/maptiler/topo-v2-pastel.webp?enhanced';
+import TopoV2Topographique from '#lib/assets/basemaps/maptiler/topo-v2-topographique.webp?enhanced';
+import TopoV2 from '#lib/assets/basemaps/maptiler/topo-v2.webp?enhanced';
+import WinterV2Dark from '#lib/assets/basemaps/maptiler/winter-v2-dark.webp?enhanced';
+import WinterV2 from '#lib/assets/basemaps/maptiler/winter-v2.webp?enhanced';
 
 // Stadia Maps
-import AlidadeSmoothDark from '$lib/assets/basemaps/stadia-maps/alidade_smooth_dark.webp?enhanced';
-import AlidadeSmooth from '$lib/assets/basemaps/stadia-maps/alidade_smooth.webp?enhanced';
-import OsmBright from '$lib/assets/basemaps/stadia-maps/osm_bright.webp?enhanced';
-import Outdoors from '$lib/assets/basemaps/stadia-maps/outdoors.webp?enhanced';
+import AlidadeSmoothDark from '#lib/assets/basemaps/stadia-maps/alidade_smooth_dark.webp?enhanced';
+import AlidadeSmooth from '#lib/assets/basemaps/stadia-maps/alidade_smooth.webp?enhanced';
+import OsmBright from '#lib/assets/basemaps/stadia-maps/osm_bright.webp?enhanced';
+import Outdoors from '#lib/assets/basemaps/stadia-maps/outdoors.webp?enhanced';
 
 // Stamen
-import StamenTerrain from '$lib/assets/basemaps/stamen/stamen_terrain.webp?enhanced';
-import StamenTonerLite from '$lib/assets/basemaps/stamen/stamen_toner_lite.webp?enhanced';
-import StamenToner from '$lib/assets/basemaps/stamen/stamen_toner.webp?enhanced';
-import StamenWatercolor from '$lib/assets/basemaps/stamen/stamen_watercolor.webp?enhanced';
+import StamenTerrain from '#lib/assets/basemaps/stamen/stamen_terrain.webp?enhanced';
+import StamenTonerLite from '#lib/assets/basemaps/stamen/stamen_toner_lite.webp?enhanced';
+import StamenToner from '#lib/assets/basemaps/stamen/stamen_toner.webp?enhanced';
+import StamenWatercolor from '#lib/assets/basemaps/stamen/stamen_watercolor.webp?enhanced';
 
-import type { Basemap, BasemapProvider } from '$lib/types/basemap';
+import type { Basemap, BasemapProvider } from '#lib/types/basemap.ts';
 
 const CARTO_BASEMAPS: Basemap[] = [
   {

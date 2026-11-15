@@ -3,14 +3,14 @@
   import type { MapSourceDataEvent } from 'maplibre-gl';
   import { getContext } from 'svelte';
 
-  import LineIcon from '$lib/components/icons/LineIcon.svelte';
-  import PointIcon from '$lib/components/icons/PointIcon.svelte';
-  import PolygonIcon from '$lib/components/icons/PolygonIcon.svelte';
-  import LoadingIndicator from '$lib/components/shared/LoadingIndicator.svelte';
-  import { applyDiff } from '$lib/core/diff';
-  import { map } from '$lib/state/map.svelte';
-  import type { GalleryItem } from '$lib/types/gallery';
-  import { GALLERY_ITEMS } from '$lib/utils/gallery';
+  import LineIcon from '#lib/components/icons/LineIcon.svelte';
+  import PointIcon from '#lib/components/icons/PointIcon.svelte';
+  import PolygonIcon from '#lib/components/icons/PolygonIcon.svelte';
+  import LoadingIndicator from '#lib/components/shared/LoadingIndicator.svelte';
+  import { applyDiff } from '#lib/core/diff/index.ts';
+  import { map } from '#lib/state/map.svelte.ts';
+  import type { GalleryItem } from '#lib/types/gallery.ts';
+  import { GALLERY_ITEMS } from '#lib/utils/gallery.ts';
 
   const closeModal = getContext<() => void>('close-modal');
 

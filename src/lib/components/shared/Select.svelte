@@ -1,7 +1,7 @@
 <script lang="ts" generics="T">
   import type { ChangeEventHandler } from 'svelte/elements';
 
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
+  import FieldLabel from '#lib/components/shared/FieldLabel.svelte';
 
   interface Props {
     selected: T;

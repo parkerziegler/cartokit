@@ -1,4 +1,4 @@
-import type { CartoKitIR } from '$lib/types';
+import type { CartoKitIR } from '#lib/types/index.ts';
 
 /**
  * Get the ids of the layers directly derived from the queried layer.

@@ -1,10 +1,10 @@
 import { expect, test, describe } from 'vitest';
 
-import { deriveSize } from '$lib/interaction/geometry';
-import { catalog } from '$lib/state/catalog.svelte';
-import type { ProportionalSymbolStyle } from '$lib/types';
-import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
-import { signedSqrt } from '$lib/utils/number';
+import { deriveSize } from '#lib/interaction/geometry.ts';
+import { catalog } from '#lib/state/catalog.svelte.ts';
+import type { ProportionalSymbolStyle } from '#lib/types/index.ts';
+import type { QuantitativeAttributeEntry } from '#lib/types/catalog.ts';
+import { signedSqrt } from '#lib/utils/number.ts';
 
 const LAYER_ID = 'test-layer';
 

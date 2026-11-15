@@ -1,7 +1,7 @@
-import type { CartoKitDiff } from '$lib/core/diff';
-import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
-import type { CartoKitHeatmapLayer } from '$lib/types';
-import { selectQuantitativeAttribute } from '$lib/utils/attribute';
+import type { CartoKitDiff } from '#lib/core/diff/index.ts';
+import type { PatchFnParams, PatchFnResult } from '#lib/core/patch/index.ts';
+import type { CartoKitHeatmapLayer } from '#lib/types/index.ts';
+import { selectQuantitativeAttribute } from '#lib/utils/attribute.ts';
 
 /**
  * Patch heatmap-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.

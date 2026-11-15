@@ -2,15 +2,15 @@
   import { uniqueId } from 'lodash-es';
   import { onMount, tick } from 'svelte';
 
-  import ChatDialog from '$lib/components/chat/ChatDialog.svelte';
-  import ArrowUpIcon from '$lib/components/icons/ArrowUpIcon.svelte';
-  import Menu from '$lib/components/shared/Menu.svelte';
-  import Select from '$lib/components/shared/Select.svelte';
-  import { applyDiff } from '$lib/core/diff';
-  import { chat, MODELS } from '$lib/state/chat.svelte';
-  import { ir } from '$lib/stores/ir';
-  import type { LLM, LLMRequest, LLMRequestState } from '$lib/types/llm';
-  import { catalog } from '$lib/state/catalog.svelte';
+  import ChatDialog from '#lib/components/chat/ChatDialog.svelte';
+  import ArrowUpIcon from '#lib/components/icons/ArrowUpIcon.svelte';
+  import Menu from '#lib/components/shared/Menu.svelte';
+  import Select from '#lib/components/shared/Select.svelte';
+  import { applyDiff } from '#lib/core/diff/index.ts';
+  import { chat, MODELS } from '#lib/state/chat.svelte.ts';
+  import { ir } from '#lib/stores/ir.ts';
+  import type { LLM, LLMRequest, LLMRequestState } from '#lib/types/llm.ts';
+  import { catalog } from '#lib/state/catalog.svelte.ts';
 
   interface Props {
     ref?: HTMLDivElement;

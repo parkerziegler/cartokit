@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Select from '$lib/components/shared/Select.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import { error } from '$lib/state/error.svelte';
-  import type { LayerType, VisualizationType } from '$lib/types';
+  import Select from '#lib/components/shared/Select.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import { error } from '#lib/state/error.svelte.ts';
+  import type { LayerType, VisualizationType } from '#lib/types/index.ts';
 
   interface Props {
     layerId: string;

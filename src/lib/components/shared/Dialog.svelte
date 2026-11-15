@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
+  import CloseIcon from '#lib/components/icons/CloseIcon.svelte';
 
   interface Props {
     class?: string;

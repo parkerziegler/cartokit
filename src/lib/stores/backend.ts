@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-import type { CartoKitBackend } from '$lib/types/codegen';
+import type { CartoKitBackend } from '#lib/types/codegen.ts';
 
 export const backend = writable<CartoKitBackend>({
   library: 'maplibre',

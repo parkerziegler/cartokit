@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { tooltip } from '$lib/attachments/tooltip';
-  import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
-  import PlusIcon from '$lib/components/icons/PlusIcon.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import MinusIcon from '#lib/components/icons/MinusIcon.svelte';
+  import PlusIcon from '#lib/components/icons/PlusIcon.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
   import type {
     CategoricalFill,
     ConstantFill,
     QuantitativeFill
-  } from '$lib/types';
+  } from '#lib/types/index.ts';
 
   interface Props {
     layerId: string;

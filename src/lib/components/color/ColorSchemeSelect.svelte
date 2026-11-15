@@ -1,26 +1,26 @@
 <script lang="ts">
-  import { tooltip } from '$lib/attachments/tooltip';
-  import { onClickOutside } from '$lib/attachments/on-click-outside';
-  import { focus } from '$lib/actions/focus.svelte';
-  import ColorPalette from '$lib/components/channel/shared/ColorPalette.svelte';
-  import ReverseIcon from '$lib/components/icons/ReverseIcon.svelte';
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import Portal from '$lib/components/shared/Portal.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import { onClickOutside } from '#lib/attachments/on-click-outside.ts';
+  import { focus } from '#lib/actions/focus.svelte.ts';
+  import ColorPalette from '#lib/components/channel/shared/ColorPalette.svelte';
+  import ReverseIcon from '#lib/components/icons/ReverseIcon.svelte';
+  import FieldLabel from '#lib/components/shared/FieldLabel.svelte';
+  import Portal from '#lib/components/shared/Portal.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
   import type {
     CategoricalColorScale,
     ContinuousColorScale,
     QuantitativeColorScale
-  } from '$lib/types';
+  } from '#lib/types/index.ts';
   import {
     type CategoricalColorScheme,
     type QuantitativeColorScheme,
     type SchemeDirection
-  } from '$lib/types/color';
+  } from '#lib/types/color.ts';
   import {
     CATEGORICAL_COLOR_SCHEMES,
     QUANTITATIVE_COLOR_SCHEMES
-  } from '$lib/utils/color/scheme';
+  } from '#lib/utils/color/scheme.ts';
 
   interface Props {
     layerId: string;

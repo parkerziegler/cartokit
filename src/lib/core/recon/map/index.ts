@@ -1,6 +1,6 @@
-import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
-import { map } from '$lib/state/map.svelte';
-import { isAffiliatedId, isAffiliatedLayer } from '$lib/utils/layer';
+import type { ReconFnParams, ReconFnResult } from '#lib/core/recon/index.ts';
+import { map } from '#lib/state/map.svelte.ts';
+import { isAffiliatedId, isAffiliatedLayer } from '#lib/utils/layer.ts';
 
 /**
  * Reconcile map-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.

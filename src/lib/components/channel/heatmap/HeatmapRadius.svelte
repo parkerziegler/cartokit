@@ -1,8 +1,8 @@
 <script lang="ts">
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import type { CartoKitHeatmapLayer } from '$lib/types';
+  import FieldLabel from '#lib/components/shared/FieldLabel.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import type { CartoKitHeatmapLayer } from '#lib/types/index.ts';
 
   interface Props {
     layer: CartoKitHeatmapLayer;

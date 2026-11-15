@@ -1,7 +1,7 @@
 <script lang="ts">
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { decimalToPercent } from '$lib/utils/converters/decimal-to-percent';
-  import { percentToDecimal } from '$lib/utils/converters/percent-to-decimal';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import { decimalToPercent } from '#lib/utils/converters/decimal-to-percent.ts';
+  import { percentToDecimal } from '#lib/utils/converters/percent-to-decimal.ts';
 
   interface Props {
     id: string;

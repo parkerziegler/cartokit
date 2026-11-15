@@ -1,12 +1,12 @@
-import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
-import { map } from '$lib/state/map.svelte';
+import type { ReconFnParams, ReconFnResult } from '#lib/core/recon/index.ts';
+import { map } from '#lib/state/map.svelte.ts';
 import type {
   CartoKitChoroplethLayer,
   CartoKitLineLayer,
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer
-} from '$lib/types';
+} from '#lib/types/index.ts';
 
 /**
  * Reconcile stroke-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.

@@ -1,14 +1,14 @@
 <script lang="ts">
-  import MoreIcon from '$lib/components/icons/MoreIcon.svelte';
-  import StepsEditor from '$lib/components/scale/StepsEditor.svelte';
-  import Dialog from '$lib/components/shared/Dialog.svelte';
-  import Portal from '$lib/components/shared/Portal.svelte';
-  import Select from '$lib/components/shared/Select.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import { ir } from '$lib/stores/ir';
-  import { layout } from '$lib/stores/layout';
-  import type { QuantitativeColorScale } from '$lib/types';
-  import { SOURCE_TYPES_TO_CLASSIFICATION_METHODS } from '$lib/utils/classification';
+  import MoreIcon from '#lib/components/icons/MoreIcon.svelte';
+  import StepsEditor from '#lib/components/scale/StepsEditor.svelte';
+  import Dialog from '#lib/components/shared/Dialog.svelte';
+  import Portal from '#lib/components/shared/Portal.svelte';
+  import Select from '#lib/components/shared/Select.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import { ir } from '#lib/stores/ir.ts';
+  import { layout } from '#lib/stores/layout.ts';
+  import type { QuantitativeColorScale } from '#lib/types/index.ts';
+  import { SOURCE_TYPES_TO_CLASSIFICATION_METHODS } from '#lib/utils/classification.ts';
 
   interface Props {
     layerId: string;

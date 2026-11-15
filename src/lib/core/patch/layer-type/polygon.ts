@@ -1,5 +1,8 @@
-import type { CartoKitChoroplethLayer, CartoKitPolygonLayer } from '$lib/types';
-import { randomColor } from '$lib/utils/color';
+import type {
+  CartoKitChoroplethLayer,
+  CartoKitPolygonLayer
+} from '#lib/types/index.ts';
+import { randomColor } from '#lib/utils/color.ts';
 
 /**
  * Patch a {@link CartoKitChoroplethLayer} to a {@link CartoKitPolygonLayer}.

@@ -1,8 +1,8 @@
 import { expect, test, describe } from 'vitest';
 import * as d3 from 'd3';
 
-import { deriveColorRamp, deriveColorScale } from '$lib/interaction/color';
-import { DEFAULT_FILL } from '$lib/utils/constants';
+import { deriveColorRamp, deriveColorScale } from '#lib/interaction/color.ts';
+import { DEFAULT_FILL } from '#lib/utils/constants.ts';
 
 describe('deriveColorScale', () => {
   describe('Quantitative', () => {

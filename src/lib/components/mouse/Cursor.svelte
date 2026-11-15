@@ -1,7 +1,7 @@
 <script lang="ts">
   import { on } from 'svelte/events';
 
-  import { popup } from '$lib/state/popup.svelte';
+  import { popup } from '#lib/state/popup.svelte.ts';
 
   let cursorRef: HTMLDivElement;
   let interacting = $derived(Object.values(popup).some((p) => p.open));

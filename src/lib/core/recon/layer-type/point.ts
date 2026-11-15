@@ -1,7 +1,7 @@
-import { map } from '$lib/state/map.svelte';
-import type { CartoKitPointLayer, LayerType } from '$lib/types';
-import { DEFAULT_SIZE } from '$lib/utils/constants';
-import { redraw } from '$lib/utils/layer/redraw';
+import { map } from '#lib/state/map.svelte.ts';
+import type { CartoKitPointLayer, LayerType } from '#lib/types/index.ts';
+import { DEFAULT_SIZE } from '#lib/utils/constants.ts';
+import { redraw } from '#lib/utils/layer/redraw.ts';
 
 /**
  * Reconcile a {@link CartoKitLayer} to a {@link CartoKitPointLayer}.

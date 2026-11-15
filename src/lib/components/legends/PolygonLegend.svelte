@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { CartoKitPolygonLayer } from '$lib/types';
-  import { formatFeatureCount } from '$lib/utils/formatters/feature';
+  import type { CartoKitPolygonLayer } from '#lib/types/index.ts';
+  import { formatFeatureCount } from '#lib/utils/formatters/feature.ts';
 
   interface Props {
     layer: CartoKitPolygonLayer;

@@ -1,14 +1,14 @@
-import type { ReconFnParams, ReconFnResult } from '$lib/core/recon';
-import { removeLayerListeners } from '$lib/interaction/events';
-import { addLayer } from '$lib/interaction/layer';
-import { db } from '$lib/state/db.svelte';
-import { feature } from '$lib/state/feature.svelte';
-import { layerId } from '$lib/state/layerId.svelte';
-import { map } from '$lib/state/map.svelte';
-import { readTableAsGeoJSON } from '$lib/utils/db';
-import { getAffiliatedLayerIds } from '$lib/utils/layer';
-import { getCanonicalLayerId, getSourceId } from '$lib/utils/layer/id';
-import { redraw } from '$lib/utils/layer/redraw';
+import type { ReconFnParams, ReconFnResult } from '#lib/core/recon/index.ts';
+import { removeLayerListeners } from '#lib/interaction/events.ts';
+import { addLayer } from '#lib/interaction/layer.ts';
+import { db } from '#lib/state/db.svelte.ts';
+import { feature } from '#lib/state/feature.svelte.ts';
+import { layerId } from '#lib/state/layerId.svelte.ts';
+import { map } from '#lib/state/map.svelte.ts';
+import { readTableAsGeoJSON } from '#lib/utils/db.ts';
+import { getAffiliatedLayerIds } from '#lib/utils/layer.ts';
+import { getCanonicalLayerId, getSourceId } from '#lib/utils/layer/id.ts';
+import { redraw } from '#lib/utils/layer/redraw.ts';
 
 /**
  * Reconcile layer-related {@link CartoKitDiff}s based on the target {@link CartoKitIR}.

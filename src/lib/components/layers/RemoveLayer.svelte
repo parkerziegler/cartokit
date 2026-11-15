@@ -1,19 +1,19 @@
 <script lang="ts">
-  import { tooltip } from '$lib/attachments/tooltip';
-  import MinusIcon from '$lib/components/icons/MinusIcon.svelte';
-  import Button from '$lib/components/shared/Button.svelte';
-  import Dialog from '$lib/components/shared/Dialog.svelte';
-  import Portal from '$lib/components/shared/Portal.svelte';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import MinusIcon from '#lib/components/icons/MinusIcon.svelte';
+  import Button from '#lib/components/shared/Button.svelte';
+  import Dialog from '#lib/components/shared/Dialog.svelte';
+  import Portal from '#lib/components/shared/Portal.svelte';
   import {
     applyDiff,
     type CartoKitDiff,
     type RemoveLayerStrategy
-  } from '$lib/core/diff';
-  import { contextMenu } from '$lib/state/context-menu.svelte';
-  import { ir } from '$lib/stores/ir';
-  import type { CartoKitLayer } from '$lib/types';
-  import { conjugate, pluralize } from '$lib/utils/formatters/shared';
-  import { getLayerDescendants } from '$lib/utils/ir';
+  } from '#lib/core/diff/index.ts';
+  import { contextMenu } from '#lib/state/context-menu.svelte.ts';
+  import { ir } from '#lib/stores/ir.ts';
+  import type { CartoKitLayer } from '#lib/types/index.ts';
+  import { conjugate, pluralize } from '#lib/utils/formatters/shared.ts';
+  import { getLayerDescendants } from '#lib/utils/ir.ts';
 
   interface Props {
     layer: CartoKitLayer;

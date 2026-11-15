@@ -1,13 +1,13 @@
 <script lang="ts">
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import { catalog } from '$lib/state/catalog.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import { catalog } from '#lib/state/catalog.svelte.ts';
   import type {
     ContinuousColorScale,
     QuantitativeColorScale
-  } from '$lib/types';
-  import type { QuantitativeAttributeEntry } from '$lib/types/catalog';
-  import { materializeColorScheme } from '$lib/utils/color/scheme';
+  } from '#lib/types/index.ts';
+  import type { QuantitativeAttributeEntry } from '#lib/types/catalog.ts';
+  import { materializeColorScheme } from '#lib/utils/color/scheme.ts';
 
   interface Props {
     layerId: string;

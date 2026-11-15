@@ -1,13 +1,13 @@
 <script lang="ts">
   import * as d3 from 'd3';
 
-  import Select from '$lib/components/shared/Select.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
+  import Select from '#lib/components/shared/Select.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
   import type {
     QuantitativeColorScale,
     ContinuousColorScale,
     QuantitativeStepCount
-  } from '$lib/types';
+  } from '#lib/types/index.ts';
 
   interface Props {
     layerId: string;

@@ -1,9 +1,9 @@
-import type { CartoKitDiff } from '$lib/core/diff';
-import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
+import type { CartoKitDiff } from '#lib/core/diff/index.ts';
+import type { PatchFnParams, PatchFnResult } from '#lib/core/patch/index.ts';
 import type {
   CartoKitPointLayer,
   CartoKitProportionalSymbolLayer
-} from '$lib/types';
+} from '#lib/types/index.ts';
 
 /**
  * Patch size-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.

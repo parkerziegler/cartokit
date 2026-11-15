@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
-import { pluralize } from '$lib/utils/formatters/shared';
-import { catalog } from '$lib/state/catalog.svelte';
+import { pluralize } from '#lib/utils/formatters/shared.ts';
+import { catalog } from '#lib/state/catalog.svelte.ts';
 
 /**
  * Format the feature count and geometry type of a {@link CartoKitSource}.

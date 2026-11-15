@@ -12,9 +12,9 @@ import type {
   DuckDBColumn,
   DuckDBGeometryType,
   DuckDBTable
-} from '$lib/types/db';
-import type { CartoKitSource, CartoKitTableSource } from '$lib/types/source';
-import type { Transformation } from '$lib/types/transformation';
+} from '#lib/types/db.ts';
+import type { CartoKitSource, CartoKitTableSource } from '#lib/types/source.ts';
+import type { Transformation } from '#lib/types/transformation.ts';
 
 const DUCKDB_BUNDLES = getJsDelivrBundles();
 

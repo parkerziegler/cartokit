@@ -1,11 +1,11 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
-  import Button from '$lib/components/shared/Button.svelte';
-  import FieldLabel from '$lib/components/shared/FieldLabel.svelte';
-  import TextInput from '$lib/components/shared/TextInput.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import { ir } from '$lib/stores/ir';
+  import Button from '#lib/components/shared/Button.svelte';
+  import FieldLabel from '#lib/components/shared/FieldLabel.svelte';
+  import TextInput from '#lib/components/shared/TextInput.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import { ir } from '#lib/stores/ir.ts';
 
   let tileUrl = $state(
     $ir.basemap.provider === 'Custom' ? $ir.basemap.url : ''

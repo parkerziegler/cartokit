@@ -1,8 +1,12 @@
 <script lang="ts">
   import * as d3 from 'd3';
 
-  import type { CategoricalFill, ConstantStroke, LayerType } from '$lib/types';
-  import { materializeColorScheme } from '$lib/utils/color/scheme';
+  import type {
+    CategoricalFill,
+    ConstantStroke,
+    LayerType
+  } from '#lib/types/index.ts';
+  import { materializeColorScheme } from '#lib/utils/color/scheme.ts';
 
   interface Props {
     fill: CategoricalFill;

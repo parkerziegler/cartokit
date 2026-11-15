@@ -3,8 +3,8 @@ import { expect, test, describe } from 'vitest';
 import {
   convertSchemeToRamp,
   convertRampToScheme
-} from '$lib/utils/color/converter';
-import { DEFAULT_QUANTITATIVE_SCHEME } from '$lib/utils/constants';
+} from '#lib/utils/color/converter.ts';
+import { DEFAULT_QUANTITATIVE_SCHEME } from '#lib/utils/constants.ts';
 
 describe('convertSchemeToRamp', () => {
   test('converts a valid sequential single-hue scheme to its ramp', () => {

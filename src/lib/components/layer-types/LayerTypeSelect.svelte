@@ -1,13 +1,13 @@
 <script lang="ts">
-  import Select from '$lib/components/shared/Select.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import { catalog } from '$lib/state/catalog.svelte';
-  import { error } from '$lib/state/error.svelte';
-  import type { CartoKitLayer, LayerType } from '$lib/types';
+  import Select from '#lib/components/shared/Select.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import { catalog } from '#lib/state/catalog.svelte.ts';
+  import { error } from '#lib/state/error.svelte.ts';
+  import type { CartoKitLayer, LayerType } from '#lib/types/index.ts';
   import {
     SIMPLE_FEATURES_GEOMETRY_TYPES_TO_LAYER_TYPES,
     PMTILES_GEOMETRY_TYPES_TO_LAYER_TYPES
-  } from '$lib/utils/layer';
+  } from '#lib/utils/layer.ts';
 
   interface Props {
     layer: CartoKitLayer;

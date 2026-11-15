@@ -1,6 +1,6 @@
 import { expect, test, describe } from 'vitest';
 
-import { isAffiliatedId, isAffiliatedLayer } from '$lib/utils/layer';
+import { isAffiliatedId, isAffiliatedLayer } from '#lib/utils/layer.ts';
 
 const LAYER_ID = 'power-plants__1';
 

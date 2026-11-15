@@ -1,12 +1,12 @@
-import type { CartoKitDiff } from '$lib/core/diff';
-import type { PatchFnParams, PatchFnResult } from '$lib/core/patch';
+import type { CartoKitDiff } from '#lib/core/diff/index.ts';
+import type { PatchFnParams, PatchFnResult } from '#lib/core/patch/index.ts';
 import type {
   CartoKitChoroplethLayer,
   CartoKitLineLayer,
   CartoKitPointLayer,
   CartoKitPolygonLayer,
   CartoKitProportionalSymbolLayer
-} from '$lib/types';
+} from '#lib/types/index.ts';
 
 /**
  * Patch stroke-related {@link CartoKitDiff}s for the current {@link CartoKitIR}.

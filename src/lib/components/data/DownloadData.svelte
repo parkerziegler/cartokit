@@ -2,14 +2,14 @@
   import { snakeCase } from 'lodash-es';
   import { onMount } from 'svelte';
 
-  import { tooltip } from '$lib/attachments/tooltip';
-  import DownloadIcon from '$lib/components/icons/DownloadIcon.svelte';
-  import { db } from '$lib/state/db.svelte';
-  import type { CartoKitLayer } from '$lib/types';
-  import { downloadBlob } from '$lib/utils/download';
-  import { copyTableToGeoJSON } from '$lib/utils/geojson';
-  import { copyTableToGeoParquet } from '$lib/utils/geoparquet';
-  import { registerKeybinding } from '$lib/utils/keybinding';
+  import { tooltip } from '#lib/attachments/tooltip.ts';
+  import DownloadIcon from '#lib/components/icons/DownloadIcon.svelte';
+  import { db } from '#lib/state/db.svelte.ts';
+  import type { CartoKitLayer } from '#lib/types/index.ts';
+  import { downloadBlob } from '#lib/utils/download.ts';
+  import { copyTableToGeoJSON } from '#lib/utils/geojson.ts';
+  import { copyTableToGeoParquet } from '#lib/utils/geoparquet.ts';
+  import { registerKeybinding } from '#lib/utils/keybinding.ts';
 
   interface Props {
     layer: CartoKitLayer;

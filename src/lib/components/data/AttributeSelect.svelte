@@ -1,9 +1,9 @@
 <script lang="ts">
-  import Select from '$lib/components/shared/Select.svelte';
-  import { applyDiff, type CartoKitDiff } from '$lib/core/diff';
-  import { catalog } from '$lib/state/catalog.svelte';
-  import type { Channel } from '$lib/types';
-  import type { AttributeKind } from '$lib/types/attribute';
+  import Select from '#lib/components/shared/Select.svelte';
+  import { applyDiff, type CartoKitDiff } from '#lib/core/diff/index.ts';
+  import { catalog } from '#lib/state/catalog.svelte.ts';
+  import type { Channel } from '#lib/types/index.ts';
+  import type { AttributeKind } from '#lib/types/attribute.ts';
 
   interface Props {
     selected: string;

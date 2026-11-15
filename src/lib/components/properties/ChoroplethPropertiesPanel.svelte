@@ -1,10 +1,10 @@
 <script lang="ts">
-  import ColorControls from '$lib/components/color/ColorControls.svelte';
-  import OpacityInput from '$lib/components/color/OpacityInput.svelte';
-  import StrokeModifier from '$lib/components/color/StrokeModifier.svelte';
-  import StrokePicker from '$lib/components/color/StrokePicker.svelte';
-  import MenuItem from '$lib/components/shared/MenuItem.svelte';
-  import type { CartoKitChoroplethLayer } from '$lib/types';
+  import ColorControls from '#lib/components/color/ColorControls.svelte';
+  import OpacityInput from '#lib/components/color/OpacityInput.svelte';
+  import StrokeModifier from '#lib/components/color/StrokeModifier.svelte';
+  import StrokePicker from '#lib/components/color/StrokePicker.svelte';
+  import MenuItem from '#lib/components/shared/MenuItem.svelte';
+  import type { CartoKitChoroplethLayer } from '#lib/types/index.ts';
 
   interface Props {
     layer: CartoKitChoroplethLayer;

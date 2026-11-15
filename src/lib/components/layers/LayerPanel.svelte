@@ -1,8 +1,8 @@
 <script lang="ts">
   import { orderBy } from 'lodash-es';
 
-  import LayerEntry from '$lib/components/layers/LayerEntry.svelte';
-  import { ir } from '$lib/stores/ir';
+  import LayerEntry from '#lib/components/layers/LayerEntry.svelte';
+  import { ir } from '#lib/stores/ir.ts';
 </script>
 
 {#if Object.values($ir.layers).some((layer) => !layer.layout.deleted)}
