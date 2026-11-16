@@ -5,6 +5,7 @@ import favicon from '#lib/utils/favicon.svg?raw';
 import { codegenDataFiles } from '#lib/codegen/codegen-data.ts';
 import type { CartoKitIR } from '#lib/types/index.ts';
 import type { CartokitCodegenProgramFile } from '#lib/types/codegen.ts';
+import type { DuckDBClient } from '#lib/types/db.ts';
 
 /**
  * Bundle a cartokit-generated Vite project into a .zip archive.
@@ -12,12 +13,14 @@ import type { CartokitCodegenProgramFile } from '#lib/types/codegen.ts';
  * @param ir The {@link CartoKitIR}.
  * @param files The program files produced by code generation.
  * @param rootDir The name of the directory containing the project.
+ * @param client The {@link DuckDBClient} holding the layers' tables.
  * @returns A Promise resolving to a Blob containing the .zip archive.
  */
 export async function zipProject(
   ir: CartoKitIR,
   files: CartokitCodegenProgramFile[],
-  rootDir: string
+  rootDir: string,
+  client: DuckDBClient
 ): Promise<Blob> {
   const entries: Zippable = {
     [`${rootDir}/public/favicon.svg`]: strToU8(favicon)
@@ -27,7 +30,7 @@ export async function zipProject(
     entries[`${rootDir}/${file.path}`] = strToU8(file.text);
   }
 
-  for (const file of await codegenDataFiles(ir)) {
+  for (const file of await codegenDataFiles(ir, client)) {
     entries[`${rootDir}/${file.path}`] = file.bytes;
   }
 

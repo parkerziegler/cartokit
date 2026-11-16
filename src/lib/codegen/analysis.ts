@@ -3,7 +3,7 @@ import type {
   CartoKitBackend,
   CartoKitBackendAnalysis
 } from '#lib/types/codegen.ts';
-import { getLayerDescendants } from '#lib/utils/ir.ts';
+import { hasRequiredDependents, isLayerDataRequired } from '#lib/utils/ir.ts';
 
 /**
  * Determine whether we need to include the PMTiles client library.
@@ -25,7 +25,7 @@ export function isPMTilesRequired(
 
 /**
  * Determine whether we need to include DuckDB to load GeoParquet sources or
- * derive layers from other layers.
+ * derive layers from other layers. Orphaned soft-deleted layers are ignored.
  *
  * @param ir The current {@link CartoKitIR}.
  * @returns A Boolean value indicating whether DuckDB is required.
@@ -33,41 +33,27 @@ export function isPMTilesRequired(
 function isDuckDBRequired(ir: CartoKitIR): boolean {
   return Object.values(ir.layers).some(
     (layer) =>
-      layer.source.type === 'geoparquet' || layer.source.type === 'table'
+      (layer.source.type === 'geoparquet' || layer.source.type === 'table') &&
+      isLayerDataRequired(ir, layer.id)
   );
 }
 
 /**
- * Determine whether we need to include DuckDBDataProtocol to support register-
- * ing local GeoParquet files.
- *
- * @param ir The current {@link CartoKitIR}.
- * @returns A Boolean value indicating whether DuckDBDataProtocol is required.
- */
-function isDuckDBDataProtocolRequired(ir: CartoKitIR): boolean {
-  return Object.values(ir.layers).some(
-    (layer) =>
-      layer.source.type === 'geoparquet' &&
-      layer.source.location.type === 'file'
-  );
-}
-
-/**
- * Determine whether we need the DuckDB instance to register files, either local
- * GeoParquet files or uploaded GeoJSON files read by derived layers.
+ * Determine whether we need the DuckDB instance and DuckDBDataProtocol to
+ * register files, either local GeoParquet files or uploaded GeoJSON files read
+ * by derived layers.
  *
  * @param ir The current {@link CartoKitIR}.
  * @returns A Boolean value indicating whether file registration is required.
  */
 function isDuckDBFileRegistrationRequired(ir: CartoKitIR): boolean {
-  return (
-    isDuckDBDataProtocolRequired(ir) ||
-    Object.values(ir.layers).some(
-      (layer) =>
-        layer.source.type === 'geojson' &&
-        layer.source.location.type === 'file' &&
-        getLayerDescendants(ir, layer.id).size > 0
-    )
+  return Object.values(ir.layers).some(
+    (layer) =>
+      layer.source.location.type === 'file' &&
+      ((layer.source.type === 'geoparquet' &&
+        isLayerDataRequired(ir, layer.id)) ||
+        (layer.source.type === 'geojson' &&
+          hasRequiredDependents(ir, layer.id)))
   );
 }
 
@@ -87,7 +73,6 @@ export function analyzeIR(
     library: backend.library,
     isPMTilesRequired: isPMTilesRequired(ir, backend),
     isDuckDBRequired: isDuckDBRequired(ir),
-    isDuckDBDataProtocolRequired: isDuckDBDataProtocolRequired(ir),
     isDuckDBFileRegistrationRequired: isDuckDBFileRegistrationRequired(ir)
   };
 }

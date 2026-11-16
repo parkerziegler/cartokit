@@ -7,6 +7,7 @@
   import ViteIcon from '#lib/components/icons/ViteIcon.svelte';
   import TabItem from '#lib/components/shared/TabItem.svelte';
   import Tabs from '#lib/components/shared/Tabs.svelte';
+  import { db } from '#lib/state/db.svelte.ts';
   import { ir } from '#lib/stores/ir.ts';
   import { program } from '#lib/stores/program.ts';
   import { downloadBlob } from '#lib/utils/download.ts';
@@ -18,7 +19,7 @@
     const { zipProject } = await import('#lib/utils/zip.ts');
 
     downloadBlob(
-      await zipProject($ir, $program, PROJECT_NAME),
+      await zipProject($ir, $program, PROJECT_NAME, db.value!),
       `${PROJECT_NAME}.zip`
     );
   }

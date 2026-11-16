@@ -6,13 +6,13 @@ import {
   codegenDuckDBFileRegistrations,
   codegenSource
 } from '#lib/codegen/codegen-source.ts';
-import { withDefault } from '#lib/codegen/utils.ts';
+import { prop, props, withDefault } from '#lib/codegen/utils.ts';
 import type { CartoKitIR } from '#lib/types/index.ts';
 import type { CartoKitBackendAnalysis } from '#lib/types/codegen.ts';
 
 /**
- * Generate a program fragment for layer sources, layer renders, and the
- * top-level map instance.
+ * Generate a program fragment for map setup, the top-level map instance, layer
+ * sources, and layer renders.
  *
  * @param ir The {@link CartoKitIR}.
  * @param analysis The {@link CartoKitBackendAnalysis} for the current
@@ -25,62 +25,50 @@ export function codegenMap(
   analysis: CartoKitBackendAnalysis
 ): string {
   const projection = codegenProjection(ir, analysis.library);
-  const layerSources = orderBy(
-    Object.values(ir.layers),
-    'layout.z',
-    'asc'
-  ).reduce((p, layer) => {
-    return p.concat('\n\n' + codegenSource(layer, ir, analysis));
-  }, '');
-  const layerRenders = orderBy(
-    Object.values(ir.layers),
-    'layout.z',
-    'asc'
-  ).reduce((p, layer) => {
-    if (layer.layout.deleted) {
-      return p;
-    }
+  const layers = orderBy(Object.values(ir.layers), 'layout.z', 'asc');
 
-    return p.concat('\n\n' + codegenLayer(layer, ir.basemap.beforeId));
-  }, '');
+  const workerUrl =
+    analysis.library === 'maplibre' ? 'setWorkerUrl(workerUrl)' : '';
 
-  const protocol =
-    analysis.isPMTilesRequired && analysis.library === 'maplibre'
-      ? `
-  const protocol = new pmtiles.Protocol();
-  addProtocol('pmtiles', protocol.tile);
-  `
-      : '';
+  const protocol = analysis.isPMTilesRequired
+    ? `const protocol = new pmtiles.Protocol();
+addProtocol('pmtiles', protocol.tile);`
+    : '';
 
-  const mapOptions = [
-    `${analysis.library === 'mapbox' ? `accessToken: 'YOUR_MAPBOX_ACCESS_TOKEN'` : ''}`,
-    "container: 'map'",
-    `style: '${ir.basemap.url.replace(/=.+$/, '=_MAPTILER_API_KEY')}'`,
-    `center: [${ir.center.join(', ')}]`,
-    `zoom: ${ir.zoom}`,
+  const mapOptions = props(
+    analysis.library === 'mapbox'
+      ? prop('accessToken', 'YOUR_MAPBOX_ACCESS_TOKEN')
+      : '',
+    prop('container', 'map'),
+    prop('style', ir.basemap.url.replace(/=.+$/, '=_MAPTILER_API_KEY')),
+    prop('center', ir.center),
+    prop('zoom', ir.zoom),
     withDefault('bearing', ir.bearing),
     withDefault('pitch', ir.pitch),
-    `${analysis.library === 'mapbox' ? projection : ''}`
-  ]
-    .filter(Boolean)
-    .join(',\n');
+    analysis.library === 'mapbox' ? projection : ''
+  );
 
   const map = `const map = new ${analysis.library === 'mapbox' ? 'mapboxgl.' : ''}Map({
   ${mapOptions}
 });`;
 
-  const mapLoad = layerSources
-    ? `
-map.on('load', ${analysis.isDuckDBRequired ? 'async ' : ''}() => {
-  ${analysis.isDuckDBRequired ? `const { conn${analysis.isDuckDBDataProtocolRequired ? ', db' : ''} } = await initDB();` : ''}
+  const mapLoadBody = [
+    analysis.isDuckDBRequired
+      ? `const { conn${analysis.isDuckDBFileRegistrationRequired ? ', db' : ''} } = await initDB();`
+      : '',
+    codegenDuckDBFileRegistrations(ir),
+    ...layers.map((layer) => codegenSource(layer, ir, analysis)),
+    ...layers
+      .filter((layer) => !layer.layout.deleted)
+      .map((layer) => codegenLayer(layer, ir.basemap.beforeId))
+  ]
+    .filter(Boolean)
+    .join('\n\n');
 
-  ${codegenDuckDBFileRegistrations(ir)}
-
-  ${layerSources}
-
-  ${layerRenders}
-});
-  `
+  const mapLoad = mapLoadBody
+    ? `map.on('load', ${analysis.isDuckDBRequired ? 'async ' : ''}() => {
+  ${mapLoadBody}
+});`
     : '';
 
   const mapStyleLoad =
@@ -90,5 +78,7 @@ map.on('load', ${analysis.isDuckDBRequired ? 'async ' : ''}() => {
 });`
       : '';
 
-  return [protocol, map, mapLoad, mapStyleLoad].filter(Boolean).join('\n\n');
+  return [workerUrl, protocol, map, mapLoad, mapStyleLoad]
+    .filter(Boolean)
+    .join('\n\n');
 }

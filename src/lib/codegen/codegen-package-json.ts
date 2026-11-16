@@ -16,41 +16,23 @@ const versions = {
 /** Represents the string union of all cartokit dependency names. */
 type PackageName = keyof typeof versions;
 
-/** Represents a value for a package.json entry. */
-type JSONValue = string | boolean | JSONEntry[];
-
-/** Represents a key-value pair for a package.json entry. */
-interface JSONEntry {
-  key: string;
-  value: JSONValue;
-}
-
 /**
- * Write a single key-value {@link JSONEntry}, recursing on Array-valued values.
- *
- * @param entry A key-value {@link JSONEntry}.
- * @returns A string for a key-value {@link JSONEntry}.
- */
-function writeJSONEntry(entry: JSONEntry): string {
-  const serialized = Array.isArray(entry.value)
-    ? `{\n${entry.value.map(writeJSONEntry).join(',\n')}\n}`
-    : JSON.stringify(entry.value);
-
-  return `${JSON.stringify(entry.key)}: ${serialized}`;
-}
-
-/**
- * Convert a dictionary of packages to an Array of {@link JSONEntry} values.
+ * Select the packages to include in the generated package.json, paired with
+ * their versions.
  *
  * @param include A partial dictionary mapping package names to Boolean
  * conditions indicating whether or not they're included in the generated code.
- * @returns A list of {@link JSONEntry} key-value pairs representing packages to
- * include in the generated package.json.
+ * @returns A dictionary mapping the names of included packages to their
+ * versions.
  */
-function packages(include: Partial<Record<PackageName, boolean>>): JSONEntry[] {
-  return Object.entries(include)
-    .filter(([, isIncluded]) => isIncluded)
-    .map(([key]) => ({ key, value: versions[key as PackageName] }));
+function packages(
+  include: Partial<Record<PackageName, boolean>>
+): Partial<Record<PackageName, string>> {
+  return Object.fromEntries(
+    Object.entries(include)
+      .filter(([, isIncluded]) => isIncluded)
+      .map(([name]) => [name, versions[name as PackageName]])
+  );
 }
 
 /**
@@ -62,37 +44,30 @@ function packages(include: Partial<Record<PackageName, boolean>>): JSONEntry[] {
 export function codegenPackageJson(analysis: CartoKitBackendAnalysis) {
   const isTypeScript = analysis.language === 'typescript';
 
-  const json: JSONEntry[] = [
-    { key: 'name', value: 'cartokit-project' },
-    { key: 'private', value: true },
-    { key: 'version', value: '0.0.0' },
-    { key: 'type', value: 'module' },
+  return JSON.stringify(
     {
-      key: 'scripts',
-      value: [
-        { key: 'dev', value: 'vite' },
-        { key: 'build', value: `${isTypeScript ? 'tsc && ' : ''}vite build` },
-        { key: 'preview', value: 'vite preview' }
-      ]
-    },
-    {
-      key: 'dependencies',
-      value: packages({
+      name: 'cartokit-project',
+      private: true,
+      version: '0.0.0',
+      type: 'module',
+      scripts: {
+        dev: 'vite',
+        build: `${isTypeScript ? 'tsc && ' : ''}vite build`,
+        preview: 'vite preview'
+      },
+      dependencies: packages({
         '@duckdb/duckdb-wasm': analysis.isDuckDBRequired,
         'mapbox-gl': analysis.library === 'mapbox',
         'maplibre-gl': analysis.library === 'maplibre',
         pmtiles: analysis.isPMTilesRequired
-      })
-    },
-    {
-      key: 'devDependencies',
-      value: packages({
+      }),
+      devDependencies: packages({
         '@types/geojson': analysis.isDuckDBRequired && isTypeScript,
         typescript: isTypeScript,
         vite: true
       })
-    }
-  ];
-
-  return `{\n${json.map(writeJSONEntry).join(',\n')}\n}`;
+    },
+    null,
+    2
+  );
 }

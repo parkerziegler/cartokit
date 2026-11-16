@@ -1,8 +1,9 @@
 import { camelCase } from 'lodash-es';
 
-import type { CartoKitIR, CartoKitLayer } from '#lib/types/index.ts';
+import { literal } from '#lib/codegen/utils.ts';
 import type { CartoKitBackendAnalysis } from '#lib/types/codegen.ts';
 import type { DuckDBTable } from '#lib/types/db.ts';
+import type { CartoKitIR, CartoKitLayer } from '#lib/types/index.ts';
 import type {
   CartoKitGeoJSONSource,
   CartoKitGeoParquetSource,
@@ -10,11 +11,11 @@ import type {
   CartoKitTableSource
 } from '#lib/types/source.ts';
 import {
-  generateCreateTableStatement,
   generateCreateDerivedTableStatement,
+  generateCreateTableStatement,
   generateSelectStatement
 } from '#lib/utils/db.ts';
-import { getLayerDescendants } from '#lib/utils/ir.ts';
+import { hasRequiredDependents, isLayerDataRequired } from '#lib/utils/ir.ts';
 
 /**
  * Get the name a source's data is read under in generated code: its URL, or the
@@ -37,11 +38,12 @@ function codegenSourceName({
  */
 export function codegenDuckDBFileRegistrations(ir: CartoKitIR): string {
   const promises = Object.values(ir.layers).flatMap((layer) =>
-    (layer.source.type === 'geoparquet' ||
+    ((layer.source.type === 'geoparquet' &&
+      isLayerDataRequired(ir, layer.id)) ||
       (layer.source.type === 'geojson' &&
-        getLayerDescendants(ir, layer.id).size > 0)) &&
+        hasRequiredDependents(ir, layer.id))) &&
     layer.source.location.type === 'file'
-      ? `db.registerFileURL("${layer.source.location.file.name}", new URL("/data/${layer.source.location.file.name}", window.location.href).href, DuckDBDataProtocol.HTTP, false)`
+      ? `db.registerFileURL(${literal(layer.source.location.file.name)}, new URL(${literal(`/data/${layer.source.location.file.name}`)}, window.location.href).href, DuckDBDataProtocol.HTTP, false)`
       : []
   );
 
@@ -75,7 +77,8 @@ interface CodegenDuckDBSourceParams {
  * @param params.table The {@link DuckDBTable} the statement creates.
  * @param params.dataIdent The identifier the layer's data is bound to in
  * generated code.
- * @returns A program fragment adding the source to the map.
+ * @returns A (potentially empty) program fragment adding the source to the
+ * map.
  */
 function codegenDuckDBSource({
   ir,
@@ -84,13 +87,13 @@ function codegenDuckDBSource({
   table,
   dataIdent
 }: CodegenDuckDBSourceParams) {
-  const layer = ir.layers[layerId];
-  const dependents = getLayerDescendants(ir, layer.id);
-
-  // If the layer is flagged as deleted but still has dependents, ensure that we
-  // generate a statement to create the table.
-  if (layer.layout.deleted && dependents.size > 0) {
-    return `await conn.query(\`${createStatement}\`);`;
+  // A soft-deleted layer is not added to the map. If rendered layers still
+  // derive from it, generate only the statement to create its table; if it's
+  // orphaned, generate nothing.
+  if (ir.layers[layerId].layout.deleted) {
+    return isLayerDataRequired(ir, layerId)
+      ? `await conn.query(\`${createStatement}\`);`
+      : '';
   }
 
   const selectStatement = generateSelectStatement(layerId, table);
@@ -99,7 +102,7 @@ function codegenDuckDBSource({
     ${createStatement}
     ${selectStatement}
   \`);`,
-    `map.addSource("${layerId}", {
+    `map.addSource(${literal(layerId)}, {
   type: "geojson",
   data: toFeatureCollection(${dataIdent})
 });`
@@ -129,26 +132,27 @@ function codegenGeoJSONSource({
   ir,
   source,
   layerId
-}: CodegenSourceParams<CartoKitGeoJSONSource>) {
+}: Omit<CodegenSourceParams<CartoKitGeoJSONSource>, 'dataIdent'>) {
   const deleted = ir.layers[layerId].layout.deleted;
   let createTable = '';
 
-  // If the layer has descendants, generate a CREATE TABLE statement.
-  if (getLayerDescendants(ir, layerId).size > 0) {
+  // If layers whose data is required derive from this layer, generate a CREATE
+  // TABLE statement.
+  if (hasRequiredDependents(ir, layerId)) {
     createTable = `await conn.query(\`${generateCreateTableStatement(layerId, codegenSourceName(source))}\`);`;
   }
 
   const data =
     source.location.type === 'api'
-      ? `"${source.location.url}"`
-      : `"/data/${source.location.file.name}"`;
+      ? source.location.url
+      : `/data/${source.location.file.name}`;
 
   return [
     createTable,
     !deleted
-      ? `map.addSource("${layerId}", {
+      ? `map.addSource(${literal(layerId)}, {
   type: "geojson",
-  data: ${data}
+  data: ${literal(data)}
 });`
       : undefined
   ]
@@ -237,9 +241,9 @@ function codegenPMTilesSource(
       ? `pmtiles://${source.location.url}`
       : source.location.url;
 
-  return `map.addSource("${layerId}", {
+  return `map.addSource(${literal(layerId)}, {
   type: "vector",
-  url: ${JSON.stringify(url)}
+  url: ${literal(url)}
 });`;
 }
 
@@ -265,8 +269,7 @@ export function codegenSource(
       return codegenGeoJSONSource({
         ir,
         source: layer.source,
-        layerId: layer.id,
-        dataIdent
+        layerId: layer.id
       });
     case 'geoparquet':
       return codegenGeoParquetSource({

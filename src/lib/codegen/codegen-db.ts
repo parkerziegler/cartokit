@@ -1,81 +1,79 @@
-import { Project, SyntaxKind, ScriptTarget, ModuleKind, ts } from 'ts-morph';
+import { inferCRS } from '#lib/utils/crs.ts';
 
-import type { CartoKitBackendAnalysis } from '#lib/types/codegen.ts';
-import dbSrc from '#lib/utils/db?raw';
+/**
+ * Generate the module that initializes DuckDB and converts query results to
+ * GeoJSON.
+ *
+ * The program is always generated as TypeScript; types are erased downstream
+ * for the JavaScript backend.
+ *
+ * @returns The TypeScript program text.
+ */
+export function codegenDB(): string {
+  const imports = `import * as duckdb from "@duckdb/duckdb-wasm";
+import type { Feature, FeatureCollection } from "geojson";`;
 
-// Create a new project using ts-morph to parse the source code for TypeScript.
-const projectTS = new Project({
-  useInMemoryFileSystem: true,
-  compilerOptions: {
-    target: ScriptTarget.ESNext
-  }
-});
-const tsSourceFile = projectTS.createSourceFile('db.ts', dbSrc);
+  const bundles = `const DUCKDB_BUNDLES = duckdb.getJsDelivrBundles();`;
 
-export function codegenDB(
-  language: CartoKitBackendAnalysis['language']
-): string {
-  // Get the AST nodes for variables and functions we want to incldue in the
-  // generated code.
-  const astNodes = [
-    tsSourceFile.getVariableStatement('DUCKDB_BUNDLES'),
-    tsSourceFile.getFunction('initDB'),
-    tsSourceFile.getFunction('toFeatureCollection')
-  ].filter((astNode) => astNode !== undefined);
-
-  // Find the set of identifiers that are actually used by the above AST nodes.
-  const identifiers = new Set(
-    astNodes.flatMap((astNode) =>
-      astNode
-        .getDescendantsOfKind(SyntaxKind.Identifier)
-        .map((identifier) => identifier.getText())
-    )
+  const initDB = `export async function initDB() {
+  const bundle = await duckdb.selectBundle(DUCKDB_BUNDLES);
+  const workerURL = URL.createObjectURL(
+    new Blob([\`importScripts("\${bundle.mainWorker}");\`], {
+      type: 'text/javascript'
+    })
   );
 
-  // Build the import statements and body of the program.
-  const importStatements = tsSourceFile
-    .getImportDeclarations()
-    .flatMap((importDecl) => {
-      const defaultImport = importDecl.getDefaultImport()?.getText();
-      const namedImports = importDecl
-        .getNamedImports()
-        .filter((namedImport) =>
-          identifiers.has(
-            (namedImport.getAliasNode() ?? namedImport.getNameNode()).getText()
-          )
-        )
-        .map((namedImport) => namedImport.getText());
+  // Instantiate the asynchronous version of DuckDB-wasm
+  const worker = new Worker(workerURL);
+  const logger = new duckdb.ConsoleLogger();
+  const db = new duckdb.AsyncDuckDB(logger, worker);
+  await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+  URL.revokeObjectURL(workerURL);
 
-      const clauses = [
-        defaultImport && identifiers.has(defaultImport) ? defaultImport : '',
-        namedImports.length > 0 ? `{ ${namedImports.join(', ')} }` : ''
-      ].filter(Boolean);
+  // Cast types that Arrow would otherwise surface as BigInt or Decimal objects
+  // to plain numbers. MapLibre cannot serialize these when tiling GeoJSON.
+  await db.open({
+    query: {
+      castBigIntToDouble: true,
+      castDecimalToDouble: true,
+      castTimestampToDate: true
+    }
+  });
 
-      if (clauses.length === 0) {
-        return [];
-      }
+  // Install and load the Spatial extension at startup.
+  // See https://github.com/duckdb/duckdb-wasm/issues/2199 for why the call to
+  // duckdb_coordinate_systems is necessary to support GeoParquet loading.
+  const conn = await db.connect();
+  await conn.query(\`SELECT * FROM duckdb_coordinate_systems();
+INSTALL spatial;
+LOAD spatial;
 
-      return `import ${importDecl.isTypeOnly() ? 'type ' : ''}${clauses.join(', ')} from '${importDecl.getModuleSpecifierValue()}';`;
-    })
-    .join('\n');
-  const body = astNodes.map((astNode) => astNode.getText()).join('\n\n');
+${inferCRS()}
+\`);
 
-  const program = `${importStatements}
+  return { db, worker, conn };
+}`;
 
-${body}`;
+  const toFeatureCollection = `export function toFeatureCollection(
+  results: Pick<Awaited<ReturnType<duckdb.AsyncDuckDBConnection["query"]>>, "toArray">
+): FeatureCollection {
+  const features = results
+    .toArray()
+    .map((row: { toJSON: () => { geom: string; [key: string]: unknown } }) => {
+      const { geom, ...properties } = row.toJSON();
 
-  if (language === 'typescript') {
-    return program;
-  }
+      return {
+        type: 'Feature',
+        properties,
+        geometry: JSON.parse(geom)
+      } as Feature;
+    });
 
-  // Strip types from the program. This is a single-file transform, so we don't
-  // need a full ts-morph Project here.
-  return ts
-    .transpileModule(program, {
-      compilerOptions: {
-        target: ScriptTarget.ESNext,
-        module: ModuleKind.ESNext
-      }
-    })
-    .outputText.replaceAll(/^(\s*)(export|return)\b/gm, '\n$1$2');
+  return {
+    type: 'FeatureCollection',
+    features
+  };
+}`;
+
+  return [imports, bundles, initDB, toFeatureCollection].join('\n\n');
 }
