@@ -38,8 +38,6 @@ export function isPMTilesRequired(
  * 3. They later delete the transformation layer, orphaning the original layer
  * in the dependency graph.
  *
- * isLayerDataRequired finds this case and ensures we don't bring in DuckDB.
- *
  * @param ir The current {@link CartoKitIR}.
  * @returns A Boolean value indicating whether DuckDB is required.
  */
