@@ -1,13 +1,10 @@
 import { inferCRS } from '#lib/utils/crs.ts';
 
 /**
- * Generate the module that initializes DuckDB and converts query results to
- * GeoJSON.
+ * Generate the src/db.{js,ts} module that initializes DuckDB and supports
+ * querying data from DuckDB as GeoJSON.
  *
- * The program is always generated as TypeScript; types are erased downstream
- * for the JavaScript backend.
- *
- * @returns The TypeScript program text.
+ * @returns Program text for the src/db.{js,ts} module.
  */
 export function codegenDB(): string {
   const imports = `import * as duckdb from "@duckdb/duckdb-wasm";
@@ -23,7 +20,7 @@ import type { Feature, FeatureCollection } from "geojson";`;
     })
   );
 
-  // Instantiate the asynchronous version of DuckDB-wasm
+  // Instantiate the asynchronous version of DuckDB-wasm.
   const worker = new Worker(workerURL);
   const logger = new duckdb.ConsoleLogger();
   const db = new duckdb.AsyncDuckDB(logger, worker);

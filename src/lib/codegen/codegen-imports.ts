@@ -32,7 +32,7 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';`;
 export function codegenImports(analysis: CartoKitBackendAnalysis): string {
   const libraryImports = [
     analysis.isDuckDBFileRegistrationRequired
-      ? "import { DuckDBDataProtocol } from '@duckdb/duckdb-wasm';"
+      ? "import * as duckdb from '@duckdb/duckdb-wasm';"
       : '',
     analysis.library === 'mapbox'
       ? "import * as mapboxgl from 'mapbox-gl/esm';"

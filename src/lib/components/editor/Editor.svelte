@@ -19,7 +19,12 @@
     const { zipProject } = await import('#lib/utils/zip.ts');
 
     downloadBlob(
-      await zipProject($ir, $program, PROJECT_NAME, db.value!),
+      await zipProject({
+        ir: $ir,
+        files: $program,
+        rootDir: PROJECT_NAME,
+        dbState: db.value!
+      }),
       `${PROJECT_NAME}.zip`
     );
   }

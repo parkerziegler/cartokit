@@ -90,21 +90,22 @@ export function generateTransformationExpression(
   transformation: Transformation,
   geometryColumn: string
 ): string {
+  const geom = quoteIdentifier(geometryColumn);
+
   switch (transformation.type) {
     case 'Buffer': {
-      const geom = quoteIdentifier(geometryColumn);
       const inferCRSExpression = `infer_crs(${geom})`;
       // Repair invalid input before buffering, since GEOS's buffer overlay can
       // throw a TopologyException on invalid polygons. ST_MakeValid may emit
       // stray LineStrings alongside polygons; ST_CollectionExtract keeps only
       // the parts of the highest dimension, so Points and LineStrings pass
       // through unchanged.
-      return `ST_Transform(ST_Buffer(ST_Transform(ST_CollectionExtract(ST_MakeValid(${geom})),'EPSG:4326', ${inferCRSExpression}, always_xy := true), ${transformation.args.distance}), ${inferCRSExpression}, 'EPSG:4326', always_xy := true)`;
+      return `ST_Transform(ST_Buffer(ST_Transform(ST_CollectionExtract(ST_MakeValid(${geom})), 'EPSG:4326', ${inferCRSExpression}, always_xy := true), ${transformation.args.distance}), ${inferCRSExpression}, 'EPSG:4326', always_xy := true)`;
     }
     case 'Centroid':
-      return `ST_Centroid(${quoteIdentifier(geometryColumn)})`;
+      return `ST_Centroid(${geom})`;
     case 'Envelope':
-      return `ST_Envelope(${quoteIdentifier(geometryColumn)})`;
+      return `ST_Envelope(${geom})`;
   }
 }
 

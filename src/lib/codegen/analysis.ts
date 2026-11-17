@@ -33,10 +33,11 @@ export function isPMTilesRequired(
  * The call to isLayerDataRequired helps to guard against a case like the
  * following:
  *
- * 1. A user uploads a GeoParquet file and applies a transformation.
- * 2. They soft-delete the GeoParquet file, flipping its deleted flag to true.
- * 3. They later delete the transformation layer, orphaning the original layer
- * in the dependency graph.
+ * 1. A user uploads a GeoParquet file and applies a transformation, generating
+ *    a descedant layer.
+ * 2. They soft delete the parent layer, flipping its deleted flag to true.
+ * 3. They later delete the descendant layer, orphaning the parent layer in the
+ *    the dependency graph.
  *
  * @param ir The current {@link CartoKitIR}.
  * @returns A Boolean value indicating whether DuckDB is required.
@@ -50,8 +51,8 @@ function isDuckDBRequired(ir: CartoKitIR): boolean {
 }
 
 /**
- * Determine whether we need the DuckDB instance and DuckDBDataProtocol to
- * register files, either local GeoParquet files or uploaded GeoJSON files read
+ * Determine whether we need to register files in DuckDB's virtual file system.
+ * These will either be local GeoParquet files or local GeoJSON files read
  * by derived layers.
  *
  * @param ir The current {@link CartoKitIR}.
@@ -60,6 +61,7 @@ function isDuckDBRequired(ir: CartoKitIR): boolean {
 function isDuckDBFileRegistrationRequired(ir: CartoKitIR): boolean {
   return Object.values(ir.layers).some((layer) => {
     const isFileUpload = layer.source.location.type === 'file';
+
     const isGeoParquetWithRequiredData =
       layer.source.type === 'geoparquet' && isLayerDataRequired(ir, layer.id);
     const isGeoJSONWithDescendants =

@@ -57,7 +57,7 @@ export function codegenDuckDBFileRegistrations(ir: CartoKitIR): string {
           ${literal(`/data/${layer.source.location.file.name}`)},
           window.location.href
         ).href,
-        DuckDBDataProtocol.HTTP,
+        duckdb.DuckDBDataProtocol.HTTP,
         false
       )`;
     }

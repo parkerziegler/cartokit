@@ -43,8 +43,6 @@ function codegenAddLayer({
     paint ? `paint: { ${paint} }` : ''
   );
 
-  // The newline after the opening brace keeps Prettier from collapsing short
-  // layer definitions onto a single line.
   return `map.addLayer({
 ${options}
 }${beforeId ? `, ${literal(beforeId)}` : ''});`;
