@@ -1,5 +1,3 @@
-import { codegenMap } from '#lib/codegen/codegen-map.ts';
-import type { CartoKitIR } from '#lib/types/index.ts';
 import type { CartoKitBackendAnalysis } from '#lib/types/codegen.ts';
 
 /**
@@ -13,7 +11,7 @@ function codegenMapLibreNamedImports(analysis: CartoKitBackendAnalysis) {
   const namedImports = Object.entries({
     Map: true,
     setWorkerUrl: true,
-    addProtocol: analysis.isPMTilesRequired && analysis.library === 'maplibre'
+    addProtocol: analysis.isPMTilesRequired
   })
     .filter(([, include]) => include)
     .map(([namedImport]) => namedImport)
@@ -24,21 +22,17 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';`;
 }
 
 /**
- * Generate a program fragment for all library and data source imports.
+ * Generate a program fragment for all library and stylesheet imports.
  *
- * @param ir The {@link CartoKitIR}.
  * @param analysis The {@link CartoKitBackendAnalysis} for the current
  * {@link CartoKitIR}.
- * @returns A program fragment containing all modules and file imports for the
- * program.
+ * @returns A program fragment containing all module and stylesheet imports for
+ * the program.
  */
-export function codegenImports(
-  ir: CartoKitIR,
-  analysis: CartoKitBackendAnalysis
-): string {
+export function codegenImports(analysis: CartoKitBackendAnalysis): string {
   const libraryImports = [
-    analysis.isDuckDBDataProtocolRequired
-      ? "import { DuckDBDataProtocol } from '@duckdb/duckdb-wasm';"
+    analysis.isDuckDBFileRegistrationRequired
+      ? "import * as duckdb from '@duckdb/duckdb-wasm';"
       : '',
     analysis.library === 'mapbox'
       ? "import * as mapboxgl from 'mapbox-gl/esm';"
@@ -46,9 +40,7 @@ export function codegenImports(
     analysis.library === 'maplibre'
       ? codegenMapLibreNamedImports(analysis)
       : '',
-    analysis.isPMTilesRequired && analysis.library === 'maplibre'
-      ? "import * as pmtiles from 'pmtiles';"
-      : '',
+    analysis.isPMTilesRequired ? "import * as pmtiles from 'pmtiles';" : '',
     analysis.isDuckDBRequired
       ? "import { initDB, toFeatureCollection } from './db';"
       : ''
@@ -59,12 +51,5 @@ export function codegenImports(
   const cssImports = `import '${analysis.library}-gl/dist/${analysis.library}-gl.css';
 import './style.css'`;
 
-  return [
-    libraryImports,
-    cssImports,
-    analysis.library === 'maplibre' ? `setWorkerUrl(workerUrl)` : '',
-    codegenMap(ir, analysis)
-  ]
-    .filter(Boolean)
-    .join('\n\n');
+  return [libraryImports, cssImports].join('\n\n');
 }

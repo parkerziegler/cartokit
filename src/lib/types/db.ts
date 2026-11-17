@@ -1,3 +1,13 @@
+import type { AsyncDuckDB, AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
+
+/** A DuckDB instance paired with an open connection to it. */
+export interface DuckDBState {
+  /** The DuckDB instance. */
+  db: AsyncDuckDB;
+  /** An open connection to the DuckDB instance. */
+  conn: AsyncDuckDBConnection;
+}
+
 /** Valid return types of DuckDB's GEOMETRY_TYPE enum. */
 export type DuckDBGeometryType =
   | 'POINT'

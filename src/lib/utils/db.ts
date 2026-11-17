@@ -15,6 +15,7 @@ import type {
 } from '#lib/types/db.ts';
 import type { CartoKitSource, CartoKitTableSource } from '#lib/types/source.ts';
 import type { Transformation } from '#lib/types/transformation.ts';
+import { inferCRS } from '#lib/utils/crs.ts';
 
 const DUCKDB_BUNDLES = getJsDelivrBundles();
 
@@ -57,7 +58,9 @@ export async function initDB() {
   const conn = await db.connect();
   await conn.query(`SELECT * FROM duckdb_coordinate_systems();
 INSTALL spatial;
-LOAD spatial;`);
+LOAD spatial;
+
+${inferCRS()}`);
 
   return { db, worker, conn };
 }
@@ -87,18 +90,22 @@ export function generateTransformationExpression(
   transformation: Transformation,
   geometryColumn: string
 ): string {
+  const geom = quoteIdentifier(geometryColumn);
+
   switch (transformation.type) {
-    case 'Buffer':
+    case 'Buffer': {
+      const inferCRSExpression = `infer_crs(${geom})`;
       // Repair invalid input before buffering, since GEOS's buffer overlay can
       // throw a TopologyException on invalid polygons. ST_MakeValid may emit
       // stray LineStrings alongside polygons; ST_CollectionExtract keeps only
       // the parts of the highest dimension, so Points and LineStrings pass
       // through unchanged.
-      return `ST_Transform(ST_Buffer(ST_Transform(ST_CollectionExtract(ST_MakeValid(${quoteIdentifier(geometryColumn)})),'EPSG:4326', 'EPSG:3857', always_xy := true), ${transformation.args.distance}), 'EPSG:3857', 'EPSG:4326', always_xy := true)`;
+      return `ST_Transform(ST_Buffer(ST_Transform(ST_CollectionExtract(ST_MakeValid(${geom})), 'EPSG:4326', ${inferCRSExpression}, always_xy := true), ${transformation.args.distance}), ${inferCRSExpression}, 'EPSG:4326', always_xy := true)`;
+    }
     case 'Centroid':
-      return `ST_Centroid(${quoteIdentifier(geometryColumn)})`;
+      return `ST_Centroid(${geom})`;
     case 'Envelope':
-      return `ST_Envelope(${quoteIdentifier(geometryColumn)})`;
+      return `ST_Envelope(${geom})`;
   }
 }
 

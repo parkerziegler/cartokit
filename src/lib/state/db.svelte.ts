@@ -1,9 +1,9 @@
-import type { AsyncDuckDB, AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
+import type { DuckDBState } from '#lib/types/db.ts';
 
 export const db = $state<{
-  value: {
-    db: AsyncDuckDB;
-    worker: Worker;
-    conn: AsyncDuckDBConnection;
-  } | null;
+  value:
+    | (DuckDBState & {
+        worker: Worker;
+      })
+    | null;
 }>({ value: null });
