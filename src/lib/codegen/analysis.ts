@@ -3,7 +3,10 @@ import type {
   CartoKitBackend,
   CartoKitBackendAnalysis
 } from '#lib/types/codegen.ts';
-import { hasRequiredDependents, isLayerDataRequired } from '#lib/utils/ir.ts';
+import {
+  hasDescendantsRequiringData,
+  isLayerDataRequired
+} from '#lib/utils/ir.ts';
 
 /**
  * Determine whether we need to include the PMTiles client library.
@@ -25,7 +28,17 @@ export function isPMTilesRequired(
 
 /**
  * Determine whether we need to include DuckDB to load GeoParquet sources or
- * derive layers from other layers. Orphaned soft-deleted layers are ignored.
+ * derive layers from other layers.
+ *
+ * The call to isLayerDataRequired helps to guard against a case like the
+ * following:
+ *
+ * 1. A user uploads a GeoParquet file and applies a transformation.
+ * 2. They soft-delete the GeoParquet file, flipping its deleted flag to true.
+ * 3. They later delete the transformation layer, orphaning the original layer
+ * in the dependency graph.
+ *
+ * isLayerDataRequired finds this case and ensures we don't bring in DuckDB.
  *
  * @param ir The current {@link CartoKitIR}.
  * @returns A Boolean value indicating whether DuckDB is required.
@@ -47,14 +60,18 @@ function isDuckDBRequired(ir: CartoKitIR): boolean {
  * @returns A Boolean value indicating whether file registration is required.
  */
 function isDuckDBFileRegistrationRequired(ir: CartoKitIR): boolean {
-  return Object.values(ir.layers).some(
-    (layer) =>
-      layer.source.location.type === 'file' &&
-      ((layer.source.type === 'geoparquet' &&
-        isLayerDataRequired(ir, layer.id)) ||
-        (layer.source.type === 'geojson' &&
-          hasRequiredDependents(ir, layer.id)))
-  );
+  return Object.values(ir.layers).some((layer) => {
+    const isFileUpload = layer.source.location.type === 'file';
+    const isGeoParquetWithRequiredData =
+      layer.source.type === 'geoparquet' && isLayerDataRequired(ir, layer.id);
+    const isGeoJSONWithDescendants =
+      layer.source.type === 'geojson' &&
+      hasDescendantsRequiringData(ir, layer.id);
+
+    return (
+      isFileUpload && (isGeoParquetWithRequiredData || isGeoJSONWithDescendants)
+    );
+  });
 }
 
 /**

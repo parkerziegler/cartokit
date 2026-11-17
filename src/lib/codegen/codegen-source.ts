@@ -15,7 +15,10 @@ import {
   generateCreateTableStatement,
   generateSelectStatement
 } from '#lib/utils/db.ts';
-import { hasRequiredDependents, isLayerDataRequired } from '#lib/utils/ir.ts';
+import {
+  hasDescendantsRequiringData,
+  isLayerDataRequired
+} from '#lib/utils/ir.ts';
 
 /**
  * Get the name a source's data is read under in generated code: its URL, or the
@@ -37,15 +40,30 @@ function codegenSourceName({
  * @returns A (potentially empty) program fragment.
  */
 export function codegenDuckDBFileRegistrations(ir: CartoKitIR): string {
-  const promises = Object.values(ir.layers).flatMap((layer) =>
-    ((layer.source.type === 'geoparquet' &&
-      isLayerDataRequired(ir, layer.id)) ||
-      (layer.source.type === 'geojson' &&
-        hasRequiredDependents(ir, layer.id))) &&
-    layer.source.location.type === 'file'
-      ? `db.registerFileURL(${literal(layer.source.location.file.name)}, new URL(${literal(`/data/${layer.source.location.file.name}`)}, window.location.href).href, DuckDBDataProtocol.HTTP, false)`
-      : []
-  );
+  const promises = Object.values(ir.layers).flatMap((layer) => {
+    const isGeoParquetWithRequiredData =
+      layer.source.type === 'geoparquet' && isLayerDataRequired(ir, layer.id);
+    const isGeoJSONWithDescendants =
+      layer.source.type === 'geojson' &&
+      hasDescendantsRequiringData(ir, layer.id);
+
+    if (
+      layer.source.location.type === 'file' &&
+      (isGeoParquetWithRequiredData || isGeoJSONWithDescendants)
+    ) {
+      return `db.registerFileURL(
+        ${literal(layer.source.location.file.name)},
+        new URL(
+          ${literal(`/data/${layer.source.location.file.name}`)},
+          window.location.href
+        ).href,
+        DuckDBDataProtocol.HTTP,
+        false
+      )`;
+    }
+
+    return [];
+  });
 
   switch (promises.length) {
     case 0:
@@ -87,11 +105,10 @@ function codegenDuckDBSource({
   table,
   dataIdent
 }: CodegenDuckDBSourceParams) {
-  // A soft-deleted layer is not added to the map. If rendered layers still
-  // derive from it, generate only the statement to create its table; if it's
-  // orphaned, generate nothing.
+  // If the layer itself is soft-deleted, check to see if it has descendants
+  // that still require it. If so, generate a statement to create the table.
   if (ir.layers[layerId].layout.deleted) {
-    return isLayerDataRequired(ir, layerId)
+    return hasDescendantsRequiringData(ir, layerId)
       ? `await conn.query(\`${createStatement}\`);`
       : '';
   }
@@ -136,9 +153,9 @@ function codegenGeoJSONSource({
   const deleted = ir.layers[layerId].layout.deleted;
   let createTable = '';
 
-  // If layers whose data is required derive from this layer, generate a CREATE
-  // TABLE statement.
-  if (hasRequiredDependents(ir, layerId)) {
+  // Check if any descendants of this layer still require its data; if so,
+  // ensure we generate a CREATE TABLE statement for it.
+  if (hasDescendantsRequiringData(ir, layerId)) {
     createTable = `await conn.query(\`${generateCreateTableStatement(layerId, codegenSourceName(source))}\`);`;
   }
 

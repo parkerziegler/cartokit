@@ -27,18 +27,18 @@ export function getLayerDescendants(
 }
 
 /**
- * Determine whether any layer whose data is still required derives from the
- * queried layer.
+ * Determine whether any layer requires the queried layer's data, directly or
+ * transitively.
  *
- * Unlike {@link getLayerDescendants}, this looks through soft-deleted layers: a
- * soft-deleted child counts if a rendered layer derives from it in turn.
+ * This extends to soft-deleted layers, whose data may need to be kept to
+ * support downstream layers that are still rendered.
  *
  * @param ir The {@link CartoKitIR}.
  * @param parentLayerId The id of the parent layer.
  * @returns A Boolean value indicating whether the parent layer's table is read
  * by a layer whose data is required.
  */
-export function hasRequiredDependents(
+export function hasDescendantsRequiringData(
   ir: CartoKitIR,
   parentLayerId: string
 ): boolean {
@@ -65,6 +65,7 @@ export function hasRequiredDependents(
  */
 export function isLayerDataRequired(ir: CartoKitIR, layerId: string): boolean {
   return (
-    !ir.layers[layerId].layout.deleted || hasRequiredDependents(ir, layerId)
+    !ir.layers[layerId].layout.deleted ||
+    hasDescendantsRequiringData(ir, layerId)
   );
 }

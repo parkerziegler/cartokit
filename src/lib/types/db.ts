@@ -1,7 +1,7 @@
 import type { AsyncDuckDB, AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
 
 /** A DuckDB instance paired with an open connection to it. */
-export interface DuckDBClient {
+export interface DuckDBState {
   /** The DuckDB instance. */
   db: AsyncDuckDB;
   /** An open connection to the DuckDB instance. */
