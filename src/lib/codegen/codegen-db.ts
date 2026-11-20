@@ -41,7 +41,8 @@ import type { Feature, FeatureCollection } from "geojson";`;
   // See https://github.com/duckdb/duckdb-wasm/issues/2199 for why the call to
   // duckdb_coordinate_systems is necessary to support GeoParquet loading.
   const conn = await db.connect();
-  await conn.query(\`SELECT * FROM duckdb_coordinate_systems();
+  await conn.query(\`
+SELECT * FROM duckdb_coordinate_systems();
 INSTALL spatial;
 LOAD spatial;
 

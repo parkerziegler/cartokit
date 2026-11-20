@@ -319,6 +319,7 @@ export function formatSQL(query: string): string {
       ...duckdb.tokenizerOptions,
       reservedFunctionNames: [
         ...duckdb.tokenizerOptions.reservedFunctionNames,
+        'infer_crs',
         'ST_AsGeoJSON',
         'ST_Buffer',
         'ST_Centroid',
