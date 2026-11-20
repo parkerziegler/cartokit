@@ -289,7 +289,8 @@ export async function queryGeometryType(
     await conn.query(`
       SELECT ST_GeometryType(${quoteIdentifier(geometryColumn)})::VARCHAR AS geometry_type
       FROM ${quoteIdentifier(layerId)}
-      WHERE ${geometryColumn} IS NOT NULL LIMIT 1;
+      WHERE ${geometryColumn} IS NOT NULL
+      LIMIT 1;
     `)
   )
     .toArray()
