@@ -52,13 +52,37 @@
   }
 </script>
 
+{#snippet PropertiesEditor(layer: CartoKitLayer)}
+  {#if layer.source.type === 'pmtiles'}
+    <MenuItem title="Source Layer">
+      <SourceLayerSelect layerId={layer.id} source={layer.source} />
+    </MenuItem>
+  {/if}
+  <MenuItem title="Layer Type">
+    <LayerTypeSelect {layer} />
+  </MenuItem>
+  {#if layer.type === 'Choropleth'}
+    <ChoroplethPropertiesPanel {layer} />
+  {:else if layer.type === 'Heatmap'}
+    <HeatmapPropertiesPanel {layer} />
+  {:else if layer.type === 'Line'}
+    <LinePropertiesPanel {layer} />
+  {:else if layer.type === 'Point'}
+    <PointPropertiesPanel {layer} />
+  {:else if layer.type === 'Polygon'}
+    <PolygonPropertiesPanel {layer} />
+  {:else if layer.type === 'Proportional Symbol'}
+    <ProportionalSymbolPropertiesPanel {layer} />
+  {/if}
+{/snippet}
+
 <Menu
   id="properties"
   class={[
     'ease-cubic-out absolute top-4 right-4 z-10 max-h-[calc(100%-9rem)] w-80 transition-[max-height,translate,width] duration-[200ms,400ms,200ms]',
     {
       'max-h-[calc(100%-25.25rem)]': $layout.dataVisible,
-      'translate-x-[-33.333333vw]': $layout.editorVisible
+      'translate-x-[-33.333333vw]': $layout.sourceVisible
     }
   ]}
 >
@@ -81,25 +105,5 @@
       </div>
     {/snippet}
   </MenuTitle>
-  {#if layer.source.type === 'pmtiles'}
-    <MenuItem title="Source Layer">
-      <SourceLayerSelect layerId={layer.id} source={layer.source} />
-    </MenuItem>
-  {/if}
-  <MenuItem title="Layer Type">
-    <LayerTypeSelect {layer} />
-  </MenuItem>
-  {#if layer.type === 'Choropleth'}
-    <ChoroplethPropertiesPanel {layer} />
-  {:else if layer.type === 'Heatmap'}
-    <HeatmapPropertiesPanel {layer} />
-  {:else if layer.type === 'Line'}
-    <LinePropertiesPanel {layer} />
-  {:else if layer.type === 'Point'}
-    <PointPropertiesPanel {layer} />
-  {:else if layer.type === 'Polygon'}
-    <PolygonPropertiesPanel {layer} />
-  {:else if layer.type === 'Proportional Symbol'}
-    <ProportionalSymbolPropertiesPanel {layer} />
-  {/if}
+  {@render PropertiesEditor(layer)}
 </Menu>

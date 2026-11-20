@@ -74,7 +74,7 @@
       class={[
         'ease-cubic-out fixed top-64 right-150 transition-transform duration-400',
         {
-          'translate-x-[-33.333333vw]': $layout.editorVisible
+          'translate-x-[-33.333333vw]': $layout.sourceVisible
         }
       ]}
     >

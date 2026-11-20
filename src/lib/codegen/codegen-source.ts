@@ -116,8 +116,8 @@ function codegenDuckDBSource({
   const selectStatement = generateSelectStatement(layerId, table);
   return [
     `const ${dataIdent} = await conn.query(\`
-    ${createStatement}
-    ${selectStatement}
+${createStatement}
+${selectStatement}
   \`);`,
     `map.addSource(${literal(layerId)}, {
   type: "geojson",

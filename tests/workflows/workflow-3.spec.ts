@@ -19,7 +19,7 @@ test('workflow-3', async ({ page }) => {
 
   await openCartokit(page);
 
-  // Click the Open Editor button.
+  // Click the View Source button.
   await page.getByTestId('editor-toggle').click();
 
   // Ensure the Editor Panel is visible.

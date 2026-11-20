@@ -151,8 +151,8 @@
 
     const destroyHistory = initHistory();
     const deregisterKeybinding = registerKeybinding(
-      'e',
-      toggleEditorVisibility
+      's',
+      toggleSourceVisibility
     );
 
     return () => {
@@ -174,9 +174,9 @@
     };
   });
 
-  function toggleEditorVisibility() {
+  function toggleSourceVisibility() {
     layout.update((layout) => {
-      layout.editorVisible = !layout.editorVisible;
+      layout.sourceVisible = !layout.sourceVisible;
 
       return layout;
     });
@@ -197,7 +197,7 @@
       'maplibregl-map relative h-full w-full',
       {
         'compact-y': $layout.dataVisible,
-        'compact-x': $layout.editorVisible
+        'compact-x': $layout.sourceVisible
       }
     ]}
     id="map"
@@ -222,22 +222,22 @@
         'ease-cubic-out absolute right-4 bottom-12 z-10 flex items-baseline gap-2 rounded bg-slate-900 px-3 py-2 text-sm tracking-wider text-white shadow-lg transition-transform duration-400 disabled:cursor-not-allowed',
         {
           '-translate-y-72': $layout.dataVisible,
-          'translate-x-[-33.333333vw]': $layout.editorVisible
+          'translate-x-[-33.333333vw]': $layout.sourceVisible
         }
       ]}
-      onclick={toggleEditorVisibility}
+      onclick={toggleSourceVisibility}
       disabled={!mapState.value}
       data-testid="editor-toggle"
     >
-      {$layout.editorVisible ? 'Close Editor' : 'Open Editor'}
-      <span class="text-slate-400">E</span>
+      {$layout.sourceVisible ? 'Hide Source' : 'View Source'}
+      <span class="text-slate-400">S</span>
     </button>
     {#if map && layerId.value && $layout.dataVisible}
       {@const layer = $ir.layers[layerId.value]}
       <DataTable
         class={[
           'ease-cubic-out absolute bottom-0 h-72 transition-all duration-400',
-          $layout.editorVisible ? 'w-2/3' : 'w-full'
+          $layout.sourceVisible ? 'w-2/3' : 'w-full'
         ]}
         layerId={layerId.value}
         {map}
@@ -246,7 +246,7 @@
       />
     {/if}
   </div>
-  {#if $layout.editorVisible}
+  {#if $layout.sourceVisible}
     <Editor />
   {/if}
   {#if error.message}
