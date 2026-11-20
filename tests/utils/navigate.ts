@@ -22,7 +22,7 @@ export async function openCartokit(page: Page) {
     });
   }
 
-  // Wait for the Open Editor button and Add Layer button to become enabled.
+  // Wait for the View Source button and Add Layer button to become enabled.
   // These are proxies for the map reaching an idle state.
   await expect(page.getByTestId('editor-toggle')).toBeEnabled({
     timeout: 10000

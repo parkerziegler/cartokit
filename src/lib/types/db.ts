@@ -28,7 +28,7 @@ export interface DuckDBColumn {
 
 /** A DuckDB table for a layer. */
 export interface DuckDBTable {
-  /** The {@link DuckDBColumn}s of the normalized table. */
+  /** The {@link DuckDBColumn}s of the table. */
   columns: DuckDBColumn[];
   /** The name of the geometry column. */
   geometryColumn: string;

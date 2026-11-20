@@ -7,6 +7,7 @@ import {
   selectBundle
 } from '@duckdb/duckdb-wasm';
 import type { Feature, FeatureCollection } from 'geojson';
+import { duckdb, formatDialect } from 'sql-formatter';
 
 import type {
   DuckDBColumn,
@@ -23,7 +24,7 @@ const DUCKDB_BUNDLES = getJsDelivrBundles();
  * Initialize a DuckDB in-memory database.
  *
  * @returns An Object continaing:
- *  1. The initialized {@link AsyncDuckDB} instance
+ *  1. The initialized {@link AsyncDuckDB} instance.
  *  2. A reference to the {@link Worker} thread running the instance.
  *  3. The active {@link AsyncDuckDBConnection}.
  */
@@ -35,7 +36,7 @@ export async function initDB() {
     })
   );
 
-  // Instantiate the asynchronous version of DuckDB-wasm
+  // Instantiate the asynchronous version of DuckDB-Wasm.
   const worker = new Worker(workerURL);
   const logger = new ConsoleLogger();
   const db = new AsyncDuckDB(logger, worker);
@@ -75,12 +76,44 @@ ${inferCRS()}`);
 export function generateCreateTableStatement(layerId: string, source: string) {
   const reader = /\.(geo)?parquet$/.test(source) ? `read_parquet` : `ST_Read`;
 
-  return `CREATE TABLE ${layerId} AS SELECT * FROM ${reader}('${source}');`;
+  const query = `
+  CREATE TABLE ${layerId} AS
+  SELECT * FROM ${reader}('${source}');
+  `;
+
+  return formatSQL(query);
+}
+
+/**
+ * Generate a SQL CREATE TABLE statement for a layer derived from another
+ * layer's table, replacing the parent's geometry with its transformed geometry.
+ *
+ * @param layerId The layerId to use as the table name.
+ * @param location The location of the {@link CartoKitTableSource}.
+ * @param geometryColumn The name of the parent table's geometry column.
+ * @returns A SQL CREATE TABLE statement.
+ */
+export function generateCreateDerivedTableStatement(
+  layerId: string,
+  { parentLayerId, transformation }: CartoKitTableSource['location'],
+  geometryColumn: string
+) {
+  const query = `
+  CREATE TABLE ${layerId} AS
+  SELECT * REPLACE (${generateTransformationExpression(transformation, geometryColumn)} AS ${quoteIdentifier(geometryColumn)})
+  FROM ${parentLayerId};
+  `;
+
+  return formatSQL(query);
 }
 
 /**
  * Generate the SQL expression that applies a {@link Transformation} to a
  * geometry column.
+ *
+ * The call to ST_MakeValid is an attempt to repair invalid geometries (e.g.,
+ * zero-width spikes) before buffering — GEOS' buffer overlay can throw a
+ * TopologyException on such geometries.
  *
  * @param transformation The {@link Transformation} to apply.
  * @param geometryColumn The name of the geometry column to transform.
@@ -91,64 +124,59 @@ export function generateTransformationExpression(
   geometryColumn: string
 ): string {
   const geom = quoteIdentifier(geometryColumn);
+  const inferCRSExpression = `infer_crs(${geom})`;
+  let query = '';
 
   switch (transformation.type) {
-    case 'Buffer': {
-      const inferCRSExpression = `infer_crs(${geom})`;
-      // Repair invalid input before buffering, since GEOS's buffer overlay can
-      // throw a TopologyException on invalid polygons. ST_MakeValid may emit
-      // stray LineStrings alongside polygons; ST_CollectionExtract keeps only
-      // the parts of the highest dimension, so Points and LineStrings pass
-      // through unchanged.
-      return `ST_Transform(ST_Buffer(ST_Transform(ST_CollectionExtract(ST_MakeValid(${geom})), 'EPSG:4326', ${inferCRSExpression}, always_xy := true), ${transformation.args.distance}), ${inferCRSExpression}, 'EPSG:4326', always_xy := true)`;
-    }
+    case 'Buffer':
+      query = `ST_Transform(
+        ST_Buffer(
+          ST_Transform(
+            ST_CollectionExtract(ST_MakeValid(${geom})),
+            'EPSG:4326',
+            ${inferCRSExpression},
+            always_xy := true
+          ),
+          ${transformation.args.distance}
+        ),
+        ${inferCRSExpression},
+        'EPSG:4326',
+        always_xy := true
+      )`;
+      break;
     case 'Centroid':
-      return `ST_Centroid(${geom})`;
+      query = `ST_Transform(
+        ST_Centroid(
+          ST_Transform(
+            ${geom},
+            'EPSG:4326',
+            ${inferCRSExpression},
+            always_xy := true
+          )
+        ),
+        ${inferCRSExpression},
+        'EPSG:4326',
+        always_xy := true
+      )`;
+      break;
     case 'Envelope':
-      return `ST_Envelope(${geom})`;
+      query = `ST_Transform(
+        ST_Envelope(
+          ST_Transform(
+            ${geom},
+            'EPSG:4326',
+            ${inferCRSExpression},
+            always_xy := true
+          )
+        ),
+        ${inferCRSExpression},
+        'EPSG:4326',
+        always_xy := true
+      )`;
+      break;
   }
-}
 
-/**
- * Generate a SQL CREATE TABLE statement for a layer derived from another
- * layer's table, replacing the parent's geometry with its transformed geometry.
- *
- * @param layerId The layerId to use as the table name.
- * @param location The location of the derived {@link CartoKitTableSource}.
- * @param geometryColumn The name of the parent table's geometry column.
- * @returns A SQL CREATE TABLE statement.
- */
-export function generateCreateDerivedTableStatement(
-  layerId: string,
-  { parentLayerId, transformation }: CartoKitTableSource['location'],
-  geometryColumn: string
-) {
-  return `CREATE TABLE ${layerId} AS SELECT * REPLACE (${generateTransformationExpression(transformation, geometryColumn)} AS ${quoteIdentifier(geometryColumn)}) FROM ${parentLayerId};`;
-}
-
-/**
- * Generate the select list of a query reading all data as GeoJSON-ready
- * columns: nested properties serialized to JSON, and the geometry serialized
- * to GeoJSON in a column named geom.
- *
- * @param table The {@link DuckDBTable} to select from.
- * @returns A SQL select list.
- */
-export function generateSelectList({ columns, geometryColumn }: DuckDBTable) {
-  const nestedProperties = columns
-    .filter(({ column_type }) => isNestedType(column_type))
-    .map(({ column_name }) => column_name);
-  const excludeClause = `(${[geometryColumn, ...nestedProperties].map(quoteIdentifier).join(', ')})`;
-
-  // Join the select list from its parts, so that an empty set of nested
-  // properties doesn't leave behind a dangling comma.
-  return [
-    `* EXCLUDE ${excludeClause}`,
-    ...nestedProperties.map(
-      (name) => `to_json(${quoteIdentifier(name)}) AS ${quoteIdentifier(name)}`
-    ),
-    `ST_AsGeoJSON(${quoteIdentifier(geometryColumn)}) AS geom`
-  ].join(', ');
+  return formatSQL(query);
 }
 
 /**
@@ -158,8 +186,35 @@ export function generateSelectList({ columns, geometryColumn }: DuckDBTable) {
  * @param table The {@link DuckDBTable} to query.
  * @returns A SQL SELECT statement.
  */
-export function generateSelectStatement(layerId: string, table: DuckDBTable) {
-  return `SELECT ${generateSelectList(table)} FROM ${layerId};`;
+export function generateSelectStatement(
+  layerId: string,
+  { columns, geometryColumn }: DuckDBTable
+) {
+  const nestedColumns = columns.flatMap(({ column_type, column_name }) => {
+    if (
+      /^(STRUCT|MAP|UNION)\(/.test(column_type) ||
+      column_type.endsWith(']')
+    ) {
+      return [column_name];
+    }
+
+    return [];
+  });
+  const excludeClause = `EXCLUDE (${[geometryColumn, ...nestedColumns].map(quoteIdentifier).join(', ')})`;
+  const selectClause = nestedColumns
+    .map(
+      (column_name) =>
+        `to_json(${quoteIdentifier(column_name)}) AS ${quoteIdentifier(column_name)}`
+    )
+    .concat(`ST_AsGeoJSON(${quoteIdentifier(geometryColumn)}) AS geom`)
+    .join(', ');
+
+  const query = `
+  SELECT * ${excludeClause}, ${selectClause}
+  FROM ${layerId};
+  `;
+
+  return formatSQL(query);
 }
 
 /**
@@ -186,18 +241,6 @@ export async function describeTable(
   return (await conn.query(`DESCRIBE ${layerId};`))
     .toArray()
     .map((row: { toJSON: () => DuckDBColumn }) => row.toJSON());
-}
-
-/**
- * Determine whether a DuckDB type is nested (STRUCT, MAP, UNION, LIST, or
- * ARRAY). Arrow surfaces values of these types as StructRow and MapRow Proxies
- * and Vectors, which cannot be structured-cloned to MapLibre's workers.
- *
- * @param columnType The DuckDB type, as reported by DESCRIBE.
- * @returns Whether the type is nested.
- */
-function isNestedType(columnType: string): boolean {
-  return /^(STRUCT|MAP|UNION)\(/.test(columnType) || columnType.endsWith(']');
 }
 
 /**
@@ -243,9 +286,12 @@ export async function queryGeometryType(
   geometryColumn: string
 ): Promise<DuckDBGeometryType> {
   const [row] = (
-    await conn.query(
-      `SELECT ST_GeometryType(${quoteIdentifier(geometryColumn)})::VARCHAR AS geometry_type FROM ${quoteIdentifier(layerId)} WHERE ${geometryColumn} IS NOT NULL LIMIT 1;`
-    )
+    await conn.query(`
+      SELECT ST_GeometryType(${quoteIdentifier(geometryColumn)})::VARCHAR AS geometry_type
+      FROM ${quoteIdentifier(layerId)}
+      WHERE ${geometryColumn} IS NOT NULL
+      LIMIT 1;
+    `)
   )
     .toArray()
     .map((row: { toJSON: () => { geometry_type: DuckDBGeometryType } }) =>
@@ -259,6 +305,38 @@ export async function queryGeometryType(
   }
 
   return row.geometry_type;
+}
+
+/**
+ * Format a SQL query for display.
+ *
+ * @param query The SQL query to format.
+ * @returns The formatted SQL query.
+ */
+export function formatSQL(query: string): string {
+  const dialect = {
+    ...duckdb,
+    tokenizerOptions: {
+      ...duckdb.tokenizerOptions,
+      reservedFunctionNames: [
+        ...duckdb.tokenizerOptions.reservedFunctionNames,
+        'infer_crs',
+        'ST_AsGeoJSON',
+        'ST_Buffer',
+        'ST_Centroid',
+        'ST_CollectionExtract',
+        'ST_Envelope',
+        'ST_MakeValid',
+        'ST_Read',
+        'ST_Transform'
+      ]
+    }
+  };
+
+  return formatDialect(query, {
+    dialect,
+    keywordCase: 'upper'
+  });
 }
 
 interface CreateTableParams {
