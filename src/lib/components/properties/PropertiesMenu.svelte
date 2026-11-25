@@ -28,7 +28,7 @@
   let { map, layer }: Props = $props();
 
   function onPropertiesMenuClose() {
-    if (feature.value?.id) {
+    if (feature.value?.id !== undefined) {
       map.removeFeatureState(
         {
           source: feature.value.sourceId,

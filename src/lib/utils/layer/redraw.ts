@@ -1,11 +1,14 @@
 import type { Map } from 'maplibre-gl';
 
 import { addLayer } from '#lib/interaction/layer.ts';
-import { removeLayerListeners } from '#lib/interaction/events.ts';
+import { removeLayerListeners } from '#lib/interaction/listeners.ts';
 import { feature } from '#lib/state/feature.svelte.ts';
 import type { CartoKitLayer } from '#lib/types/index.ts';
-import { getAffiliatedLayerIds } from '#lib/utils/layer.ts';
-import { getCanonicalLayerId, getSourceId } from '#lib/utils/layer/id.ts';
+import {
+  getAffiliatedLayerIds,
+  getCanonicalLayerId,
+  getSourceId
+} from '#lib/utils/layer.ts';
 
 /**
  * Redraw a layer on the map given the source and target layer definitions.

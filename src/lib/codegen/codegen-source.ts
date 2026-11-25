@@ -11,9 +11,11 @@ import type {
   CartoKitTableSource
 } from '#lib/types/source.ts';
 import {
+  formatSQL,
   generateCreateDerivedTableStatement,
   generateCreateTableStatement,
-  generateSelectStatement
+  generateSelectStatement,
+  quoteIdentifier
 } from '#lib/utils/db.ts';
 import {
   hasDescendantsRequiringData,
@@ -113,7 +115,13 @@ function codegenDuckDBSource({
       : '';
   }
 
-  const selectStatement = generateSelectStatement(layerId, table);
+  const selectStatement = formatSQL(
+    generateSelectStatement({
+      layerId,
+      table,
+      geometryExpression: quoteIdentifier(table.geometryColumn)
+    })
+  );
   return [
     `const ${dataIdent} = await conn.query(\`
 ${createStatement}
@@ -156,7 +164,10 @@ function codegenGeoJSONSource({
   // Check if any descendants of this layer still require its data; if so,
   // ensure we generate a CREATE TABLE statement for it.
   if (hasDescendantsRequiringData(ir, layerId)) {
-    createTable = `await conn.query(\`${generateCreateTableStatement(layerId, codegenSourceName(source))}\`);`;
+    const createStatement = formatSQL(
+      generateCreateTableStatement(layerId, codegenSourceName(source))
+    );
+    createTable = `await conn.query(\`${createStatement}\`);`;
   }
 
   const data =
@@ -196,9 +207,8 @@ function codegenGeoParquetSource({
 }: CodegenSourceParams<CartoKitGeoParquetSource>) {
   return codegenDuckDBSource({
     ir,
-    createStatement: generateCreateTableStatement(
-      layerId,
-      codegenSourceName(source)
+    createStatement: formatSQL(
+      generateCreateTableStatement(layerId, codegenSourceName(source))
     ),
     layerId,
     table: source.table,
@@ -227,10 +237,12 @@ function codegenTableSource({
 }: CodegenSourceParams<CartoKitTableSource>) {
   return codegenDuckDBSource({
     ir,
-    createStatement: generateCreateDerivedTableStatement(
-      layerId,
-      source.location,
-      source.table.geometryColumn
+    createStatement: formatSQL(
+      generateCreateDerivedTableStatement(
+        layerId,
+        source.location,
+        source.table.geometryColumn
+      )
     ),
     layerId,
     table: source.table,

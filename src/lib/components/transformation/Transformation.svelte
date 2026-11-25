@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { FeatureCollection } from 'geojson';
   import { snakeCase, uniqueId } from 'lodash-es';
   import type { GeoJSONSource } from 'maplibre-gl';
   import { onMount, untrack } from 'svelte';
@@ -18,9 +17,9 @@
   import type { Transformation } from '#lib/types/transformation.ts';
   import { DEFAULT_SIZE } from '#lib/utils/constants.ts';
   import {
-    generateTransformationExpression,
-    quoteIdentifier,
-    toFeatureCollection
+    generateViewportTransformationQuery,
+    invalidatePreviewQueries,
+    runPreviewQuery
   } from '#lib/utils/db.ts';
   import { registerKeybinding } from '#lib/utils/keybinding.ts';
 
@@ -47,9 +46,6 @@
     return off;
   });
 
-  // Incremented on each speculation, so stale results can be discarded.
-  let generation = 0;
-
   async function speculate() {
     const { source } = $ir.layers[contextMenu.layerId];
     if (!db.value || source.type === 'pmtiles') {
@@ -62,51 +58,31 @@
       speculating = true;
     }, 500);
 
-    const gen = ++generation;
-
-    // Cancel any in-flight speculation query. This only affects queries
-    // started with conn.send, which only speculation uses.
-    await db.value.conn.cancelSent();
-
-    const { geometryColumn } = source.table;
-
     // Restrict speculation to features intersecting the current viewport.
-    const [west, south, east, north] = map.value!.getBounds().toArray().flat();
-    const viewport = `ST_MakeEnvelope(${west}, ${south}, ${east}, ${north})`;
-
-    const query = `SELECT ST_AsGeoJSON(${generateTransformationExpression(
+    const bounds = map.value!.getBounds();
+    const query = generateViewportTransformationQuery({
+      parentLayerId: contextMenu.layerId,
       transformation,
-      geometryColumn
-    )}) AS geom
-FROM ${contextMenu.layerId}
-WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
+      table: source.table,
+      bounds: [
+        bounds.getWest(),
+        bounds.getSouth(),
+        bounds.getEast(),
+        bounds.getNorth()
+      ]
+    });
 
-    // Use conn.send rather than conn.query: the worker executes a sent query
-    // in slices, so a later cancelSent can interrupt it.
-    let batches;
-    try {
-      const reader = await db.value.conn.send(query);
-      batches = await reader.readAll();
-    } catch {
-      // The query was cancelled by a newer speculation.
+    const geojson = await runPreviewQuery(db.value.conn, query);
+
+    // If geojson evaluates to null, either a newer preview has superseded this
+    // preview or the preview has been invalidated by a mouseleave on the
+    // ContextMenu.
+    if (!geojson) {
       speculating = false;
       clearTimeout(timeoutId);
 
       return;
     }
-
-    // Discard results superseded by a newer speculation or by ending preview.
-    if (gen !== generation) {
-      speculating = false;
-      clearTimeout(timeoutId);
-
-      return;
-    }
-
-    const geojson: FeatureCollection = {
-      type: 'FeatureCollection',
-      features: batches.flatMap((batch) => toFeatureCollection(batch).features)
-    };
 
     const id = `${contextMenu.layerId}-speculate`;
     const speculatedSource = map.value!.getSource<GeoJSONSource>(id);
@@ -211,7 +187,9 @@ WHERE ST_Intersects(${quoteIdentifier(geometryColumn)}, ${viewport})`;
 
   function removePreview(layerId: string) {
     // Ensure an in-flight speculation doesn't re-add the preview.
-    generation++;
+    if (db.value) {
+      void invalidatePreviewQueries(db.value.conn);
+    }
 
     const id = `${layerId}-speculate`;
 

@@ -2,15 +2,17 @@ import type { Map } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
 import { deriveColorRamp, deriveColorScale } from '#lib/interaction/color.ts';
+import { deriveSize } from '#lib/interaction/geometry.ts';
 import {
   instrumentLineHover,
-  instrumentLineSelect,
   instrumentPointHover,
+  instrumentPolygonHover
+} from '#lib/interaction/hover.ts';
+import {
+  instrumentLineSelect,
   instrumentPointSelect,
-  instrumentPolygonHover,
   instrumentPolygonSelect
-} from '#lib/interaction/events.ts';
-import { deriveSize } from '#lib/interaction/geometry.ts';
+} from '#lib/interaction/select.ts';
 import { catalog } from '#lib/state/catalog.svelte.ts';
 import { ir } from '#lib/stores/ir.ts';
 import type { CartoKitLayer } from '#lib/types/index.ts';
@@ -22,7 +24,10 @@ import {
   DEFAULT_STROKE_OPACITY,
   DEFAULT_STROKE_WIDTH
 } from '#lib/utils/constants.ts';
-import { getAffiliatedLayerIds } from '#lib/utils/layer.ts';
+import {
+  getAffiliatedLayerIds,
+  getInstrumentedLayerId
+} from '#lib/utils/layer.ts';
 
 /**
  * Generate a {@link CartoKitLayer} for a given {@link CartoKitSource}.
@@ -176,6 +181,7 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
   const sourceLayer =
     layer.source.type === 'pmtiles' ? layer.source.sourceLayerId : undefined;
   const beforeId = getBeforeId(map, layer);
+  const instrumentedLayerId = getInstrumentedLayerId(layer.id, layer.type);
 
   switch (layer.type) {
     case 'Choropleth': {
@@ -216,8 +222,8 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         beforeId
       );
 
-      instrumentPolygonHover(map, layer.id, sourceLayer);
-      instrumentPolygonSelect(map, layer.id, sourceLayer);
+      instrumentPolygonHover(map, instrumentedLayerId, sourceLayer);
+      instrumentPolygonSelect(map, instrumentedLayerId, sourceLayer);
       break;
     }
     case 'Heatmap': {
@@ -225,7 +231,7 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
       // This is the layer we'll instrument for hover and select effects.
       map.addLayer(
         {
-          id: `${layer.id}-points`,
+          id: instrumentedLayerId,
           source: layer.id,
           'source-layer': sourceLayer,
           type: 'circle',
@@ -253,8 +259,8 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         beforeId
       );
 
-      instrumentPointHover(map, `${layer.id}-points`, sourceLayer);
-      instrumentPointSelect(map, `${layer.id}-points`, sourceLayer);
+      instrumentPointHover(map, instrumentedLayerId, sourceLayer);
+      instrumentPointSelect(map, instrumentedLayerId, sourceLayer);
       break;
     }
     case 'Line': {
@@ -273,8 +279,8 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         beforeId
       );
 
-      instrumentLineHover(map, layer.id, sourceLayer);
-      instrumentLineSelect(map, layer.id, sourceLayer);
+      instrumentLineHover(map, instrumentedLayerId, sourceLayer);
+      instrumentLineSelect(map, instrumentedLayerId, sourceLayer);
       break;
     }
     case 'Point': {
@@ -315,8 +321,8 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         beforeId
       );
 
-      instrumentPointHover(map, layer.id, sourceLayer);
-      instrumentPointSelect(map, layer.id, sourceLayer);
+      instrumentPointHover(map, instrumentedLayerId, sourceLayer);
+      instrumentPointSelect(map, instrumentedLayerId, sourceLayer);
       break;
     }
     case 'Polygon': {
@@ -365,8 +371,8 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         beforeId
       );
 
-      instrumentPolygonHover(map, layer.id, sourceLayer);
-      instrumentPolygonSelect(map, layer.id, sourceLayer);
+      instrumentPolygonHover(map, instrumentedLayerId, sourceLayer);
+      instrumentPolygonSelect(map, instrumentedLayerId, sourceLayer);
       break;
     }
     case 'Proportional Symbol': {
@@ -407,8 +413,8 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
         beforeId
       );
 
-      instrumentPointHover(map, layer.id, sourceLayer);
-      instrumentPointSelect(map, layer.id, sourceLayer);
+      instrumentPointHover(map, instrumentedLayerId, sourceLayer);
+      instrumentPointSelect(map, instrumentedLayerId, sourceLayer);
       break;
     }
   }

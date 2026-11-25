@@ -33,3 +33,6 @@ interface EnvelopeTransformation {
 /** The possible transformations that can be applied to a layer's table. */
 export type Transformation =
   BufferTransformation | CentroidTransformation | EnvelopeTransformation;
+
+/** The cardinal direction of a control point. */
+export type Direction = 'North' | 'South' | 'East' | 'West';

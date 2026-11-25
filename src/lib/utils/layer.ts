@@ -57,6 +57,42 @@ export function getAffiliatedLayerIds(
     );
 }
 
+/**
+ * Get the canonical layerId for a {@link CartoKitLayer}.
+ *
+ * @param layerId The id of the {@link CartoKitLayer} to canonicalize.
+ * @returns The canonical layerId, with any suffixes (e.g. "-points") removed.
+ */
+export function getCanonicalLayerId(layerId: string) {
+  return layerId.replace(/-points/g, '');
+}
+
+/**
+ * Get the instrumented layerId for a {@link CartoKitLayer}.
+ *
+ * @param layerId The canonical layerId of the {@link CartoKitLayer}.
+ * @param layerType The {@link LayerType} of the {@link CartoKitLayer}.
+ * @returns The instrumented layerId.
+ */
+export function getInstrumentedLayerId(layerId: string, layerType: LayerType) {
+  if (layerType === 'Heatmap' && !layerId.endsWith('-points')) {
+    return `${layerId}-points`;
+  }
+
+  return layerId;
+}
+
+/**
+ * Get the id of the source backing a layer on the map.
+ *
+ * @param map The top-level {@link Map} instance.
+ * @param layerId The id of the layer to look up.
+ * @returns The id of the source backing the layer.
+ */
+export function getSourceId(map: MapLibreGLMap, layerId: string) {
+  return map.getLayer(layerId)?.source ?? layerId;
+}
+
 export const SIMPLE_FEATURES_GEOMETRY_TYPES_TO_LAYER_TYPES = new Map<
   Geometry['type'],
   LayerType[]

@@ -14,10 +14,7 @@ describe('isAffiliatedId', () => {
       `${LAYER_ID}-stroke`,
       `${LAYER_ID}-hover`,
       `${LAYER_ID}-select`,
-      `${LAYER_ID}-points`,
-      `${LAYER_ID}-outlines`,
-      `${LAYER_ID}-outlines-hover`,
-      `${LAYER_ID}-outlines-select`
+      `${LAYER_ID}-points`
     ];
 
     for (const id of ids) {
@@ -41,15 +38,6 @@ describe('isAffiliatedLayer', () => {
       isAffiliatedLayer(LAYER_ID, {
         id: `${LAYER_ID}-points`,
         source: LAYER_ID
-      })
-    ).toBe(true);
-  });
-
-  test('matches a layer drawn from an affiliated source', () => {
-    expect(
-      isAffiliatedLayer(LAYER_ID, {
-        id: `${LAYER_ID}-outlines-hover`,
-        source: `${LAYER_ID}-outlines`
       })
     ).toBe(true);
   });

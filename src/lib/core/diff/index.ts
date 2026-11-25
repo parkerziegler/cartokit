@@ -306,6 +306,13 @@ interface RenameLayerDiff extends LayerDiff {
   };
 }
 
+interface UpdateBufferDistanceDiff extends LayerDiff {
+  type: 'update-buffer-distance';
+  payload: {
+    distance: number;
+  };
+}
+
 interface BasemapDiff {
   type: 'basemap';
   payload: CartoKitIR['basemap'];
@@ -398,6 +405,7 @@ export type CartoKitDiff =
   | AddLayerDiff
   | RemoveLayerDiff
   | RenameLayerDiff
+  | UpdateBufferDistanceDiff
   | BasemapDiff
   | ZoomDiff
   | CenterDiff

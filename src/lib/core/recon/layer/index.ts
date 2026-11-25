@@ -1,13 +1,16 @@
 import type { ReconFnParams, ReconFnResult } from '#lib/core/recon/index.ts';
-import { removeLayerListeners } from '#lib/interaction/events.ts';
+import { removeLayerListeners } from '#lib/interaction/listeners.ts';
 import { addLayer } from '#lib/interaction/layer.ts';
 import { db } from '#lib/state/db.svelte.ts';
 import { feature } from '#lib/state/feature.svelte.ts';
 import { layerId } from '#lib/state/layerId.svelte.ts';
 import { map } from '#lib/state/map.svelte.ts';
 import { readTableAsGeoJSON } from '#lib/utils/db.ts';
-import { getAffiliatedLayerIds } from '#lib/utils/layer.ts';
-import { getCanonicalLayerId, getSourceId } from '#lib/utils/layer/id.ts';
+import {
+  getAffiliatedLayerIds,
+  getCanonicalLayerId,
+  getSourceId
+} from '#lib/utils/layer.ts';
 import { redraw } from '#lib/utils/layer/redraw.ts';
 
 /**
@@ -40,8 +43,7 @@ export async function reconLayerDiffs(
 
           map.value!.addSource(layer.id, {
             type: 'geojson',
-            data: geojson,
-            generateId: true
+            data: geojson
           });
           break;
         }
