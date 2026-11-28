@@ -4,8 +4,22 @@ import {
   rhumbDestination,
   rhumbDistance
 } from '@turf/turf';
+import type { Geometry } from 'geojson';
 
 import type { Direction, Transformation } from '#lib/types/transformation.ts';
+
+export const SF_GEOMETRY_TYPES_TO_TRANSFORMATIONS = new Map<
+  Geometry['type'],
+  Transformation['type'][]
+>([
+  ['Point', ['Buffer']],
+  ['MultiPoint', ['Buffer']],
+  ['LineString', ['Buffer', 'Centroid', 'Envelope']],
+  ['MultiLineString', ['Buffer', 'Centroid', 'Envelope']],
+  ['Polygon', ['Buffer', 'Centroid', 'Envelope']],
+  ['MultiPolygon', ['Buffer', 'Centroid', 'Envelope']],
+  ['GeometryCollection', []]
+]);
 
 /**
  * Get a default buffering distance, in meters, based on the Zoom level.

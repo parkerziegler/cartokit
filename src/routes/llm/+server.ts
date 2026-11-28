@@ -1,4 +1,4 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import OpenAI from 'openai';
 import type {
   ChatCompletionMessageParam,
@@ -18,15 +18,14 @@ import {
   CATEGORICAL_COLOR_SCHEMES,
   QUANTITATIVE_COLOR_SCHEMES
 } from '#lib/utils/color/scheme.ts';
+import { SF_GEOMETRY_TYPES_TO_TRANSFORMATIONS } from '#lib/utils/transformation.ts';
 
 // Initialize the OpenAI client.
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY!
 });
 
-/**
- * Diffs that apply to the map instance.
- */
+// Diffs that apply to the map.
 const MAP_DIFFs = [
   'center',
   'zoom',
@@ -36,21 +35,18 @@ const MAP_DIFFs = [
   'projection'
 ];
 
-/**
- * Diffs accepted by every layer, regardless of its {@link LayerType}.
- */
+// Diffs that apply to all layers, regardless of their layer type.
 const LAYER_DIFFS = [
   'layer-type',
   'layer-visibility',
   'layer-tooltip-visibility',
   'rename-layer',
-  'remove-layer'
+  'remove-layer',
+  'update-buffer-distance'
 ];
 
-/**
- * Diifs specific to each layer, based on its {@link LayerType}.
- */
-const LAYER_TYPE_DIFFS: Record<LayerType, string[]> = {
+// Diffs that apply to specific layer types.
+const LAYER_TYPES_TO_DIFFS: Record<LayerType, string[]> = {
   Choropleth: [
     'fill-attribute',
     'fill-visualization-type',
@@ -136,51 +132,102 @@ const LAYER_TYPE_DIFFS: Record<LayerType, string[]> = {
   ]
 };
 
-/**
- * The static portion of the system prompt, held constant to support caching
- * across requests.
- */
-const SYSTEM_PROMPT = `You are the editing assistant for cartokit, a browser-based cartography tool. The user is looking at a map and describing changes to it in natural language. Translate their request into an ordered sequence of diffs that the application will apply to the map.
+// The static prefix of the system prompt, cached across requests.
+const SYSTEM_PROMPT = `
+You are the editing assistant for cartokit, a browser-
+based cartography tool. The user is looking at a map and describing changes to
+it in natural language. Translate their request into an ordered sequence of
+diffs that the application will apply to the map.
 
 ## Diffs
 
-A diff is a single, atomic edit. Layer-scoped diffs carry a "layerId" naming the layer they target. Map-scoped diffs ("${MAP_DIFFs.join('", "')}") apply to the map as a whole and target no layer.
+A diff is a single, atomic edit. Layer-scoped diffs carry a "layerId" naming the
+layer they target. Map-scoped diffs ("${MAP_DIFFs.join('", "')}") apply to the
+map as a whole and target no layer.
 
-Emit diffs in the order they should be applied. A later diff may depend on the effect of an earlier one — for example, converting a layer with "layer-type" before styling the result.
+Emit diffs in the order they should be applied. A later diff may depend on the
+effect of an earlier one — for example, converting a layer with "layer-type"
+before styling the result.
 
 ## Layer types
 
-Every layer has a type, and only some diffs are valid for each type. Never emit a diff for a layer whose type does not accept it.
+Every layer has a type, and only some diffs are valid for each type. Never emit
+a diff for a layer whose type does not accept it.
 
-Every layer accepts: ${LAYER_DIFFS.join(', ')}. A layer backed by a vector source also accepts "source-layer".
+Every layer accepts: ${LAYER_DIFFS.join(', ')}. A layer backed by a vector
+source also accepts "source-layer".
 
 Beyond those, each layer type accepts:
 
-${Object.entries(LAYER_TYPE_DIFFS)
+${Object.entries(LAYER_TYPES_TO_DIFFS)
   .map(([layerType, diffTypes]) => `- ${layerType}: ${diffTypes.join(', ')}`)
   .join('\n')}
 
 ## Adding Layers
 
-A user may ask you to add layers by finding a publically-available geospatial dataset on the internet. When adding layers from a remote API endpoint, do your best to validate that the endpoint returns either GeoJSON data (for "add-layer" diffs with payload.type = "geojson"), a GeoParquet file ending in .parquet or .geoparquet (for "add-layer" diffs with payload.type = "geoparquet"), or a PMTiles archive (for "add-layer" diffs with payload.type = "pmtiles").
+A user may ask you to add layers by finding a publically-available geospatial
+dataset on the internet. When adding layers from a remote API endpoint, do your
+best to validate that the endpoint returns either GeoJSON data (for "add-layer"
+diffs with payload.type = "geojson"), a GeoParquet file ending in .parquet or
+.geoparquet (for "add-layer" diffs with payload.type = "geoparquet"), or a
+PMTiles archive (for "add-layer" diffs with payload.type = "pmtiles").
+
+### Adding Layers via Transformations
+
+A user may ask to perform certain spatial analysis operations on a layer. In
+these cases, generate an "add-layer" diff with payload.type = "table" using the
+source layer's id for the parentLayerId field. The available transformations are
+based on a parent layer's geometry as following:
+
+${Array.from(SF_GEOMETRY_TYPES_TO_TRANSFORMATIONS)
+  .map(
+    ([geometry, transformations]) =>
+      `- ${geometry}: ${transformations.join(', ')}`
+  )
+  .join('\n')}
+
+The units for all transformations arguments are meters, so perform any
+conversions as needed (e.g., if a user asks for a 25km buffer, multiply 25 by
+1000 to get the distance arg).
 
 ## Conversation
 
-Earlier turns of this conversation appear before the map request state: the user's prompt, followed by the JSON you returned for it. A diff marked "errored": true failed to apply.
+Earlier turns of this conversation appear before the map request state: the
+user's prompt, followed by the JSON you returned for it. A diff marked
+"errored": true failed to apply.
 
-The map request state reflects the map as it is now — after every earlier turn, and after any edits the user made directly through the interface. Use earlier turns to resolve references such as "that layer", "the same color", "do it again" or "undo that", never as a description of the current map. Where an earlier turn and the map request state disagree, the map request state is correct.
+The map request state reflects the map as it is now — after every earlier turn,
+and after any edits the user made directly through the interface. Use earlier
+turns to resolve references such as "that layer", "the same color",
+"do it again" or "undo that", never as a description of the current map. Where an
+earlier turn and the map request state disagree, the map request state is
+correct.
 
 ## Rules
 
-- Target layers by the "id" given in the map request state, never by display name. If the user names a layer ambiguously and more than one layer could match, do not guess.
-- Only reference attributes listed for the layer you are targeting. An attribute present on one layer does not exist on every layer.
-- When creating a layer with "add-layer", generate a layer ID in kebab-case from the display name, followed by a double underscore and a random six-character alphanumeric suffix (for example, "population-data__a1b2c3" for "Population Data"). Reference that same ID in any later diffs in the same response.
-- To set manual breakpoints, emit "fill-classification-method" with method "Manual" and "fill-step-count" first, then one "fill-step-value" per breakpoint in ascending step order, starting at step 0.
-- If you cannot determine what the user wants, emit a single "unknown" diff and nothing else, then use the summary to explain what was ambiguous.
+- Target layers by the "id" given in the map request state, never by display
+  name. If the user names a layer ambiguously and more than one layer could
+  match, do not guess.
+- Only reference attributes listed for the layer you are targeting. An attribute
+  present on one layer does not exist on every layer.
+- When creating a layer with "add-layer", generate a layer ID in snake_case from
+  the display name, followed by a double underscore and a random six-character
+  lowercase alphanumeric suffix (for example, "population_data__a1b2c3" for
+  "Population Data"). Reference that same ID in any later diffs in the same
+  response.
+- To set manual breakpoints, emit "fill-classification-method" with method
+  "Manual" and "fill-step-count" first, then one "fill-step-value" per breakpoint
+  in ascending step order, starting at step 0.
+- If you cannot determine what the user wants, emit a single "unknown" diff and
+  nothing else, then use the summary to explain what was ambiguous.
 
 ## Summary
 
-Alongside the diffs, return a terse, past-tense summary of what changed, so the user knows what to expect — for example, "Converted the counties layer to a choropleth of median income." If you emitted no diffs, or only an "unknown" diff, use the summary to explain why instead.`;
+Alongside the diffs, return a terse, past-tense summary of what changed, so the
+user knows what to expect — for example, "Converted the counties layer to a
+choropleth of median income." If you emitted no diffs, or only an "unknown"
+diff, use the summary to explain why instead.
+`;
 
 /**
  * Convert the completed turns of the conversation into messages, replaying
@@ -280,74 +327,132 @@ export const POST = (async ({ request }) => {
     });
 
     // Validate the response using information from the map request state.
-    const LayerIdSchema = makeLayerIdSchema(
-      requestState.layers.map((layer) => layer.id)
-    );
-
-    const attrsSchemas = new Map(
-      requestState.layers.map((layer) => [
-        layer.id,
-        makeAttrsSchema(layer.attributes)
-      ])
-    );
-    const sourceLayerIdsSchemas = new Map(
-      requestState.layers.map((layer) => [
-        layer.id,
-        makeSourceLayerIdsSchema(layer.sourceLayerIds)
-      ])
-    );
-
-    const diffs = completion.choices[0].message.parsed?.diffs.filter((diff) => {
-      // Map-scoped diffs target no layer, and so have nothing to validate.
-      if (!('layerId' in diff)) {
-        return true;
-      }
-
-      if (!z.validate(LayerIdSchema, diff.layerId)) {
-        return false;
-      }
-
-      const AttributeSchema = attrsSchemas.get(diff.layerId);
-      const SourceLayerIdsSchema = sourceLayerIdsSchemas.get(diff.layerId);
-
-      if (
-        AttributeSchema &&
-        'attribute' in diff.payload &&
-        !z.validate(AttributeSchema, diff.payload.attribute)
-      ) {
-        return false;
-      }
-
-      if (SourceLayerIdsSchema && diff.type === 'source-layer') {
-        return (
-          z.validate(SourceLayerIdsSchema, diff.payload.sourceSourceLayerId) &&
-          z.validate(SourceLayerIdsSchema, diff.payload.targetSourceLayerId)
+    const summary = requestState.layers.reduce<{
+      layerIds: string[];
+      attrsSchemas: Map<string, ReturnType<typeof makeAttrsSchema>>;
+      sourceLayerIdsSchema: Map<
+        string,
+        ReturnType<typeof makeSourceLayerIdsSchema>
+      >;
+    }>(
+      (acc, layer) => {
+        acc.layerIds.push(layer.id);
+        acc.attrsSchemas.set(layer.id, makeAttrsSchema(layer.attributes));
+        acc.sourceLayerIdsSchema.set(
+          layer.id,
+          makeSourceLayerIdsSchema(layer.sourceLayerIds)
         );
+
+        return acc;
+      },
+      {
+        layerIds: [],
+        attrsSchemas: new Map(),
+        sourceLayerIdsSchema: new Map()
       }
+    );
 
-      return true;
-    });
+    const context: ValidationContext = {
+      LayerIdSchema: makeLayerIdSchema(summary.layerIds),
+      attrsSchemas: summary.attrsSchemas,
+      sourceLayerIdsSchemas: summary.sourceLayerIdsSchema,
+      availableLayerIds: new Set(summary.layerIds)
+    };
 
-    return json({
-      diffs: diffs ?? [],
+    const diffs = (completion.choices[0].message.parsed?.diffs ?? []).map(
+      (diff) =>
+        validateDiff(diff, context) ? diff : { ...diff, errored: true }
+    );
+
+    return Response.json({
+      diffs,
       summary: completion.choices[0].message.parsed?.summary ?? ''
     });
   } catch (err) {
     console.error(err);
 
-    return error(500, {
-      message: 'Internal server error'
-    });
+    return error(500, 'Internal server error');
   }
 }) satisfies RequestHandler;
 
+type GeneratedDiff = z.infer<typeof DiffSchema>['diffs'][number];
+
+/** The per-request state used to validate generated diffs against the map. */
+interface ValidationContext {
+  /**
+   * The schema for layer ids, accepting either existing layer ids or
+   * well-formed fresh ids.
+   */
+  LayerIdSchema: ReturnType<typeof makeLayerIdSchema>;
+  /** The schema for attributes, keyed by layer. */
+  attrsSchemas: Map<string, ReturnType<typeof makeAttrsSchema>>;
+  /** The schema for sourceLayrIds, keyed by layer. */
+  sourceLayerIdsSchemas: Map<
+    string,
+    ReturnType<typeof makeSourceLayerIdsSchema>
+  >;
+  /**
+   * The set of ids for existing layers, as well as any added via a generated
+   * "add-layer" diff.
+   */
+  availableLayerIds: Set<string>;
+}
+
+/**
+ * Validate a single generated diff against the map request state.
+ *
+ * @param diff The diff generated by the model.
+ * @param context The {@link ValidationContext} for the request.
+ * @returns A Boolean flag indicating whether the diff is valid.
+ */
+function validateDiff(
+  diff: GeneratedDiff,
+  context: ValidationContext
+): boolean {
+  if (!('layerId' in diff)) {
+    return true;
+  }
+
+  if (!z.validate(context.LayerIdSchema, diff.layerId)) {
+    return false;
+  }
+
+  if (diff.type === 'add-layer') {
+    if (
+      diff.payload.type === 'table' &&
+      !context.availableLayerIds.has(diff.payload.location.parentLayerId)
+    ) {
+      return false;
+    }
+
+    context.availableLayerIds.add(diff.layerId);
+
+    return true;
+  }
+
+  const AttributeSchema = context.attrsSchemas.get(diff.layerId);
+  const SourceLayerIdsSchema = context.sourceLayerIdsSchemas.get(diff.layerId);
+
+  if (
+    AttributeSchema &&
+    'attribute' in diff.payload &&
+    !z.validate(AttributeSchema, diff.payload.attribute)
+  ) {
+    return false;
+  }
+
+  if (SourceLayerIdsSchema && diff.type === 'source-layer') {
+    return (
+      z.validate(SourceLayerIdsSchema, diff.payload.sourceSourceLayerId) &&
+      z.validate(SourceLayerIdsSchema, diff.payload.targetSourceLayerId)
+    );
+  }
+
+  return true;
+}
+
 /**
  * Construct the schema for the layerId field for a diff.
- *
- * Responses from the OpenAI API are validated after the fact, and should only
- * target existing map layers. This schema also permits a fresh layer ID
- * subschema to support the "add-layer" diff, which must generate a layer ID on
- * the fly.
  *
  * @param layerIds An array of the IDs of the current layers on the map.
  * @returns A Zod schema for the layerId field of a generated diff.
@@ -355,7 +460,7 @@ export const POST = (async ({ request }) => {
 function makeLayerIdSchema(layerIds: string[]) {
   const freshLayerIdSchema = z
     .string()
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*__[a-z0-9]+$/);
+    .regex(/^[a-z0-9]+(?:_[a-z0-9]+)*__[a-z0-9]+$/);
 
   if (layerIds.length === 0) {
     return freshLayerIdSchema;
@@ -369,15 +474,7 @@ function makeLayerIdSchema(layerIds: string[]) {
 }
 
 /**
- * Construct the schema for a dataset attribute, potentially present in the
- * payload of a diff.
- *
- * Responses from the OpenAI API are validated after the fact — the JSON schema
- * sent to the API is static, so it cannot constrain decoding to the attributes
- * of a particular layer. Build one schema per layer, since an attribute
- * present on one layer does not necessarily exist on another. If the layer
- * exposes no attributes, the schema falls back to the "None" sentinel, which
- * rejects every attribute.
+ * Construct the schema for dataset attributes.
  *
  * @param attributes The attributes available on a single map layer.
  * @returns A Zod schema for the attribute field of a diff targeting that layer.
@@ -400,16 +497,9 @@ function makeAttrsSchema(attributes: string[]) {
 }
 
 /**
- * Construct the schema for a source layer ID, present in the payload of the
- * "source-layer" diff.
+ * Construct the schema for source layer ids.
  *
- * Responses from the OpenAI API are validated after the fact. Build one schema
- * per layer, since the source layers of one vector layer are unrelated to
- * those of another. A layer not backed by a vector source exposes no source
- * layer IDs, so its schema falls back to the "None" sentinel, which rejects
- * every "source-layer" diff targeting it.
- *
- * @param ids The source layer IDs available on a single map layer.
+ * @param ids The source layer ids available on a single map layer.
  * @returns A Zod schema for the sourceSourceLayerId or targetSourceLayerId
  * field of a "source-layer" diff targeting that layer.
  */
@@ -724,9 +814,38 @@ const LayerTooltipVisibilityDiff = z.object({
   payload: z.object({ visible: z.boolean() })
 });
 
+const BufferTransformation = z.object({
+  type: z.literal('Buffer'),
+  args: z.object({
+    distance: z.number().min(0)
+  })
+});
+
+const CentroidTransformation = z.object({
+  type: z.literal('Centroid'),
+  args: z.object({})
+});
+
+const EnvelopeTransformation = z.object({
+  type: z.literal('Envelope'),
+  args: z.object({})
+});
+
+const Transformation = z.union([
+  BufferTransformation,
+  CentroidTransformation,
+  EnvelopeTransformation
+]);
+
 const APILocation = z.object({
   type: z.literal('api'),
   url: z.string()
+});
+
+const TableLocation = z.object({
+  type: z.literal('table'),
+  parentLayerId: z.string(),
+  transformation: Transformation
 });
 
 const GeoJSONLayerPayload = z.object({
@@ -747,13 +866,20 @@ const PMTilesLayerPayload = z.object({
   location: APILocation
 });
 
+const TableLayerPayload = z.object({
+  type: z.literal('table'),
+  displayName: z.string(),
+  location: TableLocation
+});
+
 const AddLayerDiff = z.object({
   type: z.literal('add-layer'),
   layerId: z.string(),
   payload: z.union([
     GeoJSONLayerPayload,
     GeoParquetLayerPayload,
-    PMTilesLayerPayload
+    PMTilesLayerPayload,
+    TableLayerPayload
   ])
 });
 
@@ -769,6 +895,14 @@ const RenameLayerDiff = z.object({
   type: z.literal('rename-layer'),
   layerId: z.string(),
   payload: z.object({ displayName: z.string() })
+});
+
+const UpdateBufferDistanceDiff = z.object({
+  type: z.literal('update-buffer-distance'),
+  layerId: z.string(),
+  payload: z.object({
+    distance: z.number().min(0)
+  })
 });
 
 const Basemap = z.union(
@@ -868,6 +1002,7 @@ const DiffSchema = z.object({
       AddLayerDiff,
       RemoveLayerDiff,
       RenameLayerDiff,
+      UpdateBufferDistanceDiff,
       BasemapDiff,
       ZoomDiff,
       CenterDiff,
