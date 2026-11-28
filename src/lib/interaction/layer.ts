@@ -227,22 +227,6 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
       break;
     }
     case 'Heatmap': {
-      // Add a transparent layer to the map for the points.
-      // This is the layer we'll instrument for hover and select effects.
-      map.addLayer(
-        {
-          id: instrumentedLayerId,
-          source: layer.id,
-          'source-layer': sourceLayer,
-          type: 'circle',
-          paint: {
-            'circle-color': 'transparent',
-            'circle-opacity': 0
-          }
-        },
-        beforeId
-      );
-
       // Add the heatmap layer to the map.
       map.addLayer(
         {
@@ -254,6 +238,22 @@ export function addLayer(map: Map, layer: CartoKitLayer): void {
             'heatmap-color': deriveColorRamp(layer.style.heatmap),
             'heatmap-opacity': layer.style.heatmap.opacity,
             'heatmap-radius': layer.style.heatmap.radius
+          }
+        },
+        beforeId
+      );
+
+      // Add a transparent layer to the map for the points.
+      // This is the layer we'll instrument for hover and select effects.
+      map.addLayer(
+        {
+          id: instrumentedLayerId,
+          source: layer.id,
+          'source-layer': sourceLayer,
+          type: 'circle',
+          paint: {
+            'circle-color': 'transparent',
+            'circle-opacity': 0
           }
         },
         beforeId

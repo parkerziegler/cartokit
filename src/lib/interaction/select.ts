@@ -124,7 +124,11 @@ export function instrumentPolygonSelect(
  * @param sourceLayerId The id of the source layer to instrument. This is only
  * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
  */
-function addSelectListeners(map: Map, lyrId: string, sourceLayerId?: string) {
+function addSelectListeners(
+  map: Map,
+  lyrId: string,
+  sourceLayerId?: string
+): void {
   let featureId: string | number | undefined;
   const sourceId = getSourceId(map, lyrId);
 
