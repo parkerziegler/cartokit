@@ -1,207 +1,18 @@
 import type { Map, MapLayerMouseEvent, MapMouseEvent } from 'maplibre-gl';
 import { get } from 'svelte/store';
 
+import { contextMenu } from '#lib/state/context-menu.svelte.ts';
 import { feature } from '#lib/state/feature.svelte.ts';
 import { layerId } from '#lib/state/layerId.svelte.ts';
-import { listeners, type LayerListeners } from '#lib/state/listeners.svelte.ts';
-import { popup } from '#lib/state/popup.svelte.ts';
-import { ir } from '#lib/stores/ir.ts';
+import { listeners } from '#lib/state/listeners.svelte.ts';
 import { layout } from '#lib/stores/layout.ts';
 import type { CartoKitLayer } from '#lib/types/index.ts';
-import { getCanonicalLayerId, getSourceId } from '#lib/utils/layer/id.ts';
-import { contextMenu } from '#lib/state/context-menu.svelte.ts';
-
-/**
- * Add a hover effect to all features in a point layer.
- *
- * @param map The top-level {@link Map} instance.
- * @param layerId The id of the layer to instrument.
- * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
- */
-export function instrumentPointHover(
-  map: Map,
-  layerId: string,
-  sourceLayerId?: string
-): void {
-  const currentStrokeWidth = map.getPaintProperty(
-    layerId,
-    'circle-stroke-width'
-  );
-  const currentStrokeColor = map.getPaintProperty(
-    layerId,
-    'circle-stroke-color'
-  );
-
-  map.setPaintProperty(layerId, 'circle-stroke-width', [
-    'case',
-    ['boolean', ['feature-state', 'hover'], false],
-    ['number', 1],
-    ['number', currentStrokeWidth ?? 0]
-  ]);
-  map.setPaintProperty(layerId, 'circle-stroke-color', [
-    'case',
-    ['boolean', ['feature-state', 'hover'], false],
-    ['string', '#FFFFFF'],
-    ['string', currentStrokeColor ?? 'transparent']
-  ]);
-
-  addHoverListeners(map, layerId, sourceLayerId);
-}
-
-/**
- * Add a hover effect to all features in a line layer.
- *
- * @param map The top-level {@link Map} instance.
- * @param layerId The id of the layer to instrument.
- * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
- */
-export function instrumentLineHover(
-  map: Map,
-  layerId: string,
-  sourceLayerId?: string
-): void {
-  const currentStrokeWidth = map.getPaintProperty(layerId, 'line-width');
-  const currentStrokeColor = map.getPaintProperty(layerId, 'line-color');
-
-  map.setPaintProperty(layerId, 'line-width', [
-    'case',
-    ['boolean', ['feature-state', 'hover'], false],
-    ['number', 1],
-    ['number', currentStrokeWidth ?? 0]
-  ]);
-  map.setPaintProperty(layerId, 'line-color', [
-    'case',
-    ['boolean', ['feature-state', 'hover'], false],
-    ['string', '#FFFFFF'],
-    ['string', currentStrokeColor ?? 'transparent']
-  ]);
-
-  addHoverListeners(map, layerId, sourceLayerId);
-}
-
-/**
- * Add a hover effect to all features in a polygon layer.
- *
- * @param map The top-level {@link Map} instance.
- * @param layerId The id of the layer to instrument.
- * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
- */
-export function instrumentPolygonHover(
-  map: Map,
-  layerId: string,
-  sourceLayerId?: string
-): void {
-  map.addLayer({
-    id: `${layerId}-hover`,
-    type: 'line',
-    source: getSourceId(map, layerId),
-    'source-layer': sourceLayerId,
-    paint: {
-      'line-color': '#FFFFFF',
-      'line-width': [
-        'case',
-        ['boolean', ['feature-state', 'hover'], false],
-        1,
-        0
-      ]
-    }
-  });
-
-  addHoverListeners(map, layerId, sourceLayerId);
-}
-
-/**
- * Wire up event listeners for hover effects.
- *
- * @param map The top-level {@link Map} instance.
- * @param layerId The id of the layer to add event listeners to.
- * @param sourceLayerId The id of the source layer to instrument. This is only
- * necessary for {@link CartoKitLayer}s with {@link CartoKitPMTilesSource}s.
- */
-function addHoverListeners(
-  map: Map,
-  layerId: string,
-  sourceLayerId?: string
-): void {
-  let hoveredFeatureId: string | null = null;
-  const canonicalLayerId = getCanonicalLayerId(layerId);
-  const sourceId = getSourceId(map, layerId);
-
-  function onMouseMove(event: MapLayerMouseEvent): void {
-    if (event.features && event.features.length > 0) {
-      if (hoveredFeatureId !== null) {
-        map.setFeatureState(
-          {
-            source: sourceId,
-            id: hoveredFeatureId,
-            sourceLayer: sourceLayerId
-          },
-          { hover: false }
-        );
-      }
-
-      hoveredFeatureId = event.features[0].id?.toString() ?? null;
-
-      if (hoveredFeatureId) {
-        map.setFeatureState(
-          {
-            source: sourceId,
-            id: hoveredFeatureId,
-            sourceLayer: sourceLayerId
-          },
-          { hover: true }
-        );
-        map.getCanvas().style.cursor = 'pointer';
-      }
-
-      const currentIR = get(ir);
-
-      if (currentIR.layers[canonicalLayerId].layout.tooltip.visible) {
-        popup[canonicalLayerId] = {
-          open: true,
-          displayName: currentIR.layers[canonicalLayerId].displayName,
-          properties: event.features[0].properties
-        };
-      }
-    }
-  }
-
-  function onMouseLeave(): void {
-    if (hoveredFeatureId !== null) {
-      map.setFeatureState(
-        {
-          source: sourceId,
-          id: hoveredFeatureId,
-          sourceLayer: sourceLayerId
-        },
-        { hover: false }
-      );
-      map.getCanvas().style.cursor = '';
-    }
-
-    popup[canonicalLayerId] = {
-      open: false,
-      displayName: '',
-      properties: {}
-    };
-
-    hoveredFeatureId = null;
-  }
-
-  map.on('mousemove', layerId, onMouseMove);
-  map.on('mouseleave', layerId, onMouseLeave);
-
-  const layerListeners = listeners.value.get(layerId)!;
-
-  listeners.value.set(layerId, {
-    ...layerListeners,
-    mousemove: onMouseMove,
-    mouseleave: onMouseLeave
-  });
-}
+import { DEFAULT_SELECTION_COLOR } from '#lib/utils/constants.ts';
+import {
+  getCanonicalLayerId,
+  getInstrumentedLayerId,
+  getSourceId
+} from '#lib/utils/layer.ts';
 
 /**
  * Add a selection indicator to a feature in a point layer.
@@ -234,7 +45,7 @@ export function instrumentPointSelect(
   map.setPaintProperty(layerId, 'circle-stroke-color', [
     'case',
     ['boolean', ['feature-state', 'selected'], false],
-    ['string', '#A534FF'],
+    ['string', DEFAULT_SELECTION_COLOR],
     ['string', currentStrokeColor ?? 'transparent']
   ]);
 
@@ -266,7 +77,7 @@ export function instrumentLineSelect(
   map.setPaintProperty(layerId, 'line-color', [
     'case',
     ['boolean', ['feature-state', 'selected'], false],
-    ['string', '#A534FF'],
+    ['string', DEFAULT_SELECTION_COLOR],
     ['string', currentStrokeColor ?? 'transparent']
   ]);
 
@@ -292,7 +103,7 @@ export function instrumentPolygonSelect(
     source: getSourceId(map, layerId),
     'source-layer': sourceLayerId,
     paint: {
-      'line-color': '#A534FF',
+      'line-color': DEFAULT_SELECTION_COLOR,
       'line-width': [
         'case',
         ['boolean', ['feature-state', 'selected'], false],
@@ -336,7 +147,7 @@ function addSelectListeners(
 
       const { id, type, properties, geometry } = event.features[0];
 
-      if (id) {
+      if (id !== undefined) {
         map.setFeatureState(
           {
             source: sourceId,
@@ -391,17 +202,11 @@ export function onFeatureLeave(
   layers: Record<string, CartoKitLayer>
 ): (event: MapMouseEvent) => void {
   return (event: MapMouseEvent): void => {
-    const layerIds = Object.values(layers).map((layer) => {
-      // For heatmap layers, we need to deselect the points layer.
-      if (layer.type === 'Heatmap') {
-        return `${layer.id}-points`;
-      }
-
-      return layer.id;
-    });
-
+    const instrumentedLayerIds = Object.values(layers).map((layer) =>
+      getInstrumentedLayerId(layer.id, layer.type)
+    );
     const features = map.queryRenderedFeatures(event.point, {
-      layers: layerIds
+      layers: instrumentedLayerIds
     });
 
     // If the mouse event intersects no features and there is a currently selected feature...
@@ -449,26 +254,4 @@ export function onFeatureLeave(
     // Remove the context menu in all instances.
     contextMenu.layerId = '';
   };
-}
-
-/**
- * Detach the event listeners registered for a set of layers.
- *
- * @param map The top-level {@link Map} instance.
- * @param layerIds The ids of the layers to detach listeners from.
- */
-export function removeLayerListeners(map: Map, layerIds: string[]): void {
-  layerIds.forEach((layerId) => {
-    const layerListeners = listeners.value.get(layerId);
-
-    if (!layerListeners) {
-      return;
-    }
-
-    Object.entries(layerListeners).forEach(([event, listener]) => {
-      map.off(event as keyof LayerListeners, layerId, listener);
-    });
-
-    listeners.value.delete(layerId);
-  });
 }

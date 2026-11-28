@@ -3,14 +3,15 @@
   import * as pmtiles from 'pmtiles';
   import { onMount } from 'svelte';
 
+  import { page } from '$app/state';
   import type { PageData } from './$types';
 
-  import { page } from '$app/state';
   import Editor from '#lib/components/editor/Editor.svelte';
   import AlertIcon from '#lib/components/icons/AlertIcon.svelte';
   import AddLayer from '#lib/components/layers/AddLayer.svelte';
   import LayerPanel from '#lib/components/layers/LayerPanel.svelte';
   import ContextMenu from '#lib/components/mouse/ContextMenu.svelte';
+  import ControlPoints from '#lib/components/mouse/ControlPoints.svelte';
   import Cursor from '#lib/components/mouse/Cursor.svelte';
   import PropertiesMenu from '#lib/components/properties/PropertiesMenu.svelte';
   import Alert from '#lib/components/shared/Alert.svelte';
@@ -19,7 +20,7 @@
   import MenuTitle from '#lib/components/shared/MenuTitle.svelte';
   import Popup from '#lib/components/shared/Popup.svelte';
   import Toolbar from '#lib/components/toolbar/Toolbar.svelte';
-  import { onFeatureLeave } from '#lib/interaction/events.ts';
+  import { onFeatureLeave } from '#lib/interaction/select.ts';
   import { chat } from '#lib/state/chat.svelte.ts';
   import { contextMenu } from '#lib/state/context-menu.svelte.ts';
   import { db } from '#lib/state/db.svelte.ts';
@@ -261,6 +262,7 @@
     </div>
   {/if}
   <Cursor />
+  <ControlPoints />
   <Popup />
   <ContextMenu />
 </main>

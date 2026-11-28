@@ -8,6 +8,7 @@ import { reconLayerTypeDiffs } from '#lib/core/recon/layer-type/index.ts';
 import { reconMapDiffs } from '#lib/core/recon/map/index.ts';
 import { reconSizeDiffs } from '#lib/core/recon/size/index.ts';
 import { reconStrokeDiffs } from '#lib/core/recon/stroke/index.ts';
+import { reconTransformationDiffs } from '#lib/core/recon/transformation/index.ts';
 import type { CartoKitIR } from '#lib/types/index.ts';
 
 export interface ReconFnParams {
@@ -34,7 +35,8 @@ export async function recon(
     reconLayerTypeDiffs,
     reconMapDiffs,
     reconSizeDiffs,
-    reconStrokeDiffs
+    reconStrokeDiffs,
+    reconTransformationDiffs
   );
 
   await reconciler(Promise.resolve({ diff, targetIR }));

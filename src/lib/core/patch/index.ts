@@ -8,6 +8,7 @@ import { patchLayerTypeDiffs } from '#lib/core/patch/layer-type/index.ts';
 import { patchMapDiffs } from '#lib/core/patch/map/index.ts';
 import { patchSizeDiffs } from '#lib/core/patch/size/index.ts';
 import { patchStrokeDiffs } from '#lib/core/patch/stroke/index.ts';
+import { patchTransformationDiffs } from '#lib/core/patch/transformation/index.ts';
 
 import type { CartoKitIR } from '#lib/types/index.ts';
 
@@ -38,7 +39,8 @@ export async function patch(
     patchLayerTypeDiffs,
     patchMapDiffs,
     patchStrokeDiffs,
-    patchSizeDiffs
+    patchSizeDiffs,
+    patchTransformationDiffs
   );
 
   const { inverseDiff } = await patcher(

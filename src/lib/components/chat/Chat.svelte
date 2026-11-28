@@ -121,7 +121,7 @@
       }).then((response) => response.json());
 
       for (const diff of data.diffs) {
-        if (diff.type === 'unknown') {
+        if (diff.type === 'unknown' || diff.errored) {
           continue;
         } else {
           try {

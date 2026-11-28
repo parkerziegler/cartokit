@@ -17,6 +17,7 @@ import type {
 import type { CartoKitSource, CartoKitTableSource } from '#lib/types/source.ts';
 import type { Transformation } from '#lib/types/transformation.ts';
 import { inferCRS } from '#lib/utils/crs.ts';
+import { padBoundsForTransformation } from '#lib/utils/transformation.ts';
 
 const DUCKDB_BUNDLES = getJsDelivrBundles();
 
@@ -73,7 +74,10 @@ ${inferCRS()}`);
  * @param source The data source, either a
  * @returns A SQL CREATE TABLE statement.
  */
-export function generateCreateTableStatement(layerId: string, source: string) {
+export function generateCreateTableStatement(
+  layerId: string,
+  source: string
+): string {
   const reader = /\.(geo)?parquet$/.test(source) ? `read_parquet` : `ST_Read`;
 
   const query = `
@@ -81,7 +85,7 @@ export function generateCreateTableStatement(layerId: string, source: string) {
   SELECT * FROM ${reader}('${source}');
   `;
 
-  return formatSQL(query);
+  return query;
 }
 
 /**
@@ -97,14 +101,14 @@ export function generateCreateDerivedTableStatement(
   layerId: string,
   { parentLayerId, transformation }: CartoKitTableSource['location'],
   geometryColumn: string
-) {
+): string {
   const query = `
   CREATE TABLE ${layerId} AS
   SELECT * REPLACE (${generateTransformationExpression(transformation, geometryColumn)} AS ${quoteIdentifier(geometryColumn)})
   FROM ${parentLayerId};
   `;
 
-  return formatSQL(query);
+  return query;
 }
 
 /**
@@ -176,20 +180,37 @@ export function generateTransformationExpression(
       break;
   }
 
-  return formatSQL(query);
+  return query;
+}
+
+/** The column alias carrying each feature's stable id for GeoJSON reads. */
+export const FEATURE_ID_COLUMN = '__cartokit_id';
+
+interface GenerateSelectStatementParams {
+  layerId: string;
+  table: DuckDBTable;
+  geometryExpression: string;
+  includeFeatureId?: boolean;
 }
 
 /**
- * Generate a SQL SELECT query to query all data from a table.
+ * Generate the SELECT statement for reading a table's rows as GeoJSON.
  *
- * @param layerId The id of the table to query.
- * @param table The {@link DuckDBTable} to query.
+ * @param params The {@link GenerateSelectStatementParams}.
+ * @param params.layerId The id of the layer being queried.
+ * @param params.table The {@link DuckDBTable} being queried.
+ * @param params.geometryExpression A SQL expression evaluating to each row's
+ * geometry.
+ * @param params.includeFeatureId Whether to select each row's rowid as its
+ * feature id, aliased as {@link FEATURE_ID_COLUMN}. Defaults to false.
  * @returns A SQL SELECT statement.
  */
-export function generateSelectStatement(
-  layerId: string,
-  { columns, geometryColumn }: DuckDBTable
-) {
+export function generateSelectStatement({
+  layerId,
+  table: { columns, geometryColumn },
+  geometryExpression,
+  includeFeatureId = false
+}: GenerateSelectStatementParams): string {
   const nestedColumns = columns.flatMap(({ column_type, column_name }) => {
     if (
       /^(STRUCT|MAP|UNION)\(/.test(column_type) ||
@@ -200,21 +221,66 @@ export function generateSelectStatement(
 
     return [];
   });
-  const excludeClause = `EXCLUDE (${[geometryColumn, ...nestedColumns].map(quoteIdentifier).join(', ')})`;
-  const selectClause = nestedColumns
-    .map(
+  const excludedColumns = [geometryColumn, ...nestedColumns]
+    .map(quoteIdentifier)
+    .join(', ');
+  const serializedColumns = [
+    ...nestedColumns.map(
       (column_name) =>
         `to_json(${quoteIdentifier(column_name)}) AS ${quoteIdentifier(column_name)}`
-    )
-    .concat(`ST_AsGeoJSON(${quoteIdentifier(geometryColumn)}) AS geom`)
-    .join(', ');
+    ),
+    `ST_AsGeoJSON(${geometryExpression}) AS geom`,
+    ...(includeFeatureId
+      ? [`rowid::INTEGER AS ${quoteIdentifier(FEATURE_ID_COLUMN)}`]
+      : [])
+  ].join(', ');
 
-  const query = `
-  SELECT * ${excludeClause}, ${selectClause}
-  FROM ${layerId};
-  `;
+  return `SELECT * EXCLUDE(${excludedColumns}), ${serializedColumns} FROM ${layerId}`;
+}
 
-  return formatSQL(query);
+interface GenerateViewportTransformationQueryParams {
+  parentLayerId: string;
+  transformation: Transformation;
+  table: DuckDBTable;
+  bounds: [number, number, number, number];
+}
+
+/**
+ * Generate a query that applies a {@link Transformation} to the features of a
+ * parent table intersecting the viewport, selected as GeoJSON.
+ *
+ * @param params The {@link GenerateViewportTransformationQueryParams}.
+ * @param params.parentLayerId The id of the parent layer to transform.
+ * @param params.transformation The {@link Transformation} to apply.
+ * @param params.table The parent layer's {@link DuckDBTable}.
+ * @param params.bounds The viewport bounds, as [west, south, east, north].
+ * @returns A SQL SELECT statement.
+ */
+export function generateViewportTransformationQuery({
+  parentLayerId,
+  transformation,
+  table,
+  bounds
+}: GenerateViewportTransformationQueryParams): string {
+  const [west, south, east, north] = padBoundsForTransformation(
+    transformation,
+    bounds
+  );
+
+  return `
+  ${generateSelectStatement({
+    layerId: parentLayerId,
+    table,
+    geometryExpression: generateTransformationExpression(
+      transformation,
+      table.geometryColumn
+    ),
+    includeFeatureId: true
+  })}
+  WHERE ST_Intersects(
+    ${quoteIdentifier(table.geometryColumn)},
+    ST_MakeEnvelope(${west}, ${south}, ${east}, ${north})
+  );`;
 }
 
 /**
@@ -409,7 +475,12 @@ export async function readTableAsGeoJSON(
   layerId: string,
   table: DuckDBTable
 ): Promise<FeatureCollection> {
-  const query = generateSelectStatement(layerId, table);
+  const query = generateSelectStatement({
+    layerId,
+    table,
+    geometryExpression: quoteIdentifier(table.geometryColumn),
+    includeFeatureId: true
+  });
 
   return toFeatureCollection(await conn.query(query));
 }
@@ -428,10 +499,11 @@ export function toFeatureCollection(
   const features = results
     .toArray()
     .map((row: { toJSON: () => { geom: string; [key: string]: unknown } }) => {
-      const { geom, ...properties } = row.toJSON();
+      const { geom, [FEATURE_ID_COLUMN]: id, ...properties } = row.toJSON();
 
       return {
         type: 'Feature',
+        ...(id !== undefined && { id: id as number }),
         properties,
         geometry: JSON.parse(geom)
       } as Feature;
@@ -441,4 +513,65 @@ export function toFeatureCollection(
     type: 'FeatureCollection',
     features
   };
+}
+
+let previewController = new AbortController();
+let previewQueue: Promise<unknown> = Promise.resolve();
+
+/**
+ * Run a preview query (e.g., speculation, drag previews) and read its results
+ * as GeoJSON. Only the latest preview's results are returned; superseded
+ * previews resolve to null.
+ *
+ * @param conn The active {@link AsyncDuckDBConnection}.
+ * @param query The preview SQL query to run.
+ * @returns The query results as a {@link FeatureCollection}, or null if the
+ * preview was superseded or invalidated.
+ */
+export function runPreviewQuery(
+  conn: AsyncDuckDBConnection,
+  query: string
+): Promise<FeatureCollection | null> {
+  previewController.abort();
+  previewController = new AbortController();
+  const { signal } = previewController;
+  void conn.cancelSent();
+
+  const preview = previewQueue
+    .then(async () => {
+      if (signal.aborted) {
+        return null;
+      }
+
+      const batches = await (await conn.send(query)).readAll();
+
+      return signal.aborted
+        ? null
+        : ({
+            type: 'FeatureCollection',
+            features: batches.flatMap(
+              (batch) => toFeatureCollection(batch).features
+            )
+          } satisfies FeatureCollection);
+    })
+    .catch(() => null);
+
+  previewQueue = preview;
+
+  return preview;
+}
+
+/**
+ * Invalidate all in-flight preview queries, so their results are discarded,
+ * and wait for the queue of previews to settle.
+ *
+ * @param conn The active {@link AsyncDuckDBConnection}.
+ */
+export async function invalidatePreviewQueries(
+  conn: AsyncDuckDBConnection
+): Promise<void> {
+  previewController.abort();
+  void conn.cancelSent();
+
+  await previewQueue;
 }
